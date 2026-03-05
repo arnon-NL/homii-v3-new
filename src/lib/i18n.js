@@ -13,7 +13,7 @@ const dict = {
 
   // Navigation — objects section
   objects:       { en: "Objects",       nl: "Objecten" },
-  buildings:     { en: "Buildings",     nl: "Gebouwen" },
+  buildings:     { en: "Complexes",     nl: "Complexen" },
   services:      { en: "Services",     nl: "Diensten" },
   suppliers:     { en: "Suppliers",    nl: "Leveranciers" },
   meters:        { en: "Meters",        nl: "Meters" },
@@ -41,7 +41,7 @@ const dict = {
   complexId:       { en: "Complex ID",       nl: "Complex ID" },
   location:        { en: "Location",         nl: "Locatie" },
   vhe:             { en: "VHE",              nl: "VHE" },
-  components:      { en: "Components",       nl: "Componenten" },
+  components:      { en: "Services",         nl: "Diensten" },
   utilities:       { en: "Utilities",        nl: "Nutsvoorzieningen" },
   budgetProgress:  { en: "Budget",           nl: "Budget" },
   dataQuality:     { en: "Data Quality",     nl: "Datakwaliteit" },
@@ -53,7 +53,7 @@ const dict = {
   tasksTitle:    { en: "Tasks",         nl: "Taken" },
   workflowsTitle:    { en: "Workflows",     nl: "Workflows" },
   onboardingTitle:   { en: "Onboarding",    nl: "Onboarding" },
-  buildingsTitle:    { en: "Buildings",     nl: "Gebouwen" },
+  buildingsTitle:    { en: "Complexes",     nl: "Complexen" },
   metersTitle:       { en: "Meters",        nl: "Meters" },
   servicesTitle:     { en: "Services",     nl: "Diensten" },
   suppliersTitle:    { en: "Suppliers",    nl: "Leveranciers" },
@@ -65,7 +65,7 @@ const dict = {
   regulation:        { en: "Regulation",   nl: "Regelgeving" },
   metered:           { en: "Metered",      nl: "Gemeten" },
   variable:          { en: "Variable",     nl: "Variabel" },
-  buildingCount:     { en: "Buildings",    nl: "Gebouwen" },
+  buildingCount:     { en: "Complexes",    nl: "Complexen" },
   avgCostVhe:        { en: "Avg / VHE",    nl: "Gem. / VHE" },
 
   // Service categories

@@ -122,10 +122,13 @@ function NetResult({ value, lang }) {
 }
 
 /* ── Year picker ── */
+const currentYear = new Date().getFullYear();
+const availableYears = [currentYear - 2, currentYear - 1, currentYear];
+
 function YearPicker({ year, setYear }) {
   return (
     <div className="inline-flex items-center rounded-lg bg-slate-100 p-0.5">
-      {[2024, 2025].map((y) => (
+      {availableYears.map((y) => (
         <button
           key={y}
           onClick={() => setYear(y)}
@@ -165,7 +168,7 @@ export default function BuildingListPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [qualityFilter, setQualityFilter] = useState("all");
-  const [year, setYear] = useState(2025);
+  const [year, setYear] = useState(currentYear);
   const [settlementFilter, setSettlementFilter] = useState("all");
 
   const isPastYear = year < new Date().getFullYear();
@@ -421,7 +424,7 @@ export default function BuildingListPage() {
                     </span>
                   </td>
 
-                  {/* Components */}
+                  {/* Services */}
                   <td className="px-3 sm:px-4 py-3 text-right">
                     <span className="text-[13px] tabular-nums text-slate-600">
                       {b.components}
