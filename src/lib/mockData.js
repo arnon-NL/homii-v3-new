@@ -459,7 +459,102 @@ export const services = [
   },
 ];
 
-// Getter functions
+// ── Distribution Methods (verdeelsleutels) ──
+// Standardized methods for cost allocation per Servicekosten Besluit
+
+export const distributionMethods = [
+  { id: "DM-EQ",   code: "equal",       name: { en: "Equal per VHE",           nl: "Gelijk per VHE" } },
+  { id: "DM-M2",   code: "m2",          name: { en: "Based on m² floor area",  nl: "Op basis van m² vloeroppervlak" } },
+  { id: "DM-MTR",  code: "metered",     name: { en: "Metered consumption",     nl: "Op basis van meterverbruik" } },
+  { id: "DM-PRS",  code: "persons",     name: { en: "Number of persons",       nl: "Aantal personen" } },
+  { id: "DM-PRO",  code: "proportional", name: { en: "Proportional to voorschot", nl: "Naar rato van voorschot" } },
+];
+
+// ── Building-Service relationships ──
+// Junction entity: each row links a building to a service for a given book year
+// with its own distribution method, budget, actuals, and completeness status
+
+export const buildingServices = [
+  // Kloostergang (BLD-007) — 6 services
+  { id: "BS-007-201", buildingId: "BLD-007", serviceId: "SVC-201", year: 2025, distributionMethod: "metered",  budget: 18700,  actual: 4675,  ledgerEntries: 12, expectedEntries: 12, completeness: 100, status: "complete" },
+  { id: "BS-007-204", buildingId: "BLD-007", serviceId: "SVC-204", year: 2025, distributionMethod: "equal",    budget: 6600,   actual: 1650,  ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
+  { id: "BS-007-214", buildingId: "BLD-007", serviceId: "SVC-214", year: 2025, distributionMethod: "m2",       budget: 5280,   actual: 1320,  ledgerEntries: 3,  expectedEntries: 4,  completeness: 75,  status: "incomplete" },
+  { id: "BS-007-202", buildingId: "BLD-007", serviceId: "SVC-202", year: 2025, distributionMethod: "metered",  budget: 3960,   actual: 990,   ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
+  { id: "BS-007-217", buildingId: "BLD-007", serviceId: "SVC-217", year: 2025, distributionMethod: "equal",    budget: 3520,   actual: 880,   ledgerEntries: 2,  expectedEntries: 4,  completeness: 50,  status: "incomplete" },
+  { id: "BS-007-218", buildingId: "BLD-007", serviceId: "SVC-218", year: 2025, distributionMethod: "equal",    budget: 4400,   actual: 1100,  ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
+
+  // De Bolwerken (BLD-002 placeholder) — 4 services
+  { id: "BS-002-204", buildingId: "BLD-002", serviceId: "SVC-204", year: 2025, distributionMethod: "equal",    budget: 12900,  actual: 3225,  ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
+  { id: "BS-002-214", buildingId: "BLD-002", serviceId: "SVC-214", year: 2025, distributionMethod: "m2",       budget: 10320,  actual: 2580,  ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
+  { id: "BS-002-217", buildingId: "BLD-002", serviceId: "SVC-217", year: 2025, distributionMethod: "equal",    budget: 6880,   actual: 1720,  ledgerEntries: 3,  expectedEntries: 4,  completeness: 75,  status: "incomplete" },
+  { id: "BS-002-218", buildingId: "BLD-002", serviceId: "SVC-218", year: 2025, distributionMethod: "equal",    budget: 8600,   actual: 2150,  ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
+
+  // De Lindeborg (BLD-004) — 7 services
+  { id: "BS-004-201", buildingId: "BLD-004", serviceId: "SVC-201", year: 2025, distributionMethod: "metered",  budget: 57600,  actual: 14400, ledgerEntries: 12, expectedEntries: 12, completeness: 100, status: "complete" },
+  { id: "BS-004-204", buildingId: "BLD-004", serviceId: "SVC-204", year: 2025, distributionMethod: "equal",    budget: 18720,  actual: 4680,  ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
+  { id: "BS-004-202", buildingId: "BLD-004", serviceId: "SVC-202", year: 2025, distributionMethod: "metered",  budget: 12960,  actual: 3240,  ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
+  { id: "BS-004-212", buildingId: "BLD-004", serviceId: "SVC-212", year: 2025, distributionMethod: "m2",       budget: 8640,   actual: 2160,  ledgerEntries: 2,  expectedEntries: 4,  completeness: 50,  status: "incomplete" },
+  { id: "BS-004-214", buildingId: "BLD-004", serviceId: "SVC-214", year: 2025, distributionMethod: "m2",       budget: 15840,  actual: 3960,  ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
+  { id: "BS-004-216", buildingId: "BLD-004", serviceId: "SVC-216", year: 2025, distributionMethod: "equal",    budget: 34560,  actual: 8640,  ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
+  { id: "BS-004-218", buildingId: "BLD-004", serviceId: "SVC-218", year: 2025, distributionMethod: "equal",    budget: 14400,  actual: 3600,  ledgerEntries: 3,  expectedEntries: 4,  completeness: 75,  status: "incomplete" },
+];
+
+// ── VHE (Verhuurbare Eenheden / Rental Units) ──
+
+export const vhes = [
+  // Kloostergang (BLD-007) — 44 VHE, showing a representative sample
+  { id: "VHE-007-001", buildingId: "BLD-007", unit: "1A",  address: "Kloostergang 1A, Gorinchem",  floor: 0, m2: 62, contractHolder: "M. Jansen",     contractStart: "2019-03-01", voorschot: 125, status: "active" },
+  { id: "VHE-007-002", buildingId: "BLD-007", unit: "1B",  address: "Kloostergang 1B, Gorinchem",  floor: 0, m2: 58, contractHolder: "P. de Vries",    contractStart: "2021-07-01", voorschot: 118, status: "active" },
+  { id: "VHE-007-003", buildingId: "BLD-007", unit: "2A",  address: "Kloostergang 2A, Gorinchem",  floor: 1, m2: 65, contractHolder: "A. Bakker",      contractStart: "2018-01-15", voorschot: 132, status: "active" },
+  { id: "VHE-007-004", buildingId: "BLD-007", unit: "2B",  address: "Kloostergang 2B, Gorinchem",  floor: 1, m2: 58, contractHolder: "K. Meijer",      contractStart: "2022-09-01", voorschot: 118, status: "active" },
+  { id: "VHE-007-005", buildingId: "BLD-007", unit: "3A",  address: "Kloostergang 3A, Gorinchem",  floor: 2, m2: 62, contractHolder: "R. Hendriks",    contractStart: "2020-04-01", voorschot: 125, status: "active" },
+  { id: "VHE-007-006", buildingId: "BLD-007", unit: "3B",  address: "Kloostergang 3B, Gorinchem",  floor: 2, m2: 58, contractHolder: null,             contractStart: null,         voorschot: 0,   status: "vacant" },
+  { id: "VHE-007-007", buildingId: "BLD-007", unit: "4A",  address: "Kloostergang 4A, Gorinchem",  floor: 3, m2: 65, contractHolder: "S. van Dam",     contractStart: "2023-01-01", voorschot: 132, status: "active" },
+  { id: "VHE-007-008", buildingId: "BLD-007", unit: "4B",  address: "Kloostergang 4B, Gorinchem",  floor: 3, m2: 58, contractHolder: "T. Visser",      contractStart: "2017-11-01", voorschot: 118, status: "active" },
+
+  // De Lindeborg (BLD-004) — sample
+  { id: "VHE-004-001", buildingId: "BLD-004", unit: "101", address: "Lindeborg 101, Gorinchem",    floor: 0, m2: 72, contractHolder: "L. Smit",        contractStart: "2020-06-01", voorschot: 155, status: "active" },
+  { id: "VHE-004-002", buildingId: "BLD-004", unit: "102", address: "Lindeborg 102, Gorinchem",    floor: 0, m2: 68, contractHolder: "H. van der Berg", contractStart: "2019-02-01", voorschot: 148, status: "active" },
+  { id: "VHE-004-003", buildingId: "BLD-004", unit: "103", address: "Lindeborg 103, Gorinchem",    floor: 0, m2: 72, contractHolder: "G. Dijkstra",    contractStart: "2021-10-01", voorschot: 155, status: "active" },
+  { id: "VHE-004-004", buildingId: "BLD-004", unit: "201", address: "Lindeborg 201, Gorinchem",    floor: 1, m2: 68, contractHolder: "W. Mulder",      contractStart: "2022-04-01", voorschot: 148, status: "active" },
+  { id: "VHE-004-005", buildingId: "BLD-004", unit: "202", address: "Lindeborg 202, Gorinchem",    floor: 1, m2: 72, contractHolder: null,             contractStart: null,         voorschot: 0,   status: "vacant" },
+];
+
+// ── Meters ──
+
+export const meters = [
+  // Kloostergang (BLD-007) main meters
+  { id: "MTR-007-H1",  buildingId: "BLD-007", serviceId: "SVC-201", vheId: null,          type: "main",   utility: "heat",        meterNumber: "HM-20154782", unit: "GJ",  lastReading: 842.5,   readingDate: "2025-02-28", status: "active" },
+  { id: "MTR-007-W1",  buildingId: "BLD-007", serviceId: "SVC-202", vheId: null,          type: "main",   utility: "water",       meterNumber: "WM-30298741", unit: "m³",  lastReading: 1256.3,  readingDate: "2025-02-28", status: "active" },
+  { id: "MTR-007-E1",  buildingId: "BLD-007", serviceId: "SVC-204", vheId: null,          type: "main",   utility: "electricity", meterNumber: "EM-40187623", unit: "kWh", lastReading: 28450,   readingDate: "2025-02-28", status: "active" },
+  // Kloostergang submeters (linked to VHEs)
+  { id: "MTR-007-H1A", buildingId: "BLD-007", serviceId: "SVC-201", vheId: "VHE-007-001", type: "sub",    utility: "heat",        meterNumber: "HS-20154782-1A", unit: "GJ",  lastReading: 18.2,  readingDate: "2025-02-28", status: "active" },
+  { id: "MTR-007-H1B", buildingId: "BLD-007", serviceId: "SVC-201", vheId: "VHE-007-002", type: "sub",    utility: "heat",        meterNumber: "HS-20154782-1B", unit: "GJ",  lastReading: 21.4,  readingDate: "2025-02-28", status: "active" },
+  { id: "MTR-007-H2A", buildingId: "BLD-007", serviceId: "SVC-201", vheId: "VHE-007-003", type: "sub",    utility: "heat",        meterNumber: "HS-20154782-2A", unit: "GJ",  lastReading: 16.8,  readingDate: "2025-02-28", status: "active" },
+  { id: "MTR-007-H2B", buildingId: "BLD-007", serviceId: "SVC-201", vheId: "VHE-007-004", type: "sub",    utility: "heat",        meterNumber: "HS-20154782-2B", unit: "GJ",  lastReading: 22.1,  readingDate: "2025-01-31", status: "active" },
+  { id: "MTR-007-W1A", buildingId: "BLD-007", serviceId: "SVC-202", vheId: "VHE-007-001", type: "sub",    utility: "water",       meterNumber: "WS-30298741-1A", unit: "m³",  lastReading: 28.7,  readingDate: "2025-02-28", status: "active" },
+  { id: "MTR-007-W1B", buildingId: "BLD-007", serviceId: "SVC-202", vheId: "VHE-007-002", type: "sub",    utility: "water",       meterNumber: "WS-30298741-1B", unit: "m³",  lastReading: 32.1,  readingDate: "2025-02-28", status: "active" },
+
+  // De Lindeborg (BLD-004) main meters
+  { id: "MTR-004-H1",  buildingId: "BLD-004", serviceId: "SVC-201", vheId: null,          type: "main",   utility: "heat",        meterNumber: "HM-20198432", unit: "GJ",  lastReading: 2810.6,  readingDate: "2025-02-28", status: "active" },
+  { id: "MTR-004-W1",  buildingId: "BLD-004", serviceId: "SVC-202", vheId: null,          type: "main",   utility: "water",       meterNumber: "WM-30345612", unit: "m³",  lastReading: 4520.8,  readingDate: "2025-02-28", status: "active" },
+  { id: "MTR-004-E1",  buildingId: "BLD-004", serviceId: "SVC-204", vheId: null,          type: "main",   utility: "electricity", meterNumber: "EM-40223198", unit: "kWh", lastReading: 95200,   readingDate: "2025-01-31", status: "warning" },
+];
+
+// ── Activity log ──
+
+export const activities = [
+  { id: "ACT-001", buildingId: "BLD-007", type: "meter_reading",   date: "2025-02-28", description: { en: "Heat meter reading received: 842.5 GJ",            nl: "Warmtemeterstand ontvangen: 842,5 GJ" } },
+  { id: "ACT-002", buildingId: "BLD-007", type: "ledger_entry",    date: "2025-02-15", description: { en: "Ledger entry posted: Cleaning Q1 2025 — €1,320",    nl: "Boekingsregel verwerkt: Schoonmaak Q1 2025 — €1.320" } },
+  { id: "ACT-003", buildingId: "BLD-007", type: "distribution",    date: "2025-01-10", description: { en: "Distribution method updated for Cleaning: m² → equal", nl: "Verdeelsleutel gewijzigd voor Schoonmaak: m² → gelijk" } },
+  { id: "ACT-004", buildingId: "BLD-007", type: "contract_change", date: "2025-01-01", description: { en: "Unit 3B: Contract ended — now vacant",             nl: "Eenheid 3B: Contract beëindigd — nu leegstaand" } },
+  { id: "ACT-005", buildingId: "BLD-007", type: "alert",           date: "2025-02-20", description: { en: "Missing ledger entry: District Management Q4 2024",  nl: "Ontbrekende boeking: Wijkbeheer Q4 2024" } },
+  { id: "ACT-006", buildingId: "BLD-004", type: "meter_reading",   date: "2025-02-28", description: { en: "Heat meter reading received: 2,810.6 GJ",          nl: "Warmtemeterstand ontvangen: 2.810,6 GJ" } },
+  { id: "ACT-007", buildingId: "BLD-004", type: "alert",           date: "2025-02-18", description: { en: "Electricity meter reading overdue (last: Jan 31)",   nl: "Elektrameterstand te laat (laatste: 31 jan)" } },
+];
+
+// ── Getter functions ──
+
 export function getBuilding(id) {
   return buildings.find((b) => b.id === id);
 }
@@ -474,4 +569,24 @@ export function getService(id) {
 
 export function getServiceByCode(code) {
   return services.find((s) => s.code === code);
+}
+
+export function getBuildingServices(buildingId, year = 2025) {
+  return buildingServices.filter((bs) => bs.buildingId === buildingId && bs.year === year);
+}
+
+export function getVhesByBuilding(buildingId) {
+  return vhes.filter((v) => v.buildingId === buildingId);
+}
+
+export function getMetersByBuilding(buildingId) {
+  return meters.filter((m) => m.buildingId === buildingId);
+}
+
+export function getActivitiesByBuilding(buildingId) {
+  return activities.filter((a) => a.buildingId === buildingId).sort((a, b) => b.date.localeCompare(a.date));
+}
+
+export function getDistributionMethod(code) {
+  return distributionMethods.find((dm) => dm.code === code);
 }

@@ -7,6 +7,7 @@ import {
   GitBranch,
   UserPlus,
   Building2,
+  DoorOpen,
   Gauge,
   Wrench,
   Truck,
@@ -55,6 +56,7 @@ export default function Sidebar({ lang, setLang }) {
 
   const objectItems = [
     { label: t("buildings", lang), icon: Building2, path: "/buildings" },
+    { label: t("vheTitle", lang), icon: DoorOpen, path: "/vhe" },
     { label: t("services", lang), icon: Wrench, path: "/services" },
     { label: t("suppliers", lang), icon: Truck, path: "/suppliers" },
     { label: t("meters", lang), icon: Gauge, path: "/meters" },

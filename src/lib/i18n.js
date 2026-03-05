@@ -78,6 +78,31 @@ const dict = {
   // Boolean labels
   yes:               { en: "Yes",          nl: "Ja" },
   no:                { en: "No",           nl: "Nee" },
+
+  // Building detail page
+  actual:            { en: "Actual",              nl: "Werkelijk" },
+  variance:          { en: "Variance",            nl: "Afwijking" },
+  underBudget:       { en: "Under budget",        nl: "Onder budget" },
+  overBudget:        { en: "Over budget",         nl: "Over budget" },
+  settlementReadiness: { en: "Settlement",        nl: "Afrekening" },
+  activeServices:    { en: "Services",            nl: "Diensten" },
+  mainMeters:        { en: "Main Meters",         nl: "Hoofdmeters" },
+  subMeters:         { en: "Sub Meters",          nl: "Submeters" },
+  costBreakdown:     { en: "Cost Breakdown",      nl: "Kostenverdeling" },
+  completeness:      { en: "Completeness",        nl: "Volledigheid" },
+  distributionMethod: { en: "Distribution",       nl: "Verdeelsleutel" },
+  lastReading:       { en: "Last reading",        nl: "Laatste stand" },
+  meterNumber:       { en: "Meter No.",           nl: "Meternr." },
+  activity:          { en: "Activity",            nl: "Activiteit" },
+  vacant:            { en: "Vacant",              nl: "Leegstaand" },
+  unit:              { en: "Unit",                nl: "Eenheid" },
+  floor:             { en: "Floor",               nl: "Verdieping" },
+  m2:                { en: "m²",                  nl: "m²" },
+  contractHolder:    { en: "Contract Holder",     nl: "Contracthouder" },
+  voorschot:         { en: "Voorschot",           nl: "Voorschot" },
+
+  // VHE
+  vheTitle:          { en: "Units",               nl: "Eenheden" },
 };
 
 export function t(key, lang = "en") {

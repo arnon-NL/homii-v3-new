@@ -7,6 +7,7 @@ import Sidebar from "./Sidebar";
 import PlaceholderPage from "./PlaceholderPage";
 import BuildingListPage from "./BuildingListPage";
 import ServiceListPage from "./ServiceListPage";
+import BuildingDetailPage from "./BuildingDetailPage";
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -97,7 +98,15 @@ export default function App() {
               element={<PlaceholderPage title={t("onboardingTitle", lang)} />}
             />
             <Route path="/buildings" element={<BuildingListPage />} />
-            <Route path="/buildings/:buildingId" element={<PlaceholderPage title={t("buildingsTitle", lang)} />} />
+            <Route path="/buildings/:buildingId" element={<BuildingDetailPage />} />
+            <Route
+              path="/vhe"
+              element={<PlaceholderPage title={t("vheTitle", lang)} />}
+            />
+            <Route
+              path="/vhe/:vheId"
+              element={<PlaceholderPage title={t("vheTitle", lang)} />}
+            />
             <Route path="/services" element={<ServiceListPage />} />
             <Route path="/services/:serviceId" element={<PlaceholderPage title={t("servicesTitle", lang)} />} />
             <Route
