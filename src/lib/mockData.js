@@ -511,45 +511,65 @@ export const buildingServices = [
 ];
 
 // ── VHE (Verhuurbare Eenheden / Rental Units) ──
+// Critical attributes for servicekosten:
+//   unit — unit identifier within building
+//   type — apartment / studio / parking / commercial (determines which services apply)
+//   floor — for elevator service distribution
+//   m2 — primary distribution key for area-based services
+//   persons — distribution key for person-based services (water, waste)
+//   contractHolder — current tenant (null = vacant)
+//   contractStart — move-in date (determines pro-rata settlement)
+//   voorschot — monthly service charge advance
+//   status — active / vacant / in-mutation
 
 export const vhes = [
   // Kloostergang (BLD-007) — 44 VHE, showing a representative sample
-  { id: "VHE-007-001", buildingId: "BLD-007", unit: "1A",  address: "Kloostergang 1A, Gorinchem",  floor: 0, m2: 62, contractHolder: "M. Jansen",     contractStart: "2019-03-01", voorschot: 125, status: "active" },
-  { id: "VHE-007-002", buildingId: "BLD-007", unit: "1B",  address: "Kloostergang 1B, Gorinchem",  floor: 0, m2: 58, contractHolder: "P. de Vries",    contractStart: "2021-07-01", voorschot: 118, status: "active" },
-  { id: "VHE-007-003", buildingId: "BLD-007", unit: "2A",  address: "Kloostergang 2A, Gorinchem",  floor: 1, m2: 65, contractHolder: "A. Bakker",      contractStart: "2018-01-15", voorschot: 132, status: "active" },
-  { id: "VHE-007-004", buildingId: "BLD-007", unit: "2B",  address: "Kloostergang 2B, Gorinchem",  floor: 1, m2: 58, contractHolder: "K. Meijer",      contractStart: "2022-09-01", voorschot: 118, status: "active" },
-  { id: "VHE-007-005", buildingId: "BLD-007", unit: "3A",  address: "Kloostergang 3A, Gorinchem",  floor: 2, m2: 62, contractHolder: "R. Hendriks",    contractStart: "2020-04-01", voorschot: 125, status: "active" },
-  { id: "VHE-007-006", buildingId: "BLD-007", unit: "3B",  address: "Kloostergang 3B, Gorinchem",  floor: 2, m2: 58, contractHolder: null,             contractStart: null,         voorschot: 0,   status: "vacant" },
-  { id: "VHE-007-007", buildingId: "BLD-007", unit: "4A",  address: "Kloostergang 4A, Gorinchem",  floor: 3, m2: 65, contractHolder: "S. van Dam",     contractStart: "2023-01-01", voorschot: 132, status: "active" },
-  { id: "VHE-007-008", buildingId: "BLD-007", unit: "4B",  address: "Kloostergang 4B, Gorinchem",  floor: 3, m2: 58, contractHolder: "T. Visser",      contractStart: "2017-11-01", voorschot: 118, status: "active" },
+  { id: "VHE-007-001", buildingId: "BLD-007", unit: "1A",  type: "apartment", floor: 0, m2: 62, persons: 2, contractHolder: "M. Jansen",     contractStart: "2019-03-01", voorschot: 125, status: "active" },
+  { id: "VHE-007-002", buildingId: "BLD-007", unit: "1B",  type: "apartment", floor: 0, m2: 58, persons: 1, contractHolder: "P. de Vries",    contractStart: "2021-07-01", voorschot: 118, status: "active" },
+  { id: "VHE-007-003", buildingId: "BLD-007", unit: "2A",  type: "apartment", floor: 1, m2: 65, persons: 3, contractHolder: "A. Bakker",      contractStart: "2018-01-15", voorschot: 132, status: "active" },
+  { id: "VHE-007-004", buildingId: "BLD-007", unit: "2B",  type: "apartment", floor: 1, m2: 58, persons: 1, contractHolder: "K. Meijer",      contractStart: "2022-09-01", voorschot: 118, status: "active" },
+  { id: "VHE-007-005", buildingId: "BLD-007", unit: "3A",  type: "apartment", floor: 2, m2: 62, persons: 2, contractHolder: "R. Hendriks",    contractStart: "2020-04-01", voorschot: 125, status: "active" },
+  { id: "VHE-007-006", buildingId: "BLD-007", unit: "3B",  type: "apartment", floor: 2, m2: 58, persons: 0, contractHolder: null,             contractStart: null,         voorschot: 0,   status: "vacant" },
+  { id: "VHE-007-007", buildingId: "BLD-007", unit: "4A",  type: "apartment", floor: 3, m2: 65, persons: 2, contractHolder: "S. van Dam",     contractStart: "2023-01-01", voorschot: 132, status: "active" },
+  { id: "VHE-007-008", buildingId: "BLD-007", unit: "4B",  type: "studio",    floor: 3, m2: 58, persons: 1, contractHolder: "T. Visser",      contractStart: "2017-11-01", voorschot: 118, status: "active" },
 
   // De Lindeborg (BLD-004) — sample
-  { id: "VHE-004-001", buildingId: "BLD-004", unit: "101", address: "Lindeborg 101, Gorinchem",    floor: 0, m2: 72, contractHolder: "L. Smit",        contractStart: "2020-06-01", voorschot: 155, status: "active" },
-  { id: "VHE-004-002", buildingId: "BLD-004", unit: "102", address: "Lindeborg 102, Gorinchem",    floor: 0, m2: 68, contractHolder: "H. van der Berg", contractStart: "2019-02-01", voorschot: 148, status: "active" },
-  { id: "VHE-004-003", buildingId: "BLD-004", unit: "103", address: "Lindeborg 103, Gorinchem",    floor: 0, m2: 72, contractHolder: "G. Dijkstra",    contractStart: "2021-10-01", voorschot: 155, status: "active" },
-  { id: "VHE-004-004", buildingId: "BLD-004", unit: "201", address: "Lindeborg 201, Gorinchem",    floor: 1, m2: 68, contractHolder: "W. Mulder",      contractStart: "2022-04-01", voorschot: 148, status: "active" },
-  { id: "VHE-004-005", buildingId: "BLD-004", unit: "202", address: "Lindeborg 202, Gorinchem",    floor: 1, m2: 72, contractHolder: null,             contractStart: null,         voorschot: 0,   status: "vacant" },
+  { id: "VHE-004-001", buildingId: "BLD-004", unit: "101", type: "apartment", floor: 0, m2: 72, persons: 2, contractHolder: "L. Smit",        contractStart: "2020-06-01", voorschot: 155, status: "active" },
+  { id: "VHE-004-002", buildingId: "BLD-004", unit: "102", type: "apartment", floor: 0, m2: 68, persons: 2, contractHolder: "H. van der Berg", contractStart: "2019-02-01", voorschot: 148, status: "active" },
+  { id: "VHE-004-003", buildingId: "BLD-004", unit: "103", type: "apartment", floor: 0, m2: 72, persons: 1, contractHolder: "G. Dijkstra",    contractStart: "2021-10-01", voorschot: 155, status: "active" },
+  { id: "VHE-004-004", buildingId: "BLD-004", unit: "201", type: "apartment", floor: 1, m2: 68, persons: 3, contractHolder: "W. Mulder",      contractStart: "2022-04-01", voorschot: 148, status: "active" },
+  { id: "VHE-004-005", buildingId: "BLD-004", unit: "202", type: "studio",    floor: 1, m2: 72, persons: 0, contractHolder: null,             contractStart: null,         voorschot: 0,   status: "vacant" },
 ];
 
 // ── Meters ──
+// Each meter now tracks: current reading, previous reading (start of year), and consumption (delta).
+// Main meters have EAN codes (energy supply point identifier).
+// "utility" is the meter type — NOT to be confused with "services" (delivered service charges).
 
 export const meters = [
   // Kloostergang (BLD-007) main meters
-  { id: "MTR-007-H1",  buildingId: "BLD-007", serviceId: "SVC-108", vheId: null,          type: "main",   utility: "heat",        meterNumber: "HM-20154782", unit: "GJ",  lastReading: 842.5,   readingDate: "2025-02-28", status: "active" },
-  { id: "MTR-007-W1",  buildingId: "BLD-007", serviceId: "SVC-102", vheId: null,          type: "main",   utility: "water",       meterNumber: "WM-30298741", unit: "m³",  lastReading: 1256.3,  readingDate: "2025-02-28", status: "active" },
-  { id: "MTR-007-E1",  buildingId: "BLD-007", serviceId: "SVC-105", vheId: null,          type: "main",   utility: "electricity", meterNumber: "EM-40187623", unit: "kWh", lastReading: 28450,   readingDate: "2025-02-28", status: "active" },
+  { id: "MTR-007-H1",  buildingId: "BLD-007", vheId: null,          type: "main", utility: "heat",        meterNumber: "HM-20154782", ean: "871687320000012345", unit: "GJ",  previousReading: 724.1,  lastReading: 842.5,  consumption: 118.4,  readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
+  { id: "MTR-007-W1",  buildingId: "BLD-007", vheId: null,          type: "main", utility: "water",       meterNumber: "WM-30298741", ean: null,                 unit: "m³",  previousReading: 1108.0, lastReading: 1256.3, consumption: 148.3,  readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
+  { id: "MTR-007-E1",  buildingId: "BLD-007", vheId: null,          type: "main", utility: "electricity", meterNumber: "EM-40187623", ean: "871687320000054321", unit: "kWh", previousReading: 24200,  lastReading: 28450,  consumption: 4250,   readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
   // Kloostergang submeters (linked to VHEs)
-  { id: "MTR-007-H1A", buildingId: "BLD-007", serviceId: "SVC-108", vheId: "VHE-007-001", type: "sub",    utility: "heat",        meterNumber: "HS-20154782-1A", unit: "GJ",  lastReading: 18.2,  readingDate: "2025-02-28", status: "active" },
-  { id: "MTR-007-H1B", buildingId: "BLD-007", serviceId: "SVC-108", vheId: "VHE-007-002", type: "sub",    utility: "heat",        meterNumber: "HS-20154782-1B", unit: "GJ",  lastReading: 21.4,  readingDate: "2025-02-28", status: "active" },
-  { id: "MTR-007-H2A", buildingId: "BLD-007", serviceId: "SVC-108", vheId: "VHE-007-003", type: "sub",    utility: "heat",        meterNumber: "HS-20154782-2A", unit: "GJ",  lastReading: 16.8,  readingDate: "2025-02-28", status: "active" },
-  { id: "MTR-007-H2B", buildingId: "BLD-007", serviceId: "SVC-108", vheId: "VHE-007-004", type: "sub",    utility: "heat",        meterNumber: "HS-20154782-2B", unit: "GJ",  lastReading: 22.1,  readingDate: "2025-01-31", status: "active" },
-  { id: "MTR-007-W1A", buildingId: "BLD-007", serviceId: "SVC-102", vheId: "VHE-007-001", type: "sub",    utility: "water",       meterNumber: "WS-30298741-1A", unit: "m³",  lastReading: 28.7,  readingDate: "2025-02-28", status: "active" },
-  { id: "MTR-007-W1B", buildingId: "BLD-007", serviceId: "SVC-102", vheId: "VHE-007-002", type: "sub",    utility: "water",       meterNumber: "WS-30298741-1B", unit: "m³",  lastReading: 32.1,  readingDate: "2025-02-28", status: "active" },
+  { id: "MTR-007-H1A", buildingId: "BLD-007", vheId: "VHE-007-001", type: "sub",  utility: "heat",        meterNumber: "HS-20154782-1A", ean: null, unit: "GJ",  previousReading: 14.0, lastReading: 18.2,  consumption: 4.2,  readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
+  { id: "MTR-007-H1B", buildingId: "BLD-007", vheId: "VHE-007-002", type: "sub",  utility: "heat",        meterNumber: "HS-20154782-1B", ean: null, unit: "GJ",  previousReading: 16.5, lastReading: 21.4,  consumption: 4.9,  readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
+  { id: "MTR-007-H2A", buildingId: "BLD-007", vheId: "VHE-007-003", type: "sub",  utility: "heat",        meterNumber: "HS-20154782-2A", ean: null, unit: "GJ",  previousReading: 12.8, lastReading: 16.8,  consumption: 4.0,  readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
+  { id: "MTR-007-H2B", buildingId: "BLD-007", vheId: "VHE-007-004", type: "sub",  utility: "heat",        meterNumber: "HS-20154782-2B", ean: null, unit: "GJ",  previousReading: 17.2, lastReading: 22.1,  consumption: 4.9,  readingDate: "2025-01-31", previousDate: "2025-01-01", status: "active" },
+  { id: "MTR-007-W1A", buildingId: "BLD-007", vheId: "VHE-007-001", type: "sub",  utility: "water",       meterNumber: "WS-30298741-1A", ean: null, unit: "m³",  previousReading: 22.1, lastReading: 28.7,  consumption: 6.6,  readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
+  { id: "MTR-007-W1B", buildingId: "BLD-007", vheId: "VHE-007-002", type: "sub",  utility: "water",       meterNumber: "WS-30298741-1B", ean: null, unit: "m³",  previousReading: 25.8, lastReading: 32.1,  consumption: 6.3,  readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
 
   // De Lindeborg (BLD-004) main meters
-  { id: "MTR-004-H1",  buildingId: "BLD-004", serviceId: "SVC-108", vheId: null,          type: "main",   utility: "heat",        meterNumber: "HM-20198432", unit: "GJ",  lastReading: 2810.6,  readingDate: "2025-02-28", status: "active" },
-  { id: "MTR-004-W1",  buildingId: "BLD-004", serviceId: "SVC-102", vheId: null,          type: "main",   utility: "water",       meterNumber: "WM-30345612", unit: "m³",  lastReading: 4520.8,  readingDate: "2025-02-28", status: "active" },
-  { id: "MTR-004-E1",  buildingId: "BLD-004", serviceId: "SVC-105", vheId: null,          type: "main",   utility: "electricity", meterNumber: "EM-40223198", unit: "kWh", lastReading: 95200,   readingDate: "2025-01-31", status: "warning" },
+  { id: "MTR-004-H1",  buildingId: "BLD-004", vheId: null,          type: "main", utility: "heat",        meterNumber: "HM-20198432", ean: "871687320000098765", unit: "GJ",  previousReading: 2420.0, lastReading: 2810.6, consumption: 390.6,  readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
+  { id: "MTR-004-W1",  buildingId: "BLD-004", vheId: null,          type: "main", utility: "water",       meterNumber: "WM-30345612", ean: null,                 unit: "m³",  previousReading: 3810.0, lastReading: 4520.8, consumption: 710.8,  readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
+  { id: "MTR-004-E1",  buildingId: "BLD-004", vheId: null,          type: "main", utility: "electricity", meterNumber: "EM-40223198", ean: "871687320000067890", unit: "kWh", previousReading: 82400,  lastReading: 95200,  consumption: 12800,  readingDate: "2025-01-31", previousDate: "2025-01-01", status: "warning" },
+  // De Lindeborg submeters (linked to VHEs) — heat and water per unit
+  { id: "MTR-004-H101", buildingId: "BLD-004", vheId: "VHE-004-001", type: "sub", utility: "heat",        meterNumber: "HS-20198432-101", ean: null, unit: "GJ",  previousReading: 8.4,  lastReading: 12.1, consumption: 3.7, readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
+  { id: "MTR-004-H102", buildingId: "BLD-004", vheId: "VHE-004-002", type: "sub", utility: "heat",        meterNumber: "HS-20198432-102", ean: null, unit: "GJ",  previousReading: 9.1,  lastReading: 13.5, consumption: 4.4, readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
+  { id: "MTR-004-H103", buildingId: "BLD-004", vheId: "VHE-004-003", type: "sub", utility: "heat",        meterNumber: "HS-20198432-103", ean: null, unit: "GJ",  previousReading: 7.2,  lastReading: 10.8, consumption: 3.6, readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
+  { id: "MTR-004-W101", buildingId: "BLD-004", vheId: "VHE-004-001", type: "sub", utility: "water",       meterNumber: "WS-30345612-101", ean: null, unit: "m³",  previousReading: 18.2, lastReading: 24.8, consumption: 6.6, readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
+  { id: "MTR-004-W102", buildingId: "BLD-004", vheId: "VHE-004-002", type: "sub", utility: "water",       meterNumber: "WS-30345612-102", ean: null, unit: "m³",  previousReading: 20.5, lastReading: 27.9, consumption: 7.4, readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
+  { id: "MTR-004-W103", buildingId: "BLD-004", vheId: "VHE-004-003", type: "sub", utility: "water",       meterNumber: "WS-30345612-103", ean: null, unit: "m³",  previousReading: 15.8, lastReading: 21.0, consumption: 5.2, readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
 ];
 
 // ── Activity log ──

@@ -442,41 +442,87 @@ export default function BuildingDetailPage() {
                       </div>
                     ))}
 
-                  {/* Cost breakdown by service */}
-                  <Card className="border-slate-200 bg-white">
-                    <CardContent className="p-5">
-                      <h3 className="text-[13px] font-semibold text-slate-600 mb-3">
-                        {t("costBreakdown", lang)}
-                      </h3>
-                      <div className="space-y-2.5">
-                        {enrichedBs.map((bs) => {
-                          const pct =
-                            totalBudget > 0
-                              ? Math.round((bs.budget / totalBudget) * 100)
-                              : 0;
-                          return (
-                            <div key={bs.id} className="flex items-center gap-3">
-                              <span className="text-[12px] text-slate-600 w-[180px] truncate">
-                                {bs.service?.name[lang] || bs.serviceId}
-                              </span>
-                              <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                  {/* Meter health + consumption summary — replaces the old cost breakdown (which duplicated the Services tab) */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    {/* Meter health */}
+                    <Card className="border-slate-200 bg-white">
+                      <CardContent className="p-5">
+                        <h3 className="text-[13px] font-semibold text-slate-600 mb-3">
+                          {t("meterHealth", lang)}
+                        </h3>
+                        <div className="space-y-2.5">
+                          {mainMeters.map((m) => {
+                            const ui = utilityIcon[m.utility] || {};
+                            const Icon = ui.icon || Gauge;
+                            const isOverdue = m.status === "warning";
+                            return (
+                              <div key={m.id} className="flex items-center gap-3">
                                 <div
-                                  className="h-full rounded-full"
-                                  style={{
-                                    width: `${pct}%`,
-                                    background: brand.blue,
-                                  }}
-                                />
+                                  className="w-6 h-6 rounded flex items-center justify-center shrink-0"
+                                  style={{ background: (ui.color || "#94A3B8") + "15" }}
+                                >
+                                  <Icon size={12} style={{ color: ui.color || "#94A3B8" }} />
+                                </div>
+                                <span className="text-[12px] text-slate-600 flex-1 truncate">
+                                  {m.meterNumber}
+                                </span>
+                                <span className={`text-[11px] font-medium ${isOverdue ? "text-amber-600" : "text-green-600"}`}>
+                                  {isOverdue ? t("readingsOverdue", lang) : t("readingsUpToDate", lang)}
+                                </span>
                               </div>
-                              <span className="text-[11px] tabular-nums text-slate-500 w-[60px] text-right">
-                                {fmt(bs.budget)}
+                            );
+                          })}
+                          {subMeters.length > 0 && (
+                            <div className="flex items-center gap-3 pt-1 border-t border-slate-100">
+                              <span className="text-[11px] text-slate-400">
+                                {subMeters.length} {t("subMeters", lang).toLowerCase()}
+                              </span>
+                              <span className="text-[11px] text-slate-400">
+                                {subMeters.filter(m => m.status === "active").length} {t("readingsUpToDate", lang).toLowerCase()}
                               </span>
                             </div>
-                          );
-                        })}
-                      </div>
-                    </CardContent>
-                  </Card>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Consumption summary by utility */}
+                    <Card className="border-slate-200 bg-white">
+                      <CardContent className="p-5">
+                        <h3 className="text-[13px] font-semibold text-slate-600 mb-3">
+                          {t("consumption", lang)}
+                        </h3>
+                        <div className="space-y-2.5">
+                          {mainMeters.map((m) => {
+                            const ui = utilityIcon[m.utility] || {};
+                            const Icon = ui.icon || Gauge;
+                            return (
+                              <div key={m.id} className="flex items-center gap-3">
+                                <div
+                                  className="w-6 h-6 rounded flex items-center justify-center shrink-0"
+                                  style={{ background: (ui.color || "#94A3B8") + "15" }}
+                                >
+                                  <Icon size={12} style={{ color: ui.color || "#94A3B8" }} />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-[12px] font-medium text-slate-700 capitalize">
+                                    {m.utility === "electricity" ? (lang === "nl" ? "Elektra" : "Electricity") : m.utility === "heat" ? (lang === "nl" ? "Warmte" : "Heat") : (lang === "nl" ? "Water" : "Water")}
+                                  </div>
+                                  <div className="text-[11px] text-slate-400">
+                                    {m.readingDate}
+                                  </div>
+                                </div>
+                                <span className="text-[14px] font-bold tabular-nums" style={{ color: brand.navy }}>
+                                  {(m.consumption || 0).toLocaleString("nl-NL")}
+                                </span>
+                                <span className="text-[11px] text-slate-400 w-[30px]">{m.unit}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
               </TabsContent>
 
@@ -709,7 +755,7 @@ export default function BuildingDetailPage() {
               {/* ═══ METERS TAB ═══ */}
               <TabsContent value="meters">
                 <div className="mt-4 space-y-4">
-                  {/* Main meters */}
+                  {/* Main meters — cards with consumption */}
                   <div>
                     <h3 className="text-[12px] font-semibold text-slate-500 uppercase tracking-wider mb-2">
                       {t("mainMeters", lang)}
@@ -718,32 +764,25 @@ export default function BuildingDetailPage() {
                       {mainMeters.map((m) => {
                         const ui = utilityIcon[m.utility] || {};
                         const Icon = ui.icon || Gauge;
-                        const svc = getService(m.serviceId);
+                        const utilityLabel = m.utility === "electricity"
+                          ? (lang === "nl" ? "Elektra" : "Electricity")
+                          : m.utility === "heat"
+                          ? (lang === "nl" ? "Warmte" : "Heat")
+                          : (lang === "nl" ? "Water" : "Water");
                         return (
-                          <Card
-                            key={m.id}
-                            className="border-slate-200 bg-white"
-                          >
+                          <Card key={m.id} className="border-slate-200 bg-white">
                             <CardContent className="p-4">
                               <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-center gap-2">
                                   <div
                                     className="w-7 h-7 rounded-md flex items-center justify-center"
-                                    style={{
-                                      background: (ui.color || "#94A3B8") + "15",
-                                    }}
+                                    style={{ background: (ui.color || "#94A3B8") + "15" }}
                                   >
-                                    <Icon
-                                      size={14}
-                                      style={{ color: ui.color || "#94A3B8" }}
-                                    />
+                                    <Icon size={14} style={{ color: ui.color || "#94A3B8" }} />
                                   </div>
                                   <div>
-                                    <div
-                                      className="text-[13px] font-medium"
-                                      style={{ color: brand.navy }}
-                                    >
-                                      {svc?.name[lang] || m.utility}
+                                    <div className="text-[13px] font-medium" style={{ color: brand.navy }}>
+                                      {utilityLabel}
                                     </div>
                                     <div className="text-[11px] text-slate-400 font-mono">
                                       {m.meterNumber}
@@ -752,17 +791,31 @@ export default function BuildingDetailPage() {
                                 </div>
                                 <StatusBadge status={m.status} size="xs" />
                               </div>
+                              {/* Current reading */}
                               <div className="flex items-baseline justify-between">
                                 <span className="text-xl font-bold tabular-nums" style={{ color: brand.navy }}>
                                   {m.lastReading.toLocaleString("nl-NL")}
                                 </span>
-                                <span className="text-[11px] text-slate-400">
-                                  {m.unit}
-                                </span>
+                                <span className="text-[11px] text-slate-400">{m.unit}</span>
                               </div>
-                              <p className="text-[11px] text-slate-400 mt-1">
+                              <p className="text-[11px] text-slate-400 mt-0.5">
                                 {t("lastReading", lang)}: {m.readingDate}
                               </p>
+                              {/* Consumption (delta) */}
+                              {m.consumption != null && (
+                                <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between">
+                                  <span className="text-[11px] text-slate-500">{t("consumption", lang)}</span>
+                                  <span className="text-[13px] font-semibold tabular-nums" style={{ color: brand.blue }}>
+                                    {m.consumption.toLocaleString("nl-NL")} {m.unit}
+                                  </span>
+                                </div>
+                              )}
+                              {/* EAN code */}
+                              {m.ean && (
+                                <p className="text-[10px] text-slate-300 font-mono mt-1 truncate" title={m.ean}>
+                                  EAN {m.ean}
+                                </p>
+                              )}
                             </CardContent>
                           </Card>
                         );
@@ -770,7 +823,7 @@ export default function BuildingDetailPage() {
                     </div>
                   </div>
 
-                  {/* Submeters */}
+                  {/* Submeters — table with consumption column, "Utility" instead of "Service" */}
                   {subMeters.length > 0 && (
                     <div>
                       <h3 className="text-[12px] font-semibold text-slate-500 uppercase tracking-wider mb-2">
@@ -784,13 +837,16 @@ export default function BuildingDetailPage() {
                                 {t("meterNumber", lang)}
                               </th>
                               <th className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">
-                                {t("service", lang)}
+                                {t("utility", lang)}
                               </th>
                               <th className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">
                                 VHE
                               </th>
                               <th className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-2.5 text-right">
-                                {t("lastReading", lang)}
+                                {t("currentReading", lang)}
+                              </th>
+                              <th className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-2.5 text-right">
+                                {t("consumption", lang)}
                               </th>
                               <th className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-2.5 text-center">
                                 {t("status", lang)}
@@ -799,42 +855,43 @@ export default function BuildingDetailPage() {
                           </thead>
                           <tbody className="divide-y divide-slate-100">
                             {subMeters.map((m) => {
-                              const svc = getService(m.serviceId);
-                              const vhe = vheList.find(
-                                (v) => v.id === m.vheId
-                              );
+                              const vhe = vheList.find((v) => v.id === m.vheId);
+                              const ui = utilityIcon[m.utility] || {};
+                              const utilityLabel = m.utility === "electricity"
+                                ? (lang === "nl" ? "Elektra" : "Electricity")
+                                : m.utility === "heat"
+                                ? (lang === "nl" ? "Warmte" : "Heat")
+                                : (lang === "nl" ? "Water" : "Water");
                               return (
-                                <tr
-                                  key={m.id}
-                                  className="hover:bg-slate-50/80 transition-colors"
-                                >
+                                <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
                                   <td className="px-3 py-2.5 text-[12px] font-mono text-slate-600">
                                     {m.meterNumber}
                                   </td>
-                                  <td className="px-3 py-2.5 text-[12px] text-slate-600">
-                                    {svc?.name[lang] || m.serviceId}
+                                  <td className="px-3 py-2.5">
+                                    <div className="flex items-center gap-1.5">
+                                      {ui.icon && React.createElement(ui.icon, { size: 11, style: { color: ui.color } })}
+                                      <span className="text-[12px] text-slate-600">{utilityLabel}</span>
+                                    </div>
                                   </td>
                                   <td className="px-3 py-2.5">
                                     {vhe ? (
                                       <button
                                         className="text-[12px] font-medium text-[#3B8EA5] hover:text-[#3EB1C8] transition-colors"
-                                        onClick={() =>
-                                          navigate(`/vhe/${vhe.id}`)
-                                        }
+                                        onClick={() => navigate(`/vhe/${vhe.id}`)}
                                       >
                                         {vhe.unit}
                                       </button>
                                     ) : (
-                                      <span className="text-[12px] text-slate-400">
-                                        —
-                                      </span>
+                                      <span className="text-[12px] text-slate-400">—</span>
                                     )}
                                   </td>
                                   <td className="px-3 py-2.5 text-right text-[13px] tabular-nums font-medium text-slate-700">
                                     {m.lastReading.toLocaleString("nl-NL")}{" "}
-                                    <span className="text-slate-400 font-normal">
-                                      {m.unit}
-                                    </span>
+                                    <span className="text-slate-400 font-normal text-[11px]">{m.unit}</span>
+                                  </td>
+                                  <td className="px-3 py-2.5 text-right text-[13px] tabular-nums font-semibold" style={{ color: brand.blue }}>
+                                    {(m.consumption || 0).toLocaleString("nl-NL")}{" "}
+                                    <span className="text-slate-400 font-normal text-[11px]">{m.unit}</span>
                                   </td>
                                   <td className="px-3 py-2.5 text-center">
                                     <StatusBadge status={m.status} size="xs" />
@@ -857,6 +914,17 @@ export default function BuildingDetailPage() {
               </TabsContent>
 
               {/* ═══ VHE TAB ═══ */}
+              {/* Critically assessed columns:
+                  ✓ unit — primary identifier
+                  ✓ type — apartment/studio (determines service applicability)
+                  ✓ floor — needed for elevator distribution
+                  ✓ m² — primary distribution key
+                  ✓ persons — distribution key for person-based services
+                  ✓ contractHolder — current tenant
+                  ✓ voorschot — monthly advance
+                  ✓ status — active/vacant/in-mutation
+                  ✗ address — REMOVED (redundant: inherits from building)
+                  ✗ contractStart — available on detail, not needed in list */}
               <TabsContent value="vhe">
                 <div className="mt-4">
                   <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
@@ -865,9 +933,10 @@ export default function BuildingDetailPage() {
                         <tr className="border-b border-slate-200 bg-slate-50/80">
                           {[
                             { key: "unit", align: "left" },
-                            { key: "address", align: "left" },
+                            { key: "vheType", align: "left" },
                             { key: "floor", align: "center" },
                             { key: "m2", align: "right" },
+                            { key: "persons", align: "center" },
                             { key: "contractHolder", align: "left" },
                             { key: "voorschot", align: "right" },
                             { key: "status", align: "center" },
@@ -889,15 +958,12 @@ export default function BuildingDetailPage() {
                             onClick={() => navigate(`/vhe/${v.id}`)}
                           >
                             <td className="px-3 sm:px-4 py-3">
-                              <span
-                                className="text-[13px] font-semibold"
-                                style={{ color: brand.navy }}
-                              >
+                              <span className="text-[13px] font-semibold" style={{ color: brand.navy }}>
                                 {v.unit}
                               </span>
                             </td>
-                            <td className="px-3 sm:px-4 py-3 text-[12px] text-slate-600">
-                              {v.address}
+                            <td className="px-3 sm:px-4 py-3 text-[12px] text-slate-600 capitalize">
+                              {t(v.type || "apartment", lang)}
                             </td>
                             <td className="px-3 sm:px-4 py-3 text-center text-[12px] text-slate-500">
                               {v.floor}
@@ -905,23 +971,20 @@ export default function BuildingDetailPage() {
                             <td className="px-3 sm:px-4 py-3 text-right text-[13px] tabular-nums text-slate-600">
                               {v.m2} m²
                             </td>
+                            <td className="px-3 sm:px-4 py-3 text-center text-[12px] text-slate-500">
+                              {v.persons > 0 ? v.persons : "—"}
+                            </td>
                             <td className="px-3 sm:px-4 py-3 text-[12px] text-slate-600">
                               {v.contractHolder || (
-                                <span className="text-slate-300 italic">
-                                  {t("vacant", lang)}
-                                </span>
+                                <span className="text-slate-300 italic">{t("vacant", lang)}</span>
                               )}
                             </td>
                             <td className="px-3 sm:px-4 py-3 text-right text-[13px] tabular-nums text-slate-600">
-                              {v.voorschot > 0
-                                ? fmt(v.voorschot) + "/mo"
-                                : "—"}
+                              {v.voorschot > 0 ? fmt(v.voorschot) + "/mo" : "—"}
                             </td>
                             <td className="px-3 sm:px-4 py-3 text-center">
                               <StatusBadge
-                                status={
-                                  v.status === "vacant" ? "warning" : "active"
-                                }
+                                status={v.status === "vacant" ? "warning" : v.status === "in-mutation" ? "info" : "active"}
                                 size="xs"
                               />
                             </td>
@@ -929,10 +992,7 @@ export default function BuildingDetailPage() {
                         ))}
                         {vheList.length === 0 && (
                           <tr>
-                            <td
-                              colSpan={7}
-                              className="px-4 py-8 text-center text-sm text-slate-400"
-                            >
+                            <td colSpan={8} className="px-4 py-8 text-center text-sm text-slate-400">
                               {t("noResults", lang)}
                             </td>
                           </tr>
@@ -993,7 +1053,7 @@ export default function BuildingDetailPage() {
               <AttrRow label={t("complexId", lang)} value={building.complexId} />
               <AttrRow label={t("location", lang)} value={building.location} />
               <AttrRow label="VHE" value={`${building.vhe} (${activeVhe} ${t("active", lang).toLowerCase()}, ${vacantVhe} ${t("vacant", lang).toLowerCase()})`} />
-              <AttrRow label={t("components", lang)} value={building.components} />
+              <AttrRow label={t("activeServices", lang)} value={building.components} />
               <AttrRow label={t("dataQuality", lang)} value={<StatusBadge status={building.dataQuality} size="xs" />} />
             </AttrSection>
 

@@ -76,6 +76,25 @@ const dict = {
   management:        { en: "Management & Services",        nl: "Beheer & Woonservices" },
   other:             { en: "Other & Insurance",            nl: "Overig & Verzekeringen" },
 
+  // VHE attributes
+  vheType:           { en: "Type",             nl: "Type" },
+  persons:           { en: "Persons",          nl: "Personen" },
+  apartment:         { en: "Apartment",        nl: "Appartement" },
+  studio:            { en: "Studio",           nl: "Studio" },
+  parking:           { en: "Parking",          nl: "Parkeerplaats" },
+  commercial:        { en: "Commercial",       nl: "Bedrijfsruimte" },
+  inMutation:        { en: "In mutation",      nl: "In mutatie" },
+
+  // Meter attributes
+  utility:           { en: "Utility",          nl: "Nutssoort" },
+  eanCode:           { en: "EAN",              nl: "EAN" },
+  consumption:       { en: "Consumption",      nl: "Verbruik" },
+  previousReading:   { en: "Start reading",    nl: "Beginstand" },
+  currentReading:    { en: "Current reading",  nl: "Huidige stand" },
+  meterHealth:       { en: "Meter Health",     nl: "Meterstatus" },
+  readingsUpToDate:  { en: "Readings up to date", nl: "Standen actueel" },
+  readingsOverdue:   { en: "Readings overdue", nl: "Standen verlopen" },
+
   // Boolean labels
   yes:               { en: "Yes",          nl: "Ja" },
   no:                { en: "No",           nl: "Nee" },
