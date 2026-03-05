@@ -257,6 +257,208 @@ export const buildings = [
   },
 ];
 
+// ── Services (Components) ──
+// Based on Servicekosten Besluit regulation — component codes from ERP system
+// Gathered from ledger pages across all buildings
+
+export const serviceCategories = [
+  { id: "energy",    label: { en: "Energy",          nl: "Energie" } },
+  { id: "water",     label: { en: "Water",           nl: "Water" } },
+  { id: "building",  label: { en: "Building",        nl: "Gebouw" } },
+  { id: "exterior",  label: { en: "Exterior",        nl: "Buitenruimte" } },
+  { id: "insurance", label: { en: "Insurance",       nl: "Verzekering" } },
+];
+
+export const services = [
+  {
+    id: "SVC-201",
+    code: "201",
+    name: { en: "Heating Costs", nl: "Stookkosten" },
+    description: {
+      en: "Central heating supply, gas delivery, metering services, and transport costs for heat distribution",
+      nl: "Centrale verwarming, gaslevering, meetdiensten en transportkosten voor warmtedistributie",
+    },
+    category: "energy",
+    regulation: "Servicekosten Besluit Art. 1",
+    variable: true,
+    metered: true,
+    buildingCount: 12,
+    suppliers: ["ENGIE Energie Nederland", "Techem Energy Services BV", "Joulz Meetbedrijf B.V.", "Stedin Netbeh BV"],
+    avgCostPerVhe: 185,
+    status: "active",
+  },
+  {
+    id: "SVC-202",
+    code: "202",
+    name: { en: "Water", nl: "Water" },
+    description: {
+      en: "Communal water supply and distribution, including metering for shared consumption",
+      nl: "Gemeenschappelijk waterverbruik en distributie, inclusief meetdiensten voor gedeeld verbruik",
+    },
+    category: "water",
+    regulation: "Servicekosten Besluit Art. 1",
+    variable: true,
+    metered: true,
+    buildingCount: 16,
+    suppliers: ["Oasen"],
+    avgCostPerVhe: 45,
+    status: "active",
+  },
+  {
+    id: "SVC-204",
+    code: "204",
+    name: { en: "Communal Electricity", nl: "Gemeenschappelijke elektra" },
+    description: {
+      en: "Electricity for shared spaces: hallways, stairwells, elevators, parking garages, and outdoor lighting",
+      nl: "Elektriciteit voor gemeenschappelijke ruimten: gangen, trappenhuizen, liften, parkeergarages en buitenverlichting",
+    },
+    category: "energy",
+    regulation: "Servicekosten Besluit Art. 1",
+    variable: false,
+    metered: true,
+    buildingCount: 21,
+    suppliers: ["ENGIE Energie Nederland"],
+    avgCostPerVhe: 65,
+    status: "active",
+  },
+  {
+    id: "SVC-212",
+    code: "212",
+    name: { en: "Common Interior Costs", nl: "Kosten algemene binnenruimte" },
+    description: {
+      en: "Maintenance and upkeep of shared interior spaces: lobbies, corridors, laundry rooms, and communal areas",
+      nl: "Onderhoud en beheer van gemeenschappelijke binnenruimten: entrees, gangen, wasruimten en gemeenschappelijke ruimten",
+    },
+    category: "building",
+    regulation: "Servicekosten Besluit Art. 1",
+    variable: false,
+    metered: false,
+    buildingCount: 1,
+    suppliers: [],
+    avgCostPerVhe: 30,
+    status: "active",
+  },
+  {
+    id: "SVC-214",
+    code: "214",
+    name: { en: "Cleaning", nl: "Schoonmaak" },
+    description: {
+      en: "Regular cleaning of shared spaces: hallways, stairwells, elevators, windows of common areas, and entrance halls",
+      nl: "Reguliere schoonmaak van gemeenschappelijke ruimten: gangen, trappenhuizen, liften, ramen van gemeenschappelijke ruimten en entrees",
+    },
+    category: "building",
+    regulation: "Servicekosten Besluit Art. 1",
+    variable: false,
+    metered: false,
+    buildingCount: 19,
+    suppliers: [],
+    avgCostPerVhe: 55,
+    status: "active",
+  },
+  {
+    id: "SVC-215",
+    code: "215",
+    name: { en: "Window Cleaning", nl: "Glasbewassing" },
+    description: {
+      en: "Professional exterior window cleaning for building facades and communal glass surfaces",
+      nl: "Professionele glasbewassing van gevels en gemeenschappelijke glasoppervlakken",
+    },
+    category: "building",
+    regulation: "Servicekosten Besluit Art. 1",
+    variable: false,
+    metered: false,
+    buildingCount: 1,
+    suppliers: [],
+    avgCostPerVhe: 25,
+    status: "active",
+  },
+  {
+    id: "SVC-216",
+    code: "216",
+    name: { en: "Caretaker", nl: "Huismeester" },
+    description: {
+      en: "On-site caretaker services: building supervision, minor repairs, resident assistance, and facility management",
+      nl: "Huismeesterdiensten: gebouwbeheer, kleine reparaties, bewonersondersteuning en facilitair beheer",
+    },
+    category: "building",
+    regulation: "Servicekosten Besluit Art. 1",
+    variable: false,
+    metered: false,
+    buildingCount: 1,
+    suppliers: [],
+    avgCostPerVhe: 120,
+    status: "active",
+  },
+  {
+    id: "SVC-217",
+    code: "217",
+    name: { en: "District Management", nl: "Wijkbeheer" },
+    description: {
+      en: "Neighbourhood and district management services: communal area supervision, tenant liaison, and area coordination",
+      nl: "Wijkbeheer en buurtcoördinatie: toezicht gemeenschappelijke ruimten, bewonerscontact en gebiedscoördinatie",
+    },
+    category: "exterior",
+    regulation: "Servicekosten Besluit Art. 1",
+    variable: false,
+    metered: false,
+    buildingCount: 17,
+    suppliers: [],
+    avgCostPerVhe: 40,
+    status: "active",
+  },
+  {
+    id: "SVC-218",
+    code: "218",
+    name: { en: "Landscaping", nl: "Groenvoorziening" },
+    description: {
+      en: "Maintenance of gardens, lawns, hedges, trees, and green areas surrounding the building complex",
+      nl: "Onderhoud van tuinen, gazons, hagen, bomen en groenvoorzieningen rondom het gebouwcomplex",
+    },
+    category: "exterior",
+    regulation: "Servicekosten Besluit Art. 1",
+    variable: false,
+    metered: false,
+    buildingCount: 8,
+    suppliers: [],
+    avgCostPerVhe: 50,
+    status: "active",
+  },
+  {
+    id: "SVC-220",
+    code: "220",
+    name: { en: "Glass Insurance (VvE)", nl: "Glasverzekering VvE" },
+    description: {
+      en: "Collective glass breakage insurance for the owners' association covering all communal and private glass surfaces",
+      nl: "Collectieve glasbrakverzekering voor de VvE, dekkend alle gemeenschappelijke en privé glasoppervlakken",
+    },
+    category: "insurance",
+    regulation: "Servicekosten Besluit Art. 1",
+    variable: false,
+    metered: false,
+    buildingCount: 1,
+    suppliers: [],
+    avgCostPerVhe: 15,
+    status: "active",
+  },
+  {
+    id: "SVC-256",
+    code: "256",
+    name: { en: "Individual Water", nl: "Water Individueel" },
+    description: {
+      en: "Individual water metering and billing per housing unit, with separate consumption tracking",
+      nl: "Individueel waterverbruik per wooneenheid, met afzonderlijke verbruiksregistratie",
+    },
+    category: "water",
+    regulation: "Servicekosten Besluit Art. 1",
+    variable: true,
+    metered: true,
+    buildingCount: 2,
+    suppliers: ["Oasen"],
+    avgCostPerVhe: 35,
+    status: "active",
+  },
+];
+
 // Getter functions
 export function getBuilding(id) {
   return buildings.find((b) => b.id === id);
@@ -264,4 +466,12 @@ export function getBuilding(id) {
 
 export function getBuildingByComplexId(complexId) {
   return buildings.find((b) => b.complexId === complexId);
+}
+
+export function getService(id) {
+  return services.find((s) => s.id === id);
+}
+
+export function getServiceByCode(code) {
+  return services.find((s) => s.code === code);
 }

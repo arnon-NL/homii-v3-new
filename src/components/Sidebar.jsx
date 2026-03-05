@@ -8,6 +8,8 @@ import {
   UserPlus,
   Building2,
   Gauge,
+  Wrench,
+  Truck,
   Search,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
@@ -53,6 +55,8 @@ export default function Sidebar({ lang, setLang }) {
 
   const objectItems = [
     { label: t("buildings", lang), icon: Building2, path: "/buildings" },
+    { label: t("services", lang), icon: Wrench, path: "/services" },
+    { label: t("suppliers", lang), icon: Truck, path: "/suppliers" },
     { label: t("meters", lang), icon: Gauge, path: "/meters" },
   ];
 

@@ -14,6 +14,8 @@ const dict = {
   // Navigation — objects section
   objects:       { en: "Objects",       nl: "Objecten" },
   buildings:     { en: "Buildings",     nl: "Gebouwen" },
+  services:      { en: "Services",     nl: "Diensten" },
+  suppliers:     { en: "Suppliers",    nl: "Leveranciers" },
   meters:        { en: "Meters",        nl: "Meters" },
 
   // Common labels
@@ -53,6 +55,29 @@ const dict = {
   onboardingTitle:   { en: "Onboarding",    nl: "Onboarding" },
   buildingsTitle:    { en: "Buildings",     nl: "Gebouwen" },
   metersTitle:       { en: "Meters",        nl: "Meters" },
+  servicesTitle:     { en: "Services",     nl: "Diensten" },
+  suppliersTitle:    { en: "Suppliers",    nl: "Leveranciers" },
+
+  // Service list columns
+  code:              { en: "Code",         nl: "Code" },
+  service:           { en: "Service",      nl: "Dienst" },
+  category:          { en: "Category",     nl: "Categorie" },
+  regulation:        { en: "Regulation",   nl: "Regelgeving" },
+  metered:           { en: "Metered",      nl: "Gemeten" },
+  variable:          { en: "Variable",     nl: "Variabel" },
+  buildingCount:     { en: "Buildings",    nl: "Gebouwen" },
+  avgCostVhe:        { en: "Avg / VHE",    nl: "Gem. / VHE" },
+
+  // Service categories
+  energy:            { en: "Energy",       nl: "Energie" },
+  water:             { en: "Water",        nl: "Water" },
+  building:          { en: "Building",     nl: "Gebouw" },
+  exterior:          { en: "Exterior",     nl: "Buitenruimte" },
+  insurance:         { en: "Insurance",    nl: "Verzekering" },
+
+  // Boolean labels
+  yes:               { en: "Yes",          nl: "Ja" },
+  no:                { en: "No",           nl: "Nee" },
 };
 
 export function t(key, lang = "en") {
