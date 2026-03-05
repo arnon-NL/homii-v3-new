@@ -1,8 +1,22 @@
 import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Building2, Droplets, Flame, ShowerHead, Zap } from "lucide-react";
+import {
+  Search,
+  Building2,
+  Droplets,
+  Flame,
+  ShowerHead,
+  Zap,
+  ChevronDown,
+  CheckCircle2,
+  Clock,
+  AlertTriangle,
+  FileCheck,
+  Send,
+  Circle,
+} from "lucide-react";
 import { brand } from "@/lib/brand";
-import { buildings } from "@/lib/mockData";
+import { buildings, getSettlementsByYear } from "@/lib/mockData";
 import { t, useLang } from "@/lib/i18n";
 import { StatusBadge } from "./ui/status-badge";
 
@@ -64,6 +78,70 @@ function BudgetBar({ spent, total }) {
   );
 }
 
+/* ── Settlement badge ── */
+const settlementConfig = {
+  not_started:  { icon: Circle,        color: "#94A3B8", bg: "#F8FAFC", label: { en: "Not started",  nl: "Niet gestart" } },
+  monitoring:   { icon: Clock,         color: "#3B82F6", bg: "#EFF6FF", label: { en: "Monitoring",   nl: "Monitoring" } },
+  in_review:    { icon: AlertTriangle, color: "#F59E0B", bg: "#FFFBEB", label: { en: "In review",    nl: "In controle" } },
+  approved:     { icon: FileCheck,     color: "#22C55E", bg: "#F0FDF4", label: { en: "Approved",     nl: "Goedgekeurd" } },
+  distributed:  { icon: Send,          color: "#8B5CF6", bg: "#F5F3FF", label: { en: "Distributed",  nl: "Afgerekend" } },
+};
+
+function SettlementBadge({ status, lang }) {
+  const cfg = settlementConfig[status] || settlementConfig.not_started;
+  const Icon = cfg.icon;
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[11px] font-medium whitespace-nowrap"
+      style={{ background: cfg.bg, color: cfg.color }}
+    >
+      <Icon size={11} />
+      {cfg.label[lang] || cfg.label.en}
+    </span>
+  );
+}
+
+/* ── Net result display ── */
+function NetResult({ value, lang }) {
+  if (value == null) return <span className="text-slate-300">—</span>;
+  const isPositive = value >= 0;
+  const fmt = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(Math.abs(value));
+  return (
+    <span
+      className="text-[12px] font-medium tabular-nums"
+      style={{ color: isPositive ? brand.green : brand.red }}
+    >
+      {isPositive ? `+${fmt}` : `-${fmt}`}
+      <span className="text-[10px] font-normal ml-1 opacity-70">
+        {isPositive
+          ? (lang === "nl" ? "teruggave" : "refund")
+          : (lang === "nl" ? "naheffing" : "surcharge")}
+      </span>
+    </span>
+  );
+}
+
+/* ── Year picker ── */
+function YearPicker({ year, setYear }) {
+  return (
+    <div className="inline-flex items-center rounded-lg bg-slate-100 p-0.5">
+      {[2024, 2025].map((y) => (
+        <button
+          key={y}
+          onClick={() => setYear(y)}
+          className={`px-3 h-7 rounded-md text-xs font-medium tabular-nums transition-all ${
+            year === y
+              ? "bg-white text-slate-900 shadow-sm"
+              : "text-slate-400 hover:text-slate-600"
+          }`}
+        >
+          {y}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 /* ── Data quality filter options ── */
 const qualityFilters = [
   { value: "all",     label: { en: "All",     nl: "Alle" } },
@@ -72,16 +150,38 @@ const qualityFilters = [
   { value: "error",   label: { en: "Error",   nl: "Fout" } },
 ];
 
+/* ── Settlement filter options ── */
+const settlementFilters = [
+  { value: "all",          label: { en: "All",          nl: "Alle" } },
+  { value: "not_started",  label: { en: "Not started",  nl: "Niet gestart" } },
+  { value: "in_review",    label: { en: "In review",    nl: "In controle" } },
+  { value: "approved",     label: { en: "Approved",     nl: "Goedgekeurd" } },
+  { value: "distributed",  label: { en: "Distributed",  nl: "Afgerekend" } },
+];
+
 /* ── Main component ── */
 export default function BuildingListPage() {
   const lang = useLang();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [qualityFilter, setQualityFilter] = useState("all");
+  const [year, setYear] = useState(2025);
+  const [settlementFilter, setSettlementFilter] = useState("all");
+
+  const isPastYear = year < new Date().getFullYear();
+  const settlements = useMemo(() => getSettlementsByYear(year), [year]);
+
+  // Build enriched list: building + settlement for selected year
+  const enriched = useMemo(() => {
+    return buildings.map((b) => {
+      const stl = settlements.find((s) => s.buildingId === b.id);
+      return { ...b, settlement: stl };
+    });
+  }, [settlements]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return buildings.filter((b) => {
+    return enriched.filter((b) => {
       const matchSearch =
         !q ||
         b.complex.toLowerCase().includes(q) ||
@@ -89,21 +189,77 @@ export default function BuildingListPage() {
         b.location.toLowerCase().includes(q);
       const matchQuality =
         qualityFilter === "all" || b.dataQuality === qualityFilter;
-      return matchSearch && matchQuality;
+      const matchSettlement =
+        !isPastYear ||
+        settlementFilter === "all" ||
+        b.settlement?.status === settlementFilter;
+      return matchSearch && matchQuality && matchSettlement;
     });
-  }, [search, qualityFilter]);
+  }, [search, qualityFilter, enriched, isPastYear, settlementFilter]);
+
+  // Settlement summary counts for past year
+  const settlementSummary = useMemo(() => {
+    if (!isPastYear) return null;
+    const counts = { not_started: 0, in_review: 0, approved: 0, distributed: 0 };
+    settlements.forEach((s) => {
+      if (counts[s.status] !== undefined) counts[s.status]++;
+    });
+    return counts;
+  }, [settlements, isPastYear]);
+
+  const fmt = (v) =>
+    new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(v);
 
   return (
     <div className="flex-1 overflow-y-auto">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
 
-        {/* Title + count */}
-        <div className="flex items-baseline gap-2.5 mb-5">
-          <h1 className="text-xl font-semibold" style={{ color: brand.navy }}>
-            {t("buildingsTitle", lang)}
-          </h1>
-          <span className="text-sm text-slate-400">{filtered.length}</span>
+        {/* Title + year + count */}
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-baseline gap-2.5">
+            <h1 className="text-xl font-semibold" style={{ color: brand.navy }}>
+              {t("buildingsTitle", lang)}
+            </h1>
+            <span className="text-sm text-slate-400">{filtered.length}</span>
+          </div>
+          <YearPicker year={year} setYear={setYear} />
         </div>
+
+        {/* Settlement summary bar (past year only) */}
+        {isPastYear && settlementSummary && (
+          <div className="flex flex-wrap items-center gap-2 mb-4 p-3 rounded-lg bg-slate-50 border border-slate-200">
+            <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mr-2">
+              {lang === "nl" ? "Afrekening" : "Settlement"} {year}
+            </span>
+            {Object.entries(settlementSummary).map(([status, count]) => {
+              const cfg = settlementConfig[status];
+              const Icon = cfg.icon;
+              const isActive = settlementFilter === status;
+              return (
+                <button
+                  key={status}
+                  onClick={() =>
+                    setSettlementFilter(isActive ? "all" : status)
+                  }
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[12px] font-medium transition-all ${
+                    isActive
+                      ? "ring-2 ring-offset-1 shadow-sm"
+                      : "hover:bg-white"
+                  }`}
+                  style={{
+                    background: isActive ? cfg.bg : "transparent",
+                    color: cfg.color,
+                    ringColor: isActive ? cfg.color : undefined,
+                  }}
+                >
+                  <Icon size={12} />
+                  <span className="tabular-nums font-bold">{count}</span>
+                  <span className="hidden sm:inline">{cfg.label[lang] || cfg.label.en}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {/* Search & filter bar */}
         <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -173,10 +329,17 @@ export default function BuildingListPage() {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between gap-3">
-                <UtilityIcons utilities={b.utilities} lang={lang} />
-                <BudgetBar spent={b.budgetSpent} total={b.budgetTotal} />
-              </div>
+              {isPastYear && b.settlement ? (
+                <div className="flex items-center justify-between gap-3">
+                  <SettlementBadge status={b.settlement.status} lang={lang} />
+                  <NetResult value={b.settlement.netResult} lang={lang} />
+                </div>
+              ) : (
+                <div className="flex items-center justify-between gap-3">
+                  <UtilityIcons utilities={b.utilities} lang={lang} />
+                  <BudgetBar spent={b.budgetSpent} total={b.budgetTotal} />
+                </div>
+              )}
             </button>
           ))}
           {filtered.length === 0 && (
@@ -198,14 +361,21 @@ export default function BuildingListPage() {
                   { key: "vhe",           align: "right" },
                   { key: "components",    align: "right" },
                   { key: "utilities",     align: "left" },
-                  { key: "budgetProgress",align: "left" },
+                  ...(isPastYear
+                    ? [
+                        { key: "settlementStatus", align: "center", label: { en: "Settlement", nl: "Afrekening" } },
+                        { key: "netResult",        align: "right",  label: { en: "Net Result", nl: "Netto Resultaat" } },
+                      ]
+                    : [
+                        { key: "budgetProgress",align: "left" },
+                      ]),
                   { key: "dataQuality",   align: "center" },
                 ].map((col) => (
                   <th
                     key={col.key}
                     className={`text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 sm:px-4 py-2.5 text-${col.align} whitespace-nowrap`}
                   >
-                    {t(col.key, lang)}
+                    {col.label ? (col.label[lang] || col.label.en) : t(col.key, lang)}
                   </th>
                 ))}
               </tr>
@@ -263,10 +433,23 @@ export default function BuildingListPage() {
                     <UtilityIcons utilities={b.utilities} lang={lang} />
                   </td>
 
-                  {/* Budget progress */}
-                  <td className="px-3 sm:px-4 py-3">
-                    <BudgetBar spent={b.budgetSpent} total={b.budgetTotal} />
-                  </td>
+                  {/* Conditional columns: settlement (past year) or budget (current) */}
+                  {isPastYear ? (
+                    <>
+                      <td className="px-3 sm:px-4 py-3 text-center">
+                        {b.settlement && (
+                          <SettlementBadge status={b.settlement.status} lang={lang} />
+                        )}
+                      </td>
+                      <td className="px-3 sm:px-4 py-3 text-right">
+                        <NetResult value={b.settlement?.netResult} lang={lang} />
+                      </td>
+                    </>
+                  ) : (
+                    <td className="px-3 sm:px-4 py-3">
+                      <BudgetBar spent={b.budgetSpent} total={b.budgetTotal} />
+                    </td>
+                  )}
 
                   {/* Data quality */}
                   <td className="px-3 sm:px-4 py-3 text-center">
@@ -277,7 +460,7 @@ export default function BuildingListPage() {
               {filtered.length === 0 && (
                 <tr>
                   <td
-                    colSpan={8}
+                    colSpan={isPastYear ? 9 : 8}
                     className="px-3 sm:px-4 py-8 text-center text-sm text-slate-400"
                   >
                     {t("noResults", lang)}

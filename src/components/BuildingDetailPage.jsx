@@ -31,6 +31,8 @@ import {
   getMetersByBuilding,
   getActivitiesByBuilding,
   getDistributionMethod,
+  getSettlement,
+  getSettlementChecks,
   serviceCategories,
 } from "@/lib/mockData";
 
@@ -42,6 +44,14 @@ const categoryConfig = {
   management:    { icon: HardHat,    color: "#F59E0B", bg: "#FFFBEB" },
   other:         { icon: FolderOpen, color: "#64748B", bg: "#F8FAFC" },
 };
+import {
+  Circle,
+  FileCheck,
+  Send,
+  Ban,
+  ShieldCheck,
+  Flag,
+} from "lucide-react";
 import { t, useLang } from "@/lib/i18n";
 import Breadcrumbs from "./Breadcrumbs";
 import { Card, CardContent } from "./ui/card";
@@ -143,6 +153,55 @@ const activityIcons = {
   alert: { icon: AlertTriangle, color: brand.red },
 };
 
+/* ── Settlement status config ── */
+const settlementStatusConfig = {
+  not_started:  { icon: Circle,        color: "#94A3B8", bg: "#F8FAFC", label: { en: "Not started",  nl: "Niet gestart" } },
+  monitoring:   { icon: Clock,         color: "#3B82F6", bg: "#EFF6FF", label: { en: "Monitoring",   nl: "Monitoring" } },
+  in_review:    { icon: AlertTriangle, color: "#F59E0B", bg: "#FFFBEB", label: { en: "In review",    nl: "In controle" } },
+  approved:     { icon: FileCheck,     color: "#22C55E", bg: "#F0FDF4", label: { en: "Approved",     nl: "Goedgekeurd" } },
+  distributed:  { icon: Send,          color: "#8B5CF6", bg: "#F5F3FF", label: { en: "Distributed",  nl: "Afgerekend" } },
+};
+
+/* ── Settlement check icon ── */
+function CheckIcon({ passed, label }) {
+  return (
+    <div className="flex items-center gap-1.5" title={label}>
+      {passed ? (
+        <CheckCircle2 size={13} className="text-green-500" />
+      ) : passed === false ? (
+        <AlertTriangle size={13} className="text-amber-500" />
+      ) : (
+        <Circle size={13} className="text-slate-300" />
+      )}
+      <span className={`text-[11px] ${passed ? "text-slate-600" : passed === false ? "text-amber-600 font-medium" : "text-slate-400"}`}>
+        {label}
+      </span>
+    </div>
+  );
+}
+
+/* ── Settlement check status badge ── */
+const checkStatusConfig = {
+  approved: { icon: CheckCircle2, color: "#22C55E", bg: "#F0FDF4", label: { en: "Approved",  nl: "Goedgekeurd" } },
+  verified: { icon: ShieldCheck,  color: "#3B82F6", bg: "#EFF6FF", label: { en: "Verified",  nl: "Geverifieerd" } },
+  flagged:  { icon: Flag,         color: "#EF4444", bg: "#FEF2F2", label: { en: "Flagged",   nl: "Gemarkeerd" } },
+  pending:  { icon: Clock,        color: "#94A3B8", bg: "#F8FAFC", label: { en: "Pending",   nl: "In afwachting" } },
+};
+
+function CheckStatusBadge({ status, lang }) {
+  const cfg = checkStatusConfig[status] || checkStatusConfig.pending;
+  const Icon = cfg.icon;
+  return (
+    <span
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium"
+      style={{ background: cfg.bg, color: cfg.color }}
+    >
+      <Icon size={10} />
+      {cfg.label[lang] || cfg.label.en}
+    </span>
+  );
+}
+
 /* ── Currency formatter ── */
 const fmt = (v) =>
   new Intl.NumberFormat("nl-NL", {
@@ -163,6 +222,8 @@ export default function BuildingDetailPage() {
 
   const building = getBuilding(buildingId);
 
+  const isPastYear = year < new Date().getFullYear();
+
   // Related data
   const bsRelations = useMemo(
     () => getBuildingServices(buildingId, year),
@@ -176,6 +237,14 @@ export default function BuildingDetailPage() {
   const activityList = useMemo(
     () => getActivitiesByBuilding(buildingId),
     [buildingId]
+  );
+  const settlement = useMemo(
+    () => getSettlement(buildingId, year),
+    [buildingId, year]
+  );
+  const sChecks = useMemo(
+    () => getSettlementChecks(buildingId, year),
+    [buildingId, year]
   );
 
   // Derived KPIs
@@ -313,19 +382,33 @@ export default function BuildingDetailPage() {
                       icon={Activity}
                       color={variance >= 0 ? brand.green : brand.red}
                     />
-                    <KpiCard
-                      label={t("settlementReadiness", lang)}
-                      value={`${avgCompleteness}%`}
-                      sub={`${completeCount}/${bsRelations.length} ${t("services", lang).toLowerCase()}`}
-                      icon={CheckCircle2}
-                      color={
-                        avgCompleteness >= 100
-                          ? brand.green
-                          : avgCompleteness >= 75
-                          ? brand.amber
-                          : brand.red
-                      }
-                    />
+                    {isPastYear && settlement ? (
+                      <KpiCard
+                        label={t("settlementReadiness", lang)}
+                        value={
+                          settlement.netResult != null
+                            ? (settlement.netResult >= 0 ? "+" : "") + fmt(settlement.netResult)
+                            : "—"
+                        }
+                        sub={settlementStatusConfig[settlement.status]?.label[lang]}
+                        icon={settlementStatusConfig[settlement.status]?.icon || Circle}
+                        color={settlementStatusConfig[settlement.status]?.color}
+                      />
+                    ) : (
+                      <KpiCard
+                        label={t("settlementReadiness", lang)}
+                        value={`${avgCompleteness}%`}
+                        sub={`${completeCount}/${bsRelations.length} ${t("services", lang).toLowerCase()}`}
+                        icon={CheckCircle2}
+                        color={
+                          avgCompleteness >= 100
+                            ? brand.green
+                            : avgCompleteness >= 75
+                            ? brand.amber
+                            : brand.red
+                        }
+                      />
+                    )}
                     <KpiCard
                       label={t("activeServices", lang)}
                       value={bsRelations.length}
@@ -397,11 +480,106 @@ export default function BuildingDetailPage() {
                 </div>
               </TabsContent>
 
-              {/* ═══ SERVICES TAB — grouped by category ═══ */}
+              {/* ═══ SERVICES TAB — grouped by category, with settlement controls ═══ */}
               <TabsContent value="services">
                 <div className="mt-4 space-y-5">
+
+                  {/* Settlement banner (past year only) */}
+                  {isPastYear && settlement && (
+                    <Card className="border-slate-200 bg-white overflow-hidden">
+                      <div
+                        className="h-1"
+                        style={{ background: (settlementStatusConfig[settlement.status]?.color || "#94A3B8") }}
+                      />
+                      <CardContent className="p-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            {(() => {
+                              const sCfg = settlementStatusConfig[settlement.status];
+                              const SIcon = sCfg?.icon || Circle;
+                              return (
+                                <div
+                                  className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                                  style={{ background: sCfg?.bg }}
+                                >
+                                  <SIcon size={18} style={{ color: sCfg?.color }} />
+                                </div>
+                              );
+                            })()}
+                            <div>
+                              <p className="text-[13px] font-semibold" style={{ color: brand.navy }}>
+                                {lang === "nl" ? "Afrekening" : "Settlement"} {year}
+                              </p>
+                              <p className="text-[12px] text-slate-500">
+                                {settlementStatusConfig[settlement.status]?.label[lang]}
+                                {settlement.approvedAt && (
+                                  <span className="ml-2 text-slate-400">
+                                    {lang === "nl" ? "Goedgekeurd:" : "Approved:"} {settlement.approvedAt}
+                                  </span>
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                          {settlement.netResult != null && (
+                            <div className="text-right">
+                              <span
+                                className="text-lg font-bold tabular-nums"
+                                style={{ color: settlement.netResult >= 0 ? brand.green : brand.red }}
+                              >
+                                {settlement.netResult >= 0 ? "+" : ""}{fmt(settlement.netResult)}
+                              </span>
+                              <p className="text-[11px] text-slate-400">
+                                {settlement.netResult >= 0
+                                  ? (lang === "nl" ? "teruggave" : "refund")
+                                  : (lang === "nl" ? "naheffing" : "surcharge")}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Settlement checks summary */}
+                        {sChecks.length > 0 && (
+                          <div className="mt-4 pt-3 border-t border-slate-100">
+                            <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mb-2">
+                              {lang === "nl" ? "Controles per dienst" : "Checks per service"}
+                            </p>
+                            <div className="grid gap-2">
+                              {sChecks.map((sc) => {
+                                const svc = getService(sc.serviceId);
+                                return (
+                                  <div
+                                    key={sc.id}
+                                    className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-slate-50"
+                                  >
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <span className="text-[11px] font-mono text-slate-500">{svc?.code}</span>
+                                      <span className="text-[12px] text-slate-700 truncate">
+                                        {svc?.name[lang] || sc.serviceId}
+                                      </span>
+                                    </div>
+                                    <div className="flex items-center gap-3 shrink-0">
+                                      <div className="hidden lg:flex items-center gap-3">
+                                        <CheckIcon passed={sc.ledgerComplete} label={lang === "nl" ? "Boekhouding" : "Ledger"} />
+                                        <CheckIcon passed={sc.budgetApproved} label={lang === "nl" ? "Budget" : "Budget"} />
+                                        <CheckIcon passed={!sc.yoyFlagged} label="YoY" />
+                                        {sc.consumptionVerified !== false && (
+                                          <CheckIcon passed={sc.consumptionVerified} label={lang === "nl" ? "Verbruik" : "Usage"} />
+                                        )}
+                                      </div>
+                                      <CheckStatusBadge status={sc.status} lang={lang} />
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Category-grouped service tables */}
                   {(() => {
-                    // Group enriched building-services by category
                     const grouped = serviceCategories
                       .map((cat) => ({
                         ...cat,

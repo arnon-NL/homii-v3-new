@@ -602,6 +602,81 @@ export function getDistributionMethod(code) {
   return distributionMethods.find((dm) => dm.code === code);
 }
 
+// ── Settlement data ──
+// Settlement status per building per year — tracks the eindafrekening lifecycle
+// Statuses: not_started | monitoring | in_review | approved | distributed
+
+export const buildingSettlements = [
+  // 2024 — completed year, various states
+  { id: "STL-001-2024", buildingId: "BLD-001", year: 2024, status: "distributed", approvedAt: "2025-02-15", distributedAt: "2025-03-01", totalCost: 49800, totalVoorschot: 52000, netResult: 2200 },
+  { id: "STL-002-2024", buildingId: "BLD-002", year: 2024, status: "approved",    approvedAt: "2025-02-28", distributedAt: null, totalCost: 231400, totalVoorschot: 236500, netResult: 5100 },
+  { id: "STL-003-2024", buildingId: "BLD-003", year: 2024, status: "distributed", approvedAt: "2025-01-20", distributedAt: "2025-02-10", totalCost: 59200, totalVoorschot: 57750, netResult: -1450 },
+  { id: "STL-004-2024", buildingId: "BLD-004", year: 2024, status: "in_review",   approvedAt: null, distributedAt: null, totalCost: 428600, totalVoorschot: 432000, netResult: 3400 },
+  { id: "STL-005-2024", buildingId: "BLD-005", year: 2024, status: "in_review",   approvedAt: null, distributedAt: null, totalCost: 52100, totalVoorschot: 54000, netResult: 1900 },
+  { id: "STL-006-2024", buildingId: "BLD-006", year: 2024, status: "approved",    approvedAt: "2025-03-01", distributedAt: null, totalCost: 23800, totalVoorschot: 24000, netResult: 200 },
+  { id: "STL-007-2024", buildingId: "BLD-007", year: 2024, status: "distributed", approvedAt: "2025-01-15", distributedAt: "2025-02-01", totalCost: 41200, totalVoorschot: 42460, netResult: 1260 },
+  { id: "STL-008-2024", buildingId: "BLD-008", year: 2024, status: "not_started", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 28500, netResult: null },
+  { id: "STL-009-2024", buildingId: "BLD-009", year: 2024, status: "in_review",   approvedAt: null, distributedAt: null, totalCost: 107800, totalVoorschot: 110000, netResult: 2200 },
+  { id: "STL-010-2024", buildingId: "BLD-010", year: 2024, status: "not_started", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 94500, netResult: null },
+  { id: "STL-011-2024", buildingId: "BLD-011", year: 2024, status: "approved",    approvedAt: "2025-02-20", distributedAt: null, totalCost: 12400, totalVoorschot: 12500, netResult: 100 },
+  { id: "STL-012-2024", buildingId: "BLD-012", year: 2024, status: "distributed", approvedAt: "2025-01-10", distributedAt: "2025-01-25", totalCost: 39600, totalVoorschot: 40250, netResult: 650 },
+  { id: "STL-013-2024", buildingId: "BLD-013", year: 2024, status: "not_started", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 31500, netResult: null },
+  { id: "STL-014-2024", buildingId: "BLD-014", year: 2024, status: "in_review",   approvedAt: null, distributedAt: null, totalCost: 118200, totalVoorschot: 121000, netResult: 2800 },
+  { id: "STL-015-2024", buildingId: "BLD-015", year: 2024, status: "distributed", approvedAt: "2025-02-05", distributedAt: "2025-02-20", totalCost: 138500, totalVoorschot: 140000, netResult: 1500 },
+  { id: "STL-016-2024", buildingId: "BLD-016", year: 2024, status: "approved",    approvedAt: "2025-03-02", distributedAt: null, totalCost: 27200, totalVoorschot: 27500, netResult: 300 },
+  { id: "STL-017-2024", buildingId: "BLD-017", year: 2024, status: "not_started", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 42000, netResult: null },
+  { id: "STL-018-2024", buildingId: "BLD-018", year: 2024, status: "in_review",   approvedAt: null, distributedAt: null, totalCost: 167400, totalVoorschot: 170000, netResult: 2600 },
+  { id: "STL-019-2024", buildingId: "BLD-019", year: 2024, status: "distributed", approvedAt: "2025-01-30", distributedAt: "2025-02-15", totalCost: 34800, totalVoorschot: 35000, netResult: 200 },
+  { id: "STL-020-2024", buildingId: "BLD-020", year: 2024, status: "approved",    approvedAt: "2025-02-25", distributedAt: null, totalCost: 155800, totalVoorschot: 157500, netResult: 1700 },
+  { id: "STL-021-2024", buildingId: "BLD-021", year: 2024, status: "distributed", approvedAt: "2025-01-25", distributedAt: "2025-02-08", totalCost: 74200, totalVoorschot: 75000, netResult: 800 },
+
+  // 2025 — current year, all monitoring
+  ...buildings.map((b) => ({
+    id: `STL-${b.id.replace("BLD-", "")}-2025`,
+    buildingId: b.id,
+    year: 2025,
+    status: "monitoring",
+    approvedAt: null,
+    distributedAt: null,
+    totalCost: null,
+    totalVoorschot: b.budgetTotal,
+    netResult: null,
+  })),
+];
+
+// Settlement checks per building-service (for 2024 — the year under settlement)
+// Each check tracks: ledger completeness, budget variance, YoY comparison, consumption verification
+export const settlementChecks = [
+  // BLD-007 Kloostergang 2024 — fully verified (was distributed)
+  { id: "SC-007-108", buildingId: "BLD-007", serviceId: "SVC-108", year: 2024, ledgerComplete: true,  budgetVariance: -2.1,  budgetApproved: true,  yoyDeviation: 3.5,   yoyFlagged: false, consumptionVerified: true,  status: "approved" },
+  { id: "SC-007-105", buildingId: "BLD-007", serviceId: "SVC-105", year: 2024, ledgerComplete: true,  budgetVariance: 1.8,   budgetApproved: true,  yoyDeviation: -1.2,  yoyFlagged: false, consumptionVerified: true,  status: "approved" },
+  { id: "SC-007-118", buildingId: "BLD-007", serviceId: "SVC-118", year: 2024, ledgerComplete: true,  budgetVariance: -4.5,  budgetApproved: true,  yoyDeviation: 8.2,   yoyFlagged: false, consumptionVerified: false, status: "approved" },
+  { id: "SC-007-102", buildingId: "BLD-007", serviceId: "SVC-102", year: 2024, ledgerComplete: true,  budgetVariance: 0.8,   budgetApproved: true,  yoyDeviation: -2.1,  yoyFlagged: false, consumptionVerified: true,  status: "approved" },
+  { id: "SC-007-131", buildingId: "BLD-007", serviceId: "SVC-131", year: 2024, ledgerComplete: true,  budgetVariance: -1.2,  budgetApproved: true,  yoyDeviation: 5.0,   yoyFlagged: false, consumptionVerified: false, status: "approved" },
+  { id: "SC-007-123", buildingId: "BLD-007", serviceId: "SVC-123", year: 2024, ledgerComplete: true,  budgetVariance: 2.3,   budgetApproved: true,  yoyDeviation: -0.5,  yoyFlagged: false, consumptionVerified: false, status: "approved" },
+
+  // BLD-004 De Lindeborg 2024 — in review (some issues)
+  { id: "SC-004-108", buildingId: "BLD-004", serviceId: "SVC-108", year: 2024, ledgerComplete: true,  budgetVariance: -3.2,  budgetApproved: true,  yoyDeviation: 5.8,   yoyFlagged: false, consumptionVerified: true,  status: "verified" },
+  { id: "SC-004-105", buildingId: "BLD-004", serviceId: "SVC-105", year: 2024, ledgerComplete: true,  budgetVariance: 8.5,   budgetApproved: false, yoyDeviation: 12.3,  yoyFlagged: true,  consumptionVerified: true,  status: "flagged" },
+  { id: "SC-004-102", buildingId: "BLD-004", serviceId: "SVC-102", year: 2024, ledgerComplete: true,  budgetVariance: -1.5,  budgetApproved: true,  yoyDeviation: 2.1,   yoyFlagged: false, consumptionVerified: true,  status: "verified" },
+  { id: "SC-004-118a",buildingId: "BLD-004", serviceId: "SVC-118", year: 2024, ledgerComplete: false, budgetVariance: null,  budgetApproved: false, yoyDeviation: null,  yoyFlagged: false, consumptionVerified: false, status: "pending" },
+  { id: "SC-004-118b",buildingId: "BLD-004", serviceId: "SVC-118", year: 2024, ledgerComplete: true,  budgetVariance: -6.1,  budgetApproved: true,  yoyDeviation: -3.4,  yoyFlagged: false, consumptionVerified: false, status: "verified" },
+  { id: "SC-004-131", buildingId: "BLD-004", serviceId: "SVC-131", year: 2024, ledgerComplete: true,  budgetVariance: 18.2,  budgetApproved: false, yoyDeviation: 22.5,  yoyFlagged: true,  consumptionVerified: false, status: "flagged" },
+  { id: "SC-004-123", buildingId: "BLD-004", serviceId: "SVC-123", year: 2024, ledgerComplete: true,  budgetVariance: -0.8,  budgetApproved: true,  yoyDeviation: 1.2,   yoyFlagged: false, consumptionVerified: false, status: "verified" },
+];
+
+export function getSettlement(buildingId, year) {
+  return buildingSettlements.find((s) => s.buildingId === buildingId && s.year === year);
+}
+
+export function getSettlementsByYear(year) {
+  return buildingSettlements.filter((s) => s.year === year);
+}
+
+export function getSettlementChecks(buildingId, year) {
+  return settlementChecks.filter((sc) => sc.buildingId === buildingId && sc.year === year);
+}
+
 export function getServicesByCategory() {
   return serviceCategories.map((cat) => ({
     ...cat,
