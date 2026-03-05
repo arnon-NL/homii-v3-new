@@ -69,11 +69,11 @@ const dict = {
   avgCostVhe:        { en: "Avg / VHE",    nl: "Gem. / VHE" },
 
   // Service categories
-  energy:            { en: "Energy",       nl: "Energie" },
-  water:             { en: "Water",        nl: "Water" },
-  building:          { en: "Building",     nl: "Gebouw" },
-  exterior:          { en: "Exterior",     nl: "Buitenruimte" },
-  insurance:         { en: "Insurance",    nl: "Verzekering" },
+  energy:            { en: "Energy & Water",               nl: "Energie & Water" },
+  installations:     { en: "Installations & Maintenance",  nl: "Installaties & Technisch Beheer" },
+  cleaning:          { en: "Cleaning & Exterior",          nl: "Schoonmaak & Buitenruimte" },
+  management:        { en: "Management & Services",        nl: "Beheer & Woonservices" },
+  other:             { en: "Other & Insurance",            nl: "Overig & Verzekeringen" },
 
   // Boolean labels
   yes:               { en: "Yes",          nl: "Ja" },

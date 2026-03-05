@@ -11,6 +11,9 @@ import {
   Flame,
   Droplets,
   Zap,
+  Sparkles,
+  HardHat,
+  FolderOpen,
   ArrowUpRight,
   AlertTriangle,
   CheckCircle2,
@@ -28,7 +31,17 @@ import {
   getMetersByBuilding,
   getActivitiesByBuilding,
   getDistributionMethod,
+  serviceCategories,
 } from "@/lib/mockData";
+
+/* ── Category icon + color config ── */
+const categoryConfig = {
+  energy:        { icon: Zap,        color: "#EF4444", bg: "#FEF2F2" },
+  installations: { icon: Wrench,     color: "#8B5CF6", bg: "#F5F3FF" },
+  cleaning:      { icon: Sparkles,   color: "#22C55E", bg: "#F0FDF4" },
+  management:    { icon: HardHat,    color: "#F59E0B", bg: "#FFFBEB" },
+  other:         { icon: FolderOpen, color: "#64748B", bg: "#F8FAFC" },
+};
 import { t, useLang } from "@/lib/i18n";
 import Breadcrumbs from "./Breadcrumbs";
 import { Card, CardContent } from "./ui/card";
@@ -384,98 +397,134 @@ export default function BuildingDetailPage() {
                 </div>
               </TabsContent>
 
-              {/* ═══ SERVICES TAB ═══ */}
+              {/* ═══ SERVICES TAB — grouped by category ═══ */}
               <TabsContent value="services">
-                <div className="mt-4">
-                  {/* Desktop table */}
-                  <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-slate-200 bg-slate-50/80">
-                          {[
-                            { key: "code", align: "left" },
-                            { key: "service", align: "left" },
-                            { key: "distributionMethod", align: "left" },
-                            { key: "budgetProgress", align: "right" },
-                            { key: "actual", align: "right" },
-                            { key: "variance", align: "right" },
-                            { key: "completeness", align: "center" },
-                          ].map((col) => (
-                            <th
-                              key={col.key}
-                              className={`text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 sm:px-4 py-2.5 text-${col.align} whitespace-nowrap`}
+                <div className="mt-4 space-y-5">
+                  {(() => {
+                    // Group enriched building-services by category
+                    const grouped = serviceCategories
+                      .map((cat) => ({
+                        ...cat,
+                        items: enrichedBs.filter(
+                          (bs) => bs.service?.category === cat.id
+                        ),
+                      }))
+                      .filter((g) => g.items.length > 0);
+
+                    if (grouped.length === 0)
+                      return (
+                        <div className="px-4 py-8 text-center text-sm text-slate-400">
+                          {t("noResults", lang)}
+                        </div>
+                      );
+
+                    return grouped.map((group) => {
+                      const cfg = categoryConfig[group.id];
+                      const GroupIcon = cfg?.icon || Wrench;
+                      return (
+                        <div key={group.id}>
+                          {/* Category header */}
+                          <div className="flex items-center gap-2 mb-2">
+                            <div
+                              className="w-5 h-5 rounded flex items-center justify-center"
+                              style={{ background: cfg?.bg, color: cfg?.color }}
                             >
-                              {t(col.key, lang)}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100">
-                        {enrichedBs.map((bs) => {
-                          const v = bs.budget - bs.actual;
-                          return (
-                            <tr
-                              key={bs.id}
-                              className="hover:bg-slate-50/80 transition-colors cursor-pointer"
-                              onClick={() =>
-                                navigate(`/services/${bs.serviceId}`)
-                              }
+                              <GroupIcon size={11} />
+                            </div>
+                            <span
+                              className="text-[12px] font-semibold uppercase tracking-wider"
+                              style={{ color: cfg?.color }}
                             >
-                              <td className="px-3 sm:px-4 py-3">
-                                <span className="text-[12px] font-mono font-semibold text-slate-600">
-                                  {bs.service?.code}
-                                </span>
-                              </td>
-                              <td className="px-3 sm:px-4 py-3">
-                                <div
-                                  className="text-[13px] font-medium"
-                                  style={{ color: brand.navy }}
-                                >
-                                  {bs.service?.name[lang] || bs.serviceId}
-                                </div>
-                              </td>
-                              <td className="px-3 sm:px-4 py-3">
-                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600">
-                                  {bs.distMethod?.name[lang] ||
-                                    bs.distributionMethod}
-                                </span>
-                              </td>
-                              <td className="px-3 sm:px-4 py-3 text-right tabular-nums text-[13px] text-slate-600">
-                                {fmt(bs.budget)}
-                              </td>
-                              <td className="px-3 sm:px-4 py-3 text-right tabular-nums text-[13px] text-slate-600">
-                                {fmt(bs.actual)}
-                              </td>
-                              <td className="px-3 sm:px-4 py-3 text-right">
-                                <span
-                                  className="text-[13px] tabular-nums font-medium"
-                                  style={{
-                                    color: v >= 0 ? brand.green : brand.red,
-                                  }}
-                                >
-                                  {v >= 0 ? "+" : ""}
-                                  {fmt(v)}
-                                </span>
-                              </td>
-                              <td className="px-3 sm:px-4 py-3">
-                                <CompletenessBar pct={bs.completeness} />
-                              </td>
-                            </tr>
-                          );
-                        })}
-                        {enrichedBs.length === 0 && (
-                          <tr>
-                            <td
-                              colSpan={7}
-                              className="px-4 py-8 text-center text-sm text-slate-400"
-                            >
-                              {t("noResults", lang)}
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
+                              {group.label[lang] || group.label.en}
+                            </span>
+                          </div>
+
+                          {/* Table */}
+                          <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
+                            <table className="w-full text-sm">
+                              <thead>
+                                <tr className="border-b border-slate-200 bg-slate-50/80">
+                                  {[
+                                    { key: "code", align: "left" },
+                                    { key: "service", align: "left" },
+                                    { key: "distributionMethod", align: "left" },
+                                    { key: "budgetProgress", align: "right" },
+                                    { key: "actual", align: "right" },
+                                    { key: "variance", align: "right" },
+                                    { key: "completeness", align: "center" },
+                                  ].map((col) => (
+                                    <th
+                                      key={col.key}
+                                      className={`text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 sm:px-4 py-2 text-${col.align} whitespace-nowrap`}
+                                    >
+                                      {t(col.key, lang)}
+                                    </th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              <tbody className="divide-y divide-slate-100">
+                                {group.items.map((bs) => {
+                                  const v = bs.budget - bs.actual;
+                                  return (
+                                    <tr
+                                      key={bs.id}
+                                      className="hover:bg-slate-50/80 transition-colors cursor-pointer"
+                                      onClick={() =>
+                                        navigate(`/services/${bs.serviceId}`)
+                                      }
+                                    >
+                                      <td className="px-3 sm:px-4 py-2.5">
+                                        <span className="text-[12px] font-mono font-semibold text-slate-600">
+                                          {bs.service?.code}
+                                        </span>
+                                      </td>
+                                      <td className="px-3 sm:px-4 py-2.5">
+                                        <div
+                                          className="text-[13px] font-medium"
+                                          style={{ color: brand.navy }}
+                                        >
+                                          {bs.service?.name[lang] || bs.serviceId}
+                                        </div>
+                                      </td>
+                                      <td className="px-3 sm:px-4 py-2.5">
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600">
+                                          {bs.distMethod?.name[lang] ||
+                                            bs.distributionMethod}
+                                        </span>
+                                      </td>
+                                      <td className="px-3 sm:px-4 py-2.5 text-right tabular-nums text-[13px] text-slate-600">
+                                        {fmt(bs.budget)}
+                                      </td>
+                                      <td className="px-3 sm:px-4 py-2.5 text-right tabular-nums text-[13px] text-slate-600">
+                                        {fmt(bs.actual)}
+                                      </td>
+                                      <td className="px-3 sm:px-4 py-2.5 text-right">
+                                        <span
+                                          className="text-[13px] tabular-nums font-medium"
+                                          style={{
+                                            color:
+                                              v >= 0 ? brand.green : brand.red,
+                                          }}
+                                        >
+                                          {v >= 0 ? "+" : ""}
+                                          {fmt(v)}
+                                        </span>
+                                      </td>
+                                      <td className="px-3 sm:px-4 py-2.5">
+                                        <CompletenessBar
+                                          pct={bs.completeness}
+                                        />
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
                 </div>
               </TabsContent>
 
