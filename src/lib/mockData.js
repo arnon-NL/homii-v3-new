@@ -677,6 +677,121 @@ export function getSettlementChecks(buildingId, year) {
   return settlementChecks.filter((sc) => sc.buildingId === buildingId && sc.year === year);
 }
 
+// ── Saved Views ──
+// Views are saved column/filter configurations per object type.
+// Each view defines which columns to show and which filters to apply.
+// objectType matches the sidebar object (buildings, vhe, services, meters, suppliers).
+
+export const savedViews = [
+  // ── Complexes views ──
+  {
+    id: "view-all-complexes",
+    objectType: "buildings",
+    name: { en: "All Complexes", nl: "Alle Complexen" },
+    icon: "list",
+    isDefault: true,
+    columns: ["complex", "complexId", "location", "vhe", "components", "utilities", "budgetProgress", "dataQuality"],
+    filters: {},
+    year: null, // null = current year
+  },
+  {
+    id: "view-energy-overview",
+    objectType: "buildings",
+    name: { en: "Energy Overview", nl: "Energie Overzicht" },
+    icon: "zap",
+    isDefault: false,
+    columns: ["complex", "location", "vhe", "utilities", "budgetProgress", "dataQuality"],
+    filters: { hasUtility: true },
+    year: null,
+  },
+  {
+    id: "view-settlement-2024",
+    objectType: "buildings",
+    name: { en: "Settlement 2024", nl: "Afrekening 2024" },
+    icon: "fileCheck",
+    isDefault: false,
+    columns: ["complex", "location", "vhe", "components", "settlementStatus", "netResult"],
+    filters: {},
+    year: 2024,
+  },
+  {
+    id: "view-settlement-2025",
+    objectType: "buildings",
+    name: { en: "Settlement 2025", nl: "Afrekening 2025" },
+    icon: "fileCheck",
+    isDefault: false,
+    columns: ["complex", "location", "vhe", "components", "settlementStatus", "netResult"],
+    filters: {},
+    year: 2025,
+  },
+
+  // ── Units views ──
+  {
+    id: "view-all-units",
+    objectType: "vhe",
+    name: { en: "All Units", nl: "Alle Eenheden" },
+    icon: "list",
+    isDefault: true,
+    columns: [],
+    filters: {},
+    year: null,
+  },
+
+  // ── Services views ──
+  {
+    id: "view-all-services",
+    objectType: "services",
+    name: { en: "All Services", nl: "Alle Diensten" },
+    icon: "list",
+    isDefault: true,
+    columns: [],
+    filters: {},
+    year: null,
+  },
+
+  // ── Suppliers views ──
+  {
+    id: "view-all-suppliers",
+    objectType: "suppliers",
+    name: { en: "All Suppliers", nl: "Alle Leveranciers" },
+    icon: "list",
+    isDefault: true,
+    columns: [],
+    filters: {},
+    year: null,
+  },
+
+  // ── Meters views ──
+  {
+    id: "view-all-meters",
+    objectType: "meters",
+    name: { en: "All Meters", nl: "Alle Meters" },
+    icon: "list",
+    isDefault: true,
+    columns: [],
+    filters: {},
+    year: null,
+  },
+  {
+    id: "view-overdue-readings",
+    objectType: "meters",
+    name: { en: "Overdue Readings", nl: "Achterstallige Standen" },
+    icon: "alertTriangle",
+    isDefault: false,
+    columns: [],
+    filters: { overdue: true },
+    year: null,
+  },
+];
+
+export function getViewsForObject(objectType) {
+  return savedViews.filter((v) => v.objectType === objectType);
+}
+
+export function getView(viewId) {
+  return savedViews.find((v) => v.id === viewId);
+}
+
 export function getServicesByCategory() {
   return serviceCategories.map((cat) => ({
     ...cat,

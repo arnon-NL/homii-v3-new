@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation, useSearchParams } from "react-router-dom";
 import {
   Home,
   Inbox,
@@ -12,10 +12,35 @@ import {
   Wrench,
   Truck,
   Search,
+  LayoutGrid,
+  Zap,
+  FileCheck,
+  List,
+  AlertTriangle,
+  Plus,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import { t, useLang } from "@/lib/i18n";
+import { savedViews } from "@/lib/mockData";
 
+/* ── Icon lookup for view icons ── */
+const viewIconMap = {
+  list: List,
+  zap: Zap,
+  fileCheck: FileCheck,
+  alertTriangle: AlertTriangle,
+};
+
+/* ── Object type → route prefix mapping ── */
+const objectRouteMap = {
+  buildings: "/buildings",
+  vhe: "/vhe",
+  services: "/services",
+  suppliers: "/suppliers",
+  meters: "/meters",
+};
+
+/* ── Nav button (main nav + objects) ── */
 function NavButton({ item, showCount }) {
   const Icon = item.icon;
   return (
@@ -45,6 +70,36 @@ function NavButton({ item, showCount }) {
   );
 }
 
+/* ── View button (in Views section) ── */
+function ViewButton({ view, lang }) {
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const Icon = viewIconMap[view.icon] || List;
+  const basePath = objectRouteMap[view.objectType] || "/buildings";
+  const viewPath = `${basePath}?view=${view.id}`;
+
+  // Check if this view is currently active
+  const isActive =
+    location.pathname === basePath &&
+    searchParams.get("view") === view.id;
+
+  return (
+    <NavLink
+      to={viewPath}
+      className={`w-full flex items-center gap-2.5 h-7 pl-4 pr-2.5 rounded-md text-[12px] transition-colors no-underline ${
+        isActive
+          ? "bg-slate-200/60 text-slate-900 font-medium"
+          : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+      }`}
+    >
+      <Icon size={13} strokeWidth={isActive ? 2 : 1.5} />
+      <span className="flex-1 text-left truncate">
+        {view.name[lang] || view.name.en}
+      </span>
+    </NavLink>
+  );
+}
+
 export default function Sidebar({ lang, setLang }) {
   const navItems = [
     { label: t("home", lang), icon: Home, path: "/" },
@@ -61,6 +116,9 @@ export default function Sidebar({ lang, setLang }) {
     { label: t("suppliers", lang), icon: Truck, path: "/suppliers" },
     { label: t("meters", lang), icon: Gauge, path: "/meters" },
   ];
+
+  // Filter out default views — those are just the object list pages themselves
+  const viewItems = savedViews.filter((v) => !v.isDefault);
 
   return (
     <aside className="w-60 shrink-0 border-r border-slate-200 bg-slate-50 flex flex-col h-full select-none">
@@ -116,6 +174,26 @@ export default function Sidebar({ lang, setLang }) {
         {objectItems.map((item) => (
           <NavButton key={item.path} item={item} showCount />
         ))}
+
+        <div className="h-px bg-slate-200 my-2 mx-1" />
+
+        {/* Views section */}
+        <div className="flex items-center justify-between px-2.5 py-1">
+          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">
+            {lang === "nl" ? "Weergaven" : "Views"}
+          </span>
+          <button
+            className="w-4 h-4 rounded flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
+            title={lang === "nl" ? "Weergave toevoegen" : "Add view"}
+          >
+            <Plus size={11} strokeWidth={2.5} />
+          </button>
+        </div>
+        <div className="space-y-0.5">
+          {viewItems.map((view) => (
+            <ViewButton key={view.id} view={view} lang={lang} />
+          ))}
+        </div>
       </nav>
 
       {/* Footer */}

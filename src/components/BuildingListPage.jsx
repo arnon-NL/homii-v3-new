@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Search,
   Building2,
@@ -14,9 +14,10 @@ import {
   FileCheck,
   Send,
   Circle,
+  LayoutGrid,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
-import { buildings, getSettlementsByYear } from "@/lib/mockData";
+import { buildings, getSettlementsByYear, getView } from "@/lib/mockData";
 import { t, useLang } from "@/lib/i18n";
 import { StatusBadge } from "./ui/status-badge";
 
@@ -125,16 +126,18 @@ function NetResult({ value, lang }) {
 const currentYear = new Date().getFullYear();
 const availableYears = [currentYear - 2, currentYear - 1, currentYear];
 
-function YearPicker({ year, setYear }) {
+function YearPicker({ year, setYear, disabled }) {
   return (
     <div className="inline-flex items-center rounded-lg bg-slate-100 p-0.5">
       {availableYears.map((y) => (
         <button
           key={y}
-          onClick={() => setYear(y)}
+          onClick={() => !disabled && setYear(y)}
           className={`px-3 h-7 rounded-md text-xs font-medium tabular-nums transition-all ${
             year === y
               ? "bg-white text-slate-900 shadow-sm"
+              : disabled
+              ? "text-slate-300 cursor-not-allowed"
               : "text-slate-400 hover:text-slate-600"
           }`}
         >
@@ -153,26 +156,55 @@ const qualityFilters = [
   { value: "error",   label: { en: "Error",   nl: "Fout" } },
 ];
 
-/* ── Settlement filter options ── */
-const settlementFilters = [
-  { value: "all",          label: { en: "All",          nl: "Alle" } },
-  { value: "not_started",  label: { en: "Not started",  nl: "Niet gestart" } },
-  { value: "in_review",    label: { en: "In review",    nl: "In controle" } },
-  { value: "approved",     label: { en: "Approved",     nl: "Goedgekeurd" } },
-  { value: "distributed",  label: { en: "Distributed",  nl: "Afgerekend" } },
-];
+/* ── Column definitions ── */
+const allColumns = {
+  complex:          { align: "left" },
+  complexId:        { align: "left" },
+  location:         { align: "left" },
+  vhe:              { align: "right" },
+  components:       { align: "right" },
+  utilities:        { align: "left" },
+  budgetProgress:   { align: "left" },
+  settlementStatus: { align: "center", label: { en: "Settlement", nl: "Afrekening" } },
+  netResult:        { align: "right",  label: { en: "Net Result", nl: "Netto Resultaat" } },
+  dataQuality:      { align: "center" },
+};
+
+/* ── Default columns (no view active) — year-aware ── */
+function getDefaultColumns(isPastYear) {
+  return [
+    "complex", "complexId", "location", "vhe", "components", "utilities",
+    ...(isPastYear ? ["settlementStatus", "netResult"] : ["budgetProgress"]),
+    "dataQuality",
+  ];
+}
 
 /* ── Main component ── */
 export default function BuildingListPage() {
   const lang = useLang();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const [qualityFilter, setQualityFilter] = useState("all");
-  const [year, setYear] = useState(currentYear);
   const [settlementFilter, setSettlementFilter] = useState("all");
 
-  const isPastYear = year < new Date().getFullYear();
+  // Resolve active view from URL
+  const viewId = searchParams.get("view");
+  const activeView = viewId ? getView(viewId) : null;
+
+  // Year: locked by view or user-controlled
+  const [userYear, setUserYear] = useState(currentYear);
+  const year = activeView?.year ?? userYear;
+  const yearLocked = activeView?.year != null;
+
+  const isPastYear = year < currentYear;
   const settlements = useMemo(() => getSettlementsByYear(year), [year]);
+
+  // Resolve which columns to show
+  const visibleColumns = useMemo(() => {
+    if (activeView?.columns?.length) return activeView.columns;
+    return getDefaultColumns(isPastYear);
+  }, [activeView, isPastYear]);
 
   // Build enriched list: building + settlement for selected year
   const enriched = useMemo(() => {
@@ -210,26 +242,112 @@ export default function BuildingListPage() {
     return counts;
   }, [settlements, isPastYear]);
 
-  const fmt = (v) =>
-    new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(v);
+  const showSettlement = visibleColumns.includes("settlementStatus");
+  const showBudget = visibleColumns.includes("budgetProgress");
+
+  // Page title: view name or default
+  const pageTitle = activeView
+    ? (activeView.name[lang] || activeView.name.en)
+    : t("buildingsTitle", lang);
+
+  /* ── Cell renderer ── */
+  function renderCell(col, b) {
+    switch (col) {
+      case "complex":
+        return (
+          <td key={col} className="px-3 sm:px-4 py-3">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded flex items-center justify-center bg-slate-100">
+                <Building2 size={13} className="text-slate-400" />
+              </div>
+              <span className="text-[13px] font-medium" style={{ color: brand.navy }}>
+                {b.complex}
+              </span>
+            </div>
+          </td>
+        );
+      case "complexId":
+        return (
+          <td key={col} className="px-3 sm:px-4 py-3">
+            <span className="text-[12px] font-mono text-slate-500">{b.complexId}</span>
+          </td>
+        );
+      case "location":
+        return (
+          <td key={col} className="px-3 sm:px-4 py-3 text-[13px] text-slate-600">
+            {b.location}
+          </td>
+        );
+      case "vhe":
+        return (
+          <td key={col} className="px-3 sm:px-4 py-3 text-right">
+            <span className="text-[13px] font-semibold tabular-nums text-slate-700">{b.vhe}</span>
+          </td>
+        );
+      case "components":
+        return (
+          <td key={col} className="px-3 sm:px-4 py-3 text-right">
+            <span className="text-[13px] tabular-nums text-slate-600">{b.components}</span>
+          </td>
+        );
+      case "utilities":
+        return (
+          <td key={col} className="px-3 sm:px-4 py-3">
+            <UtilityIcons utilities={b.utilities} lang={lang} />
+          </td>
+        );
+      case "budgetProgress":
+        return (
+          <td key={col} className="px-3 sm:px-4 py-3">
+            <BudgetBar spent={b.budgetSpent} total={b.budgetTotal} />
+          </td>
+        );
+      case "settlementStatus":
+        return (
+          <td key={col} className="px-3 sm:px-4 py-3 text-center">
+            {b.settlement && <SettlementBadge status={b.settlement.status} lang={lang} />}
+          </td>
+        );
+      case "netResult":
+        return (
+          <td key={col} className="px-3 sm:px-4 py-3 text-right">
+            <NetResult value={b.settlement?.netResult} lang={lang} />
+          </td>
+        );
+      case "dataQuality":
+        return (
+          <td key={col} className="px-3 sm:px-4 py-3 text-center">
+            <StatusBadge status={b.dataQuality} size="xs" />
+          </td>
+        );
+      default:
+        return <td key={col} className="px-3 sm:px-4 py-3">—</td>;
+    }
+  }
 
   return (
     <div className="flex-1 overflow-y-auto">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
 
-        {/* Title + year + count */}
+        {/* Title + view badge + year + count */}
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-baseline gap-2.5">
             <h1 className="text-xl font-semibold" style={{ color: brand.navy }}>
-              {t("buildingsTitle", lang)}
+              {pageTitle}
             </h1>
+            {activeView && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-medium text-slate-500">
+                <LayoutGrid size={10} />
+                {lang === "nl" ? "Weergave" : "View"}
+              </span>
+            )}
             <span className="text-sm text-slate-400">{filtered.length}</span>
           </div>
-          <YearPicker year={year} setYear={setYear} />
+          <YearPicker year={year} setYear={setUserYear} disabled={yearLocked} />
         </div>
 
         {/* Settlement summary bar (past year only) */}
-        {isPastYear && settlementSummary && (
+        {isPastYear && settlementSummary && showSettlement && (
           <div className="flex flex-wrap items-center gap-2 mb-4 p-3 rounded-lg bg-slate-50 border border-slate-200">
             <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mr-2">
               {lang === "nl" ? "Afrekening" : "Settlement"} {year}
@@ -332,7 +450,7 @@ export default function BuildingListPage() {
                 </span>
               </div>
 
-              {isPastYear && b.settlement ? (
+              {showSettlement && b.settlement ? (
                 <div className="flex items-center justify-between gap-3">
                   <SettlementBadge status={b.settlement.status} lang={lang} />
                   <NetResult value={b.settlement.netResult} lang={lang} />
@@ -357,30 +475,17 @@ export default function BuildingListPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50/80">
-                {[
-                  { key: "complex",       align: "left" },
-                  { key: "complexId",     align: "left" },
-                  { key: "location",      align: "left" },
-                  { key: "vhe",           align: "right" },
-                  { key: "components",    align: "right" },
-                  { key: "utilities",     align: "left" },
-                  ...(isPastYear
-                    ? [
-                        { key: "settlementStatus", align: "center", label: { en: "Settlement", nl: "Afrekening" } },
-                        { key: "netResult",        align: "right",  label: { en: "Net Result", nl: "Netto Resultaat" } },
-                      ]
-                    : [
-                        { key: "budgetProgress",align: "left" },
-                      ]),
-                  { key: "dataQuality",   align: "center" },
-                ].map((col) => (
-                  <th
-                    key={col.key}
-                    className={`text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 sm:px-4 py-2.5 text-${col.align} whitespace-nowrap`}
-                  >
-                    {col.label ? (col.label[lang] || col.label.en) : t(col.key, lang)}
-                  </th>
-                ))}
+                {visibleColumns.map((colKey) => {
+                  const col = allColumns[colKey] || { align: "left" };
+                  return (
+                    <th
+                      key={colKey}
+                      className={`text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 sm:px-4 py-2.5 text-${col.align} whitespace-nowrap`}
+                    >
+                      {col.label ? (col.label[lang] || col.label.en) : t(colKey, lang)}
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -390,80 +495,13 @@ export default function BuildingListPage() {
                   className="hover:bg-slate-50/80 transition-colors cursor-pointer"
                   onClick={() => navigate(`/buildings/${b.id}`)}
                 >
-                  {/* Complex name */}
-                  <td className="px-3 sm:px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded flex items-center justify-center bg-slate-100">
-                        <Building2 size={13} className="text-slate-400" />
-                      </div>
-                      <span
-                        className="text-[13px] font-medium"
-                        style={{ color: brand.navy }}
-                      >
-                        {b.complex}
-                      </span>
-                    </div>
-                  </td>
-
-                  {/* Complex ID */}
-                  <td className="px-3 sm:px-4 py-3">
-                    <span className="text-[12px] font-mono text-slate-500">
-                      {b.complexId}
-                    </span>
-                  </td>
-
-                  {/* Location */}
-                  <td className="px-3 sm:px-4 py-3 text-[13px] text-slate-600">
-                    {b.location}
-                  </td>
-
-                  {/* VHE */}
-                  <td className="px-3 sm:px-4 py-3 text-right">
-                    <span className="text-[13px] font-semibold tabular-nums text-slate-700">
-                      {b.vhe}
-                    </span>
-                  </td>
-
-                  {/* Services */}
-                  <td className="px-3 sm:px-4 py-3 text-right">
-                    <span className="text-[13px] tabular-nums text-slate-600">
-                      {b.components}
-                    </span>
-                  </td>
-
-                  {/* Utilities */}
-                  <td className="px-3 sm:px-4 py-3">
-                    <UtilityIcons utilities={b.utilities} lang={lang} />
-                  </td>
-
-                  {/* Conditional columns: settlement (past year) or budget (current) */}
-                  {isPastYear ? (
-                    <>
-                      <td className="px-3 sm:px-4 py-3 text-center">
-                        {b.settlement && (
-                          <SettlementBadge status={b.settlement.status} lang={lang} />
-                        )}
-                      </td>
-                      <td className="px-3 sm:px-4 py-3 text-right">
-                        <NetResult value={b.settlement?.netResult} lang={lang} />
-                      </td>
-                    </>
-                  ) : (
-                    <td className="px-3 sm:px-4 py-3">
-                      <BudgetBar spent={b.budgetSpent} total={b.budgetTotal} />
-                    </td>
-                  )}
-
-                  {/* Data quality */}
-                  <td className="px-3 sm:px-4 py-3 text-center">
-                    <StatusBadge status={b.dataQuality} size="xs" />
-                  </td>
+                  {visibleColumns.map((colKey) => renderCell(colKey, b))}
                 </tr>
               ))}
               {filtered.length === 0 && (
                 <tr>
                   <td
-                    colSpan={isPastYear ? 9 : 8}
+                    colSpan={visibleColumns.length}
                     className="px-3 sm:px-4 py-8 text-center text-sm text-slate-400"
                   >
                     {t("noResults", lang)}

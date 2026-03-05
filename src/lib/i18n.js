@@ -13,6 +13,7 @@ const dict = {
 
   // Navigation — objects section
   objects:       { en: "Objects",       nl: "Objecten" },
+  views:         { en: "Views",         nl: "Weergaven" },
   buildings:     { en: "Complexes",     nl: "Complexen" },
   services:      { en: "Services",     nl: "Diensten" },
   suppliers:     { en: "Suppliers",    nl: "Leveranciers" },
