@@ -34,6 +34,16 @@ const dict = {
   inactive:      { en: "Inactive",      nl: "Inactief" },
   noResults:     { en: "No results found", nl: "Geen resultaten gevonden" },
 
+  // Building list columns
+  complex:         { en: "Complex",          nl: "Complex" },
+  complexId:       { en: "Complex ID",       nl: "Complex ID" },
+  location:        { en: "Location",         nl: "Locatie" },
+  vhe:             { en: "VHE",              nl: "VHE" },
+  components:      { en: "Components",       nl: "Componenten" },
+  utilities:       { en: "Utilities",        nl: "Nutsvoorzieningen" },
+  budgetProgress:  { en: "Budget",           nl: "Budget" },
+  dataQuality:     { en: "Data Quality",     nl: "Datakwaliteit" },
+
   // Page titles
   homeTitle:     { en: "Dashboard",     nl: "Dashboard" },
   homeSubtitle:  { en: "Welcome back",  nl: "Welkom terug" },

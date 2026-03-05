@@ -5,6 +5,7 @@ import { brand } from "@/lib/brand";
 import { LangCtx, t } from "@/lib/i18n";
 import Sidebar from "./Sidebar";
 import PlaceholderPage from "./PlaceholderPage";
+import BuildingListPage from "./BuildingListPage";
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -94,10 +95,8 @@ export default function App() {
               path="/onboarding"
               element={<PlaceholderPage title={t("onboardingTitle", lang)} />}
             />
-            <Route
-              path="/buildings"
-              element={<PlaceholderPage title={t("buildingsTitle", lang)} />}
-            />
+            <Route path="/buildings" element={<BuildingListPage />} />
+            <Route path="/buildings/:buildingId" element={<PlaceholderPage title={t("buildingsTitle", lang)} />} />
             <Route
               path="/meters"
               element={<PlaceholderPage title={t("metersTitle", lang)} />}
