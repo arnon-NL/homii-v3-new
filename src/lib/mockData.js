@@ -1552,3 +1552,217 @@ export function getLedgerSummaryByBuilding(buildingId, year = 2025) {
   });
   return byService;
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// COST CATEGORIES — breakdown of costs within a service
+// Each service has one or more cost categories representing actual
+// supplier invoices. This is the level at which ledger entries match.
+// ═══════════════════════════════════════════════════════════════════
+
+export const costCategories = [
+  // ── SVC-108: Warmtekosten ──
+  { id: "CC-108-01", serviceId: "SVC-108", name: { en: "Gas delivery", nl: "Gaslevering" }, supplier: "ENGIE Energie Nederland", invoiceFrequency: "monthly", budgetShare: 0.55, unit: "m³", unitPrice: 1.45 },
+  { id: "CC-108-02", serviceId: "SVC-108", name: { en: "Grid operator costs", nl: "Netbeheerkosten" }, supplier: "Stedin Netbeheer BV", invoiceFrequency: "monthly", budgetShare: 0.15, unit: null, unitPrice: null },
+  { id: "CC-108-03", serviceId: "SVC-108", name: { en: "Metering services", nl: "Meetdiensten" }, supplier: "Techem Energy Services BV", invoiceFrequency: "quarterly", budgetShare: 0.15, unit: null, unitPrice: null },
+  { id: "CC-108-04", serviceId: "SVC-108", name: { en: "Heat transport", nl: "Transportkosten warmtenet" }, supplier: "ENGIE Energie Nederland", invoiceFrequency: "monthly", budgetShare: 0.15, unit: null, unitPrice: null },
+
+  // ── SVC-102: Koud water ──
+  { id: "CC-102-01", serviceId: "SVC-102", name: { en: "Water supply", nl: "Waterlevering" }, supplier: "Oasen", invoiceFrequency: "monthly", budgetShare: 0.70, unit: "m³", unitPrice: 1.85 },
+  { id: "CC-102-02", serviceId: "SVC-102", name: { en: "Standing charge", nl: "Vastrecht" }, supplier: "Oasen", invoiceFrequency: "quarterly", budgetShare: 0.20, unit: null, unitPrice: null },
+  { id: "CC-102-03", serviceId: "SVC-102", name: { en: "Sewer levy", nl: "Rioolheffing" }, supplier: "Gemeente Gorinchem", invoiceFrequency: "annual", budgetShare: 0.10, unit: null, unitPrice: null },
+
+  // ── SVC-104: Warm water ──
+  { id: "CC-104-01", serviceId: "SVC-104", name: { en: "Hot water delivery", nl: "Warmwaterlevering" }, supplier: "ENGIE Energie Nederland", invoiceFrequency: "monthly", budgetShare: 0.75, unit: "m³", unitPrice: 8.50 },
+  { id: "CC-104-02", serviceId: "SVC-104", name: { en: "Standing charge", nl: "Vastrecht warm water" }, supplier: "ENGIE Energie Nederland", invoiceFrequency: "quarterly", budgetShare: 0.25, unit: null, unitPrice: null },
+
+  // ── SVC-105: Elektra algemeen ──
+  { id: "CC-105-01", serviceId: "SVC-105", name: { en: "Electricity supply", nl: "Elektralevering" }, supplier: "ENGIE Energie Nederland", invoiceFrequency: "monthly", budgetShare: 0.65, unit: "kWh", unitPrice: 0.38 },
+  { id: "CC-105-02", serviceId: "SVC-105", name: { en: "Standing charge", nl: "Vastrecht elektra" }, supplier: "ENGIE Energie Nederland", invoiceFrequency: "quarterly", budgetShare: 0.20, unit: null, unitPrice: null },
+  { id: "CC-105-03", serviceId: "SVC-105", name: { en: "Grid costs", nl: "Netbeheerkosten" }, supplier: "Stedin Netbeheer BV", invoiceFrequency: "monthly", budgetShare: 0.15, unit: null, unitPrice: null },
+
+  // ── SVC-106: Elektra woonruimte ──
+  { id: "CC-106-01", serviceId: "SVC-106", name: { en: "Electricity supply", nl: "Elektralevering" }, supplier: "ENGIE Energie Nederland", invoiceFrequency: "monthly", budgetShare: 0.80, unit: "kWh", unitPrice: 0.38 },
+  { id: "CC-106-02", serviceId: "SVC-106", name: { en: "Standing charge", nl: "Vastrecht" }, supplier: "ENGIE Energie Nederland", invoiceFrequency: "quarterly", budgetShare: 0.20, unit: null, unitPrice: null },
+
+  // ── SVC-107: Gas gemeenschappelijk ──
+  { id: "CC-107-01", serviceId: "SVC-107", name: { en: "Gas delivery", nl: "Gaslevering" }, supplier: "ENGIE Energie Nederland", invoiceFrequency: "monthly", budgetShare: 0.75, unit: "m³", unitPrice: 1.45 },
+  { id: "CC-107-02", serviceId: "SVC-107", name: { en: "Grid costs", nl: "Netbeheerkosten" }, supplier: "Stedin Netbeheer BV", invoiceFrequency: "monthly", budgetShare: 0.25, unit: null, unitPrice: null },
+
+  // ── SVC-110: Elektra BOG ──
+  { id: "CC-110-01", serviceId: "SVC-110", name: { en: "Electricity supply", nl: "Elektralevering BOG" }, supplier: "ENGIE Energie Nederland", invoiceFrequency: "monthly", budgetShare: 1.0, unit: "kWh", unitPrice: 0.38 },
+
+  // ── SVC-091: Zonnepanelen (credit) ──
+  { id: "CC-091-01", serviceId: "SVC-091", name: { en: "Solar generation credit", nl: "Opbrengst zonnepanelen" }, supplier: null, invoiceFrequency: "quarterly", budgetShare: 1.0, unit: "kWh", unitPrice: -0.12 },
+
+  // ── Non-utility services (single cost category each) ──
+  { id: "CC-111-01", serviceId: "SVC-111", name: { en: "Meter maintenance", nl: "Onderhoud meters" }, supplier: "Techem Energy Services BV", invoiceFrequency: "quarterly", budgetShare: 1.0, unit: null, unitPrice: null },
+  { id: "CC-115-01", serviceId: "SVC-115", name: { en: "24h emergency service", nl: "24-uur storingsdienst" }, supplier: "Feenstra Verwarming B.V.", invoiceFrequency: "quarterly", budgetShare: 1.0, unit: null, unitPrice: null },
+  { id: "CC-120-01", serviceId: "SVC-120", name: { en: "Hydrophore service", nl: "Hydrofoor onderhoud" }, supplier: "Hydro Building Systems BV", invoiceFrequency: "quarterly", budgetShare: 1.0, unit: null, unitPrice: null },
+  { id: "CC-126-01", serviceId: "SVC-126", name: { en: "Geyser cleaning", nl: "Reinigen geisers" }, supplier: null, invoiceFrequency: "annual", budgetShare: 1.0, unit: null, unitPrice: null },
+  { id: "CC-127-01", serviceId: "SVC-127", name: { en: "Ventilation maintenance", nl: "Onderhoud ventilatie" }, supplier: "Feenstra Verwarming B.V.", invoiceFrequency: "quarterly", budgetShare: 1.0, unit: null, unitPrice: null },
+  { id: "CC-132-01", serviceId: "SVC-132", name: { en: "Elevator maintenance", nl: "Liftonderhoud" }, supplier: "Schindler Liften B.V.", invoiceFrequency: "quarterly", budgetShare: 0.70, unit: null, unitPrice: null },
+  { id: "CC-132-02", serviceId: "SVC-132", name: { en: "Elevator inspection", nl: "Liftkeuring" }, supplier: "Schindler Liften B.V.", invoiceFrequency: "annual", budgetShare: 0.30, unit: null, unitPrice: null },
+  { id: "CC-133-01", serviceId: "SVC-133", name: { en: "Elevator electricity", nl: "Elektra lift" }, supplier: null, invoiceFrequency: "monthly", budgetShare: 1.0, unit: "kWh", unitPrice: 0.38 },
+  { id: "CC-171-01", serviceId: "SVC-171", name: { en: "Electric doors service", nl: "Service elektrische deuren" }, supplier: "ASSA ABLOY Entrance Systems", invoiceFrequency: "quarterly", budgetShare: 1.0, unit: null, unitPrice: null },
+  { id: "CC-116-01", serviceId: "SVC-116", name: { en: "Lamp replacement", nl: "Vervanging lampen" }, supplier: "ISS Facility Services", invoiceFrequency: "irregular", budgetShare: 1.0, unit: null, unitPrice: null },
+  { id: "CC-118-01", serviceId: "SVC-118", name: { en: "Cleaning service", nl: "Schoonmaakdienst" }, supplier: "CSU Cleaning Services", invoiceFrequency: "monthly", budgetShare: 1.0, unit: null, unitPrice: null },
+  { id: "CC-122-01", serviceId: "SVC-122", name: { en: "Drain cleaning", nl: "Rioolreiniging" }, supplier: "Riool.nl (Rioned Groep)", invoiceFrequency: "annual", budgetShare: 1.0, unit: null, unitPrice: null },
+  { id: "CC-123-01", serviceId: "SVC-123", name: { en: "Landscaping", nl: "Tuinonderhoud" }, supplier: "Van Ginkel Groep B.V.", invoiceFrequency: "monthly", budgetShare: 0.80, unit: null, unitPrice: null },
+  { id: "CC-123-02", serviceId: "SVC-123", name: { en: "Seasonal work", nl: "Seizoenswerk" }, supplier: "Van Ginkel Groep B.V.", invoiceFrequency: "quarterly", budgetShare: 0.20, unit: null, unitPrice: null },
+  { id: "CC-124-01", serviceId: "SVC-124", name: { en: "Gutter cleaning", nl: "Dakgootreiniging" }, supplier: "Van Ginkel Groep B.V.", invoiceFrequency: "annual", budgetShare: 1.0, unit: null, unitPrice: null },
+  { id: "CC-140-01", serviceId: "SVC-140", name: { en: "Window cleaning", nl: "Glasbewassing" }, supplier: "CSU Cleaning Services", invoiceFrequency: "quarterly", budgetShare: 1.0, unit: null, unitPrice: null },
+  { id: "CC-131-01", serviceId: "SVC-131", name: { en: "Caretaker services", nl: "Huismeesterdiensten" }, supplier: "SWB Wijkbeheer", invoiceFrequency: "monthly", budgetShare: 1.0, unit: null, unitPrice: null },
+  { id: "CC-137-01", serviceId: "SVC-137", name: { en: "Support services", nl: "Woonondersteuning" }, supplier: "SWB Wijkbeheer", invoiceFrequency: "monthly", budgetShare: 1.0, unit: null, unitPrice: null },
+  { id: "CC-142-01", serviceId: "SVC-142", name: { en: "Internet subscription", nl: "Internetabonnement" }, supplier: "KPN Zakelijk", invoiceFrequency: "monthly", budgetShare: 1.0, unit: null, unitPrice: null },
+  { id: "CC-036-01", serviceId: "SVC-036", name: { en: "Glass insurance", nl: "Glasverzekering" }, supplier: "Centraal Beheer Verzekeringen", invoiceFrequency: "annual", budgetShare: 1.0, unit: null, unitPrice: null },
+  { id: "CC-099-01", serviceId: "SVC-099", name: { en: "Miscellaneous", nl: "Diversen" }, supplier: null, invoiceFrequency: "irregular", budgetShare: 1.0, unit: null, unitPrice: null },
+];
+
+export function getCostCategoriesByService(serviceId) {
+  return costCategories.filter(cc => cc.serviceId === serviceId);
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MONTHLY CLOSE STATUS — per building × service × month
+// Tracks whether each month's costs have been reviewed and closed.
+// Status: closed (green), review (amber), open (red), future (gray)
+// ═══════════════════════════════════════════════════════════════════
+
+function generateMonthlyCloseStatus() {
+  const statuses = [];
+  const currentYear = 2026;
+  const currentMonth = 3; // March 2026
+
+  // For each building-service relationship, generate monthly statuses
+  buildingServices.forEach(bs => {
+    if (bs.year === 2024) {
+      // 2024: all months closed
+      for (let m = 1; m <= 12; m++) {
+        statuses.push({
+          buildingId: bs.buildingId,
+          serviceId: bs.serviceId,
+          year: 2024,
+          month: m,
+          status: "closed",
+          closedAt: `2025-${String(m + 1 > 12 ? 1 : m + 1).padStart(2, "0")}-15`,
+          closedBy: "system",
+        });
+      }
+    } else if (bs.year === 2025) {
+      // 2025: months 1-10 mostly closed, 11-12 mixed
+      for (let m = 1; m <= 12; m++) {
+        let status;
+        if (m <= 9) {
+          status = "closed";
+        } else if (m === 10) {
+          status = Math.random() < 0.85 ? "closed" : "review";
+        } else if (m === 11) {
+          const r = Math.random();
+          status = r < 0.60 ? "closed" : r < 0.85 ? "review" : "open";
+        } else {
+          // December 2025
+          const r = Math.random();
+          status = r < 0.35 ? "closed" : r < 0.70 ? "review" : "open";
+        }
+        statuses.push({
+          buildingId: bs.buildingId,
+          serviceId: bs.serviceId,
+          year: 2025,
+          month: m,
+          status,
+          closedAt: status === "closed" ? `2026-${String(Math.min(m + 1, 12)).padStart(2, "0")}-${10 + Math.floor(Math.random() * 15)}` : null,
+          closedBy: status === "closed" ? "user" : null,
+        });
+      }
+    } else if (bs.year === 2026) {
+      // 2026: Jan mostly closed, Feb mixed, Mar future
+      for (let m = 1; m <= 12; m++) {
+        let status;
+        if (m === 1) {
+          status = Math.random() < 0.80 ? "closed" : "review";
+        } else if (m === 2) {
+          const r = Math.random();
+          status = r < 0.30 ? "closed" : r < 0.65 ? "review" : "open";
+        } else {
+          status = "future";
+        }
+        statuses.push({
+          buildingId: bs.buildingId,
+          serviceId: bs.serviceId,
+          year: 2026,
+          month: m,
+          status,
+          closedAt: status === "closed" ? `2026-${String(m + 1 > 12 ? 1 : m + 1).padStart(2, "0")}-${10 + Math.floor(Math.random() * 10)}` : null,
+          closedBy: status === "closed" ? "user" : null,
+        });
+      }
+    }
+  });
+
+  return statuses;
+}
+
+export const monthlyCloseStatuses = generateMonthlyCloseStatus();
+
+export function getMonthlyCloseForBuilding(buildingId, year) {
+  return monthlyCloseStatuses.filter(s => s.buildingId === buildingId && s.year === year);
+}
+
+export function getMonthlyCloseForBuildingService(buildingId, serviceId, year) {
+  return monthlyCloseStatuses.filter(s => s.buildingId === buildingId && s.serviceId === serviceId && s.year === year);
+}
+
+// Aggregated monthly close status per service for a building
+// Returns { serviceId, months: [{ month, status }], closedCount, totalMonths }
+export function getMonthlyCloseGridForBuilding(buildingId, year) {
+  const bsRelations = buildingServices.filter(bs => bs.buildingId === buildingId && bs.year === year);
+  const closeData = monthlyCloseStatuses.filter(s => s.buildingId === buildingId && s.year === year);
+
+  const currentMonth = year === 2026 ? 2 : 12; // Feb 2026 is the last closeable month
+
+  return bsRelations.map(bs => {
+    const serviceMonths = closeData
+      .filter(s => s.serviceId === bs.serviceId)
+      .sort((a, b) => a.month - b.month);
+
+    const closedCount = serviceMonths.filter(s => s.status === "closed").length;
+    const reviewCount = serviceMonths.filter(s => s.status === "review").length;
+    const openCount = serviceMonths.filter(s => s.status === "open").length;
+    const applicableMonths = serviceMonths.filter(s => s.status !== "future").length;
+
+    return {
+      buildingId,
+      serviceId: bs.serviceId,
+      year,
+      months: serviceMonths,
+      closedCount,
+      reviewCount,
+      openCount,
+      applicableMonths,
+      overallStatus: openCount > 0 ? "open" : reviewCount > 0 ? "review" : closedCount === applicableMonths && applicableMonths > 0 ? "closed" : "future",
+    };
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MODULE CONFIGURATION — controls which features are visible
+// "full" = all features, "energy" = energy module only, "serviceCharges" = service charges only
+// ═══════════════════════════════════════════════════════════════════
+
+export const moduleConfig = {
+  mode: "full", // "full" | "energy" | "serviceCharges"
+  hasLedgerData: true,
+  hasConsumptionData: true,
+  hasNonUtilityServices: true,
+};
+
+export function isFeatureEnabled(feature) {
+  switch (feature) {
+    case "ledger": return moduleConfig.mode === "full" || moduleConfig.mode === "serviceCharges";
+    case "consumption": return moduleConfig.mode === "full" || moduleConfig.mode === "energy";
+    case "nonUtilityServices": return moduleConfig.mode === "full" || moduleConfig.mode === "serviceCharges";
+    case "consumptionControl": return moduleConfig.mode === "full"; // needs both ledger AND consumption
+    case "monthlyClose": return moduleConfig.mode === "full" || moduleConfig.mode === "serviceCharges";
+    default: return true;
+  }
+}

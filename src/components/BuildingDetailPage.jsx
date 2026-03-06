@@ -25,6 +25,13 @@ import {
   BarChart3,
   TrendingUp,
   TrendingDown,
+  Circle,
+  FileCheck,
+  Send,
+  Ban,
+  ShieldCheck,
+  Flag,
+  Lock,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import {
@@ -41,7 +48,22 @@ import {
   getLedgerSummaryByBuilding,
   getLedgerByServiceAndBuilding,
   meters,
+  getCostCategoriesByService,
+  getMonthlyCloseGridForBuilding,
+  costCategories,
+  isFeatureEnabled,
 } from "@/lib/mockData";
+import { t, useLang } from "@/lib/i18n";
+import Breadcrumbs from "./Breadcrumbs";
+import { Card, CardContent } from "./ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
+import {
+  AttributePanel,
+  AttrSection,
+  AttrRow,
+  AttrLink,
+} from "./ui/attribute-panel";
+import { StatusBadge } from "./ui/status-badge";
 
 /* ── Category icon + color config ── */
 const categoryConfig = {
@@ -65,6 +87,13 @@ const fmtDate = (d) => {
   const dt = new Date(d);
   return dt.toLocaleDateString("nl-NL", { day: "2-digit", month: "short" });
 };
+
+const fmt = (v) =>
+  new Intl.NumberFormat("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(v);
 
 /* ── Ledger status config ── */
 const ledgerStatusCfg = {
@@ -118,81 +147,6 @@ function MonthlyBarChart({ entries, budgetPerMonth }) {
         );
       })}
     </div>
-  );
-}
-
-import {
-  Circle,
-  FileCheck,
-  Send,
-  Ban,
-  ShieldCheck,
-  Flag,
-  Lock,
-} from "lucide-react";
-import { t, useLang } from "@/lib/i18n";
-import Breadcrumbs from "./Breadcrumbs";
-import { Card, CardContent } from "./ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
-import {
-  AttributePanel,
-  AttrSection,
-  AttrRow,
-  AttrLink,
-} from "./ui/attribute-panel";
-import { StatusBadge } from "./ui/status-badge";
-
-/* ── Year selector ── */
-function YearSelector({ year, setYear }) {
-  const years = [2024, 2025, 2026];
-  return (
-    <div className="inline-flex items-center rounded-lg bg-slate-100 p-0.5">
-      {years.map((y) => (
-        <button
-          key={y}
-          onClick={() => setYear(y)}
-          className={`px-3 h-7 rounded-md text-xs font-medium tabular-nums transition-all ${
-            year === y
-              ? "bg-white text-slate-900 shadow-sm"
-              : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          {y}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-/* ── KPI card ── */
-function KpiCard({ label, value, sub, color, icon: Icon }) {
-  return (
-    <Card className="border-slate-200 bg-white">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between mb-2">
-          <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
-            {label}
-          </p>
-          {Icon && (
-            <div
-              className="w-6 h-6 rounded flex items-center justify-center"
-              style={{ background: (color || brand.blue) + "15" }}
-            >
-              <Icon size={13} style={{ color: color || brand.blue }} />
-            </div>
-          )}
-        </div>
-        <span
-          className="text-2xl font-bold tabular-nums"
-          style={{ color: color || brand.navy }}
-        >
-          {value}
-        </span>
-        {sub && (
-          <p className="text-[11px] text-slate-400 mt-0.5">{sub}</p>
-        )}
-      </CardContent>
-    </Card>
   );
 }
 
@@ -280,13 +234,59 @@ function CheckStatusBadge({ status, lang }) {
   );
 }
 
-/* ── Currency formatter ── */
-const fmt = (v) =>
-  new Intl.NumberFormat("nl-NL", {
-    style: "currency",
-    currency: "EUR",
-    maximumFractionDigits: 0,
-  }).format(v);
+/* ── Year selector ── */
+function YearSelector({ year, setYear }) {
+  const years = [2024, 2025, 2026];
+  return (
+    <div className="inline-flex items-center rounded-lg bg-slate-100 p-0.5">
+      {years.map((y) => (
+        <button
+          key={y}
+          onClick={() => setYear(y)}
+          className={`px-3 h-7 rounded-md text-xs font-medium tabular-nums transition-all ${
+            year === y
+              ? "bg-white text-slate-900 shadow-sm"
+              : "text-slate-400 hover:text-slate-600"
+          }`}
+        >
+          {y}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ── KPI Card ── */
+function KpiCard({ label, value, sub, color, icon: Icon }) {
+  return (
+    <Card className="border-slate-200 bg-white">
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between mb-2">
+          <p className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
+            {label}
+          </p>
+          {Icon && (
+            <div
+              className="w-6 h-6 rounded flex items-center justify-center"
+              style={{ background: (color || brand.blue) + "15" }}
+            >
+              <Icon size={13} style={{ color: color || brand.blue }} />
+            </div>
+          )}
+        </div>
+        <span
+          className="text-2xl font-bold tabular-nums"
+          style={{ color: color || brand.navy }}
+        >
+          {value}
+        </span>
+        {sub && (
+          <p className="text-[11px] text-slate-400 mt-0.5">{sub}</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 /* ══════════════════════════════════════════════════════════════ */
 /* ██  MAIN COMPONENT                                          ██ */
@@ -299,6 +299,7 @@ export default function BuildingDetailPage() {
   const [year, setYear] = useState(2025);
   const [expandedVhe, setExpandedVhe] = useState(null);
   const [expandedService, setExpandedService] = useState(null);
+  const [expandedBudgetService, setExpandedBudgetService] = useState(null);
 
   const building = getBuilding(buildingId);
 
@@ -340,6 +341,10 @@ export default function BuildingDetailPage() {
     () => getLedgerSummaryByBuilding(buildingId, year),
     [buildingId, year]
   );
+  const monthlyCloseGrid = useMemo(
+    () => getMonthlyCloseGridForBuilding(buildingId, year),
+    [buildingId, year]
+  );
 
   // Derived KPIs
   const avgCompleteness =
@@ -376,9 +381,21 @@ export default function BuildingDetailPage() {
     return { ...bs, service: svc, distMethod: dm };
   });
 
+  // Calculate year KPIs for monitoring cockpit
+  const totalBudget = enrichedBs.reduce((s, bs) => s + bs.budget, 0);
+  const totalActual = enrichedBs.reduce((s, bs) => s + bs.actual, 0);
+  const variance = totalBudget - totalActual;
+  const monthsClosed = monthlyCloseGrid
+    .flatMap((row) => row.months)
+    .filter((m) => m.status === "closed").length;
+  const flaggedCount = enrichedBs.reduce((s, bs) => {
+    const ledger = ledgerByService[bs.serviceId];
+    return s + (ledger?.flagged || 0);
+  }, 0);
+
   return (
     <div className="flex-1 overflow-y-auto">
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
         <Breadcrumbs items={crumbs} />
 
         {/* ── Header ── */}
@@ -430,7 +447,7 @@ export default function BuildingDetailPage() {
                     value: "services",
                     label: `${t("services", lang)} (${bsRelations.length})`,
                   },
-                  {
+                  isFeatureEnabled("consumption") && {
                     value: "meters",
                     label: `${t("meters", lang)} (${meterList.length})`,
                   },
@@ -439,7 +456,7 @@ export default function BuildingDetailPage() {
                     label: `VHE (${vheList.length})`,
                   },
                   { value: "activity", label: t("activity", lang) },
-                ].map((tab) => (
+                ].filter(Boolean).map((tab) => (
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
@@ -450,172 +467,9 @@ export default function BuildingDetailPage() {
                 ))}
               </TabsList>
 
-              {/* ═══ OVERVIEW TAB ═══ */}
+              {/* ═══ OVERVIEW TAB — MONITORING COCKPIT ═══ */}
               <TabsContent value="overview">
                 <div className="mt-4 space-y-4">
-                  {/* Alerts */}
-                  {activityList
-                    .filter((a) => a.type === "alert")
-                    .slice(0, 3)
-                    .map((alert) => (
-                      <div
-                        key={alert.id}
-                        className="flex items-start gap-3 px-4 py-3 rounded-lg border border-amber-200 bg-amber-50/50"
-                      >
-                        <AlertTriangle
-                          size={14}
-                          className="text-amber-500 mt-0.5 shrink-0"
-                        />
-                        <div>
-                          <p className="text-[12px] text-slate-700">
-                            {alert.description[lang] || alert.description.en}
-                          </p>
-                          <p className="text-[11px] text-slate-400 mt-0.5">
-                            {alert.date}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-
-                  {/* Meter health + consumption summary */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                    {/* Meter health */}
-                    <Card className="border-slate-200 bg-white">
-                      <CardContent className="p-5">
-                        <h3 className="text-[13px] font-semibold text-slate-600 mb-3">
-                          {t("meterHealth", lang)}
-                        </h3>
-                        <div className="space-y-2.5">
-                          {mainMeters.map((m) => {
-                            const ui = utilityIcon[m.utility] || {};
-                            const Icon = ui.icon || Gauge;
-                            const isOverdue = m.status === "warning";
-                            return (
-                              <div key={m.id} className="flex items-center gap-3">
-                                <div
-                                  className="w-6 h-6 rounded flex items-center justify-center shrink-0"
-                                  style={{ background: (ui.color || "#94A3B8") + "15" }}
-                                >
-                                  <Icon size={12} style={{ color: ui.color || "#94A3B8" }} />
-                                </div>
-                                <span className="text-[12px] text-slate-600 flex-1 truncate">
-                                  {m.meterNumber}
-                                </span>
-                                <span className={`text-[11px] font-medium ${isOverdue ? "text-amber-600" : "text-green-600"}`}>
-                                  {isOverdue ? t("readingsOverdue", lang) : t("readingsUpToDate", lang)}
-                                </span>
-                              </div>
-                            );
-                          })}
-                          {subMeters.length > 0 && (
-                            <div className="flex items-center gap-3 pt-1 border-t border-slate-100">
-                              <span className="text-[11px] text-slate-400">
-                                {subMeters.length} {t("subMeters", lang).toLowerCase()}
-                              </span>
-                              <span className="text-[11px] text-slate-400">
-                                {subMeters.filter(m => m.status === "active").length} {t("readingsUpToDate", lang).toLowerCase()}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Consumption summary by utility */}
-                    <Card className="border-slate-200 bg-white">
-                      <CardContent className="p-5">
-                        <h3 className="text-[13px] font-semibold text-slate-600 mb-3">
-                          {t("consumption", lang)}
-                        </h3>
-                        <div className="space-y-2.5">
-                          {mainMeters.map((m) => {
-                            const ui = utilityIcon[m.utility] || {};
-                            const Icon = ui.icon || Gauge;
-                            return (
-                              <div key={m.id} className="flex items-center gap-3">
-                                <div
-                                  className="w-6 h-6 rounded flex items-center justify-center shrink-0"
-                                  style={{ background: (ui.color || "#94A3B8") + "15" }}
-                                >
-                                  <Icon size={12} style={{ color: ui.color || "#94A3B8" }} />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="text-[12px] font-medium text-slate-700 capitalize">
-                                    {m.utility === "electricity" ? (lang === "nl" ? "Elektra" : "Electricity") : m.utility === "heat" ? (lang === "nl" ? "Warmte" : "Heat") : (lang === "nl" ? "Water" : "Water")}
-                                  </div>
-                                  <div className="text-[11px] text-slate-400">
-                                    {m.readingDate}
-                                  </div>
-                                </div>
-                                <span className="text-[14px] font-bold tabular-nums" style={{ color: brand.navy }}>
-                                  {(m.consumption || 0).toLocaleString("nl-NL")}
-                                </span>
-                                <span className="text-[11px] text-slate-400 w-[30px]">{m.unit}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* ── Contractinformatie (participant stats + budget tracking) ── */}
-                  <Card className="border-slate-200 bg-white">
-                    <CardContent className="p-5">
-                      <h3 className="text-[13px] font-semibold text-slate-600 mb-3">
-                        {lang === "nl" ? "Contractinformatie" : "Contract Information"}
-                      </h3>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                        {(() => {
-                          const totalVhe = vheList.length;
-                          const activeVhe = vheList.filter(v => v.status === "active").length;
-                          const vacantVhe = vheList.filter(v => v.status === "vacant").length;
-                          const mutationVhe = vheList.filter(v => v.status === "in-mutation").length;
-                          const totalVoorschot = vheList.reduce((sum, v) => sum + (v.voorschot || 0), 0);
-                          const avgVoorschot = activeVhe > 0 ? Math.round(totalVoorschot / activeVhe) : 0;
-                          return (
-                            <>
-                              <div>
-                                <div className="text-[11px] text-slate-400 uppercase tracking-wider mb-1">
-                                  {lang === "nl" ? "Totaal VHE" : "Total VHE"}
-                                </div>
-                                <div className="text-[20px] font-bold tabular-nums" style={{ color: brand.navy }}>{building.vhe}</div>
-                                <div className="text-[11px] text-slate-400">{totalVhe} {lang === "nl" ? "in beheer" : "managed"}</div>
-                              </div>
-                              <div>
-                                <div className="text-[11px] text-slate-400 uppercase tracking-wider mb-1">
-                                  {t("active", lang)}
-                                </div>
-                                <div className="text-[20px] font-bold tabular-nums text-emerald-600">{activeVhe}</div>
-                                <div className="text-[11px] text-slate-400">{vacantVhe} {t("vacant", lang).toLowerCase()}{mutationVhe > 0 ? `, ${mutationVhe} ${t("inMutation", lang).toLowerCase()}` : ""}</div>
-                              </div>
-                              <div>
-                                <div className="text-[11px] text-slate-400 uppercase tracking-wider mb-1">
-                                  {lang === "nl" ? "Gem. voorschot" : "Avg. advance"}
-                                </div>
-                                <div className="text-[20px] font-bold tabular-nums" style={{ color: brand.navy }}>{fmt(avgVoorschot)}</div>
-                                <div className="text-[11px] text-slate-400">/{lang === "nl" ? "maand" : "month"}</div>
-                              </div>
-                              <div>
-                                <div className="text-[11px] text-slate-400 uppercase tracking-wider mb-1">
-                                  {lang === "nl" ? "Totaal voorschot" : "Total advance"}
-                                </div>
-                                <div className="text-[20px] font-bold tabular-nums" style={{ color: brand.navy }}>{fmt(totalVoorschot)}</div>
-                                <div className="text-[11px] text-slate-400">/{lang === "nl" ? "maand" : "month"}</div>
-                              </div>
-                            </>
-                          );
-                        })()}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              {/* ═══ SERVICES TAB — grouped by category, with settlement controls ═══ */}
-              <TabsContent value="services">
-                <div className="mt-4 space-y-5">
-
                   {/* Settlement banner (past year only) */}
                   {isPastYear && settlement && (
                     <Card className="border-slate-200 bg-white overflow-hidden">
@@ -668,51 +522,281 @@ export default function BuildingDetailPage() {
                             </div>
                           )}
                         </div>
-
-                        {/* Settlement checks summary */}
-                        {sChecks.length > 0 && (
-                          <div className="mt-4 pt-3 border-t border-slate-100">
-                            <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mb-2">
-                              {lang === "nl" ? "Controles per dienst" : "Checks per service"}
-                            </p>
-                            <div className="grid gap-2">
-                              {sChecks.map((sc) => {
-                                const svc = getService(sc.serviceId);
-                                return (
-                                  <div
-                                    key={sc.id}
-                                    className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-slate-50"
-                                  >
-                                    <div className="flex items-center gap-2 min-w-0">
-                                      <span className="text-[11px] font-mono text-slate-500">{svc?.code}</span>
-                                      <span className="text-[12px] text-slate-700 truncate">
-                                        {svc?.name[lang] || sc.serviceId}
-                                      </span>
-                                    </div>
-                                    <div className="flex items-center gap-3 shrink-0">
-                                      <div className="hidden lg:flex items-center gap-3">
-                                        <CheckIcon passed={sc.ledgerComplete} label={lang === "nl" ? "Boekhouding" : "Ledger"} />
-                                        <CheckIcon passed={sc.budgetApproved} label={lang === "nl" ? "Budget" : "Budget"} />
-                                        <CheckIcon passed={!sc.yoyFlagged} label="YoY" />
-                                        {sc.consumptionVerified !== false && (
-                                          <CheckIcon passed={sc.consumptionVerified} label={lang === "nl" ? "Verbruik" : "Usage"} />
-                                        )}
-                                      </div>
-                                      <CheckStatusBadge status={sc.status} lang={lang} />
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        )}
                       </CardContent>
                     </Card>
                   )}
 
-                  {/* Category-grouped service tables */}
+                  {/* Section 1: Year KPI Strip */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                    <KpiCard
+                      label={lang === "nl" ? "Totaal budget" : "Total budget"}
+                      value={fmt(totalBudget)}
+                      color={brand.blue}
+                    />
+                    <KpiCard
+                      label={lang === "nl" ? "Werkelijk" : "Actual"}
+                      value={fmt(totalActual)}
+                      color={brand.navy}
+                    />
+                    <KpiCard
+                      label={lang === "nl" ? "Verschil" : "Variance"}
+                      value={fmt(variance)}
+                      color={variance >= 0 ? brand.green : brand.red}
+                      sub={variance >= 0 ? (lang === "nl" ? "Onder budget" : "Under budget") : (lang === "nl" ? "Over budget" : "Over budget")}
+                    />
+                    <KpiCard
+                      label={lang === "nl" ? "Maanden" : "Months"}
+                      value={`${monthsClosed}/12`}
+                      color={brand.green}
+                      sub={lang === "nl" ? "afgesloten" : "closed"}
+                    />
+                    <KpiCard
+                      label={lang === "nl" ? "Vlaggen" : "Flags"}
+                      value={flaggedCount}
+                      color={flaggedCount > 0 ? brand.red : brand.muted}
+                      sub={flaggedCount > 0 ? (lang === "nl" ? "vereist aandacht" : "needs attention") : (lang === "nl" ? "geen problemen" : "all clear")}
+                    />
+                  </div>
+
+                  {/* Section 2: Monthly Closing Grid (requires ledger/monthlyClose) */}
+                  {isFeatureEnabled("monthlyClose") && (
+                  <Card className="border-slate-200 bg-white overflow-hidden">
+                    <CardContent className="p-5">
+                      <h3 className="text-[13px] font-semibold text-slate-600 mb-4">
+                        {lang === "nl" ? "Maandelijkse afsluitingsstatus" : "Monthly Closing Status"}
+                      </h3>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs">
+                          <thead>
+                            <tr className="border-b border-slate-200">
+                              <th className="text-left px-3 py-2 font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap sticky left-0 bg-white z-10">
+                                {lang === "nl" ? "Dienst" : "Service"}
+                              </th>
+                              {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map((m, idx) => (
+                                <th key={idx} className="text-center px-2 py-2 font-semibold text-slate-500 uppercase tracking-wider w-8">
+                                  {m}
+                                </th>
+                              ))}
+                              <th className="text-center px-3 py-2 font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">
+                                {lang === "nl" ? "Totaal" : "Total"}
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {monthlyCloseGrid.map((row, rowIdx) => {
+                              const closedCount = row.months.filter((m) => m.status === "closed").length;
+                              return (
+                                <tr key={rowIdx} className="border-b border-slate-100 hover:bg-slate-50/80 transition-colors">
+                                  <td className="text-left px-3 py-2 font-medium text-slate-700 whitespace-nowrap sticky left-0 bg-white z-10">
+                                    <div className="text-[11px]">{(() => { const svc = getService(row.serviceId); return svc ? svc.code : row.serviceId; })()}</div>
+                                    <div className="text-[12px] font-semibold">{(() => { const svc = getService(row.serviceId); return svc ? (svc.name[lang] || svc.name.en) : row.serviceId; })()}</div>
+                                  </td>
+                                  {row.months.map((month, monthIdx) => {
+                                    let dotColor = "#E2E8F0"; // future
+                                    if (month.status === "closed") dotColor = brand.green;
+                                    else if (month.status === "review") dotColor = brand.amber;
+                                    else if (month.status === "open") dotColor = brand.red;
+
+                                    return (
+                                      <td key={monthIdx} className="text-center px-2 py-2">
+                                        <div
+                                          className="w-2.5 h-2.5 rounded-full mx-auto"
+                                          style={{ background: dotColor }}
+                                          title={month.status}
+                                        />
+                                      </td>
+                                    );
+                                  })}
+                                  <td className="text-center px-3 py-2 font-semibold text-slate-700 whitespace-nowrap">
+                                    <span className="text-[12px]">{closedCount}/12</span>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  )}
+
+                  {/* Section 3: Budget vs Actual Summary Table (requires ledger) */}
+                  {isFeatureEnabled("ledger") && (
+                  <Card className="border-slate-200 bg-white overflow-hidden">
+                    <CardContent className="p-5">
+                      <h3 className="text-[13px] font-semibold text-slate-600 mb-4">
+                        {lang === "nl" ? "Budget monitoring per dienst" : "Budget Monitoring per Service"}
+                      </h3>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-slate-200 bg-slate-50/80">
+                              <th className="w-8 px-2 py-2" />
+                              {[
+                                { key: "code", align: "left" },
+                                { key: "service", align: "left" },
+                                { key: "budget", align: "right", label: lang === "nl" ? "Budget" : "Budget" },
+                                { key: "actual", align: "right", label: lang === "nl" ? "Werkelijk" : "Actual" },
+                                { key: "variance", align: "right", label: lang === "nl" ? "Verschil" : "Variance" },
+                                { key: "status", align: "center", label: lang === "nl" ? "Status" : "Status" },
+                              ].map((col) => (
+                                <th
+                                  key={col.key}
+                                  className={`text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 sm:px-4 py-2 text-${col.align} whitespace-nowrap`}
+                                >
+                                  {col.label || t(col.key, lang)}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100">
+                            {enrichedBs.map((bs) => {
+                              const v = bs.budget - bs.actual;
+                              const ledger = ledgerByService[bs.serviceId];
+                              const isExpanded = expandedBudgetService === bs.serviceId;
+                              const ledgerEntries = isExpanded
+                                ? getLedgerByServiceAndBuilding(bs.serviceId, buildingId, year)
+                                    .sort((a, b) => b.date.localeCompare(a.date))
+                                : [];
+
+                              // Determine status dot color
+                              let statusColor = brand.green;
+                              if (v < 0) statusColor = brand.red;
+                              else if (v < (bs.budget * 0.1)) statusColor = brand.amber;
+
+                              return (
+                                <React.Fragment key={bs.id}>
+                                  <tr
+                                    className="hover:bg-slate-50/80 transition-colors cursor-pointer"
+                                    onClick={() =>
+                                      setExpandedBudgetService(isExpanded ? null : bs.serviceId)
+                                    }
+                                  >
+                                    <td className="px-2 py-2.5 w-8">
+                                      <ChevronRight
+                                        size={13}
+                                        className={`text-slate-400 transition-transform duration-150 ${isExpanded ? "rotate-90" : ""}`}
+                                      />
+                                    </td>
+                                    <td className="px-3 sm:px-4 py-2.5 text-[11px] font-mono text-slate-500">
+                                      {bs.service?.code || "—"}
+                                    </td>
+                                    <td className="px-3 sm:px-4 py-2.5 text-[12px] text-slate-700 font-medium">
+                                      {bs.service?.name[lang] || bs.serviceId}
+                                    </td>
+                                    <td className="px-3 sm:px-4 py-2.5 text-right text-[12px] font-mono text-slate-700">
+                                      {fmt(bs.budget)}
+                                    </td>
+                                    <td className="px-3 sm:px-4 py-2.5 text-right text-[12px] font-mono text-slate-700">
+                                      {fmt(bs.actual)}
+                                    </td>
+                                    <td className="px-3 sm:px-4 py-2.5 text-right text-[12px] font-mono font-medium" style={{ color: statusColor }}>
+                                      {v >= 0 ? "+" : ""}{fmt(v)}
+                                    </td>
+                                    <td className="px-3 sm:px-4 py-2.5 text-center">
+                                      <div
+                                        className="w-2.5 h-2.5 rounded-full mx-auto"
+                                        style={{ background: statusColor }}
+                                      />
+                                    </td>
+                                  </tr>
+                                  {isExpanded && (
+                                    <tr className="bg-slate-50/50">
+                                      <td colSpan="7" className="px-3 sm:px-4 py-4">
+                                        <div className="space-y-3">
+                                          {/* Monthly bar chart */}
+                                          <div>
+                                            <p className="text-[11px] text-slate-500 font-medium mb-2 uppercase tracking-wider">
+                                              {lang === "nl" ? "Maandelijks patroon" : "Monthly pattern"}
+                                            </p>
+                                            <MonthlyBarChart
+                                              entries={ledgerEntries}
+                                              budgetPerMonth={bs.budget / 12}
+                                            />
+                                          </div>
+
+                                          {/* Ledger entries */}
+                                          {ledgerEntries.length > 0 && (
+                                            <div>
+                                              <p className="text-[11px] text-slate-500 font-medium mb-2 uppercase tracking-wider">
+                                                {lang === "nl" ? "Boeking" : "Entries"} ({ledgerEntries.length})
+                                              </p>
+                                              <div className="space-y-1">
+                                                {ledgerEntries.slice(0, 5).map((entry) => (
+                                                  <div key={entry.id} className="flex items-center justify-between text-[11px] px-2 py-1.5 rounded bg-white/60 border border-slate-100">
+                                                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                      <span className="text-slate-400">{fmtDate(entry.date)}</span>
+                                                      <span className="text-slate-600 truncate">{typeof entry.description === "object" ? (entry.description[lang] || entry.description.en) : entry.description}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 shrink-0 ml-2">
+                                                      <span className="font-mono text-slate-700">{fmtEur2(entry.amount)}</span>
+                                                      <LedgerStatusBadge status={entry.status} lang={lang} />
+                                                    </div>
+                                                  </div>
+                                                ))}
+                                                {ledgerEntries.length > 5 && (
+                                                  <p className="text-[10px] text-slate-400 italic px-2 py-1">
+                                                    {lang === "nl" ? "+" : "+"} {ledgerEntries.length - 5} {lang === "nl" ? "meer" : "more"}
+                                                  </p>
+                                                )}
+                                              </div>
+                                            </div>
+                                          )}
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  )}
+                                </React.Fragment>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  )}
+
+                  {/* Section 4: Alerts Strip */}
+                  {activityList.filter((a) => a.type === "alert").length > 0 && (
+                    <div className="space-y-2">
+                      <h3 className="text-[13px] font-semibold text-slate-600">
+                        {lang === "nl" ? "Waarschuwingen" : "Alerts"}
+                      </h3>
+                      {activityList
+                        .filter((a) => a.type === "alert")
+                        .slice(0, 3)
+                        .map((alert) => (
+                          <div
+                            key={alert.id}
+                            className="flex items-start gap-3 px-4 py-3 rounded-lg border border-amber-200 bg-amber-50/50"
+                          >
+                            <AlertTriangle
+                              size={14}
+                              className="text-amber-500 mt-0.5 shrink-0"
+                            />
+                            <div>
+                              <p className="text-[12px] text-slate-700">
+                                {alert.description[lang] || alert.description.en}
+                              </p>
+                              <p className="text-[11px] text-slate-400 mt-0.5">
+                                {alert.date}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              {/* ═══ SERVICES TAB — CONFIGURATION ONLY ═══ */}
+              <TabsContent value="services">
+                <div className="mt-4 space-y-5">
                   {(() => {
-                    const grouped = serviceCategories
+                    const visibleCategories = isFeatureEnabled("nonUtilityServices")
+                      ? serviceCategories
+                      : serviceCategories.filter((c) => c.id === "energy");
+                    const grouped = visibleCategories
                       .map((cat) => ({
                         ...cat,
                         items: enrichedBs.filter(
@@ -734,7 +818,7 @@ export default function BuildingDetailPage() {
                       return (
                         <div key={group.id}>
                           {/* Category header */}
-                          <div className="flex items-center gap-2 mb-2">
+                          <div className="flex items-center gap-2 mb-3">
                             <div
                               className="w-5 h-5 rounded flex items-center justify-center"
                               style={{ background: cfg?.bg, color: cfg?.color }}
@@ -749,254 +833,86 @@ export default function BuildingDetailPage() {
                             </span>
                           </div>
 
-                          {/* Table */}
-                          <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-                            <table className="w-full text-sm">
-                              <thead>
-                                <tr className="border-b border-slate-200 bg-slate-50/80">
-                                  <th className="w-8 px-2 py-2" />
-                                  {[
-                                    { key: "code", align: "left" },
-                                    { key: "service", align: "left" },
-                                    { key: "distributionMethod", align: "left" },
-                                    { key: "budgetProgress", align: "right" },
-                                    { key: "actual", align: "right" },
-                                    { key: "variance", align: "right" },
-                                    { key: "completeness", align: "center" },
-                                  ].map((col) => (
-                                    <th
-                                      key={col.key}
-                                      className={`text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 sm:px-4 py-2 text-${col.align} whitespace-nowrap`}
-                                    >
-                                      {t(col.key, lang)}
-                                    </th>
-                                  ))}
-                                </tr>
-                              </thead>
-                              <tbody className="divide-y divide-slate-100">
-                                {group.items.map((bs) => {
-                                  const v = bs.budget - bs.actual;
-                                  const ledger = ledgerByService[bs.serviceId];
-                                  const isServiceExpanded = expandedService === bs.serviceId;
-                                  const ledgerEntries = isServiceExpanded
-                                    ? getLedgerByServiceAndBuilding(bs.serviceId, buildingId, year)
-                                        .sort((a, b) => b.date.localeCompare(a.date))
-                                    : [];
-                                  const ledgerTotal = ledgerEntries.reduce((s, e) => s + e.amount, 0);
+                          {/* Service cards */}
+                          <div className="grid gap-3 mb-4">
+                            {group.items.map((bs) => (
+                              <Card key={bs.id} className="border-slate-200 bg-white hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/services/${bs.serviceId}`)}>
+                                <CardContent className="p-4">
+                                  {/* Header: Service code + name + metered badge */}
+                                  <div className="flex items-start justify-between mb-3">
+                                    <div>
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <span className="text-[12px] font-mono text-slate-500">{bs.service?.code}</span>
+                                        <span className="text-[13px] font-semibold text-slate-900">{bs.service?.name[lang]}</span>
+                                      </div>
+                                    </div>
+                                    {bs.service?.metered === true && (
+                                      <span className="text-[10px] px-2 py-1 rounded-full font-medium text-slate-600 bg-slate-100">
+                                        {lang === "nl" ? "Gemeten" : "Metered"}
+                                      </span>
+                                    )}
+                                  </div>
 
-                                  return (
-                                    <React.Fragment key={bs.id}>
-                                      <tr
-                                        className="hover:bg-slate-50/80 transition-colors cursor-pointer"
-                                        onClick={() =>
-                                          setExpandedService(isServiceExpanded ? null : bs.serviceId)
+                                  {/* Cost categories */}
+                                  <div className="mb-3 pb-3 border-b border-slate-100">
+                                    <p className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mb-2">
+                                      {lang === "nl" ? "Kostensoorten" : "Cost Categories"}
+                                    </p>
+                                    <div className="space-y-1.5">
+                                      {(() => {
+                                        const costCats = getCostCategoriesByService(bs.serviceId);
+                                        if (costCats.length === 0) {
+                                          return (
+                                            <p className="text-[11px] text-slate-400 italic">
+                                              {lang === "nl" ? "Geen kostensoorten" : "No cost categories"}
+                                            </p>
+                                          );
                                         }
-                                      >
-                                        <td className="px-2 py-2.5 w-8">
-                                          <ChevronRight
-                                            size={13}
-                                            className={`text-slate-400 transition-transform duration-150 ${isServiceExpanded ? "rotate-90" : ""}`}
-                                          />
-                                        </td>
-                                        <td className="px-3 sm:px-4 py-2.5">
-                                          <span className="text-[12px] font-mono font-semibold text-slate-600">
-                                            {bs.service?.code}
-                                          </span>
-                                        </td>
-                                        <td className="px-3 sm:px-4 py-2.5">
-                                          <div className="flex items-center gap-2">
-                                            <div
-                                              className="text-[13px] font-medium"
-                                              style={{ color: brand.navy }}
-                                            >
-                                              {bs.service?.name[lang] || bs.serviceId}
+                                        return costCats.slice(0, 4).map((cc, idx) => (
+                                          <div key={idx} className="flex items-center justify-between text-[11px]">
+                                            <div>
+                                              <span className="text-slate-700 font-medium">{cc.name[lang] || cc.name.en}</span>
+                                              <span className="text-slate-400 ml-2">({cc.supplier})</span>
                                             </div>
-                                            {isPastYear && settlement && (settlement.status === "distributed" || settlement.status === "approved") && (
-                                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-slate-100 text-slate-600">
-                                                <Lock size={8} />
-                                                {t("locked", lang)}
-                                              </span>
-                                            )}
-                                            {ledger?.flagged > 0 && (
-                                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-red-50 text-red-600">
-                                                <AlertTriangle size={8} />
-                                                {ledger.flagged}
-                                              </span>
-                                            )}
-                                            {ledger?.pending > 0 && (
-                                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-amber-50 text-amber-600">
-                                                <Clock size={8} />
-                                                {ledger.pending}
-                                              </span>
-                                            )}
+                                            <span className="text-slate-500">{cc.invoiceFrequency}</span>
                                           </div>
-                                        </td>
-                                        <td className="px-3 sm:px-4 py-2.5">
-                                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600">
-                                            {bs.distMethod?.name[lang] ||
-                                              bs.distributionMethod}
-                                          </span>
-                                        </td>
-                                        <td className="px-3 sm:px-4 py-2.5 text-right tabular-nums text-[13px] text-slate-600">
-                                          {fmt(bs.budget)}
-                                        </td>
-                                        <td className="px-3 sm:px-4 py-2.5 text-right tabular-nums text-[13px] text-slate-600">
-                                          {fmt(bs.actual)}
-                                        </td>
-                                        <td className="px-3 sm:px-4 py-2.5 text-right">
-                                          <span
-                                            className="text-[13px] tabular-nums font-medium"
-                                            style={{
-                                              color:
-                                                v >= 0 ? brand.green : brand.red,
-                                            }}
-                                          >
-                                            {v >= 0 ? "+" : ""}
-                                            {fmt(v)}
-                                          </span>
-                                        </td>
-                                        <td className="px-3 sm:px-4 py-2.5">
-                                          <CompletenessBar
-                                            pct={bs.completeness}
-                                          />
-                                        </td>
-                                      </tr>
+                                        ));
+                                      })()}
+                                      {(() => {
+                                        const costCats = getCostCategoriesByService(bs.serviceId);
+                                        if (costCats.length > 4) {
+                                          return (
+                                            <p className="text-[10px] text-slate-400 italic pt-1">
+                                              {lang === "nl" ? "+" : "+"} {costCats.length - 4} {lang === "nl" ? "meer" : "more"}
+                                            </p>
+                                          );
+                                        }
+                                      })()}
+                                    </div>
+                                  </div>
 
-                                      {/* ── Expanded: ledger entries for this service ── */}
-                                      {isServiceExpanded && (
-                                        <tr>
-                                          <td colSpan={8} className="p-0">
-                                            <div className="border-t border-slate-100">
-                                              {/* Monthly bar chart */}
-                                              <div className="px-4 py-3 bg-slate-50/50 border-b border-slate-100">
-                                                <div className="flex items-center gap-2 mb-2">
-                                                  <BarChart3 size={12} className="text-slate-400" />
-                                                  <span className="text-[11px] font-medium text-slate-500">
-                                                    {lang === "nl" ? "Maandverdeling" : "Monthly Distribution"}
-                                                  </span>
-                                                </div>
-                                                <MonthlyBarChart
-                                                  entries={ledgerEntries}
-                                                  budgetPerMonth={bs.budget / 12}
-                                                />
-                                              </div>
-
-                                              {/* Ledger entry table */}
-                                              {ledgerEntries.length > 0 ? (
-                                                <div className="overflow-x-auto">
-                                                  <table className="w-full text-sm">
-                                                    <thead>
-                                                      <tr className="bg-slate-50/60 border-b border-slate-100">
-                                                        <th className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-left">
-                                                          {t("date", lang)}
-                                                        </th>
-                                                        <th className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-left">
-                                                          {t("description", lang)}
-                                                        </th>
-                                                        <th className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-left hidden lg:table-cell">
-                                                          {t("supplier", lang)}
-                                                        </th>
-                                                        <th className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-left hidden md:table-cell">
-                                                          {lang === "nl" ? "Factuur" : "Invoice"}
-                                                        </th>
-                                                        <th className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-right">
-                                                          {lang === "nl" ? "Bedrag" : "Amount"}
-                                                        </th>
-                                                        <th className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-center">
-                                                          {t("status", lang)}
-                                                        </th>
-                                                      </tr>
-                                                    </thead>
-                                                    <tbody className="divide-y divide-slate-50">
-                                                      {ledgerEntries.map((entry) => (
-                                                        <tr
-                                                          key={entry.id}
-                                                          className="hover:bg-slate-50/40 transition-colors"
-                                                          style={
-                                                            entry.status === "flagged"
-                                                              ? { background: "#FFFBEB40" }
-                                                              : {}
-                                                          }
-                                                        >
-                                                          <td className="px-4 py-2 text-[12px] text-slate-500 tabular-nums whitespace-nowrap">
-                                                            {fmtDate(entry.date)}
-                                                          </td>
-                                                          <td className="px-4 py-2">
-                                                            <div className="text-[12px] text-slate-700">
-                                                              {entry.description}
-                                                            </div>
-                                                            {entry.flag && (
-                                                              <div className="text-[10px] mt-0.5 flex items-center gap-1" style={{ color: brand.red }}>
-                                                                <AlertTriangle size={9} />
-                                                                {entry.flag[lang] || entry.flag.en}
-                                                              </div>
-                                                            )}
-                                                          </td>
-                                                          <td className="px-4 py-2 text-[12px] text-slate-500 hidden lg:table-cell">
-                                                            {entry.supplier || "—"}
-                                                          </td>
-                                                          <td className="px-4 py-2 text-[11px] font-mono text-slate-400 hidden md:table-cell">
-                                                            {entry.invoiceRef}
-                                                          </td>
-                                                          <td className="px-4 py-2 text-right text-[12px] font-medium tabular-nums" style={{ color: brand.navy }}>
-                                                            {fmtEur2(entry.amount)}
-                                                          </td>
-                                                          <td className="px-4 py-2 text-center">
-                                                            <LedgerStatusBadge status={entry.status} lang={lang} />
-                                                          </td>
-                                                        </tr>
-                                                      ))}
-                                                    </tbody>
-                                                    <tfoot>
-                                                      <tr className="border-t border-slate-200 bg-slate-50/60">
-                                                        <td
-                                                          colSpan={4}
-                                                          className="px-4 py-2.5 text-[12px] font-semibold text-slate-500"
-                                                        >
-                                                          {lang === "nl" ? "Totaal" : "Total"} ·{" "}
-                                                          <span className="font-normal text-slate-400">
-                                                            {lang === "nl" ? "Budget" : "Budget"}:{" "}
-                                                            {fmt(bs.budget)}
-                                                          </span>
-                                                        </td>
-                                                        <td className="px-4 py-2.5 text-right text-[13px] font-bold tabular-nums" style={{ color: brand.navy }}>
-                                                          {fmtEur2(ledgerTotal)}
-                                                        </td>
-                                                        <td />
-                                                      </tr>
-                                                    </tfoot>
-                                                  </table>
-                                                </div>
-                                              ) : (
-                                                <div className="px-4 py-6 text-center text-[12px] text-slate-400">
-                                                  {lang === "nl" ? "Geen boekingen gevonden" : "No entries found"}
-                                                </div>
-                                              )}
-
-                                              {/* Link to service detail page */}
-                                              <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50/30 flex items-center justify-between">
-                                                <button
-                                                  onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    navigate(`/services/${bs.serviceId}`);
-                                                  }}
-                                                  className="text-[12px] font-medium hover:underline transition-colors"
-                                                  style={{ color: brand.blue }}
-                                                >
-                                                  {lang === "nl"
-                                                    ? `Bekijk alle complexen voor deze dienst →`
-                                                    : `View all complexes for this service →`}
-                                                </button>
-                                              </div>
-                                            </div>
-                                          </td>
-                                        </tr>
-                                      )}
-                                    </React.Fragment>
-                                  );
-                                })}
-                              </tbody>
-                            </table>
+                                  {/* Distribution method + budget */}
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider mb-1">
+                                        {lang === "nl" ? "Verdeling" : "Distribution"}
+                                      </p>
+                                      <p className="text-[12px] text-slate-700">
+                                        {bs.distMethod?.name[lang] || bs.distMethod?.name.en || "—"}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider mb-1 text-right">
+                                        {lang === "nl" ? "Budget" : "Budget"}
+                                      </p>
+                                      <p className="text-[14px] font-bold text-slate-900 text-right" style={{ color: brand.navy }}>
+                                        {fmt(bs.budget)}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
                           </div>
                         </div>
                       );
@@ -1005,462 +921,248 @@ export default function BuildingDetailPage() {
                 </div>
               </TabsContent>
 
-              {/* ═══ METERS TAB ═══ */}
-              <TabsContent value="meters">
+              {/* ═══ METERS TAB (requires consumption feature) ═══ */}
+              {isFeatureEnabled("consumption") && <TabsContent value="meters">
                 <div className="mt-4 space-y-4">
-                  {/* Main meters — cards with consumption */}
+                  {/* Main meters */}
                   <div>
-                    <h3 className="text-[12px] font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                      {t("mainMeters", lang)}
+                    <h3 className="text-[13px] font-semibold text-slate-600 mb-3">
+                      {lang === "nl" ? "Hoofdmeters" : "Main Meters"}
                     </h3>
-                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                      {mainMeters.map((m) => {
-                        const ui = utilityIcon[m.utility] || {};
-                        const Icon = ui.icon || Gauge;
-                        const utilityLabel = m.utility === "electricity"
-                          ? (lang === "nl" ? "Elektra" : "Electricity")
-                          : m.utility === "heat"
-                          ? (lang === "nl" ? "Warmte" : "Heat")
-                          : (lang === "nl" ? "Water" : "Water");
-                        return (
-                          <Card key={m.id} className="border-slate-200 bg-white">
-                            <CardContent className="p-4">
-                              <div className="flex items-start justify-between mb-3">
-                                <div className="flex items-center gap-2">
-                                  <div
-                                    className="w-7 h-7 rounded-md flex items-center justify-center"
-                                    style={{ background: (ui.color || "#94A3B8") + "15" }}
-                                  >
-                                    <Icon size={14} style={{ color: ui.color || "#94A3B8" }} />
-                                  </div>
-                                  <div>
-                                    <div className="text-[13px] font-medium" style={{ color: brand.navy }}>
-                                      {utilityLabel}
+                    {mainMeters.length === 0 ? (
+                      <div className="px-4 py-8 text-center text-sm text-slate-400">
+                        {t("noResults", lang)}
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {mainMeters.map((m) => {
+                          const ui = utilityIcon[m.utility] || {};
+                          const Icon = ui.icon || Gauge;
+                          const isOverdue = m.status === "warning";
+                          return (
+                            <Card key={m.id} className="border-slate-200 bg-white">
+                              <CardContent className="p-4">
+                                <div className="flex items-center justify-between mb-3">
+                                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                                    <div
+                                      className="w-8 h-8 rounded flex items-center justify-center shrink-0"
+                                      style={{ background: (ui.color || "#94A3B8") + "15" }}
+                                    >
+                                      <Icon size={14} style={{ color: ui.color || "#94A3B8" }} />
                                     </div>
-                                    <div className="text-[11px] text-slate-400 font-mono">
-                                      {m.meterNumber}
+                                    <div className="min-w-0">
+                                      <p className="text-[12px] text-slate-700 font-medium">{m.meterNumber}</p>
+                                      <p className="text-[11px] text-slate-400">{t(m.utility, lang)} · {m.unit}</p>
                                     </div>
                                   </div>
-                                </div>
-                                <StatusBadge status={m.status} size="xs" />
-                              </div>
-                              {/* Current reading */}
-                              <div className="flex items-baseline justify-between">
-                                <span className="text-xl font-bold tabular-nums" style={{ color: brand.navy }}>
-                                  {m.lastReading.toLocaleString("nl-NL")}
-                                </span>
-                                <span className="text-[11px] text-slate-400">{m.unit}</span>
-                              </div>
-                              <p className="text-[11px] text-slate-400 mt-0.5">
-                                {t("lastReading", lang)}: {m.readingDate}
-                              </p>
-                              {/* Consumption (delta) */}
-                              {m.consumption != null && (
-                                <div className="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between">
-                                  <span className="text-[11px] text-slate-500">{t("consumption", lang)}</span>
-                                  <span className="text-[13px] font-semibold tabular-nums" style={{ color: brand.blue }}>
-                                    {m.consumption.toLocaleString("nl-NL")} {m.unit}
+                                  <span className={`text-[11px] font-medium whitespace-nowrap ml-2 ${isOverdue ? "text-amber-600" : "text-green-600"}`}>
+                                    {isOverdue ? t("readingsOverdue", lang) : t("readingsUpToDate", lang)}
                                   </span>
                                 </div>
-                              )}
-                              {/* EAN code */}
-                              {m.ean && (
-                                <p className="text-[10px] text-slate-300 font-mono mt-1 truncate" title={m.ean}>
-                                  EAN {m.ean}
-                                </p>
-                              )}
-                            </CardContent>
-                          </Card>
-                        );
-                      })}
-                    </div>
+
+                                <div className="grid grid-cols-3 gap-3 px-3 py-2 bg-slate-50 rounded">
+                                  <div>
+                                    <p className="text-[10px] text-slate-500 uppercase font-medium">
+                                      {lang === "nl" ? "Huidig" : "Current"}
+                                    </p>
+                                    <p className="text-[13px] font-bold text-slate-900">
+                                      {(m.lastReading || 0).toLocaleString("nl-NL")}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] text-slate-500 uppercase font-medium">
+                                      {lang === "nl" ? "Verbruik" : "Consumption"}
+                                    </p>
+                                    <p className="text-[13px] font-bold text-slate-900">
+                                      {(m.consumption || 0).toLocaleString("nl-NL")} {m.unit}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] text-slate-500 uppercase font-medium">
+                                      {lang === "nl" ? "Aflezing" : "Reading date"}
+                                    </p>
+                                    <p className="text-[13px] font-bold text-slate-900">
+                                      {m.readingDate}
+                                    </p>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Submeters — table with consumption column, "Utility" instead of "Service" */}
+                  {/* Sub meters */}
                   {subMeters.length > 0 && (
                     <div>
-                      <h3 className="text-[12px] font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                        {t("subMeters", lang)} ({subMeters.length})
+                      <h3 className="text-[13px] font-semibold text-slate-600 mb-3">
+                        {lang === "nl" ? "Submeters" : "Sub Meters"} ({subMeters.length})
                       </h3>
-                      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="border-b border-slate-200 bg-slate-50/80">
-                              <th className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">
-                                {t("meterNumber", lang)}
-                              </th>
-                              <th className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">
-                                {t("utility", lang)}
-                              </th>
-                              <th className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-2.5 text-left">
-                                VHE
-                              </th>
-                              <th className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-2.5 text-right">
-                                {t("currentReading", lang)}
-                              </th>
-                              <th className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-2.5 text-right">
-                                {t("consumption", lang)}
-                              </th>
-                              <th className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 py-2.5 text-center">
-                                {t("status", lang)}
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-100">
-                            {subMeters.map((m) => {
-                              const vhe = vheList.find((v) => v.id === m.vheId);
-                              const ui = utilityIcon[m.utility] || {};
-                              const utilityLabel = m.utility === "electricity"
-                                ? (lang === "nl" ? "Elektra" : "Electricity")
-                                : m.utility === "heat"
-                                ? (lang === "nl" ? "Warmte" : "Heat")
-                                : (lang === "nl" ? "Water" : "Water");
-                              return (
-                                <tr key={m.id} className="hover:bg-slate-50/80 transition-colors">
-                                  <td className="px-3 py-2.5 text-[12px] font-mono text-slate-600">
-                                    {m.meterNumber}
-                                  </td>
-                                  <td className="px-3 py-2.5">
-                                    <div className="flex items-center gap-1.5">
-                                      {ui.icon && React.createElement(ui.icon, { size: 11, style: { color: ui.color } })}
-                                      <span className="text-[12px] text-slate-600">{utilityLabel}</span>
+                      <div className="space-y-2">
+                        {subMeters.map((m) => {
+                          const ui = utilityIcon[m.utility] || {};
+                          const Icon = ui.icon || Gauge;
+                          return (
+                            <Card key={m.id} className="border-slate-200 bg-white">
+                              <CardContent className="p-4">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                                    <div
+                                      className="w-8 h-8 rounded flex items-center justify-center shrink-0"
+                                      style={{ background: (ui.color || "#94A3B8") + "15" }}
+                                    >
+                                      <Icon size={14} style={{ color: ui.color || "#94A3B8" }} />
                                     </div>
-                                  </td>
-                                  <td className="px-3 py-2.5">
-                                    {vhe ? (
-                                      <button
-                                        className="text-[12px] font-medium text-[#3B8EA5] hover:text-[#3EB1C8] transition-colors"
-                                        onClick={() => navigate(`/vhe/${vhe.id}`)}
-                                      >
-                                        {vhe.unit}
-                                      </button>
-                                    ) : (
-                                      <span className="text-[12px] text-slate-400">—</span>
-                                    )}
-                                  </td>
-                                  <td className="px-3 py-2.5 text-right text-[13px] tabular-nums font-medium text-slate-700">
-                                    {m.lastReading.toLocaleString("nl-NL")}{" "}
-                                    <span className="text-slate-400 font-normal text-[11px]">{m.unit}</span>
-                                  </td>
-                                  <td className="px-3 py-2.5 text-right text-[13px] tabular-nums font-semibold" style={{ color: brand.blue }}>
-                                    {(m.consumption || 0).toLocaleString("nl-NL")}{" "}
-                                    <span className="text-slate-400 font-normal text-[11px]">{m.unit}</span>
-                                  </td>
-                                  <td className="px-3 py-2.5 text-center">
-                                    <StatusBadge status={m.status} size="xs" />
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
+                                    <div className="min-w-0">
+                                      <p className="text-[12px] text-slate-700 font-medium">{m.meterNumber}</p>
+                                      <p className="text-[11px] text-slate-400">{m.vheId}</p>
+                                    </div>
+                                  </div>
+                                  <span className="text-[13px] font-bold tabular-nums" style={{ color: brand.navy }}>
+                                    {(m.consumption || 0).toLocaleString("nl-NL")} {m.unit}
+                                  </span>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
-
-                  {meterList.length === 0 && (
-                    <div className="text-center py-8 text-sm text-slate-400">
-                      {t("noResults", lang)}
-                    </div>
-                  )}
                 </div>
-              </TabsContent>
+              </TabsContent>}
 
               {/* ═══ VHE TAB ═══ */}
-              {/* Columns: address (primary), type, floor, m², contract, voorschot, status
-                  + expandable row showing voorschot breakdown per service component */}
               <TabsContent value="vhe">
-                <div className="mt-4">
-                  <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-slate-200 bg-slate-50/80">
-                          {[
-                            { key: "address", align: "left" },
-                            { key: "vheType", align: "left" },
-                            { key: "floor", align: "center" },
-                            { key: "m2", align: "right" },
-                            { key: "contract", align: "left" },
-                            { key: "voorschot", align: "right" },
-                            { key: "status", align: "center" },
-                          ].map((col) => (
-                            <th
-                              key={col.key}
-                              className={`text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 sm:px-4 py-2.5 text-${col.align} whitespace-nowrap`}
-                            >
-                              {t(col.key, lang)}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100">
-                        {vheList.map((v) => {
-                          const isExpanded = expandedVhe === v.id;
-                          return (
-                            <React.Fragment key={v.id}>
-                              <tr
-                                className="hover:bg-slate-50/80 transition-colors cursor-pointer"
-                                onClick={() => setExpandedVhe(isExpanded ? null : v.id)}
-                              >
-                                <td className="px-3 sm:px-4 py-3">
-                                  <div className="flex items-center gap-2">
-                                    <ChevronRight
-                                      size={13}
-                                      className={`text-slate-400 transition-transform shrink-0 ${isExpanded ? "rotate-90" : ""}`}
-                                    />
-                                    <span className="text-[13px] font-semibold" style={{ color: brand.navy }}>
-                                      {v.address || v.unit}
-                                    </span>
-                                  </div>
-                                </td>
-                                <td className="px-3 sm:px-4 py-3 text-[12px] text-slate-600 capitalize">
-                                  {t(v.type || "apartment", lang)}
-                                </td>
-                                <td className="px-3 sm:px-4 py-3 text-center text-[12px] text-slate-500">
-                                  {v.floor}
-                                </td>
-                                <td className="px-3 sm:px-4 py-3 text-right text-[13px] tabular-nums text-slate-600">
-                                  {v.m2} m²
-                                </td>
-                                <td className="px-3 sm:px-4 py-3 text-[12px]">
-                                  {v.contract ? (
-                                    <div>
-                                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-50 text-emerald-700">
-                                        {t("contractActive", lang)}
-                                      </span>
-                                      <span className="block text-[10px] text-slate-400 mt-0.5">
-                                        {lang === "nl" ? "Sinds" : "Since"} {v.contract.startDate}
-                                      </span>
-                                    </div>
-                                  ) : (
-                                    <span className="text-slate-300 italic text-[11px]">{t("noContract", lang)}</span>
-                                  )}
-                                </td>
-                                <td className="px-3 sm:px-4 py-3 text-right text-[13px] tabular-nums text-slate-600">
-                                  {v.voorschot > 0 ? fmt(v.voorschot) + "/mo" : "—"}
-                                </td>
-                                <td className="px-3 sm:px-4 py-3 text-center">
-                                  <StatusBadge
-                                    status={v.status === "vacant" ? "warning" : v.status === "in-mutation" ? "info" : "active"}
-                                    size="xs"
+                <div className="mt-4 space-y-3">
+                  {vheList.length === 0 ? (
+                    <div className="px-4 py-8 text-center text-sm text-slate-400">
+                      {t("noResults", lang)}
+                    </div>
+                  ) : (
+                    vheList.map((vhe) => {
+                      const isExpanded = expandedVhe === vhe.id;
+                      return (
+                        <React.Fragment key={vhe.id}>
+                          <Card
+                            className="border-slate-200 bg-white cursor-pointer hover:shadow-md transition-shadow"
+                            onClick={() =>
+                              setExpandedVhe(isExpanded ? null : vhe.id)
+                            }
+                          >
+                            <CardContent className="p-4">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                  <ChevronRight
+                                    size={13}
+                                    className={`text-slate-400 transition-transform duration-150 shrink-0 ${isExpanded ? "rotate-90" : ""}`}
                                   />
-                                </td>
-                              </tr>
-                              {/* Expanded: settlement costs per service */}
-                              {isExpanded && v.voorschotBreakdown && v.voorschotBreakdown.length > 0 && (
-                                <tr>
-                                  <td colSpan={7} className="px-0 py-0">
-                                    <div className="bg-slate-50/60 border-t border-slate-100 px-6 sm:px-10 py-3">
-                                      <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                                        {t("settlement", lang)} — {t("costBreakdown", lang)}
-                                      </div>
-                                      <table className="w-full text-[11px]">
-                                        <thead>
-                                          <tr className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">
-                                            <th className="text-left pb-1.5 pr-2">{t("service", lang)}</th>
-                                            <th className="text-right pb-1.5 px-2">{t("voorschot", lang)}</th>
-                                            <th className="text-right pb-1.5 px-2">{t("actual", lang)}</th>
-                                            <th className="text-right pb-1.5 pl-2">{t("netResult", lang)}</th>
-                                          </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-slate-100/80">
-                                          {v.voorschotBreakdown.map((comp) => {
-                                            const ledgerData = ledgerByService[comp.serviceId];
-                                            const annualVoorschot = comp.amount * 12;
-                                            // Distribute ledger total across VHEs proportionally (simplified: equal per VHE)
-                                            const totalVhe = building?.vhe || 1;
-                                            const actualPerVhe = ledgerData ? ledgerData.total / totalVhe : 0;
-                                            const netResult = annualVoorschot - actualPerVhe;
-                                            return (
-                                              <tr key={comp.serviceId}>
-                                                <td className="py-1.5 pr-2 text-slate-600 truncate max-w-[180px]">{comp.serviceName}</td>
-                                                <td className="py-1.5 px-2 text-right tabular-nums text-slate-500">{fmt(annualVoorschot)}</td>
-                                                <td className="py-1.5 px-2 text-right tabular-nums text-slate-700 font-medium">{fmt(actualPerVhe)}</td>
-                                                <td
-                                                  className="py-1.5 pl-2 text-right tabular-nums font-semibold"
-                                                  style={{ color: netResult >= 0 ? brand.green : brand.red }}
-                                                >
-                                                  {netResult >= 0 ? "+" : ""}{fmt(netResult)}
-                                                </td>
-                                              </tr>
-                                            );
-                                          })}
-                                        </tbody>
-                                      </table>
-                                      {/* Totals row */}
-                                      {(() => {
-                                        const totalVoorschotYr = v.voorschotBreakdown.reduce((s, c) => s + c.amount * 12, 0);
-                                        const totalVhe = building?.vhe || 1;
-                                        const totalActualVhe = v.voorschotBreakdown.reduce((s, c) => {
-                                          const ld = ledgerByService[c.serviceId];
-                                          return s + (ld ? ld.total / totalVhe : 0);
-                                        }, 0);
-                                        const totalNet = totalVoorschotYr - totalActualVhe;
-                                        return (
-                                          <div className="mt-2 pt-2 border-t border-slate-200 flex items-center justify-between">
-                                            <span className="text-[11px] font-semibold text-slate-600">
-                                              {t("netResult", lang)}
-                                            </span>
-                                            <div className="flex items-center gap-4 text-[12px] tabular-nums">
-                                              <span className="text-slate-400">{t("voorschot", lang)}: {fmt(totalVoorschotYr)}</span>
-                                              <span className="text-slate-600">{t("actual", lang)}: {fmt(totalActualVhe)}</span>
-                                              <span
-                                                className="font-bold"
-                                                style={{ color: totalNet >= 0 ? brand.green : brand.red }}
-                                              >
-                                                {totalNet >= 0
-                                                  ? `${t("teruggave", lang)}: +${fmt(totalNet)}`
-                                                  : `${t("naheffing", lang)}: ${fmt(totalNet)}`}
-                                              </span>
-                                            </div>
-                                          </div>
-                                        );
-                                      })()}
+                                  <div className="min-w-0">
+                                    <p className="text-[12px] text-slate-700 font-medium truncate">
+                                      {vhe.address}
+                                    </p>
+                                    <p className="text-[11px] text-slate-400">
+                                      {t("unit", lang)} {vhe.unit}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="text-right shrink-0">
+                                  <StatusBadge status={vhe.status} />
+                                  <p className="text-[11px] text-slate-400 mt-1 tabular-nums">
+                                    {lang === "nl" ? "Voorschot:" : "Advance:"} {fmt(vhe.voorschot)}
+                                  </p>
+                                </div>
+                              </div>
 
-                                      {/* Submeters */}
-                                      {(() => {
-                                        const vheMeters = meters.filter(m => m.vheId === v.id && m.type === "sub");
-                                        if (vheMeters.length === 0) return null;
-                                        return (
-                                          <div className="mt-3 pt-3 border-t border-slate-100">
-                                            <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
-                                              {lang === "nl" ? "Submeters" : "Submeters"}
-                                            </div>
-                                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                                              {vheMeters.map(meter => {
-                                                const reading = meter.readings?.[year];
-                                                const utilityLabels = { heat: { en: "Heat", nl: "Warmte" }, water: { en: "Water", nl: "Water" }, warmWater: { en: "Hot Water", nl: "Warm water" }, electricity: { en: "Electricity", nl: "Elektra" } };
-                                                const label = utilityLabels[meter.utility]?.[lang] || meter.utility;
-                                                return (
-                                                  <div key={meter.id} className="bg-slate-50 rounded-lg px-3 py-2">
-                                                    <div className="text-[10px] text-slate-400 uppercase">{label}</div>
-                                                    <div className="text-[13px] font-semibold tabular-nums" style={{ color: brand.navy }}>
-                                                      {reading ? `${reading.consumption?.toFixed(1)} ${meter.unit}` : "—"}
-                                                    </div>
-                                                    <div className="text-[10px] text-slate-400">
-                                                      {reading ? `${reading.start?.toFixed(1)} → ${reading.end?.toFixed(1)}` : lang === "nl" ? "Geen stand" : "No reading"}
-                                                    </div>
-                                                  </div>
-                                                );
-                                              })}
-                                            </div>
-                                          </div>
-                                        );
-                                      })()}
-                                    </div>
-                                  </td>
-                                </tr>
+                              {isExpanded && (
+                                <div className="mt-4 pt-4 border-t border-slate-100 space-y-2">
+                                  <AttributePanel>
+                                    <AttrSection title={lang === "nl" ? "Details" : "Details"}>
+                                      <AttrRow
+                                        label={lang === "nl" ? "VHE ID" : "VHE ID"}
+                                        value={vhe.id}
+                                      />
+                                      <AttrRow
+                                        label={lang === "nl" ? "Oppervlakte" : "Area"}
+                                        value={`${vhe.m2} m²`}
+                                      />
+                                      <AttrRow
+                                        label={lang === "nl" ? "Status" : "Status"}
+                                        value={vhe.status}
+                                      />
+                                    </AttrSection>
+                                  </AttributePanel>
+                                </div>
                               )}
-                            </React.Fragment>
-                          );
-                        })}
-                        {vheList.length === 0 && (
-                          <tr>
-                            <td colSpan={7} className="px-4 py-8 text-center text-sm text-slate-400">
-                              {t("noResults", lang)}
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
+                            </CardContent>
+                          </Card>
+                        </React.Fragment>
+                      );
+                    })
+                  )}
                 </div>
               </TabsContent>
 
               {/* ═══ ACTIVITY TAB ═══ */}
               <TabsContent value="activity">
-                <div className="mt-4 space-y-1">
-                  {activityList.map((a, idx) => {
-                    const cfg = activityIcons[a.type] || activityIcons.alert;
-                    const Icon = cfg.icon;
-                    return (
-                      <div
-                        key={a.id}
-                        className="flex items-start gap-3 px-4 py-3 rounded-lg hover:bg-slate-50 transition-colors"
-                      >
-                        <div className="relative">
-                          <div
-                            className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
-                            style={{ background: cfg.color + "15" }}
-                          >
-                            <Icon size={13} style={{ color: cfg.color }} />
-                          </div>
-                          {idx < activityList.length - 1 && (
-                            <div className="absolute top-7 left-1/2 -translate-x-1/2 w-px h-4 bg-slate-200" />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[12px] text-slate-700">
-                            {a.description[lang] || a.description.en}
-                          </p>
-                          <p className="text-[11px] text-slate-400 mt-0.5">
-                            {a.date}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {activityList.length === 0 && (
-                    <div className="text-center py-8 text-sm text-slate-400">
+                <div className="mt-4 space-y-2">
+                  {activityList.length === 0 ? (
+                    <div className="px-4 py-8 text-center text-sm text-slate-400">
                       {t("noResults", lang)}
                     </div>
+                  ) : (
+                    activityList.map((activity) => {
+                      const cfg = activityIcons[activity.type] || {};
+                      const Icon = cfg.icon || Activity;
+                      return (
+                        <Card key={activity.id} className="border-slate-200 bg-white">
+                          <CardContent className="p-4">
+                            <div className="flex items-start gap-3">
+                              <div
+                                className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5"
+                                style={{ background: (cfg.color || brand.blue) + "15" }}
+                              >
+                                <Icon size={14} style={{ color: cfg.color || brand.blue }} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[12px] text-slate-700 font-medium">
+                                  {typeof activity.description === "object" ? (activity.description[lang] || activity.description.en) : activity.description}
+                                </p>
+                                <p className="text-[11px] text-slate-400 mt-1">
+                                  {fmtDate(activity.date)}
+                                </p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      );
+                    })
                   )}
                 </div>
               </TabsContent>
             </Tabs>
           </div>
 
-          {/* ── Right: Attribute Panel ── */}
-          <AttributePanel>
-            <AttrSection title={t("details", lang)}>
-              <AttrRow label={t("complex", lang)} value={building.complex} />
-              <AttrRow label={t("complexId", lang)} value={building.complexId} />
-              <AttrRow label={t("location", lang)} value={building.location} />
-              <AttrRow label="VHE" value={`${building.vhe} (${activeVhe} ${t("active", lang).toLowerCase()}, ${vacantVhe} ${t("vacant", lang).toLowerCase()})`} />
-              <AttrRow label={t("activeServices", lang)} value={building.components} />
-              <AttrRow label={t("dataQuality", lang)} value={<StatusBadge status={building.dataQuality} size="xs" />} />
-            </AttrSection>
-
-            <AttrSection title={t("utilities", lang)}>
-              <div className="flex items-center gap-2">
-                {building.utilities.map((u) => {
-                  const ui = utilityIcon[u];
-                  if (!ui) return null;
-                  const Icon = ui.icon;
-                  return (
-                    <div
-                      key={u}
-                      className="w-7 h-7 rounded-md flex items-center justify-center"
-                      style={{ background: ui.color + "15" }}
-                      title={u}
-                    >
-                      <Icon size={14} style={{ color: ui.color }} />
-                    </div>
-                  );
-                })}
-              </div>
-            </AttrSection>
-
-            <AttrLink
-              title={t("services", lang)}
-              items={enrichedBs.map((bs) => ({
-                label: `${bs.service?.code} — ${bs.service?.name[lang] || bs.serviceId}`,
-                onClick: () => navigate(`/services/${bs.serviceId}`),
-              }))}
-            />
-
-            {mainMeters.length > 0 && (
-              <AttrSection title={t("mainMeters", lang)}>
-                {mainMeters.map((m) => (
-                  <AttrRow
-                    key={m.id}
-                    label={m.meterNumber}
-                    value={`${m.lastReading.toLocaleString("nl-NL")} ${m.unit}`}
-                  />
-                ))}
+          {/* ── Attribute panel (right sidebar) ── */}
+          <div className="w-full xl:w-80 shrink-0">
+            <AttributePanel>
+              <AttrSection title={lang === "nl" ? "Informatie" : "Information"}>
+                <AttrRow label={lang === "nl" ? "Complex ID" : "Complex ID"} value={building.complexId} />
+                <AttrRow label={lang === "nl" ? "Locatie" : "Location"} value={building.location} />
+                <AttrRow label={lang === "nl" ? "VHE" : "VHE"} value={building.vhe} />
+                <AttrRow
+                  label={lang === "nl" ? "Datakwaliteit" : "Data Quality"}
+                  value={building.dataQuality}
+                />
+                <AttrRow
+                  label={lang === "nl" ? "Staat" : "Status"}
+                  value={building.status}
+                />
               </AttrSection>
-            )}
-          </AttributePanel>
+            </AttributePanel>
+          </div>
         </div>
       </div>
     </div>
