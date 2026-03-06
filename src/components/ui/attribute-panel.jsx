@@ -45,8 +45,9 @@ export function AttrLink({ title, label, items, onItemClick }) {
         {items.map((item, i) => (
           <button key={i}
             onClick={() => item.onClick ? item.onClick() : onItemClick?.(item)}
-            className="group flex items-center gap-1 text-[12px] font-medium text-left transition-colors text-[#3B8EA5] hover:text-[#3EB1C8] hover:underline">
-            <span>{item.label}</span>
+            className="group flex items-center gap-1 text-[12px] font-medium text-left transition-colors text-[#3B8EA5] hover:text-[#3EB1C8] hover:underline max-w-full"
+            title={item.label}>
+            <span className="truncate">{item.label}</span>
             <ArrowUpRight size={11} className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
           </button>
         ))}
