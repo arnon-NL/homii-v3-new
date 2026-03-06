@@ -78,7 +78,6 @@ const dict = {
 
   // VHE attributes
   vheType:           { en: "Type",             nl: "Type" },
-  persons:           { en: "Persons",          nl: "Personen" },
   apartment:         { en: "Apartment",        nl: "Appartement" },
   studio:            { en: "Studio",           nl: "Studio" },
   parking:           { en: "Parking",          nl: "Parkeerplaats" },
@@ -128,11 +127,20 @@ const dict = {
   unit:              { en: "Unit",                nl: "Eenheid" },
   floor:             { en: "Floor",               nl: "Verdieping" },
   m2:                { en: "m²",                  nl: "m²" },
-  contractHolder:    { en: "Contract Holder",     nl: "Contracthouder" },
   voorschot:         { en: "Voorschot",           nl: "Voorschot" },
+  contract:          { en: "Contract",            nl: "Contract" },
+  contractNumber:    { en: "Contract No.",        nl: "Contractnr." },
+  startDate:         { en: "Start Date",          nl: "Startdatum" },
+  endDate:           { en: "End Date",            nl: "Einddatum" },
+  voorschotBreakdown:{ en: "Advance Breakdown",   nl: "Voorschotspecificatie" },
+  advancePerComponent:{ en: "Advance per Component", nl: "Voorschot per component" },
+  totalAdvance:      { en: "Total Advance",       nl: "Totaal voorschot" },
+  contractActive:    { en: "Active",              nl: "Actief" },
+  contractEnded:     { en: "Ended",               nl: "Beëindigd" },
+  noContract:        { en: "No contract",         nl: "Geen contract" },
 
   // VHE
-  vheTitle:          { en: "Units",               nl: "Eenheden" },
+  vheTitle:          { en: "VHE",                 nl: "VHE" },
 
   // Settlement (eindafrekening)
   settlement:        { en: "Settlement",           nl: "Afrekening" },

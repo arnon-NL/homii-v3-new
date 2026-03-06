@@ -34,6 +34,7 @@ import {
   getSettlement,
   getSettlementChecks,
   serviceCategories,
+  getLedgerSummaryByBuilding,
 } from "@/lib/mockData";
 
 /* ── Category icon + color config ── */
@@ -219,6 +220,7 @@ export default function BuildingDetailPage() {
   const navigate = useNavigate();
   const lang = useLang();
   const [year, setYear] = useState(2025);
+  const [expandedVhe, setExpandedVhe] = useState(null);
 
   const building = getBuilding(buildingId);
 
@@ -244,6 +246,10 @@ export default function BuildingDetailPage() {
   );
   const sChecks = useMemo(
     () => getSettlementChecks(buildingId, year),
+    [buildingId, year]
+  );
+  const ledgerByService = useMemo(
+    () => getLedgerSummaryByBuilding(buildingId, year),
     [buildingId, year]
   );
 
@@ -442,7 +448,7 @@ export default function BuildingDetailPage() {
                       </div>
                     ))}
 
-                  {/* Meter health + consumption summary — replaces the old cost breakdown (which duplicated the Services tab) */}
+                  {/* Meter health + consumption summary */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                     {/* Meter health */}
                     <Card className="border-slate-200 bg-white">
@@ -523,6 +529,128 @@ export default function BuildingDetailPage() {
                       </CardContent>
                     </Card>
                   </div>
+
+                  {/* ── Contractinformatie (participant stats + budget tracking) ── */}
+                  <Card className="border-slate-200 bg-white">
+                    <CardContent className="p-5">
+                      <h3 className="text-[13px] font-semibold text-slate-600 mb-3">
+                        {lang === "nl" ? "Contractinformatie" : "Contract Information"}
+                      </h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        {(() => {
+                          const totalVhe = vheList.length;
+                          const activeVhe = vheList.filter(v => v.status === "active").length;
+                          const vacantVhe = vheList.filter(v => v.status === "vacant").length;
+                          const mutationVhe = vheList.filter(v => v.status === "in-mutation").length;
+                          const totalVoorschot = vheList.reduce((sum, v) => sum + (v.voorschot || 0), 0);
+                          const avgVoorschot = activeVhe > 0 ? Math.round(totalVoorschot / activeVhe) : 0;
+                          return (
+                            <>
+                              <div>
+                                <div className="text-[11px] text-slate-400 uppercase tracking-wider mb-1">
+                                  {lang === "nl" ? "Totaal VHE" : "Total VHE"}
+                                </div>
+                                <div className="text-[20px] font-bold tabular-nums" style={{ color: brand.navy }}>{building.vhe}</div>
+                                <div className="text-[11px] text-slate-400">{totalVhe} {lang === "nl" ? "in beheer" : "managed"}</div>
+                              </div>
+                              <div>
+                                <div className="text-[11px] text-slate-400 uppercase tracking-wider mb-1">
+                                  {t("active", lang)}
+                                </div>
+                                <div className="text-[20px] font-bold tabular-nums text-emerald-600">{activeVhe}</div>
+                                <div className="text-[11px] text-slate-400">{vacantVhe} {t("vacant", lang).toLowerCase()}{mutationVhe > 0 ? `, ${mutationVhe} ${t("inMutation", lang).toLowerCase()}` : ""}</div>
+                              </div>
+                              <div>
+                                <div className="text-[11px] text-slate-400 uppercase tracking-wider mb-1">
+                                  {lang === "nl" ? "Gem. voorschot" : "Avg. advance"}
+                                </div>
+                                <div className="text-[20px] font-bold tabular-nums" style={{ color: brand.navy }}>{fmt(avgVoorschot)}</div>
+                                <div className="text-[11px] text-slate-400">/{lang === "nl" ? "maand" : "month"}</div>
+                              </div>
+                              <div>
+                                <div className="text-[11px] text-slate-400 uppercase tracking-wider mb-1">
+                                  {lang === "nl" ? "Totaal voorschot" : "Total advance"}
+                                </div>
+                                <div className="text-[20px] font-bold tabular-nums" style={{ color: brand.navy }}>{fmt(totalVoorschot)}</div>
+                                <div className="text-[11px] text-slate-400">/{lang === "nl" ? "maand" : "month"}</div>
+                              </div>
+                            </>
+                          );
+                        })()}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* ── Te verdelen componenten (cost components to distribute) ── */}
+                  <Card className="border-slate-200 bg-white">
+                    <CardContent className="p-5">
+                      <h3 className="text-[13px] font-semibold text-slate-600 mb-3">
+                        {lang === "nl" ? "Te verdelen componenten" : "Cost Components"}
+                      </h3>
+                      <div className="space-y-3">
+                        {/* Variable costs */}
+                        <div>
+                          <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                            {lang === "nl" ? "Variabele kosten" : "Variable costs"}
+                          </div>
+                          <div className="space-y-1.5">
+                            {bsRelations.filter(bs => {
+                              const svc = getService(bs.serviceId);
+                              return svc?.variable;
+                            }).map(bs => {
+                              const svc = getService(bs.serviceId);
+                              return (
+                                <div key={bs.id} className="flex items-center justify-between gap-3">
+                                  <span className="text-[12px] text-slate-600 truncate">{svc?.name[lang] || svc?.name.en}</span>
+                                  <div className="flex items-center gap-4 shrink-0">
+                                    <span className="text-[12px] tabular-nums text-slate-500">{fmt(bs.actual)} / {fmt(bs.budget)}</span>
+                                    <span className={`text-[11px] tabular-nums font-medium ${bs.actual <= bs.budget ? "text-emerald-600" : "text-red-500"}`}>
+                                      {bs.actual <= bs.budget ? "−" : "+"}{fmt(Math.abs(bs.budget - bs.actual))}
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                        {/* Fixed / shared costs */}
+                        <div>
+                          <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+                            {lang === "nl" ? "Gedeelde & vaste kosten" : "Shared & fixed costs"}
+                          </div>
+                          <div className="space-y-1.5">
+                            {bsRelations.filter(bs => {
+                              const svc = getService(bs.serviceId);
+                              return !svc?.variable;
+                            }).map(bs => {
+                              const svc = getService(bs.serviceId);
+                              return (
+                                <div key={bs.id} className="flex items-center justify-between gap-3">
+                                  <span className="text-[12px] text-slate-600 truncate">{svc?.name[lang] || svc?.name.en}</span>
+                                  <div className="flex items-center gap-4 shrink-0">
+                                    <span className="text-[12px] tabular-nums text-slate-500">{fmt(bs.actual)} / {fmt(bs.budget)}</span>
+                                    <span className={`text-[11px] tabular-nums font-medium ${bs.actual <= bs.budget ? "text-emerald-600" : "text-red-500"}`}>
+                                      {bs.actual <= bs.budget ? "−" : "+"}{fmt(Math.abs(bs.budget - bs.actual))}
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                        {/* Total */}
+                        <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
+                          <span className="text-[12px] font-semibold text-slate-700">{lang === "nl" ? "Totaal" : "Total"}</span>
+                          <div className="flex items-center gap-4">
+                            <span className="text-[13px] tabular-nums font-bold" style={{ color: brand.navy }}>{fmt(totalActual)} / {fmt(totalBudget)}</span>
+                            <span className={`text-[12px] tabular-nums font-bold ${variance >= 0 ? "text-emerald-600" : "text-red-500"}`}>
+                              {variance >= 0 ? "−" : "+"}{fmt(Math.abs(variance))}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               </TabsContent>
 
@@ -914,17 +1042,8 @@ export default function BuildingDetailPage() {
               </TabsContent>
 
               {/* ═══ VHE TAB ═══ */}
-              {/* Critically assessed columns:
-                  ✓ unit — primary identifier
-                  ✓ type — apartment/studio (determines service applicability)
-                  ✓ floor — needed for elevator distribution
-                  ✓ m² — primary distribution key
-                  ✓ persons — distribution key for person-based services
-                  ✓ contractHolder — current tenant
-                  ✓ voorschot — monthly advance
-                  ✓ status — active/vacant/in-mutation
-                  ✗ address — REMOVED (redundant: inherits from building)
-                  ✗ contractStart — available on detail, not needed in list */}
+              {/* Columns: address (primary), type, floor, m², contract, voorschot, status
+                  + expandable row showing voorschot breakdown per service component */}
               <TabsContent value="vhe">
                 <div className="mt-4">
                   <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
@@ -932,12 +1051,11 @@ export default function BuildingDetailPage() {
                       <thead>
                         <tr className="border-b border-slate-200 bg-slate-50/80">
                           {[
-                            { key: "unit", align: "left" },
+                            { key: "address", align: "left" },
                             { key: "vheType", align: "left" },
                             { key: "floor", align: "center" },
                             { key: "m2", align: "right" },
-                            { key: "persons", align: "center" },
-                            { key: "contractHolder", align: "left" },
+                            { key: "contract", align: "left" },
                             { key: "voorschot", align: "right" },
                             { key: "status", align: "center" },
                           ].map((col) => (
@@ -951,48 +1069,138 @@ export default function BuildingDetailPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100">
-                        {vheList.map((v) => (
-                          <tr
-                            key={v.id}
-                            className="hover:bg-slate-50/80 transition-colors cursor-pointer"
-                            onClick={() => navigate(`/vhe/${v.id}`)}
-                          >
-                            <td className="px-3 sm:px-4 py-3">
-                              <span className="text-[13px] font-semibold" style={{ color: brand.navy }}>
-                                {v.unit}
-                              </span>
-                            </td>
-                            <td className="px-3 sm:px-4 py-3 text-[12px] text-slate-600 capitalize">
-                              {t(v.type || "apartment", lang)}
-                            </td>
-                            <td className="px-3 sm:px-4 py-3 text-center text-[12px] text-slate-500">
-                              {v.floor}
-                            </td>
-                            <td className="px-3 sm:px-4 py-3 text-right text-[13px] tabular-nums text-slate-600">
-                              {v.m2} m²
-                            </td>
-                            <td className="px-3 sm:px-4 py-3 text-center text-[12px] text-slate-500">
-                              {v.persons > 0 ? v.persons : "—"}
-                            </td>
-                            <td className="px-3 sm:px-4 py-3 text-[12px] text-slate-600">
-                              {v.contractHolder || (
-                                <span className="text-slate-300 italic">{t("vacant", lang)}</span>
+                        {vheList.map((v) => {
+                          const isExpanded = expandedVhe === v.id;
+                          return (
+                            <React.Fragment key={v.id}>
+                              <tr
+                                className="hover:bg-slate-50/80 transition-colors cursor-pointer"
+                                onClick={() => setExpandedVhe(isExpanded ? null : v.id)}
+                              >
+                                <td className="px-3 sm:px-4 py-3">
+                                  <div className="flex items-center gap-2">
+                                    <ChevronRight
+                                      size={13}
+                                      className={`text-slate-400 transition-transform shrink-0 ${isExpanded ? "rotate-90" : ""}`}
+                                    />
+                                    <span className="text-[13px] font-semibold" style={{ color: brand.navy }}>
+                                      {v.address || v.unit}
+                                    </span>
+                                  </div>
+                                </td>
+                                <td className="px-3 sm:px-4 py-3 text-[12px] text-slate-600 capitalize">
+                                  {t(v.type || "apartment", lang)}
+                                </td>
+                                <td className="px-3 sm:px-4 py-3 text-center text-[12px] text-slate-500">
+                                  {v.floor}
+                                </td>
+                                <td className="px-3 sm:px-4 py-3 text-right text-[13px] tabular-nums text-slate-600">
+                                  {v.m2} m²
+                                </td>
+                                <td className="px-3 sm:px-4 py-3 text-[12px]">
+                                  {v.contract ? (
+                                    <div>
+                                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-50 text-emerald-700">
+                                        {t("contractActive", lang)}
+                                      </span>
+                                      <span className="block text-[10px] text-slate-400 mt-0.5">
+                                        {lang === "nl" ? "Sinds" : "Since"} {v.contract.startDate}
+                                      </span>
+                                    </div>
+                                  ) : (
+                                    <span className="text-slate-300 italic text-[11px]">{t("noContract", lang)}</span>
+                                  )}
+                                </td>
+                                <td className="px-3 sm:px-4 py-3 text-right text-[13px] tabular-nums text-slate-600">
+                                  {v.voorschot > 0 ? fmt(v.voorschot) + "/mo" : "—"}
+                                </td>
+                                <td className="px-3 sm:px-4 py-3 text-center">
+                                  <StatusBadge
+                                    status={v.status === "vacant" ? "warning" : v.status === "in-mutation" ? "info" : "active"}
+                                    size="xs"
+                                  />
+                                </td>
+                              </tr>
+                              {/* Expanded: settlement costs per service */}
+                              {isExpanded && v.voorschotBreakdown && v.voorschotBreakdown.length > 0 && (
+                                <tr>
+                                  <td colSpan={7} className="px-0 py-0">
+                                    <div className="bg-slate-50/60 border-t border-slate-100 px-6 sm:px-10 py-3">
+                                      <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                                        {t("settlement", lang)} — {t("costBreakdown", lang)}
+                                      </div>
+                                      <table className="w-full text-[11px]">
+                                        <thead>
+                                          <tr className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">
+                                            <th className="text-left pb-1.5 pr-2">{t("service", lang)}</th>
+                                            <th className="text-right pb-1.5 px-2">{t("voorschot", lang)}</th>
+                                            <th className="text-right pb-1.5 px-2">{t("actual", lang)}</th>
+                                            <th className="text-right pb-1.5 pl-2">{t("netResult", lang)}</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100/80">
+                                          {v.voorschotBreakdown.map((comp) => {
+                                            const ledgerData = ledgerByService[comp.serviceId];
+                                            const annualVoorschot = comp.amount * 12;
+                                            // Distribute ledger total across VHEs proportionally (simplified: equal per VHE)
+                                            const totalVhe = building?.vhe || 1;
+                                            const actualPerVhe = ledgerData ? ledgerData.total / totalVhe : 0;
+                                            const netResult = annualVoorschot - actualPerVhe;
+                                            return (
+                                              <tr key={comp.serviceId}>
+                                                <td className="py-1.5 pr-2 text-slate-600 truncate max-w-[180px]">{comp.serviceName}</td>
+                                                <td className="py-1.5 px-2 text-right tabular-nums text-slate-500">{fmt(annualVoorschot)}</td>
+                                                <td className="py-1.5 px-2 text-right tabular-nums text-slate-700 font-medium">{fmt(actualPerVhe)}</td>
+                                                <td
+                                                  className="py-1.5 pl-2 text-right tabular-nums font-semibold"
+                                                  style={{ color: netResult >= 0 ? brand.green : brand.red }}
+                                                >
+                                                  {netResult >= 0 ? "+" : ""}{fmt(netResult)}
+                                                </td>
+                                              </tr>
+                                            );
+                                          })}
+                                        </tbody>
+                                      </table>
+                                      {/* Totals row */}
+                                      {(() => {
+                                        const totalVoorschotYr = v.voorschotBreakdown.reduce((s, c) => s + c.amount * 12, 0);
+                                        const totalVhe = building?.vhe || 1;
+                                        const totalActualVhe = v.voorschotBreakdown.reduce((s, c) => {
+                                          const ld = ledgerByService[c.serviceId];
+                                          return s + (ld ? ld.total / totalVhe : 0);
+                                        }, 0);
+                                        const totalNet = totalVoorschotYr - totalActualVhe;
+                                        return (
+                                          <div className="mt-2 pt-2 border-t border-slate-200 flex items-center justify-between">
+                                            <span className="text-[11px] font-semibold text-slate-600">
+                                              {t("netResult", lang)}
+                                            </span>
+                                            <div className="flex items-center gap-4 text-[12px] tabular-nums">
+                                              <span className="text-slate-400">{t("voorschot", lang)}: {fmt(totalVoorschotYr)}</span>
+                                              <span className="text-slate-600">{t("actual", lang)}: {fmt(totalActualVhe)}</span>
+                                              <span
+                                                className="font-bold"
+                                                style={{ color: totalNet >= 0 ? brand.green : brand.red }}
+                                              >
+                                                {totalNet >= 0
+                                                  ? `${t("teruggave", lang)}: +${fmt(totalNet)}`
+                                                  : `${t("naheffing", lang)}: ${fmt(totalNet)}`}
+                                              </span>
+                                            </div>
+                                          </div>
+                                        );
+                                      })()}
+                                    </div>
+                                  </td>
+                                </tr>
                               )}
-                            </td>
-                            <td className="px-3 sm:px-4 py-3 text-right text-[13px] tabular-nums text-slate-600">
-                              {v.voorschot > 0 ? fmt(v.voorschot) + "/mo" : "—"}
-                            </td>
-                            <td className="px-3 sm:px-4 py-3 text-center">
-                              <StatusBadge
-                                status={v.status === "vacant" ? "warning" : v.status === "in-mutation" ? "info" : "active"}
-                                size="xs"
-                              />
-                            </td>
-                          </tr>
-                        ))}
+                            </React.Fragment>
+                          );
+                        })}
                         {vheList.length === 0 && (
                           <tr>
-                            <td colSpan={8} className="px-4 py-8 text-center text-sm text-slate-400">
+                            <td colSpan={7} className="px-4 py-8 text-center text-sm text-slate-400">
                               {t("noResults", lang)}
                             </td>
                           </tr>

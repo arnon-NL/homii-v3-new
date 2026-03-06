@@ -9,6 +9,7 @@ import BuildingListPage from "./BuildingListPage";
 import ServiceListPage from "./ServiceListPage";
 import BuildingDetailPage from "./BuildingDetailPage";
 import SupplierListPage from "./SupplierListPage";
+import ServiceDetailPage from "./ServiceDetailPage";
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -109,7 +110,7 @@ export default function App() {
               element={<PlaceholderPage title={t("vheTitle", lang)} />}
             />
             <Route path="/services" element={<ServiceListPage />} />
-            <Route path="/services/:serviceId" element={<PlaceholderPage title={t("servicesTitle", lang)} />} />
+            <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
             <Route path="/suppliers" element={<SupplierListPage />} />
             <Route path="/suppliers/:supplierId" element={<PlaceholderPage title={t("suppliersTitle", lang)} />} />
             <Route
