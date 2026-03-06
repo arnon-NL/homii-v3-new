@@ -21,6 +21,10 @@ import {
   FileText,
   Users,
   ChevronRight,
+  ChevronDown,
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import {
@@ -35,6 +39,7 @@ import {
   getSettlementChecks,
   serviceCategories,
   getLedgerSummaryByBuilding,
+  getLedgerByServiceAndBuilding,
   meters,
 } from "@/lib/mockData";
 
@@ -46,6 +51,76 @@ const categoryConfig = {
   management:    { icon: HardHat,    color: "#F59E0B", bg: "#FFFBEB" },
   other:         { icon: FolderOpen, color: "#64748B", bg: "#F8FAFC" },
 };
+
+/* ── Ledger formatters ── */
+const fmtEur2 = (v) =>
+  new Intl.NumberFormat("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(v);
+
+const fmtDate = (d) => {
+  const dt = new Date(d);
+  return dt.toLocaleDateString("nl-NL", { day: "2-digit", month: "short" });
+};
+
+/* ── Ledger status config ── */
+const ledgerStatusCfg = {
+  booked:  { color: brand.green, bg: "#F0FDF4", label: { en: "Booked", nl: "Geboekt" }, icon: CheckCircle2 },
+  pending: { color: brand.amber, bg: "#FFFBEB", label: { en: "Pending", nl: "In afwachting" }, icon: Clock },
+  flagged: { color: brand.red,   bg: "#FEF2F2", label: { en: "Flagged", nl: "Gemarkeerd" }, icon: AlertTriangle },
+};
+
+function LedgerStatusBadge({ status, lang }) {
+  const cfg = ledgerStatusCfg[status];
+  if (!cfg) return null;
+  const Icon = cfg.icon;
+  return (
+    <span
+      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium"
+      style={{ background: cfg.bg, color: cfg.color }}
+    >
+      <Icon size={10} />
+      {cfg.label[lang]}
+    </span>
+  );
+}
+
+/* ── Mini monthly bar chart ── */
+function MonthlyBarChart({ entries, budgetPerMonth }) {
+  const monthTotals = Array.from({ length: 12 }, (_, i) => {
+    const month = i + 1;
+    return entries
+      .filter((e) => e.month === month)
+      .reduce((sum, e) => sum + e.amount, 0);
+  });
+  const maxVal = Math.max(...monthTotals, budgetPerMonth || 1);
+  const monthLabels = ["J","F","M","A","M","J","J","A","S","O","N","D"];
+
+  return (
+    <div className="flex items-end gap-1 h-[48px]">
+      {monthTotals.map((val, i) => {
+        const h = maxVal > 0 ? (val / maxVal) * 44 : 0;
+        const overBudget = budgetPerMonth && val > budgetPerMonth * 1.15;
+        return (
+          <div key={i} className="flex flex-col items-center gap-0.5" style={{ width: 18 }}>
+            <div
+              className="w-3 rounded-sm transition-all"
+              style={{
+                height: Math.max(2, h),
+                background: overBudget ? brand.red : val > 0 ? brand.blue : "#E2E8F0",
+              }}
+            />
+            <span className="text-[8px] text-slate-400">{monthLabels[i]}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 import {
   Circle,
   FileCheck,
@@ -223,6 +298,7 @@ export default function BuildingDetailPage() {
   const lang = useLang();
   const [year, setYear] = useState(2025);
   const [expandedVhe, setExpandedVhe] = useState(null);
+  const [expandedService, setExpandedService] = useState(null);
 
   const building = getBuilding(buildingId);
 
@@ -678,6 +754,7 @@ export default function BuildingDetailPage() {
                             <table className="w-full text-sm">
                               <thead>
                                 <tr className="border-b border-slate-200 bg-slate-50/80">
+                                  <th className="w-8 px-2 py-2" />
                                   {[
                                     { key: "code", align: "left" },
                                     { key: "service", align: "left" },
@@ -700,77 +777,222 @@ export default function BuildingDetailPage() {
                                 {group.items.map((bs) => {
                                   const v = bs.budget - bs.actual;
                                   const ledger = ledgerByService[bs.serviceId];
+                                  const isServiceExpanded = expandedService === bs.serviceId;
+                                  const ledgerEntries = isServiceExpanded
+                                    ? getLedgerByServiceAndBuilding(bs.serviceId, buildingId, year)
+                                        .sort((a, b) => b.date.localeCompare(a.date))
+                                    : [];
+                                  const ledgerTotal = ledgerEntries.reduce((s, e) => s + e.amount, 0);
+
                                   return (
-                                    <tr
-                                      key={bs.id}
-                                      className="hover:bg-slate-50/80 transition-colors cursor-pointer"
-                                      onClick={() =>
-                                        navigate(`/services/${bs.serviceId}`)
-                                      }
-                                    >
-                                      <td className="px-3 sm:px-4 py-2.5">
-                                        <span className="text-[12px] font-mono font-semibold text-slate-600">
-                                          {bs.service?.code}
-                                        </span>
-                                      </td>
-                                      <td className="px-3 sm:px-4 py-2.5">
-                                        <div className="flex items-center gap-2">
-                                          <div
-                                            className="text-[13px] font-medium"
-                                            style={{ color: brand.navy }}
-                                          >
-                                            {bs.service?.name[lang] || bs.serviceId}
+                                    <React.Fragment key={bs.id}>
+                                      <tr
+                                        className="hover:bg-slate-50/80 transition-colors cursor-pointer"
+                                        onClick={() =>
+                                          setExpandedService(isServiceExpanded ? null : bs.serviceId)
+                                        }
+                                      >
+                                        <td className="px-2 py-2.5 w-8">
+                                          <ChevronRight
+                                            size={13}
+                                            className={`text-slate-400 transition-transform duration-150 ${isServiceExpanded ? "rotate-90" : ""}`}
+                                          />
+                                        </td>
+                                        <td className="px-3 sm:px-4 py-2.5">
+                                          <span className="text-[12px] font-mono font-semibold text-slate-600">
+                                            {bs.service?.code}
+                                          </span>
+                                        </td>
+                                        <td className="px-3 sm:px-4 py-2.5">
+                                          <div className="flex items-center gap-2">
+                                            <div
+                                              className="text-[13px] font-medium"
+                                              style={{ color: brand.navy }}
+                                            >
+                                              {bs.service?.name[lang] || bs.serviceId}
+                                            </div>
+                                            {isPastYear && settlement && (settlement.status === "distributed" || settlement.status === "approved") && (
+                                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-slate-100 text-slate-600">
+                                                <Lock size={8} />
+                                                {t("locked", lang)}
+                                              </span>
+                                            )}
+                                            {ledger?.flagged > 0 && (
+                                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-red-50 text-red-600">
+                                                <AlertTriangle size={8} />
+                                                {ledger.flagged}
+                                              </span>
+                                            )}
+                                            {ledger?.pending > 0 && (
+                                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-amber-50 text-amber-600">
+                                                <Clock size={8} />
+                                                {ledger.pending}
+                                              </span>
+                                            )}
                                           </div>
-                                          {isPastYear && settlement && (settlement.status === "distributed" || settlement.status === "approved") && (
-                                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-slate-100 text-slate-600">
-                                              <Lock size={8} />
-                                              {t("locked", lang)}
-                                            </span>
-                                          )}
-                                          {ledger?.flagged > 0 && (
-                                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-red-50 text-red-600">
-                                              <AlertTriangle size={8} />
-                                              {ledger.flagged}
-                                            </span>
-                                          )}
-                                          {ledger?.pending > 0 && (
-                                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-amber-50 text-amber-600">
-                                              <Clock size={8} />
-                                              {ledger.pending}
-                                            </span>
-                                          )}
-                                        </div>
-                                      </td>
-                                      <td className="px-3 sm:px-4 py-2.5">
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600">
-                                          {bs.distMethod?.name[lang] ||
-                                            bs.distributionMethod}
-                                        </span>
-                                      </td>
-                                      <td className="px-3 sm:px-4 py-2.5 text-right tabular-nums text-[13px] text-slate-600">
-                                        {fmt(bs.budget)}
-                                      </td>
-                                      <td className="px-3 sm:px-4 py-2.5 text-right tabular-nums text-[13px] text-slate-600">
-                                        {fmt(bs.actual)}
-                                      </td>
-                                      <td className="px-3 sm:px-4 py-2.5 text-right">
-                                        <span
-                                          className="text-[13px] tabular-nums font-medium"
-                                          style={{
-                                            color:
-                                              v >= 0 ? brand.green : brand.red,
-                                          }}
-                                        >
-                                          {v >= 0 ? "+" : ""}
-                                          {fmt(v)}
-                                        </span>
-                                      </td>
-                                      <td className="px-3 sm:px-4 py-2.5">
-                                        <CompletenessBar
-                                          pct={bs.completeness}
-                                        />
-                                      </td>
-                                    </tr>
+                                        </td>
+                                        <td className="px-3 sm:px-4 py-2.5">
+                                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600">
+                                            {bs.distMethod?.name[lang] ||
+                                              bs.distributionMethod}
+                                          </span>
+                                        </td>
+                                        <td className="px-3 sm:px-4 py-2.5 text-right tabular-nums text-[13px] text-slate-600">
+                                          {fmt(bs.budget)}
+                                        </td>
+                                        <td className="px-3 sm:px-4 py-2.5 text-right tabular-nums text-[13px] text-slate-600">
+                                          {fmt(bs.actual)}
+                                        </td>
+                                        <td className="px-3 sm:px-4 py-2.5 text-right">
+                                          <span
+                                            className="text-[13px] tabular-nums font-medium"
+                                            style={{
+                                              color:
+                                                v >= 0 ? brand.green : brand.red,
+                                            }}
+                                          >
+                                            {v >= 0 ? "+" : ""}
+                                            {fmt(v)}
+                                          </span>
+                                        </td>
+                                        <td className="px-3 sm:px-4 py-2.5">
+                                          <CompletenessBar
+                                            pct={bs.completeness}
+                                          />
+                                        </td>
+                                      </tr>
+
+                                      {/* ── Expanded: ledger entries for this service ── */}
+                                      {isServiceExpanded && (
+                                        <tr>
+                                          <td colSpan={8} className="p-0">
+                                            <div className="border-t border-slate-100">
+                                              {/* Monthly bar chart */}
+                                              <div className="px-4 py-3 bg-slate-50/50 border-b border-slate-100">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                  <BarChart3 size={12} className="text-slate-400" />
+                                                  <span className="text-[11px] font-medium text-slate-500">
+                                                    {lang === "nl" ? "Maandverdeling" : "Monthly Distribution"}
+                                                  </span>
+                                                </div>
+                                                <MonthlyBarChart
+                                                  entries={ledgerEntries}
+                                                  budgetPerMonth={bs.budget / 12}
+                                                />
+                                              </div>
+
+                                              {/* Ledger entry table */}
+                                              {ledgerEntries.length > 0 ? (
+                                                <div className="overflow-x-auto">
+                                                  <table className="w-full text-sm">
+                                                    <thead>
+                                                      <tr className="bg-slate-50/60 border-b border-slate-100">
+                                                        <th className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-left">
+                                                          {t("date", lang)}
+                                                        </th>
+                                                        <th className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-left">
+                                                          {t("description", lang)}
+                                                        </th>
+                                                        <th className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-left hidden lg:table-cell">
+                                                          {t("supplier", lang)}
+                                                        </th>
+                                                        <th className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-left hidden md:table-cell">
+                                                          {lang === "nl" ? "Factuur" : "Invoice"}
+                                                        </th>
+                                                        <th className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-right">
+                                                          {lang === "nl" ? "Bedrag" : "Amount"}
+                                                        </th>
+                                                        <th className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-center">
+                                                          {t("status", lang)}
+                                                        </th>
+                                                      </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-slate-50">
+                                                      {ledgerEntries.map((entry) => (
+                                                        <tr
+                                                          key={entry.id}
+                                                          className="hover:bg-slate-50/40 transition-colors"
+                                                          style={
+                                                            entry.status === "flagged"
+                                                              ? { background: "#FFFBEB40" }
+                                                              : {}
+                                                          }
+                                                        >
+                                                          <td className="px-4 py-2 text-[12px] text-slate-500 tabular-nums whitespace-nowrap">
+                                                            {fmtDate(entry.date)}
+                                                          </td>
+                                                          <td className="px-4 py-2">
+                                                            <div className="text-[12px] text-slate-700">
+                                                              {entry.description}
+                                                            </div>
+                                                            {entry.flag && (
+                                                              <div className="text-[10px] mt-0.5 flex items-center gap-1" style={{ color: brand.red }}>
+                                                                <AlertTriangle size={9} />
+                                                                {entry.flag[lang] || entry.flag.en}
+                                                              </div>
+                                                            )}
+                                                          </td>
+                                                          <td className="px-4 py-2 text-[12px] text-slate-500 hidden lg:table-cell">
+                                                            {entry.supplier || "—"}
+                                                          </td>
+                                                          <td className="px-4 py-2 text-[11px] font-mono text-slate-400 hidden md:table-cell">
+                                                            {entry.invoiceRef}
+                                                          </td>
+                                                          <td className="px-4 py-2 text-right text-[12px] font-medium tabular-nums" style={{ color: brand.navy }}>
+                                                            {fmtEur2(entry.amount)}
+                                                          </td>
+                                                          <td className="px-4 py-2 text-center">
+                                                            <LedgerStatusBadge status={entry.status} lang={lang} />
+                                                          </td>
+                                                        </tr>
+                                                      ))}
+                                                    </tbody>
+                                                    <tfoot>
+                                                      <tr className="border-t border-slate-200 bg-slate-50/60">
+                                                        <td
+                                                          colSpan={4}
+                                                          className="px-4 py-2.5 text-[12px] font-semibold text-slate-500"
+                                                        >
+                                                          {lang === "nl" ? "Totaal" : "Total"} ·{" "}
+                                                          <span className="font-normal text-slate-400">
+                                                            {lang === "nl" ? "Budget" : "Budget"}:{" "}
+                                                            {fmt(bs.budget)}
+                                                          </span>
+                                                        </td>
+                                                        <td className="px-4 py-2.5 text-right text-[13px] font-bold tabular-nums" style={{ color: brand.navy }}>
+                                                          {fmtEur2(ledgerTotal)}
+                                                        </td>
+                                                        <td />
+                                                      </tr>
+                                                    </tfoot>
+                                                  </table>
+                                                </div>
+                                              ) : (
+                                                <div className="px-4 py-6 text-center text-[12px] text-slate-400">
+                                                  {lang === "nl" ? "Geen boekingen gevonden" : "No entries found"}
+                                                </div>
+                                              )}
+
+                                              {/* Link to service detail page */}
+                                              <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50/30 flex items-center justify-between">
+                                                <button
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    navigate(`/services/${bs.serviceId}`);
+                                                  }}
+                                                  className="text-[12px] font-medium hover:underline transition-colors"
+                                                  style={{ color: brand.blue }}
+                                                >
+                                                  {lang === "nl"
+                                                    ? `Bekijk alle complexen voor deze dienst →`
+                                                    : `View all complexes for this service →`}
+                                                </button>
+                                              </div>
+                                            </div>
+                                          </td>
+                                        </tr>
+                                      )}
+                                    </React.Fragment>
                                   );
                                 })}
                               </tbody>
