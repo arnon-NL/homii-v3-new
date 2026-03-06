@@ -235,8 +235,18 @@ export default function BuildingDetailPage() {
   );
   const vheList = useMemo(() => getVhesByBuilding(buildingId), [buildingId]);
   const meterList = useMemo(
-    () => getMetersByBuilding(buildingId),
-    [buildingId]
+    () =>
+      getMetersByBuilding(buildingId).map((m) => {
+        const r = m.readings?.[year];
+        return {
+          ...m,
+          lastReading: r?.end ?? 0,
+          previousReading: r?.start ?? 0,
+          consumption: r?.consumption ?? 0,
+          readingDate: r?.readingDate ?? "—",
+        };
+      }),
+    [buildingId, year]
   );
   const activityList = useMemo(
     () => getActivitiesByBuilding(buildingId),
