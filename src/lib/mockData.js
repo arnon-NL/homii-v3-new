@@ -1225,6 +1225,18 @@ export const settlementChecks = [
   { id: "SC-007-118-2025", buildingId: "BLD-007", serviceId: "SVC-118", year: 2025, ledgerComplete: false, budgetVariance: null,  budgetApproved: false, yoyDeviation: null,  yoyFlagged: false, consumptionVerified: false, status: "pending" },
 ];
 
+export function getSettlementsByYear(year) {
+  return buildingSettlements.filter((s) => s.year === year);
+}
+
+export function getSettlement(buildingId, year) {
+  return buildingSettlements.find((s) => s.buildingId === buildingId && s.year === year);
+}
+
+export function getSettlementChecks(buildingId, year) {
+  return settlementChecks.filter((sc) => sc.buildingId === buildingId && sc.year === year);
+}
+
 // ── Saved views ──
 export const savedViews = [
   // ── Buildings views ──
