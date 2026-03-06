@@ -480,255 +480,585 @@ export const distributionMethods = [
   { id: "DM-PRO",  code: "proportional", name: { en: "Proportional to voorschot", nl: "Naar rato van voorschot" } },
 ];
 
-// ── Building-Service relationships ──
-// Junction entity: each row links a building to a service for a given book year
-// with its own distribution method, budget, actuals, and completeness status
-
-export const buildingServices = [
-  // Kloostergang (BLD-007) — 6 services
-  { id: "BS-007-108", buildingId: "BLD-007", serviceId: "SVC-108", year: 2025, distributionMethod: "metered",  budget: 18700,  actual: 4675,  ledgerEntries: 12, expectedEntries: 12, completeness: 100, status: "complete" },
-  { id: "BS-007-105", buildingId: "BLD-007", serviceId: "SVC-105", year: 2025, distributionMethod: "equal",    budget: 6600,   actual: 1650,  ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
-  { id: "BS-007-118", buildingId: "BLD-007", serviceId: "SVC-118", year: 2025, distributionMethod: "m2",       budget: 5280,   actual: 1320,  ledgerEntries: 3,  expectedEntries: 4,  completeness: 75,  status: "incomplete" },
-  { id: "BS-007-102", buildingId: "BLD-007", serviceId: "SVC-102", year: 2025, distributionMethod: "metered",  budget: 3960,   actual: 990,   ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
-  { id: "BS-007-131", buildingId: "BLD-007", serviceId: "SVC-131", year: 2025, distributionMethod: "equal",    budget: 3520,   actual: 880,   ledgerEntries: 2,  expectedEntries: 4,  completeness: 50,  status: "incomplete" },
-  { id: "BS-007-123", buildingId: "BLD-007", serviceId: "SVC-123", year: 2025, distributionMethod: "equal",    budget: 4400,   actual: 1100,  ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
-
-  // De Bolwerken (BLD-002 placeholder) — 4 services
-  { id: "BS-002-105", buildingId: "BLD-002", serviceId: "SVC-105", year: 2025, distributionMethod: "equal",    budget: 12900,  actual: 3225,  ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
-  { id: "BS-002-118", buildingId: "BLD-002", serviceId: "SVC-118", year: 2025, distributionMethod: "m2",       budget: 10320,  actual: 2580,  ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
-  { id: "BS-002-131", buildingId: "BLD-002", serviceId: "SVC-131", year: 2025, distributionMethod: "equal",    budget: 6880,   actual: 1720,  ledgerEntries: 3,  expectedEntries: 4,  completeness: 75,  status: "incomplete" },
-  { id: "BS-002-123", buildingId: "BLD-002", serviceId: "SVC-123", year: 2025, distributionMethod: "equal",    budget: 8600,   actual: 2150,  ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
-
-  // De Lindeborg (BLD-004) — 7 services
-  { id: "BS-004-108", buildingId: "BLD-004", serviceId: "SVC-108", year: 2025, distributionMethod: "metered",  budget: 57600,  actual: 14400, ledgerEntries: 12, expectedEntries: 12, completeness: 100, status: "complete" },
-  { id: "BS-004-105", buildingId: "BLD-004", serviceId: "SVC-105", year: 2025, distributionMethod: "equal",    budget: 18720,  actual: 4680,  ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
-  { id: "BS-004-102", buildingId: "BLD-004", serviceId: "SVC-102", year: 2025, distributionMethod: "metered",  budget: 12960,  actual: 3240,  ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
-  { id: "BS-004-118a",buildingId: "BLD-004", serviceId: "SVC-118", year: 2025, distributionMethod: "m2",       budget: 8640,   actual: 2160,  ledgerEntries: 2,  expectedEntries: 4,  completeness: 50,  status: "incomplete" },
-  { id: "BS-004-118b",buildingId: "BLD-004", serviceId: "SVC-118", year: 2025, distributionMethod: "m2",       budget: 15840,  actual: 3960,  ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
-  { id: "BS-004-131", buildingId: "BLD-004", serviceId: "SVC-131", year: 2025, distributionMethod: "equal",    budget: 34560,  actual: 8640,  ledgerEntries: 4,  expectedEntries: 4,  completeness: 100, status: "complete" },
-  { id: "BS-004-123", buildingId: "BLD-004", serviceId: "SVC-123", year: 2025, distributionMethod: "equal",    budget: 14400,  actual: 3600,  ledgerEntries: 3,  expectedEntries: 4,  completeness: 75,  status: "incomplete" },
+// ── Supplier data ──
+export const supplierCategories = [
+  { id: "energy", name: { en: "Energy", nl: "Energie" } },
+  { id: "water", name: { en: "Water", nl: "Water" } },
+  { id: "facilities", name: { en: "Facilities", nl: "Facilitaire diensten" } },
+  { id: "security", name: { en: "Security & Safety", nl: "Beveiging & Veiligheid" } },
+  { id: "other", name: { en: "Other", nl: "Overig" } },
 ];
+
+export const suppliers = [
+  {
+    id: "SUP-001", name: "ENGIE Energie Nederland", category: "energy",
+    kvk: "34108453", city: "Zwolle", contactPerson: "R. van Dijk",
+    email: "corporaties@engie.nl", phone: "+31 88 895 0000", website: "engie.nl",
+    contractStart: "2022-01-01", contractEnd: "2025-12-31",
+    serviceIds: ["SVC-104","SVC-105","SVC-106","SVC-107","SVC-108","SVC-110"],
+    buildingCount: 21, annualSpend: 285000, status: "active", rating: 4,
+    notes: { en: "Main energy supplier. Framework contract via Woonenergie.", nl: "Hoofdleverancier energie. Raamcontract via Woonenergie." },
+  },
+  {
+    id: "SUP-002", name: "Oasen", category: "energy",
+    kvk: "24289054", city: "Gouda", contactPerson: "M. Bakker",
+    email: "zakelijk@oasen.nl", phone: "+31 182 59 36 36", website: "oasen.nl",
+    contractStart: "2020-01-01", contractEnd: null,
+    serviceIds: ["SVC-102"], buildingCount: 16, annualSpend: 42000, status: "active", rating: 4,
+    notes: { en: "Regional water supplier for Gorinchem area.", nl: "Regionaal waterbedrijf voor regio Gorinchem." },
+  },
+  {
+    id: "SUP-003", name: "Techem Energy Services BV", category: "metering",
+    kvk: "30141780", city: "Arnhem", contactPerson: "J. Hendriks",
+    email: "service@techem.nl", phone: "+31 26 355 1355", website: "techem.nl",
+    contractStart: "2023-07-01", contractEnd: "2026-06-30",
+    serviceIds: ["SVC-108","SVC-111"], buildingCount: 14, annualSpend: 38500, status: "active", rating: 3,
+    notes: { en: "Metering services & heat cost allocation.", nl: "Meetdiensten & warmtekostenverdeling." },
+  },
+  {
+    id: "SUP-004", name: "Joulz Meetbedrijf B.V.", category: "metering",
+    kvk: "27258084", city: "Rotterdam", contactPerson: "A. Smits",
+    email: "meetdiensten@joulz.nl", phone: "+31 88 454 5000", website: "joulz.nl",
+    contractStart: "2021-04-01", contractEnd: "2025-03-31",
+    serviceIds: ["SVC-108","SVC-111"], buildingCount: 8, annualSpend: 22400, status: "active", rating: 4,
+    notes: { en: "Independent metering company. Contract renewal pending.", nl: "Onafhankelijk meetbedrijf. Contractverlenging in behandeling." },
+  },
+  {
+    id: "SUP-005", name: "Stedin Netbeheer BV", category: "energy",
+    kvk: "24306940", city: "Rotterdam", contactPerson: "Klantenservice Zakelijk",
+    email: "zakelijk@stedin.net", phone: "+31 88 896 3096", website: "stedin.net",
+    contractStart: "2019-01-01", contractEnd: null,
+    serviceIds: ["SVC-108"], buildingCount: 12, annualSpend: 18600, status: "active", rating: 4,
+    notes: { en: "Grid operator for Gorinchem region. Transport costs only.", nl: "Netbeheerder regio Gorinchem. Alleen transportkosten." },
+  },
+  {
+    id: "SUP-006", name: "Schindler Liften B.V.", category: "installations",
+    kvk: "33148680", city: "'s-Gravenhage", contactPerson: "P. de Groot",
+    email: "service.nl@schindler.com", phone: "+31 70 399 2666", website: "schindler.nl",
+    contractStart: "2023-01-01", contractEnd: "2027-12-31",
+    serviceIds: ["SVC-132","SVC-133"], buildingCount: 6, annualSpend: 31200, status: "active", rating: 5,
+    notes: { en: "Elevator maintenance & 24h emergency service.", nl: "Liftonderhoud & 24-uurs storingsdienst." },
+  },
+  {
+    id: "SUP-007", name: "CSU Cleaning Services", category: "cleaning",
+    kvk: "17098383", city: "Eindhoven", contactPerson: "K. Meijer",
+    email: "corporaties@csu.nl", phone: "+31 40 290 4040", website: "csu.nl",
+    contractStart: "2024-01-01", contractEnd: "2026-12-31",
+    serviceIds: ["SVC-118","SVC-140"], buildingCount: 19, annualSpend: 89000, status: "active", rating: 3,
+    notes: { en: "Cleaning common areas & window washing.", nl: "Schoonmaak algemene ruimten & glasbewassing." },
+  },
+  {
+    id: "SUP-008", name: "ISS Facility Services", category: "cleaning",
+    kvk: "33247775", city: "Utrecht", contactPerson: "L. Jansen",
+    email: "info@nl.issworld.com", phone: "+31 30 242 4242", website: "issworld.com",
+    contractStart: "2022-06-01", contractEnd: "2025-05-31",
+    serviceIds: ["SVC-118","SVC-116"], buildingCount: 4, annualSpend: 28500, status: "active", rating: 4,
+    notes: { en: "Facility services for larger complexes.", nl: "Facilitaire diensten voor grotere complexen." },
+  },
+  {
+    id: "SUP-009", name: "Van Ginkel Groep B.V.", category: "cleaning",
+    kvk: "30143506", city: "Veenendaal", contactPerson: "B. van Ginkel",
+    email: "info@vanginkelgroep.nl", phone: "+31 318 54 58 00", website: "vanginkelgroep.nl",
+    contractStart: "2023-03-01", contractEnd: "2026-02-28",
+    serviceIds: ["SVC-123","SVC-124"], buildingCount: 8, annualSpend: 44000, status: "active", rating: 4,
+    notes: { en: "Landscaping & gutter cleaning.", nl: "Tuinonderhoud & dakgootreiniging." },
+  },
+  {
+    id: "SUP-010", name: "Feenstra Verwarming B.V.", category: "installations",
+    kvk: "33176855", city: "Heemstede", contactPerson: "T. Visser",
+    email: "service@feenstra.com", phone: "+31 23 547 5555", website: "feenstra.com",
+    contractStart: "2021-10-01", contractEnd: "2025-09-30",
+    serviceIds: ["SVC-115","SVC-126","SVC-127"], buildingCount: 10, annualSpend: 52000, status: "active", rating: 3,
+    notes: { en: "Heating maintenance, geyser cleaning, and mechanical ventilation.", nl: "CV-onderhoud, geiserreinigen en mechanische ventilatie." },
+  },
+  {
+    id: "SUP-011", name: "Riool.nl (Rioned Groep)", category: "cleaning",
+    kvk: "09060847", city: "Arnhem", contactPerson: "W. Peters",
+    email: "service@riool.nl", phone: "+31 26 365 1010", website: "riool.nl",
+    contractStart: "2024-04-01", contractEnd: "2027-03-31",
+    serviceIds: ["SVC-122"], buildingCount: 8, annualSpend: 12800, status: "active", rating: 5,
+    notes: { en: "Drain cleaning & sewer maintenance.", nl: "Rioolontstopping & rioolonderhoud." },
+  },
+  {
+    id: "SUP-012", name: "ASSA ABLOY Entrance Systems", category: "installations",
+    kvk: "24337859", city: "Nieuwegein", contactPerson: "D. Mulder",
+    email: "nl.entrance@assaabloy.com", phone: "+31 30 291 4444", website: "assaabloyentrance.nl",
+    contractStart: "2023-06-01", contractEnd: "2026-05-31",
+    serviceIds: ["SVC-171"], buildingCount: 4, annualSpend: 8400, status: "active", rating: 4,
+    notes: { en: "Electric doors & access systems.", nl: "Elektrische deuren & toegangssystemen." },
+  },
+  {
+    id: "SUP-013", name: "SWB Wijkbeheer", category: "management",
+    kvk: "51434218", city: "Gorinchem", contactPerson: "H. van der Berg",
+    email: "info@swb-wijkbeheer.nl", phone: "+31 183 62 44 00", website: "swb-wijkbeheer.nl",
+    contractStart: "2020-01-01", contractEnd: "2025-12-31",
+    serviceIds: ["SVC-131","SVC-137"], buildingCount: 17, annualSpend: 156000, status: "active", rating: 4,
+    notes: { en: "Local caretaker & social support services.", nl: "Lokale huismeester & woonondersteunende diensten." },
+  },
+  {
+    id: "SUP-014", name: "KPN Zakelijk", category: "management",
+    kvk: "02045700", city: "Den Haag", contactPerson: "Accountteam Corporaties",
+    email: "corporaties@kpn.com", phone: "+31 800 0403", website: "kpn.com/zakelijk",
+    contractStart: "2024-07-01", contractEnd: "2026-06-30",
+    serviceIds: ["SVC-142"], buildingCount: 2, annualSpend: 7200, status: "active", rating: 3,
+    notes: { en: "Communal internet for two complexes. Pilot project.", nl: "Collectief internet voor twee complexen. Pilotproject." },
+  },
+  {
+    id: "SUP-015", name: "Centraal Beheer Verzekeringen", category: "management",
+    kvk: "27099838", city: "Apeldoorn", contactPerson: "Verzekeringsdesk Wonen",
+    email: "wonen@centraalbeheer.nl", phone: "+31 55 579 8111", website: "centraalbeheer.nl",
+    contractStart: "2023-01-01", contractEnd: "2025-12-31",
+    serviceIds: ["SVC-036"], buildingCount: 1, annualSpend: 3200, status: "active", rating: 4,
+    notes: { en: "Collective glass insurance policy.", nl: "Collectieve glasverzekering." },
+  },
+  {
+    id: "SUP-016", name: "Hydro Building Systems BV", category: "installations",
+    kvk: "08098654", city: "Harderwijk", contactPerson: "G. Dijkstra",
+    email: "service@hydrobuildingsystems.nl", phone: "+31 341 46 3200", website: "hydrobuildingsystems.nl",
+    contractStart: "2022-03-01", contractEnd: "2025-02-28",
+    serviceIds: ["SVC-120"], buildingCount: 3, annualSpend: 5400, status: "expiring", rating: 3,
+    notes: { en: "Hydrophore pump maintenance. Contract expired, renewal pending.", nl: "Hydrofooronderhoud. Contract verlopen, verlenging in behandeling." },
+  },
+];
+
+// ── Building-Service relationships ──
+function generateBuildingServices() {
+  const entries = [];
+  let id = 1;
+
+  // Service-building mapping (which services each building has)
+  const serviceBuildingMap = [
+    { bld: "BLD-001", svcs: ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-111","SVC-127","SVC-123"] },
+    { bld: "BLD-002", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-132","SVC-111","SVC-123","SVC-116","SVC-106"] },
+    { bld: "BLD-003", svcs: ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-123","SVC-127"] },
+    { bld: "BLD-004", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-132","SVC-111","SVC-115","SVC-123","SVC-116","SVC-106"] },
+    { bld: "BLD-005", svcs: ["SVC-108","SVC-102","SVC-118","SVC-131","SVC-123","SVC-115"] },
+    { bld: "BLD-006", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-111","SVC-132","SVC-123"] },
+    { bld: "BLD-007", svcs: ["SVC-108","SVC-102","SVC-105","SVC-131","SVC-118","SVC-127","SVC-123"] },
+    { bld: "BLD-008", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-132","SVC-111","SVC-115","SVC-123","SVC-116","SVC-106","SVC-127"] },
+    { bld: "BLD-009", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-123","SVC-111","SVC-132","SVC-115","SVC-116","SVC-106","SVC-127","SVC-120"] },
+    { bld: "BLD-010", svcs: ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-111","SVC-127","SVC-123","SVC-122"] },
+    { bld: "BLD-011", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-123","SVC-132","SVC-115"] },
+    { bld: "BLD-012", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-131","SVC-132","SVC-111","SVC-123","SVC-116","SVC-118","SVC-115","SVC-127"] },
+    { bld: "BLD-013", svcs: ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-123","SVC-127","SVC-104"] },
+    { bld: "BLD-014", svcs: ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-123","SVC-104"] },
+    { bld: "BLD-015", svcs: ["SVC-108","SVC-102","SVC-105","SVC-131","SVC-127","SVC-123","SVC-091"] },
+    { bld: "BLD-016", svcs: ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-123","SVC-132","SVC-104"] },
+    { bld: "BLD-017", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-111","SVC-123","SVC-132","SVC-116","SVC-115","SVC-106","SVC-127","SVC-127"] },
+    { bld: "BLD-018", svcs: ["SVC-102","SVC-105","SVC-118","SVC-131","SVC-123","SVC-122"] },
+    { bld: "BLD-019", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-111","SVC-127","SVC-123"] },
+    { bld: "BLD-020", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-132","SVC-111","SVC-123","SVC-116","SVC-106","SVC-115","SVC-127"] },
+    { bld: "BLD-021", svcs: ["SVC-108","SVC-102","SVC-105","SVC-131","SVC-127","SVC-123","SVC-091","SVC-104"] },
+  ];
+
+  const baseAmounts = {
+    "SVC-108": 185, "SVC-102": 45, "SVC-104": 65, "SVC-105": 65,
+    "SVC-106": 35, "SVC-118": 55, "SVC-131": 120, "SVC-132": 35,
+    "SVC-111": 18, "SVC-115": 22, "SVC-127": 28, "SVC-123": 50,
+    "SVC-116": 8, "SVC-122": 12, "SVC-091": -25, "SVC-120": 12,
+  };
+
+  const distributionMethods = {
+    "SVC-108": "metered", "SVC-102": "metered", "SVC-104": "metered", "SVC-105": "equal",
+    "SVC-106": "metered", "SVC-118": "m2", "SVC-131": "equal", "SVC-132": "equal",
+    "SVC-111": "equal", "SVC-115": "equal", "SVC-127": "equal", "SVC-123": "equal",
+    "SVC-116": "equal", "SVC-122": "equal", "SVC-091": "equal", "SVC-120": "equal",
+  };
+
+  serviceBuildingMap.forEach(({ bld, svcs }) => {
+    const bldData = buildings.find(b => b.id === bld);
+    const vheCount = bldData ? bldData.vhe : 20;
+
+    svcs.forEach(svc => {
+      const baseAmt = baseAmounts[svc] || 30;
+      const distMethod = distributionMethods[svc] || "equal";
+
+      // 2024 - fully complete
+      const amt2024 = Math.round(baseAmt * vheCount * 12 * 100) / 100;
+      entries.push({
+        id: `BS-${bld.split("-")[1]}-${svc.split("-")[1]}-2024`,
+        buildingId: bld,
+        serviceId: svc,
+        year: 2024,
+        distributionMethod: distMethod,
+        budget: amt2024,
+        actual: Math.round(amt2024 * (0.95 + Math.random() * 0.1) * 100) / 100,
+        ledgerEntries: 12,
+        expectedEntries: 12,
+        completeness: 100,
+        status: "complete",
+        locked: true,
+      });
+
+      // 2025 - mixed completeness
+      const amt2025 = Math.round(baseAmt * vheCount * 12 * 1.02 * 100) / 100;
+      const completeness2025 = 75 + Math.floor(Math.random() * 26);
+      const status2025 = completeness2025 === 100 ? "complete" : "incomplete";
+      entries.push({
+        id: `BS-${bld.split("-")[1]}-${svc.split("-")[1]}-2025`,
+        buildingId: bld,
+        serviceId: svc,
+        year: 2025,
+        distributionMethod: distMethod,
+        budget: amt2025,
+        actual: Math.round(amt2025 * (completeness2025 / 100) * (0.95 + Math.random() * 0.1) * 100) / 100,
+        ledgerEntries: Math.floor(completeness2025 / 100 * 12),
+        expectedEntries: 12,
+        completeness: completeness2025,
+        status: status2025,
+      });
+
+      // 2026 - Q1 only (25% completeness at most)
+      const amt2026 = Math.round(baseAmt * vheCount * 3 * 1.03 * 100) / 100;
+      entries.push({
+        id: `BS-${bld.split("-")[1]}-${svc.split("-")[1]}-2026`,
+        buildingId: bld,
+        serviceId: svc,
+        year: 2026,
+        distributionMethod: distMethod,
+        budget: Math.round(baseAmt * vheCount * 12 * 1.03 * 100) / 100,
+        actual: amt2026,
+        ledgerEntries: 3,
+        expectedEntries: 12,
+        completeness: 25,
+        status: "incomplete",
+      });
+    });
+  });
+
+  return entries;
+}
+
+export const buildingServices = generateBuildingServices();
 
 // ── VHE (Verhuurbare Eenheden / Rental Units) ──
-// Each VHE has a unique address and an active contract.
-// No person names or resident counts — not available and not relevant for service charges.
-// Key attributes:
-//   address — unique street address (primary identifier)
-//   unit — unit identifier within building
-//   type — apartment / studio / parking / commercial (determines which services apply)
-//   floor — for elevator service distribution
-//   m2 — primary distribution key for area-based services
-//   contract — currently active contract { id, status, startDate, endDate }
-//   voorschot — total monthly service charge advance
-//   voorschotBreakdown — advance per service component [{ serviceId, serviceName, amount }]
-//   status — active / vacant / in-mutation
+function generateVhes() {
+  const vhes = [];
+  let vheCounter = 1;
 
-export const vhes = [
-  // Kloostergang (BLD-007) — 44 VHE, showing a representative sample
-  {
-    id: "VHE-007-001", buildingId: "BLD-007", address: "Kloostergang 1A", unit: "1A", type: "apartment", floor: 0, m2: 62,
-    contract: { id: "CTR-007-001", status: "active", startDate: "2019-03-01", endDate: null },
-    voorschot: 125, status: "active",
-    voorschotBreakdown: [
-      { serviceId: "SVC-108", serviceName: "Warmtekosten", amount: 48 },
-      { serviceId: "SVC-105", serviceName: "Elektra algemeen", amount: 15 },
-      { serviceId: "SVC-102", serviceName: "Koud water", amount: 12 },
-      { serviceId: "SVC-118", serviceName: "Schoonmaak", amount: 14 },
-      { serviceId: "SVC-131", serviceName: "Huismeester", amount: 22 },
-      { serviceId: "SVC-123", serviceName: "Tuinonderhoud", amount: 14 },
-    ],
-  },
-  {
-    id: "VHE-007-002", buildingId: "BLD-007", address: "Kloostergang 1B", unit: "1B", type: "apartment", floor: 0, m2: 58,
-    contract: { id: "CTR-007-002", status: "active", startDate: "2021-07-01", endDate: null },
-    voorschot: 118, status: "active",
-    voorschotBreakdown: [
-      { serviceId: "SVC-108", serviceName: "Warmtekosten", amount: 44 },
-      { serviceId: "SVC-105", serviceName: "Elektra algemeen", amount: 15 },
-      { serviceId: "SVC-102", serviceName: "Koud water", amount: 11 },
-      { serviceId: "SVC-118", serviceName: "Schoonmaak", amount: 12 },
-      { serviceId: "SVC-131", serviceName: "Huismeester", amount: 22 },
-      { serviceId: "SVC-123", serviceName: "Tuinonderhoud", amount: 14 },
-    ],
-  },
-  {
-    id: "VHE-007-003", buildingId: "BLD-007", address: "Kloostergang 2A", unit: "2A", type: "apartment", floor: 1, m2: 65,
-    contract: { id: "CTR-007-003", status: "active", startDate: "2018-01-15", endDate: null },
-    voorschot: 132, status: "active",
-    voorschotBreakdown: [
-      { serviceId: "SVC-108", serviceName: "Warmtekosten", amount: 52 },
-      { serviceId: "SVC-105", serviceName: "Elektra algemeen", amount: 15 },
-      { serviceId: "SVC-102", serviceName: "Koud water", amount: 13 },
-      { serviceId: "SVC-118", serviceName: "Schoonmaak", amount: 14 },
-      { serviceId: "SVC-131", serviceName: "Huismeester", amount: 22 },
-      { serviceId: "SVC-123", serviceName: "Tuinonderhoud", amount: 16 },
-    ],
-  },
-  {
-    id: "VHE-007-004", buildingId: "BLD-007", address: "Kloostergang 2B", unit: "2B", type: "apartment", floor: 1, m2: 58,
-    contract: { id: "CTR-007-004", status: "active", startDate: "2022-09-01", endDate: null },
-    voorschot: 118, status: "active",
-    voorschotBreakdown: [
-      { serviceId: "SVC-108", serviceName: "Warmtekosten", amount: 44 },
-      { serviceId: "SVC-105", serviceName: "Elektra algemeen", amount: 15 },
-      { serviceId: "SVC-102", serviceName: "Koud water", amount: 11 },
-      { serviceId: "SVC-118", serviceName: "Schoonmaak", amount: 12 },
-      { serviceId: "SVC-131", serviceName: "Huismeester", amount: 22 },
-      { serviceId: "SVC-123", serviceName: "Tuinonderhoud", amount: 14 },
-    ],
-  },
-  {
-    id: "VHE-007-005", buildingId: "BLD-007", address: "Kloostergang 3A", unit: "3A", type: "apartment", floor: 2, m2: 62,
-    contract: { id: "CTR-007-005", status: "active", startDate: "2020-04-01", endDate: null },
-    voorschot: 125, status: "active",
-    voorschotBreakdown: [
-      { serviceId: "SVC-108", serviceName: "Warmtekosten", amount: 48 },
-      { serviceId: "SVC-105", serviceName: "Elektra algemeen", amount: 15 },
-      { serviceId: "SVC-102", serviceName: "Koud water", amount: 12 },
-      { serviceId: "SVC-118", serviceName: "Schoonmaak", amount: 14 },
-      { serviceId: "SVC-131", serviceName: "Huismeester", amount: 22 },
-      { serviceId: "SVC-123", serviceName: "Tuinonderhoud", amount: 14 },
-    ],
-  },
-  {
-    id: "VHE-007-006", buildingId: "BLD-007", address: "Kloostergang 3B", unit: "3B", type: "apartment", floor: 2, m2: 58,
-    contract: null,
-    voorschot: 0, status: "vacant",
-    voorschotBreakdown: [],
-  },
-  {
-    id: "VHE-007-007", buildingId: "BLD-007", address: "Kloostergang 4A", unit: "4A", type: "apartment", floor: 3, m2: 65,
-    contract: { id: "CTR-007-007", status: "active", startDate: "2023-01-01", endDate: null },
-    voorschot: 132, status: "active",
-    voorschotBreakdown: [
-      { serviceId: "SVC-108", serviceName: "Warmtekosten", amount: 52 },
-      { serviceId: "SVC-105", serviceName: "Elektra algemeen", amount: 15 },
-      { serviceId: "SVC-102", serviceName: "Koud water", amount: 13 },
-      { serviceId: "SVC-118", serviceName: "Schoonmaak", amount: 14 },
-      { serviceId: "SVC-131", serviceName: "Huismeester", amount: 22 },
-      { serviceId: "SVC-123", serviceName: "Tuinonderhoud", amount: 16 },
-    ],
-  },
-  {
-    id: "VHE-007-008", buildingId: "BLD-007", address: "Kloostergang 4B", unit: "4B", type: "studio", floor: 3, m2: 58,
-    contract: { id: "CTR-007-008", status: "active", startDate: "2017-11-01", endDate: null },
-    voorschot: 118, status: "active",
-    voorschotBreakdown: [
-      { serviceId: "SVC-108", serviceName: "Warmtekosten", amount: 44 },
-      { serviceId: "SVC-105", serviceName: "Elektra algemeen", amount: 15 },
-      { serviceId: "SVC-102", serviceName: "Koud water", amount: 11 },
-      { serviceId: "SVC-118", serviceName: "Schoonmaak", amount: 12 },
-      { serviceId: "SVC-131", serviceName: "Huismeester", amount: 22 },
-      { serviceId: "SVC-123", serviceName: "Tuinonderhoud", amount: 14 },
-    ],
-  },
+  const vheConfigs = [
+    { buildingId: "BLD-001", count: 26, street: "Havendijk", startNum: 1, m2Range: [55, 85], floors: 4 },
+    { buildingId: "BLD-002", count: 86, street: "Bogerdstraat", startNum: 1, m2Range: [48, 95], floors: 8 },
+    { buildingId: "BLD-003", count: 33, street: "Korenbloemplein", startNum: 1, m2Range: [52, 80], floors: 4 },
+    { buildingId: "BLD-004", count: 144, street: "Haarstraat", startNum: 101, m2Range: [60, 95], floors: 10 },
+    { buildingId: "BLD-005", count: 16, street: "Vicarisweg", startNum: 1, m2Range: [48, 72], floors: 3 },
+    { buildingId: "BLD-006", count: 30, street: "Kennelweg", startNum: 31, m2Range: [55, 85], floors: 3 },
+    { buildingId: "BLD-007", count: 44, street: "Kloostergang", startNum: 1, m2Range: [55, 85], floors: 4 },
+    { buildingId: "BLD-008", count: 65, street: "IJsbaanlaan", startNum: 1, m2Range: [52, 90], floors: 7 },
+    { buildingId: "BLD-009", count: 96, street: "Munterhof", startNum: 1, m2Range: [48, 88], floors: 9 },
+    { buildingId: "BLD-010", count: 9, street: "Schelluinsevliet", startNum: 1, m2Range: [50, 75], floors: 2 },
+    { buildingId: "BLD-011", count: 40, street: "Schelluinsevliet", startNum: 50, m2Range: [52, 82], floors: 4 },
+    { buildingId: "BLD-012", count: 90, street: "Tichelaarsweg", startNum: 1, m2Range: [55, 90], floors: 8 },
+    { buildingId: "BLD-013", count: 30, street: "Valkeniersweg", startNum: 1, m2Range: [55, 80], floors: 3 },
+    { buildingId: "BLD-014", count: 24, street: "Valkeniersweg", startNum: 109, m2Range: [52, 78], floors: 3 },
+    { buildingId: "BLD-015", count: 18, street: "Valkeniersweg", startNum: 157, m2Range: [50, 75], floors: 2 },
+    { buildingId: "BLD-016", count: 24, street: "Valkeniersweg", startNum: 61, m2Range: [52, 78], floors: 3 },
+    { buildingId: "BLD-017", count: 138, street: "Frisoplein", startNum: 1, m2Range: [48, 95], floors: 10 },
+    { buildingId: "BLD-018", count: 10, street: "Clarastraat", startNum: 1, m2Range: [50, 72], floors: 2 },
+    { buildingId: "BLD-019", count: 25, street: "Blauwe Keizerstraat", startNum: 1, m2Range: [55, 85], floors: 3 },
+    { buildingId: "BLD-020", count: 135, street: "Piazza", startNum: 1, m2Range: [48, 92], floors: 9 },
+    { buildingId: "BLD-021", count: 71, street: "Boogstraat", startNum: 1, m2Range: [52, 88], floors: 7 },
+  ];
 
-  // De Lindeborg (BLD-004) — sample
-  {
-    id: "VHE-004-001", buildingId: "BLD-004", address: "Haarstraat 101", unit: "101", type: "apartment", floor: 0, m2: 72,
-    contract: { id: "CTR-004-001", status: "active", startDate: "2020-06-01", endDate: null },
-    voorschot: 155, status: "active",
-    voorschotBreakdown: [
-      { serviceId: "SVC-108", serviceName: "Warmtekosten", amount: 55 },
-      { serviceId: "SVC-105", serviceName: "Elektra algemeen", amount: 18 },
-      { serviceId: "SVC-102", serviceName: "Koud water", amount: 14 },
-      { serviceId: "SVC-118", serviceName: "Schoonmaak", amount: 16 },
-      { serviceId: "SVC-131", serviceName: "Huismeester", amount: 28 },
-      { serviceId: "SVC-123", serviceName: "Tuinonderhoud", amount: 14 },
-      { serviceId: "SVC-104", serviceName: "Warm water", amount: 10 },
-    ],
-  },
-  {
-    id: "VHE-004-002", buildingId: "BLD-004", address: "Haarstraat 102", unit: "102", type: "apartment", floor: 0, m2: 68,
-    contract: { id: "CTR-004-002", status: "active", startDate: "2019-02-01", endDate: null },
-    voorschot: 148, status: "active",
-    voorschotBreakdown: [
-      { serviceId: "SVC-108", serviceName: "Warmtekosten", amount: 51 },
-      { serviceId: "SVC-105", serviceName: "Elektra algemeen", amount: 18 },
-      { serviceId: "SVC-102", serviceName: "Koud water", amount: 13 },
-      { serviceId: "SVC-118", serviceName: "Schoonmaak", amount: 15 },
-      { serviceId: "SVC-131", serviceName: "Huismeester", amount: 28 },
-      { serviceId: "SVC-123", serviceName: "Tuinonderhoud", amount: 14 },
-      { serviceId: "SVC-104", serviceName: "Warm water", amount: 9 },
-    ],
-  },
-  {
-    id: "VHE-004-003", buildingId: "BLD-004", address: "Haarstraat 103", unit: "103", type: "apartment", floor: 0, m2: 72,
-    contract: { id: "CTR-004-003", status: "active", startDate: "2021-10-01", endDate: null },
-    voorschot: 155, status: "active",
-    voorschotBreakdown: [
-      { serviceId: "SVC-108", serviceName: "Warmtekosten", amount: 55 },
-      { serviceId: "SVC-105", serviceName: "Elektra algemeen", amount: 18 },
-      { serviceId: "SVC-102", serviceName: "Koud water", amount: 14 },
-      { serviceId: "SVC-118", serviceName: "Schoonmaak", amount: 16 },
-      { serviceId: "SVC-131", serviceName: "Huismeester", amount: 28 },
-      { serviceId: "SVC-123", serviceName: "Tuinonderhoud", amount: 14 },
-      { serviceId: "SVC-104", serviceName: "Warm water", amount: 10 },
-    ],
-  },
-  {
-    id: "VHE-004-004", buildingId: "BLD-004", address: "Haarstraat 201", unit: "201", type: "apartment", floor: 1, m2: 68,
-    contract: { id: "CTR-004-004", status: "active", startDate: "2022-04-01", endDate: null },
-    voorschot: 148, status: "active",
-    voorschotBreakdown: [
-      { serviceId: "SVC-108", serviceName: "Warmtekosten", amount: 51 },
-      { serviceId: "SVC-105", serviceName: "Elektra algemeen", amount: 18 },
-      { serviceId: "SVC-102", serviceName: "Koud water", amount: 13 },
-      { serviceId: "SVC-118", serviceName: "Schoonmaak", amount: 15 },
-      { serviceId: "SVC-131", serviceName: "Huismeester", amount: 28 },
-      { serviceId: "SVC-123", serviceName: "Tuinonderhoud", amount: 14 },
-      { serviceId: "SVC-104", serviceName: "Warm water", amount: 9 },
-    ],
-  },
-  {
-    id: "VHE-004-005", buildingId: "BLD-004", address: "Haarstraat 202", unit: "202", type: "studio", floor: 1, m2: 72,
-    contract: null,
-    voorschot: 0, status: "vacant",
-    voorschotBreakdown: [],
-  },
-];
+  // Services per building (for voorschotBreakdown)
+  const buildingServicesList = {
+    "BLD-001": ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-111","SVC-127","SVC-123"],
+    "BLD-002": ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-132","SVC-111","SVC-123","SVC-116","SVC-106"],
+    "BLD-003": ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-123","SVC-127"],
+    "BLD-004": ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-132","SVC-111","SVC-115","SVC-123","SVC-116","SVC-106"],
+    "BLD-005": ["SVC-108","SVC-102","SVC-118","SVC-131","SVC-123","SVC-115"],
+    "BLD-006": ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-111","SVC-132","SVC-123"],
+    "BLD-007": ["SVC-108","SVC-102","SVC-105","SVC-131","SVC-118","SVC-127","SVC-123"],
+    "BLD-008": ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-132","SVC-111","SVC-115","SVC-123","SVC-116","SVC-106","SVC-127"],
+    "BLD-009": ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-123","SVC-111","SVC-132","SVC-115","SVC-116","SVC-106","SVC-127","SVC-120"],
+    "BLD-010": ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-111","SVC-127","SVC-123","SVC-122"],
+    "BLD-011": ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-123","SVC-132","SVC-115"],
+    "BLD-012": ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-131","SVC-132","SVC-111","SVC-123","SVC-116","SVC-118","SVC-115","SVC-127"],
+    "BLD-013": ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-123","SVC-127","SVC-104"],
+    "BLD-014": ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-123","SVC-104"],
+    "BLD-015": ["SVC-108","SVC-102","SVC-105","SVC-131","SVC-127","SVC-123","SVC-091"],
+    "BLD-016": ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-123","SVC-132","SVC-104"],
+    "BLD-017": ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-111","SVC-123","SVC-132","SVC-116","SVC-115","SVC-106","SVC-127"],
+    "BLD-018": ["SVC-102","SVC-105","SVC-118","SVC-131","SVC-123","SVC-122"],
+    "BLD-019": ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-111","SVC-127","SVC-123"],
+    "BLD-020": ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-132","SVC-111","SVC-123","SVC-116","SVC-106","SVC-115","SVC-127"],
+    "BLD-021": ["SVC-108","SVC-102","SVC-105","SVC-131","SVC-127","SVC-123","SVC-091","SVC-104"],
+  };
+
+  const serviceLongNames = {
+    "SVC-108": "Warmtekosten",
+    "SVC-102": "Koud water",
+    "SVC-104": "Warm water",
+    "SVC-105": "Elektra algemeen",
+    "SVC-106": "Elektra woonruimte",
+    "SVC-118": "Schoonmaak",
+    "SVC-131": "Huismeester",
+    "SVC-132": "Lift onderhoud",
+    "SVC-111": "Verbruiksmeters",
+    "SVC-115": "Storingsdienst CV",
+    "SVC-127": "Ventilatie",
+    "SVC-123": "Tuinonderhoud",
+    "SVC-116": "Lampen vervanging",
+    "SVC-122": "Rioolreiniging",
+    "SVC-091": "Zonnepanelen",
+    "SVC-120": "Hydrofoor",
+  };
+
+  vheConfigs.forEach(config => {
+    const bldData = buildings.find(b => b.id === config.buildingId);
+    const bldServices = buildingServicesList[config.buildingId] || [];
+
+    for (let i = 0; i < config.count; i++) {
+      const unitNum = config.startNum + i;
+      const floor = i % config.floors;
+      const m2 = config.m2Range[0] + Math.floor(Math.random() * (config.m2Range[1] - config.m2Range[0] + 1));
+
+      // Determine address suffix
+      let addressSuffix = "";
+      if (unitNum % 2 === 0) addressSuffix = "A";
+      else addressSuffix = "B";
+      if (floor > 0) addressSuffix += floor;
+
+      const address = `${config.street} ${unitNum}${addressSuffix}`;
+      const isVacant = Math.random() < 0.03; // 3% vacancy rate
+      const isInMutation = !isVacant && Math.random() < 0.02; // 2% in-mutation
+
+      // Calculate voorschot breakdown
+      const vorschootBreakdown = [];
+      let totalVoorscht = 0;
+
+      bldServices.forEach(svcId => {
+        const service = services.find(s => s.id === svcId);
+        const baseAmount = service ? service.avgCostPerVhe : 50;
+
+        // Scale by m2 for metered services
+        let amount = baseAmount;
+        if (["SVC-108", "SVC-102", "SVC-104", "SVC-106"].includes(svcId)) {
+          amount = Math.round(baseAmount * (m2 / 70) * 100) / 100;
+        }
+
+        vorschootBreakdown.push({
+          serviceId: svcId,
+          serviceName: serviceLongNames[svcId] || service.name.nl,
+          amount: amount,
+        });
+        totalVoorscht += amount;
+      });
+
+      totalVoorscht = Math.round(totalVoorscht * 100) / 100;
+
+      vhes.push({
+        id: `VHE-${config.buildingId.split("-")[1]}-${String(i + 1).padStart(3, "0")}`,
+        buildingId: config.buildingId,
+        address,
+        unit: String(unitNum),
+        type: Math.random() < 0.1 ? "studio" : "apartment",
+        floor,
+        m2,
+        contract: isVacant || isInMutation ? null : {
+          id: `CTR-${config.buildingId.split("-")[1]}-${String(i + 1).padStart(3, "0")}`,
+          status: "active",
+          startDate: new Date(2015 + Math.floor(Math.random() * 9), Math.floor(Math.random() * 12), 1 + Math.floor(Math.random() * 28)).toISOString().split("T")[0],
+          endDate: null,
+        },
+        voorschot: isVacant || isInMutation ? 0 : totalVoorscht,
+        status: isVacant ? "vacant" : isInMutation ? "in-mutation" : "active",
+        voorschotBreakdown: isVacant || isInMutation ? [] : vorschootBreakdown,
+      });
+    }
+  });
+
+  return vhes;
+}
+
+export const vhes = generateVhes();
 
 // ── Meters ──
-// Each meter now tracks: current reading, previous reading (start of year), and consumption (delta).
-// Main meters have EAN codes (energy supply point identifier).
-// "utility" is the meter type — NOT to be confused with "services" (delivered service charges).
+function generateMeters() {
+  const meters = [];
+  let idx = 1;
 
-export const meters = [
-  // Kloostergang (BLD-007) main meters
-  { id: "MTR-007-H1",  buildingId: "BLD-007", vheId: null,          type: "main", utility: "heat",        meterNumber: "HM-20154782", ean: "871687320000012345", unit: "GJ",  previousReading: 724.1,  lastReading: 842.5,  consumption: 118.4,  readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
-  { id: "MTR-007-W1",  buildingId: "BLD-007", vheId: null,          type: "main", utility: "water",       meterNumber: "WM-30298741", ean: null,                 unit: "m³",  previousReading: 1108.0, lastReading: 1256.3, consumption: 148.3,  readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
-  { id: "MTR-007-E1",  buildingId: "BLD-007", vheId: null,          type: "main", utility: "electricity", meterNumber: "EM-40187623", ean: "871687320000054321", unit: "kWh", previousReading: 24200,  lastReading: 28450,  consumption: 4250,   readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
-  // Kloostergang submeters (linked to VHEs)
-  { id: "MTR-007-H1A", buildingId: "BLD-007", vheId: "VHE-007-001", type: "sub",  utility: "heat",        meterNumber: "HS-20154782-1A", ean: null, unit: "GJ",  previousReading: 14.0, lastReading: 18.2,  consumption: 4.2,  readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
-  { id: "MTR-007-H1B", buildingId: "BLD-007", vheId: "VHE-007-002", type: "sub",  utility: "heat",        meterNumber: "HS-20154782-1B", ean: null, unit: "GJ",  previousReading: 16.5, lastReading: 21.4,  consumption: 4.9,  readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
-  { id: "MTR-007-H2A", buildingId: "BLD-007", vheId: "VHE-007-003", type: "sub",  utility: "heat",        meterNumber: "HS-20154782-2A", ean: null, unit: "GJ",  previousReading: 12.8, lastReading: 16.8,  consumption: 4.0,  readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
-  { id: "MTR-007-H2B", buildingId: "BLD-007", vheId: "VHE-007-004", type: "sub",  utility: "heat",        meterNumber: "HS-20154782-2B", ean: null, unit: "GJ",  previousReading: 17.2, lastReading: 22.1,  consumption: 4.9,  readingDate: "2025-01-31", previousDate: "2025-01-01", status: "active" },
-  { id: "MTR-007-W1A", buildingId: "BLD-007", vheId: "VHE-007-001", type: "sub",  utility: "water",       meterNumber: "WS-30298741-1A", ean: null, unit: "m³",  previousReading: 22.1, lastReading: 28.7,  consumption: 6.6,  readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
-  { id: "MTR-007-W1B", buildingId: "BLD-007", vheId: "VHE-007-002", type: "sub",  utility: "water",       meterNumber: "WS-30298741-1B", ean: null, unit: "m³",  previousReading: 25.8, lastReading: 32.1,  consumption: 6.3,  readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
+  const vheConfigs = [
+    { buildingId: "BLD-001", count: 26 },
+    { buildingId: "BLD-002", count: 86 },
+    { buildingId: "BLD-003", count: 33 },
+    { buildingId: "BLD-004", count: 144 },
+    { buildingId: "BLD-005", count: 16 },
+    { buildingId: "BLD-006", count: 30 },
+    { buildingId: "BLD-007", count: 44 },
+    { buildingId: "BLD-008", count: 65 },
+    { buildingId: "BLD-009", count: 96 },
+    { buildingId: "BLD-010", count: 9 },
+    { buildingId: "BLD-011", count: 40 },
+    { buildingId: "BLD-012", count: 90 },
+    { buildingId: "BLD-013", count: 30 },
+    { buildingId: "BLD-014", count: 24 },
+    { buildingId: "BLD-015", count: 18 },
+    { buildingId: "BLD-016", count: 24 },
+    { buildingId: "BLD-017", count: 138 },
+    { buildingId: "BLD-018", count: 10 },
+    { buildingId: "BLD-019", count: 25 },
+    { buildingId: "BLD-020", count: 135 },
+    { buildingId: "BLD-021", count: 71 },
+  ];
 
-  // De Lindeborg (BLD-004) main meters
-  { id: "MTR-004-H1",  buildingId: "BLD-004", vheId: null,          type: "main", utility: "heat",        meterNumber: "HM-20198432", ean: "871687320000098765", unit: "GJ",  previousReading: 2420.0, lastReading: 2810.6, consumption: 390.6,  readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
-  { id: "MTR-004-W1",  buildingId: "BLD-004", vheId: null,          type: "main", utility: "water",       meterNumber: "WM-30345612", ean: null,                 unit: "m³",  previousReading: 3810.0, lastReading: 4520.8, consumption: 710.8,  readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
-  { id: "MTR-004-E1",  buildingId: "BLD-004", vheId: null,          type: "main", utility: "electricity", meterNumber: "EM-40223198", ean: "871687320000067890", unit: "kWh", previousReading: 82400,  lastReading: 95200,  consumption: 12800,  readingDate: "2025-01-31", previousDate: "2025-01-01", status: "warning" },
-  // De Lindeborg submeters (linked to VHEs) — heat and water per unit
-  { id: "MTR-004-H101", buildingId: "BLD-004", vheId: "VHE-004-001", type: "sub", utility: "heat",        meterNumber: "HS-20198432-101", ean: null, unit: "GJ",  previousReading: 8.4,  lastReading: 12.1, consumption: 3.7, readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
-  { id: "MTR-004-H102", buildingId: "BLD-004", vheId: "VHE-004-002", type: "sub", utility: "heat",        meterNumber: "HS-20198432-102", ean: null, unit: "GJ",  previousReading: 9.1,  lastReading: 13.5, consumption: 4.4, readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
-  { id: "MTR-004-H103", buildingId: "BLD-004", vheId: "VHE-004-003", type: "sub", utility: "heat",        meterNumber: "HS-20198432-103", ean: null, unit: "GJ",  previousReading: 7.2,  lastReading: 10.8, consumption: 3.6, readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
-  { id: "MTR-004-W101", buildingId: "BLD-004", vheId: "VHE-004-001", type: "sub", utility: "water",       meterNumber: "WS-30345612-101", ean: null, unit: "m³",  previousReading: 18.2, lastReading: 24.8, consumption: 6.6, readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
-  { id: "MTR-004-W102", buildingId: "BLD-004", vheId: "VHE-004-002", type: "sub", utility: "water",       meterNumber: "WS-30345612-102", ean: null, unit: "m³",  previousReading: 20.5, lastReading: 27.9, consumption: 7.4, readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
-  { id: "MTR-004-W103", buildingId: "BLD-004", vheId: "VHE-004-003", type: "sub", utility: "water",       meterNumber: "WS-30345612-103", ean: null, unit: "m³",  previousReading: 15.8, lastReading: 21.0, consumption: 5.2, readingDate: "2025-02-28", previousDate: "2025-01-01", status: "active" },
-];
+  vheConfigs.forEach(config => {
+    const bldNum = config.buildingId.split("-")[1].padStart(3, "0");
+    const bldVhes = vhes.filter(v => v.buildingId === config.buildingId);
 
-// ── Activity log ──
+    // Main meters per utility
+    const utilities = ["heat", "water", "electricity"];
+    let mainHeatStart = 500 + Math.random() * 300;
+    let mainWaterStart = 1000 + Math.random() * 400;
+    let mainElecStart = 20000 + Math.random() * 10000;
 
+    const mainHeatEnd = mainHeatStart + (50 + Math.random() * 150);
+    const mainWaterEnd = mainWaterStart + (100 + Math.random() * 250);
+    const mainElecEnd = mainElecStart + (5000 + Math.random() * 15000);
+
+    // 2024-2026 readings for main meters
+    const heatReadings = {
+      2024: { start: mainHeatStart * 0.7, end: mainHeatStart, consumption: mainHeatStart * 0.3, readingDate: "2024-12-31" },
+      2025: { start: mainHeatStart, end: mainHeatEnd, consumption: mainHeatEnd - mainHeatStart, readingDate: "2025-12-31" },
+      2026: { start: mainHeatEnd, end: mainHeatEnd + (mainHeatEnd - mainHeatStart) * 0.23, consumption: (mainHeatEnd - mainHeatStart) * 0.23, readingDate: "2026-02-28" },
+    };
+
+    const waterReadings = {
+      2024: { start: mainWaterStart * 0.7, end: mainWaterStart, consumption: mainWaterStart * 0.3, readingDate: "2024-12-31" },
+      2025: { start: mainWaterStart, end: mainWaterEnd, consumption: mainWaterEnd - mainWaterStart, readingDate: "2025-12-31" },
+      2026: { start: mainWaterEnd, end: mainWaterEnd + (mainWaterEnd - mainWaterStart) * 0.23, consumption: (mainWaterEnd - mainWaterStart) * 0.23, readingDate: "2026-02-28" },
+    };
+
+    const elecReadings = {
+      2024: { start: mainElecStart * 0.7, end: mainElecStart, consumption: mainElecStart * 0.3, readingDate: "2024-12-31" },
+      2025: { start: mainElecStart, end: mainElecEnd, consumption: mainElecEnd - mainElecStart, readingDate: "2025-12-31" },
+      2026: { start: mainElecEnd, end: mainElecEnd + (mainElecEnd - mainElecStart) * 0.23, consumption: (mainElecEnd - mainElecStart) * 0.23, readingDate: "2026-02-28" },
+    };
+
+    // Main meters
+    meters.push({
+      id: `MTR-${bldNum}-H`,
+      buildingId: config.buildingId,
+      vheId: null,
+      type: "main",
+      utility: "heat",
+      meterNumber: `HM-${20000 + Math.floor(Math.random() * 89999)}`,
+      ean: `871687${Math.random().toString().substring(2, 8)}${Math.floor(Math.random() * 1e13)}`,
+      unit: "GJ",
+      readings: heatReadings,
+      status: "active",
+    });
+
+    meters.push({
+      id: `MTR-${bldNum}-W`,
+      buildingId: config.buildingId,
+      vheId: null,
+      type: "main",
+      utility: "water",
+      meterNumber: `WM-${30000 + Math.floor(Math.random() * 89999)}`,
+      ean: null,
+      unit: "m³",
+      readings: waterReadings,
+      status: "active",
+    });
+
+    meters.push({
+      id: `MTR-${bldNum}-E`,
+      buildingId: config.buildingId,
+      vheId: null,
+      type: "main",
+      utility: "electricity",
+      meterNumber: `EM-${40000 + Math.floor(Math.random() * 89999)}`,
+      ean: `871687${Math.random().toString().substring(2, 8)}${Math.floor(Math.random() * 1e13)}`,
+      unit: "kWh",
+      readings: elecReadings,
+      status: Math.random() < 0.1 ? "warning" : "active",
+    });
+
+    // Submeters for each VHE with active contracts
+    const activeVhes = bldVhes.filter(v => v.contract !== null);
+    const vheCount = activeVhes.length;
+
+    // Pre-calculate factors for each VHE to ensure they sum to 1.0
+    const heatFactors = [];
+    const waterFactors = [];
+    let heatFactorSum = 0;
+    let waterFactorSum = 0;
+
+    activeVhes.forEach(() => {
+      const hf = 0.8 + Math.random() * 0.4;
+      const wf = 0.8 + Math.random() * 0.4;
+      heatFactors.push(hf);
+      waterFactors.push(wf);
+      heatFactorSum += hf;
+      waterFactorSum += wf;
+    });
+
+    // Normalize factors to sum to 1.0
+    const normalizedHeatFactors = heatFactors.map(f => f / heatFactorSum);
+    const normalizedWaterFactors = waterFactors.map(f => f / waterFactorSum);
+
+    activeVhes.forEach((vhe, idx) => {
+      const vheNum = vhe.id.split("-")[2];
+
+      // Submeter heat - use normalized factor
+      const subHeatConsumption2025 = (mainHeatEnd - mainHeatStart) * normalizedHeatFactors[idx];
+      const subHeatStart = mainHeatStart * 0.7 * normalizedHeatFactors[idx];
+      const subHeatEnd = subHeatStart + subHeatConsumption2025;
+
+      meters.push({
+        id: `MTR-${bldNum}-H-${vheNum}`,
+        buildingId: config.buildingId,
+        vheId: vhe.id,
+        type: "sub",
+        utility: "heat",
+        meterNumber: `HS-${20000 + Math.floor(Math.random() * 89999)}-${vheNum}`,
+        ean: null,
+        unit: "GJ",
+        readings: {
+          2024: { start: subHeatStart * 0.7, end: subHeatStart, consumption: subHeatStart * 0.3, readingDate: "2024-12-31" },
+          2025: { start: subHeatStart, end: subHeatEnd, consumption: subHeatConsumption2025, readingDate: "2025-12-31" },
+          2026: { start: subHeatEnd, end: subHeatEnd + subHeatConsumption2025 * 0.23, consumption: subHeatConsumption2025 * 0.23, readingDate: "2026-02-28" },
+        },
+        status: "active",
+      });
+
+      // Submeter water - use normalized factor
+      const subWaterConsumption2025 = (mainWaterEnd - mainWaterStart) * normalizedWaterFactors[idx];
+      const subWaterStart = mainWaterStart * 0.7 * normalizedWaterFactors[idx];
+      const subWaterEnd = subWaterStart + subWaterConsumption2025;
+
+      meters.push({
+        id: `MTR-${bldNum}-W-${vheNum}`,
+        buildingId: config.buildingId,
+        vheId: vhe.id,
+        type: "sub",
+        utility: "water",
+        meterNumber: `WS-${30000 + Math.floor(Math.random() * 89999)}-${vheNum}`,
+        ean: null,
+        unit: "m³",
+        readings: {
+          2024: { start: subWaterStart * 0.7, end: subWaterStart, consumption: subWaterStart * 0.3, readingDate: "2024-12-31" },
+          2025: { start: subWaterStart, end: subWaterEnd, consumption: subWaterConsumption2025, readingDate: "2025-12-31" },
+          2026: { start: subWaterEnd, end: subWaterEnd + subWaterConsumption2025 * 0.23, consumption: subWaterConsumption2025 * 0.23, readingDate: "2026-02-28" },
+        },
+        status: "active",
+      });
+    });
+  });
+
+  return meters;
+}
+
+export const meters = generateMeters();
+
+// ── Activities ──
 export const activities = [
-  { id: "ACT-001", buildingId: "BLD-007", type: "meter_reading",   date: "2025-02-28", description: { en: "Heat meter reading received: 842.5 GJ",            nl: "Warmtemeterstand ontvangen: 842,5 GJ" } },
-  { id: "ACT-002", buildingId: "BLD-007", type: "ledger_entry",    date: "2025-02-15", description: { en: "Ledger entry posted: Cleaning Q1 2025 — €1,320",    nl: "Boekingsregel verwerkt: Schoonmaak Q1 2025 — €1.320" } },
-  { id: "ACT-003", buildingId: "BLD-007", type: "distribution",    date: "2025-01-10", description: { en: "Distribution method updated for Cleaning: m² → equal", nl: "Verdeelsleutel gewijzigd voor Schoonmaak: m² → gelijk" } },
-  { id: "ACT-004", buildingId: "BLD-007", type: "contract_change", date: "2025-01-01", description: { en: "Unit 3B: Contract ended — now vacant",             nl: "Eenheid 3B: Contract beëindigd — nu leegstaand" } },
-  { id: "ACT-005", buildingId: "BLD-007", type: "alert",           date: "2025-02-20", description: { en: "Missing ledger entry: District Management Q4 2024",  nl: "Ontbrekende boeking: Wijkbeheer Q4 2024" } },
-  { id: "ACT-006", buildingId: "BLD-004", type: "meter_reading",   date: "2025-02-28", description: { en: "Heat meter reading received: 2,810.6 GJ",          nl: "Warmtemeterstand ontvangen: 2.810,6 GJ" } },
-  { id: "ACT-007", buildingId: "BLD-004", type: "alert",           date: "2025-02-18", description: { en: "Electricity meter reading overdue (last: Jan 31)",   nl: "Elektrameterstand te laat (laatste: 31 jan)" } },
+  { id: "ACT-001", buildingId: "BLD-007", type: "meter_reading",   date: "2026-02-28", description: { en: "Heat meter reading received: 842.5 GJ",            nl: "Warmtemeterstand ontvangen: 842,5 GJ" } },
+  { id: "ACT-002", buildingId: "BLD-007", type: "ledger_entry",    date: "2026-02-15", description: { en: "Ledger entry posted: Cleaning Q1 2026 — €1,320",    nl: "Boekingsregel verwerkt: Schoonmaak Q1 2026 — €1.320" } },
+  { id: "ACT-003", buildingId: "BLD-007", type: "distribution",    date: "2026-01-10", description: { en: "Distribution method updated for Cleaning: m² → equal", nl: "Verdeelsleutel gewijzigd voor Schoonmaak: m² → gelijk" } },
+  { id: "ACT-004", buildingId: "BLD-004", type: "meter_reading",   date: "2026-02-28", description: { en: "Heat meter reading received: 2,810.6 GJ",          nl: "Warmtemeterstand ontvangen: 2.810,6 GJ" } },
+  { id: "ACT-005", buildingId: "BLD-004", type: "alert",           date: "2026-02-18", description: { en: "Electricity meter reading overdue (last: Jan 31)",   nl: "Elektrameterstand te laat (laatste: 31 jan)" } },
 ];
 
 // ── Getter functions ──
@@ -753,6 +1083,14 @@ export function getBuildingServices(buildingId, year = 2025) {
   return buildingServices.filter((bs) => bs.buildingId === buildingId && bs.year === year);
 }
 
+export function getBuildingServicesByYear(buildingId) {
+  const result = {};
+  [2024, 2025, 2026].forEach(year => {
+    result[year] = buildingServices.filter((bs) => bs.buildingId === buildingId && bs.year === year);
+  });
+  return result;
+}
+
 export function getVhesByBuilding(buildingId) {
   return vhes.filter((v) => v.buildingId === buildingId);
 }
@@ -761,12 +1099,37 @@ export function getMetersByBuilding(buildingId) {
   return meters.filter((m) => m.buildingId === buildingId);
 }
 
+export function getSubmetersByVhe(vheId) {
+  return meters.filter((m) => m.vheId === vheId && m.type === "sub");
+}
+
+export function getVheMeterReadings(vheId, year) {
+  const vheMeters = getSubmetersByVhe(vheId);
+  return vheMeters.map(m => ({
+    meterId: m.id,
+    utility: m.utility,
+    readings: m.readings[year] || null,
+  }));
+}
+
 export function getActivitiesByBuilding(buildingId) {
   return activities.filter((a) => a.buildingId === buildingId).sort((a, b) => b.date.localeCompare(a.date));
 }
 
 export function getDistributionMethod(code) {
   return distributionMethods.find((dm) => dm.code === code);
+}
+
+export function getSupplier(id) {
+  return suppliers.find((s) => s.id === id);
+}
+
+export function getSuppliersByService(serviceId) {
+  return suppliers.filter((s) => s.serviceIds?.includes(serviceId));
+}
+
+export function getSuppliersByCategory(categoryId) {
+  return suppliers.filter((s) => s.category === categoryId);
 }
 
 // ── Settlement data ──
@@ -782,20 +1145,20 @@ export const buildingSettlements = [
   { id: "STL-005-2024", buildingId: "BLD-005", year: 2024, status: "distributed", approvedAt: "2025-04-18", distributedAt: "2025-05-15", totalCost: 52100,  totalVoorschot: 54000,  netResult: 1900 },
   { id: "STL-006-2024", buildingId: "BLD-006", year: 2024, status: "distributed", approvedAt: "2025-03-01", distributedAt: "2025-03-20", totalCost: 23800,  totalVoorschot: 24000,  netResult: 200 },
   { id: "STL-007-2024", buildingId: "BLD-007", year: 2024, status: "distributed", approvedAt: "2025-01-15", distributedAt: "2025-02-01", totalCost: 41200,  totalVoorschot: 42460,  netResult: 1260 },
-  { id: "STL-008-2024", buildingId: "BLD-008", year: 2024, status: "distributed", approvedAt: "2025-06-10", distributedAt: "2025-07-01", totalCost: 27800,  totalVoorschot: 28500,  netResult: 700 },
-  { id: "STL-009-2024", buildingId: "BLD-009", year: 2024, status: "distributed", approvedAt: "2025-04-22", distributedAt: "2025-05-10", totalCost: 107800, totalVoorschot: 110000, netResult: 2200 },
-  { id: "STL-010-2024", buildingId: "BLD-010", year: 2024, status: "distributed", approvedAt: "2025-07-05", distributedAt: "2025-07-20", totalCost: 93200,  totalVoorschot: 94500,  netResult: 1300 },
-  { id: "STL-011-2024", buildingId: "BLD-011", year: 2024, status: "distributed", approvedAt: "2025-02-20", distributedAt: "2025-03-10", totalCost: 12400,  totalVoorschot: 12500,  netResult: 100 },
-  { id: "STL-012-2024", buildingId: "BLD-012", year: 2024, status: "distributed", approvedAt: "2025-01-10", distributedAt: "2025-01-25", totalCost: 39600,  totalVoorschot: 40250,  netResult: 650 },
-  { id: "STL-013-2024", buildingId: "BLD-013", year: 2024, status: "distributed", approvedAt: "2025-08-01", distributedAt: "2025-08-15", totalCost: 30800,  totalVoorschot: 31500,  netResult: 700 },
-  { id: "STL-014-2024", buildingId: "BLD-014", year: 2024, status: "distributed", approvedAt: "2025-05-20", distributedAt: "2025-06-05", totalCost: 118200, totalVoorschot: 121000, netResult: 2800 },
-  { id: "STL-015-2024", buildingId: "BLD-015", year: 2024, status: "distributed", approvedAt: "2025-02-05", distributedAt: "2025-02-20", totalCost: 138500, totalVoorschot: 140000, netResult: 1500 },
-  { id: "STL-016-2024", buildingId: "BLD-016", year: 2024, status: "distributed", approvedAt: "2025-03-02", distributedAt: "2025-03-18", totalCost: 27200,  totalVoorschot: 27500,  netResult: 300 },
-  { id: "STL-017-2024", buildingId: "BLD-017", year: 2024, status: "distributed", approvedAt: "2025-09-10", distributedAt: "2025-09-25", totalCost: 41200,  totalVoorschot: 42000,  netResult: 800 },
-  { id: "STL-018-2024", buildingId: "BLD-018", year: 2024, status: "distributed", approvedAt: "2025-06-15", distributedAt: "2025-07-01", totalCost: 167400, totalVoorschot: 170000, netResult: 2600 },
-  { id: "STL-019-2024", buildingId: "BLD-019", year: 2024, status: "distributed", approvedAt: "2025-01-30", distributedAt: "2025-02-15", totalCost: 34800,  totalVoorschot: 35000,  netResult: 200 },
-  { id: "STL-020-2024", buildingId: "BLD-020", year: 2024, status: "distributed", approvedAt: "2025-02-25", distributedAt: "2025-03-12", totalCost: 155800, totalVoorschot: 157500, netResult: 1700 },
-  { id: "STL-021-2024", buildingId: "BLD-021", year: 2024, status: "distributed", approvedAt: "2025-01-25", distributedAt: "2025-02-08", totalCost: 74200,  totalVoorschot: 75000,  netResult: 800 },
+  { id: "STL-008-2024", buildingId: "BLD-008", year: 2024, status: "distributed", approvedAt: "2025-06-10", distributedAt: "2025-07-01", totalCost: 208800, totalVoorschot: 211250, netResult: 2450 },
+  { id: "STL-009-2024", buildingId: "BLD-009", year: 2024, status: "distributed", approvedAt: "2025-04-22", distributedAt: "2025-05-10", totalCost: 328800, totalVoorschot: 336000, netResult: 7200 },
+  { id: "STL-010-2024", buildingId: "BLD-010", year: 2024, status: "distributed", approvedAt: "2025-07-05", distributedAt: "2025-07-20", totalCost: 10800,  totalVoorschot: 11250,  netResult: 450 },
+  { id: "STL-011-2024", buildingId: "BLD-011", year: 2024, status: "distributed", approvedAt: "2025-02-20", distributedAt: "2025-03-10", totalCost: 87000,  totalVoorschot: 90000,  netResult: 3000 },
+  { id: "STL-012-2024", buildingId: "BLD-012", year: 2024, status: "distributed", approvedAt: "2025-01-10", distributedAt: "2025-01-25", totalCost: 262000, totalVoorschot: 270000, netResult: 8000 },
+  { id: "STL-013-2024", buildingId: "BLD-013", year: 2024, status: "distributed", approvedAt: "2025-08-01", distributedAt: "2025-08-15", totalCost: 57600,  totalVoorschot: 60000,  netResult: 2400 },
+  { id: "STL-014-2024", buildingId: "BLD-014", year: 2024, status: "distributed", approvedAt: "2025-05-20", distributedAt: "2025-06-05", totalCost: 40500,  totalVoorschot: 42000,  netResult: 1500 },
+  { id: "STL-015-2024", buildingId: "BLD-015", year: 2024, status: "distributed", approvedAt: "2025-02-05", distributedAt: "2025-02-20", totalCost: 25900,  totalVoorschot: 27000,  netResult: 1100 },
+  { id: "STL-016-2024", buildingId: "BLD-016", year: 2024, status: "distributed", approvedAt: "2025-03-02", distributedAt: "2025-03-18", totalCost: 40200,  totalVoorschot: 42000,  netResult: 1800 },
+  { id: "STL-017-2024", buildingId: "BLD-017", year: 2024, status: "distributed", approvedAt: "2025-09-10", distributedAt: "2025-09-25", totalCost: 468000, totalVoorschot: 483000, netResult: 15000 },
+  { id: "STL-018-2024", buildingId: "BLD-018", year: 2024, status: "distributed", approvedAt: "2025-06-15", distributedAt: "2025-07-01", totalCost: 11900,  totalVoorschot: 12500,  netResult: 600 },
+  { id: "STL-019-2024", buildingId: "BLD-019", year: 2024, status: "distributed", approvedAt: "2025-01-30", distributedAt: "2025-02-15", totalCost: 48000,  totalVoorschot: 50000,  netResult: 2000 },
+  { id: "STL-020-2024", buildingId: "BLD-020", year: 2024, status: "distributed", approvedAt: "2025-02-25", distributedAt: "2025-03-12", totalCost: 424000, totalVoorschot: 438750, netResult: 14750 },
+  { id: "STL-021-2024", buildingId: "BLD-021", year: 2024, status: "distributed", approvedAt: "2025-01-25", distributedAt: "2025-02-08", totalCost: 187800, totalVoorschot: 195250, netResult: 7450 },
 
   // 2025 — settlement year (we are in March 2026, various settlement states)
   { id: "STL-001-2025", buildingId: "BLD-001", year: 2025, status: "distributed", approvedAt: "2026-01-20", distributedAt: "2026-02-05", totalCost: 50400,  totalVoorschot: 52000,  netResult: 1600 },
@@ -805,402 +1168,75 @@ export const buildingSettlements = [
   { id: "STL-005-2025", buildingId: "BLD-005", year: 2025, status: "in_review",   approvedAt: null,         distributedAt: null,         totalCost: 53200,  totalVoorschot: 54000,  netResult: 800 },
   { id: "STL-006-2025", buildingId: "BLD-006", year: 2025, status: "approved",    approvedAt: "2026-03-01", distributedAt: null,         totalCost: 65800,  totalVoorschot: 67500,  netResult: 1700 },
   { id: "STL-007-2025", buildingId: "BLD-007", year: 2025, status: "distributed", approvedAt: "2026-01-10", distributedAt: "2026-01-25", totalCost: 108200, totalVoorschot: 110000, netResult: 1800 },
-  { id: "STL-008-2025", buildingId: "BLD-008", year: 2025, status: "not_started", approvedAt: null,         distributedAt: null,         totalCost: null,   totalVoorschot: 211250, netResult: null },
+  { id: "STL-008-2025", buildingId: "BLD-008", year: 2025, status: "in_review",   approvedAt: null,         distributedAt: null,         totalCost: 207500, totalVoorschot: 211250, netResult: 3750 },
   { id: "STL-009-2025", buildingId: "BLD-009", year: 2025, status: "in_review",   approvedAt: null,         distributedAt: null,         totalCost: 332000, totalVoorschot: 336000, netResult: 4000 },
-  { id: "STL-010-2025", buildingId: "BLD-010", year: 2025, status: "not_started", approvedAt: null,         distributedAt: null,         totalCost: null,   totalVoorschot: 11250,  netResult: null },
+  { id: "STL-010-2025", buildingId: "BLD-010", year: 2025, status: "monitoring",  approvedAt: null,         distributedAt: null,         totalCost: 10900,  totalVoorschot: 11250,  netResult: 350 },
   { id: "STL-011-2025", buildingId: "BLD-011", year: 2025, status: "approved",    approvedAt: "2026-02-15", distributedAt: null,         totalCost: 88500,  totalVoorschot: 90000,  netResult: 1500 },
   { id: "STL-012-2025", buildingId: "BLD-012", year: 2025, status: "distributed", approvedAt: "2026-01-05", distributedAt: "2026-01-20", totalCost: 267500, totalVoorschot: 270000, netResult: 2500 },
-  { id: "STL-013-2025", buildingId: "BLD-013", year: 2025, status: "not_started", approvedAt: null,         distributedAt: null,         totalCost: null,   totalVoorschot: 60000,  netResult: null },
+  { id: "STL-013-2025", buildingId: "BLD-013", year: 2025, status: "monitoring",  approvedAt: null,         distributedAt: null,         totalCost: 58200,  totalVoorschot: 60000,  netResult: 1800 },
   { id: "STL-014-2025", buildingId: "BLD-014", year: 2025, status: "in_review",   approvedAt: null,         distributedAt: null,         totalCost: 41200,  totalVoorschot: 42000,  netResult: 800 },
   { id: "STL-015-2025", buildingId: "BLD-015", year: 2025, status: "distributed", approvedAt: "2026-02-01", distributedAt: "2026-02-18", totalCost: 26200,  totalVoorschot: 27000,  netResult: 800 },
   { id: "STL-016-2025", buildingId: "BLD-016", year: 2025, status: "approved",    approvedAt: "2026-03-02", distributedAt: null,         totalCost: 41500,  totalVoorschot: 42000,  netResult: 500 },
-  { id: "STL-017-2025", buildingId: "BLD-017", year: 2025, status: "not_started", approvedAt: null,         distributedAt: null,         totalCost: null,   totalVoorschot: 483000, netResult: null },
+  { id: "STL-017-2025", buildingId: "BLD-017", year: 2025, status: "monitoring",  approvedAt: null,         distributedAt: null,         totalCost: 475000, totalVoorschot: 483000, netResult: 8000 },
   { id: "STL-018-2025", buildingId: "BLD-018", year: 2025, status: "in_review",   approvedAt: null,         distributedAt: null,         totalCost: 12100,  totalVoorschot: 12500,  netResult: 400 },
   { id: "STL-019-2025", buildingId: "BLD-019", year: 2025, status: "distributed", approvedAt: "2026-01-28", distributedAt: "2026-02-12", totalCost: 49200,  totalVoorschot: 50000,  netResult: 800 },
   { id: "STL-020-2025", buildingId: "BLD-020", year: 2025, status: "approved",    approvedAt: "2026-02-20", distributedAt: null,         totalCost: 436000, totalVoorschot: 438750, netResult: 2750 },
   { id: "STL-021-2025", buildingId: "BLD-021", year: 2025, status: "distributed", approvedAt: "2026-01-22", distributedAt: "2026-02-05", totalCost: 193800, totalVoorschot: 195250, netResult: 1450 },
+
+  // 2026 — just beginning (Q1 data only, monitoring status)
+  { id: "STL-001-2026", buildingId: "BLD-001", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 52000, netResult: null },
+  { id: "STL-002-2026", buildingId: "BLD-002", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 236500, netResult: null },
+  { id: "STL-003-2026", buildingId: "BLD-003", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 57750, netResult: null },
+  { id: "STL-004-2026", buildingId: "BLD-004", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 432000, netResult: null },
+  { id: "STL-005-2026", buildingId: "BLD-005", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 54000, netResult: null },
+  { id: "STL-006-2026", buildingId: "BLD-006", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 67500, netResult: null },
+  { id: "STL-007-2026", buildingId: "BLD-007", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 110000, netResult: null },
+  { id: "STL-008-2026", buildingId: "BLD-008", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 211250, netResult: null },
+  { id: "STL-009-2026", buildingId: "BLD-009", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 336000, netResult: null },
+  { id: "STL-010-2026", buildingId: "BLD-010", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 11250, netResult: null },
+  { id: "STL-011-2026", buildingId: "BLD-011", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 90000, netResult: null },
+  { id: "STL-012-2026", buildingId: "BLD-012", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 270000, netResult: null },
+  { id: "STL-013-2026", buildingId: "BLD-013", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 60000, netResult: null },
+  { id: "STL-014-2026", buildingId: "BLD-014", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 42000, netResult: null },
+  { id: "STL-015-2026", buildingId: "BLD-015", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 27000, netResult: null },
+  { id: "STL-016-2026", buildingId: "BLD-016", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 42000, netResult: null },
+  { id: "STL-017-2026", buildingId: "BLD-017", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 483000, netResult: null },
+  { id: "STL-018-2026", buildingId: "BLD-018", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 12500, netResult: null },
+  { id: "STL-019-2026", buildingId: "BLD-019", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 50000, netResult: null },
+  { id: "STL-020-2026", buildingId: "BLD-020", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 438750, netResult: null },
+  { id: "STL-021-2026", buildingId: "BLD-021", year: 2026, status: "monitoring", approvedAt: null, distributedAt: null, totalCost: null, totalVoorschot: 195250, netResult: null },
 ];
 
-// Settlement checks per building-service (for 2024 — the year under settlement)
-// Each check tracks: ledger completeness, budget variance, YoY comparison, consumption verification
+// Settlement checks per building-service
 export const settlementChecks = [
-  // BLD-007 Kloostergang 2024 — fully verified (was distributed)
-  { id: "SC-007-108", buildingId: "BLD-007", serviceId: "SVC-108", year: 2024, ledgerComplete: true,  budgetVariance: -2.1,  budgetApproved: true,  yoyDeviation: 3.5,   yoyFlagged: false, consumptionVerified: true,  status: "approved" },
-  { id: "SC-007-105", buildingId: "BLD-007", serviceId: "SVC-105", year: 2024, ledgerComplete: true,  budgetVariance: 1.8,   budgetApproved: true,  yoyDeviation: -1.2,  yoyFlagged: false, consumptionVerified: true,  status: "approved" },
-  { id: "SC-007-118", buildingId: "BLD-007", serviceId: "SVC-118", year: 2024, ledgerComplete: true,  budgetVariance: -4.5,  budgetApproved: true,  yoyDeviation: 8.2,   yoyFlagged: false, consumptionVerified: false, status: "approved" },
-  { id: "SC-007-102", buildingId: "BLD-007", serviceId: "SVC-102", year: 2024, ledgerComplete: true,  budgetVariance: 0.8,   budgetApproved: true,  yoyDeviation: -2.1,  yoyFlagged: false, consumptionVerified: true,  status: "approved" },
-  { id: "SC-007-131", buildingId: "BLD-007", serviceId: "SVC-131", year: 2024, ledgerComplete: true,  budgetVariance: -1.2,  budgetApproved: true,  yoyDeviation: 5.0,   yoyFlagged: false, consumptionVerified: false, status: "approved" },
-  { id: "SC-007-123", buildingId: "BLD-007", serviceId: "SVC-123", year: 2024, ledgerComplete: true,  budgetVariance: 2.3,   budgetApproved: true,  yoyDeviation: -0.5,  yoyFlagged: false, consumptionVerified: false, status: "approved" },
+  // BLD-007 2024
+  { id: "SC-007-108-2024", buildingId: "BLD-007", serviceId: "SVC-108", year: 2024, ledgerComplete: true,  budgetVariance: -2.1,  budgetApproved: true,  yoyDeviation: 3.5,   yoyFlagged: false, consumptionVerified: true,  status: "approved" },
+  { id: "SC-007-105-2024", buildingId: "BLD-007", serviceId: "SVC-105", year: 2024, ledgerComplete: true,  budgetVariance: 1.8,   budgetApproved: true,  yoyDeviation: -1.2,  yoyFlagged: false, consumptionVerified: true,  status: "approved" },
+  { id: "SC-007-118-2024", buildingId: "BLD-007", serviceId: "SVC-118", year: 2024, ledgerComplete: true,  budgetVariance: -4.5,  budgetApproved: true,  yoyDeviation: 8.2,   yoyFlagged: false, consumptionVerified: false, status: "approved" },
+  { id: "SC-007-102-2024", buildingId: "BLD-007", serviceId: "SVC-102", year: 2024, ledgerComplete: true,  budgetVariance: 0.8,   budgetApproved: true,  yoyDeviation: -2.1,  yoyFlagged: false, consumptionVerified: true,  status: "approved" },
 
-  // BLD-004 De Lindeborg 2024 — in review (some issues)
-  { id: "SC-004-108", buildingId: "BLD-004", serviceId: "SVC-108", year: 2024, ledgerComplete: true,  budgetVariance: -3.2,  budgetApproved: true,  yoyDeviation: 5.8,   yoyFlagged: false, consumptionVerified: true,  status: "verified" },
-  { id: "SC-004-105", buildingId: "BLD-004", serviceId: "SVC-105", year: 2024, ledgerComplete: true,  budgetVariance: 8.5,   budgetApproved: false, yoyDeviation: 12.3,  yoyFlagged: true,  consumptionVerified: true,  status: "flagged" },
-  { id: "SC-004-102", buildingId: "BLD-004", serviceId: "SVC-102", year: 2024, ledgerComplete: true,  budgetVariance: -1.5,  budgetApproved: true,  yoyDeviation: 2.1,   yoyFlagged: false, consumptionVerified: true,  status: "verified" },
-  { id: "SC-004-118a",buildingId: "BLD-004", serviceId: "SVC-118", year: 2024, ledgerComplete: false, budgetVariance: null,  budgetApproved: false, yoyDeviation: null,  yoyFlagged: false, consumptionVerified: false, status: "pending" },
-  { id: "SC-004-118b",buildingId: "BLD-004", serviceId: "SVC-118", year: 2024, ledgerComplete: true,  budgetVariance: -6.1,  budgetApproved: true,  yoyDeviation: -3.4,  yoyFlagged: false, consumptionVerified: false, status: "verified" },
-  { id: "SC-004-131", buildingId: "BLD-004", serviceId: "SVC-131", year: 2024, ledgerComplete: true,  budgetVariance: 18.2,  budgetApproved: false, yoyDeviation: 22.5,  yoyFlagged: true,  consumptionVerified: false, status: "flagged" },
-  { id: "SC-004-123", buildingId: "BLD-004", serviceId: "SVC-123", year: 2024, ledgerComplete: true,  budgetVariance: -0.8,  budgetApproved: true,  yoyDeviation: 1.2,   yoyFlagged: false, consumptionVerified: false, status: "verified" },
+  // BLD-004 2024
+  { id: "SC-004-108-2024", buildingId: "BLD-004", serviceId: "SVC-108", year: 2024, ledgerComplete: true,  budgetVariance: -3.2,  budgetApproved: true,  yoyDeviation: 5.8,   yoyFlagged: false, consumptionVerified: true,  status: "verified" },
+  { id: "SC-004-105-2024", buildingId: "BLD-004", serviceId: "SVC-105", year: 2024, ledgerComplete: true,  budgetVariance: 8.5,   budgetApproved: false, yoyDeviation: 12.3,  yoyFlagged: true,  consumptionVerified: true,  status: "flagged" },
+
+  // BLD-007 2025
+  { id: "SC-007-108-2025", buildingId: "BLD-007", serviceId: "SVC-108", year: 2025, ledgerComplete: true,  budgetVariance: -1.5,  budgetApproved: true,  yoyDeviation: 2.1,   yoyFlagged: false, consumptionVerified: true,  status: "verified" },
+  { id: "SC-007-105-2025", buildingId: "BLD-007", serviceId: "SVC-105", year: 2025, ledgerComplete: true,  budgetVariance: 0.3,   budgetApproved: true,  yoyDeviation: 1.5,   yoyFlagged: false, consumptionVerified: true,  status: "verified" },
+  { id: "SC-007-118-2025", buildingId: "BLD-007", serviceId: "SVC-118", year: 2025, ledgerComplete: false, budgetVariance: null,  budgetApproved: false, yoyDeviation: null,  yoyFlagged: false, consumptionVerified: false, status: "pending" },
 ];
 
-export function getSettlement(buildingId, year) {
-  return buildingSettlements.find((s) => s.buildingId === buildingId && s.year === year);
-}
-
-export function getSettlementsByYear(year) {
-  return buildingSettlements.filter((s) => s.year === year);
-}
-
-export function getSettlementChecks(buildingId, year) {
-  return settlementChecks.filter((sc) => sc.buildingId === buildingId && sc.year === year);
-}
-
-// ── Suppliers ──
-// Realistic suppliers for a woningcorporatie service charge administration
-// Each supplier provides one or more services and is linked to buildings through those services
-
-export const supplierCategories = [
-  { id: "energy",        label: { en: "Energy & Utilities",        nl: "Energie & Nutsbedrijven" } },
-  { id: "installations", label: { en: "Technical & Installations", nl: "Techniek & Installaties" } },
-  { id: "cleaning",      label: { en: "Cleaning & Maintenance",    nl: "Schoonmaak & Onderhoud" } },
-  { id: "metering",      label: { en: "Metering & Data",           nl: "Meetdiensten & Data" } },
-  { id: "management",    label: { en: "Management & Advisory",     nl: "Beheer & Advies" } },
-];
-
-export const suppliers = [
-  {
-    id: "SUP-001",
-    name: "ENGIE Energie Nederland",
-    category: "energy",
-    kvk: "34108453",
-    city: "Zwolle",
-    contactPerson: "R. van Dijk",
-    email: "corporaties@engie.nl",
-    phone: "+31 88 895 0000",
-    website: "engie.nl",
-    contractStart: "2022-01-01",
-    contractEnd: "2025-12-31",
-    serviceIds: ["SVC-104", "SVC-105", "SVC-106", "SVC-107", "SVC-108", "SVC-110"],
-    buildingCount: 21,
-    annualSpend: 285000,
-    status: "active",
-    rating: 4,
-    notes: { en: "Main energy supplier. Framework contract via Woonenergie.", nl: "Hoofdleverancier energie. Raamcontract via Woonenergie." },
-  },
-  {
-    id: "SUP-002",
-    name: "Oasen",
-    category: "energy",
-    kvk: "24289054",
-    city: "Gouda",
-    contactPerson: "M. Bakker",
-    email: "zakelijk@oasen.nl",
-    phone: "+31 182 59 36 36",
-    website: "oasen.nl",
-    contractStart: "2020-01-01",
-    contractEnd: null,
-    serviceIds: ["SVC-102"],
-    buildingCount: 16,
-    annualSpend: 42000,
-    status: "active",
-    rating: 4,
-    notes: { en: "Regional water supplier for Gorinchem area. No fixed contract, regulated tariffs.", nl: "Regionaal waterbedrijf voor regio Gorinchem. Geen vast contract, gereguleerde tarieven." },
-  },
-  {
-    id: "SUP-003",
-    name: "Techem Energy Services BV",
-    category: "metering",
-    kvk: "30141780",
-    city: "Arnhem",
-    contactPerson: "J. Hendriks",
-    email: "service@techem.nl",
-    phone: "+31 26 355 1355",
-    website: "techem.nl",
-    contractStart: "2023-07-01",
-    contractEnd: "2026-06-30",
-    serviceIds: ["SVC-108", "SVC-111"],
-    buildingCount: 14,
-    annualSpend: 38500,
-    status: "active",
-    rating: 3,
-    notes: { en: "Metering services & heat cost allocation. Some delays in reading uploads.", nl: "Meetdiensten & warmtekostenverdeling. Enige vertraging bij het uploaden van standen." },
-  },
-  {
-    id: "SUP-004",
-    name: "Joulz Meetbedrijf B.V.",
-    category: "metering",
-    kvk: "27258084",
-    city: "Rotterdam",
-    contactPerson: "A. Smits",
-    email: "meetdiensten@joulz.nl",
-    phone: "+31 88 454 5000",
-    website: "joulz.nl",
-    contractStart: "2021-04-01",
-    contractEnd: "2025-03-31",
-    serviceIds: ["SVC-108", "SVC-111"],
-    buildingCount: 8,
-    annualSpend: 22400,
-    status: "active",
-    rating: 4,
-    notes: { en: "Independent metering company for gas and electricity. Contract renewal pending.", nl: "Onafhankelijk meetbedrijf voor gas en elektriciteit. Contractverlenging in behandeling." },
-  },
-  {
-    id: "SUP-005",
-    name: "Stedin Netbeheer BV",
-    category: "energy",
-    kvk: "24306940",
-    city: "Rotterdam",
-    contactPerson: "Klantenservice Zakelijk",
-    email: "zakelijk@stedin.net",
-    phone: "+31 88 896 3096",
-    website: "stedin.net",
-    contractStart: "2019-01-01",
-    contractEnd: null,
-    serviceIds: ["SVC-108"],
-    buildingCount: 12,
-    annualSpend: 18600,
-    status: "active",
-    rating: 4,
-    notes: { en: "Grid operator for Gorinchem region. Transport costs only, regulated.", nl: "Netbeheerder regio Gorinchem. Alleen transportkosten, gereguleerd." },
-  },
-  {
-    id: "SUP-006",
-    name: "Schindler Liften B.V.",
-    category: "installations",
-    kvk: "33148680",
-    city: "'s-Gravenhage",
-    contactPerson: "P. de Groot",
-    email: "service.nl@schindler.com",
-    phone: "+31 70 399 2666",
-    website: "schindler.nl",
-    contractStart: "2023-01-01",
-    contractEnd: "2027-12-31",
-    serviceIds: ["SVC-132", "SVC-133"],
-    buildingCount: 6,
-    annualSpend: 31200,
-    status: "active",
-    rating: 5,
-    notes: { en: "Elevator maintenance & 24h emergency service. Excellent response times.", nl: "Liftonderhoud & 24-uurs storingsdienst. Uitstekende responstijden." },
-  },
-  {
-    id: "SUP-007",
-    name: "CSU Cleaning Services",
-    category: "cleaning",
-    kvk: "17098383",
-    city: "Eindhoven",
-    contactPerson: "K. Meijer",
-    email: "corporaties@csu.nl",
-    phone: "+31 40 290 4040",
-    website: "csu.nl",
-    contractStart: "2024-01-01",
-    contractEnd: "2026-12-31",
-    serviceIds: ["SVC-118", "SVC-140"],
-    buildingCount: 19,
-    annualSpend: 89000,
-    status: "active",
-    rating: 3,
-    notes: { en: "Cleaning common areas & window washing. Quality inconsistent at some locations.", nl: "Schoonmaak algemene ruimten & glasbewassing. Kwaliteit wisselend op enkele locaties." },
-  },
-  {
-    id: "SUP-008",
-    name: "ISS Facility Services",
-    category: "cleaning",
-    kvk: "33247775",
-    city: "Utrecht",
-    contactPerson: "L. Jansen",
-    email: "info@nl.issworld.com",
-    phone: "+31 30 242 4242",
-    website: "issworld.com",
-    contractStart: "2022-06-01",
-    contractEnd: "2025-05-31",
-    serviceIds: ["SVC-118", "SVC-116"],
-    buildingCount: 4,
-    annualSpend: 28500,
-    status: "active",
-    rating: 4,
-    notes: { en: "Facility services for larger complexes. Also handles lamp replacement.", nl: "Facilitaire diensten voor grotere complexen. Verzorgt ook lampvervanging." },
-  },
-  {
-    id: "SUP-009",
-    name: "Van Ginkel Groep B.V.",
-    category: "cleaning",
-    kvk: "30143506",
-    city: "Veenendaal",
-    contactPerson: "B. van Ginkel",
-    email: "info@vanginkelgroep.nl",
-    phone: "+31 318 54 58 00",
-    website: "vanginkelgroep.nl",
-    contractStart: "2023-03-01",
-    contractEnd: "2026-02-28",
-    serviceIds: ["SVC-123", "SVC-124"],
-    buildingCount: 8,
-    annualSpend: 44000,
-    status: "active",
-    rating: 4,
-    notes: { en: "Landscaping & gutter cleaning. Reliable seasonal scheduling.", nl: "Tuinonderhoud & dakgootreiniging. Betrouwbare seizoensplanning." },
-  },
-  {
-    id: "SUP-010",
-    name: "Feenstra Verwarming B.V.",
-    category: "installations",
-    kvk: "33176855",
-    city: "Heemstede",
-    contactPerson: "T. Visser",
-    email: "service@feenstra.com",
-    phone: "+31 23 547 5555",
-    website: "feenstra.com",
-    contractStart: "2021-10-01",
-    contractEnd: "2025-09-30",
-    serviceIds: ["SVC-115", "SVC-126", "SVC-127"],
-    buildingCount: 10,
-    annualSpend: 52000,
-    status: "active",
-    rating: 3,
-    notes: { en: "Heating maintenance, geyser cleaning, and mechanical ventilation. Contract renewal under negotiation.", nl: "CV-onderhoud, geiserreinigen en mechanische ventilatie. Contractverlenging in onderhandeling." },
-  },
-  {
-    id: "SUP-011",
-    name: "Riool.nl (Rioned Groep)",
-    category: "cleaning",
-    kvk: "09060847",
-    city: "Arnhem",
-    contactPerson: "W. Peters",
-    email: "service@riool.nl",
-    phone: "+31 26 365 1010",
-    website: "riool.nl",
-    contractStart: "2024-04-01",
-    contractEnd: "2027-03-31",
-    serviceIds: ["SVC-122"],
-    buildingCount: 8,
-    annualSpend: 12800,
-    status: "active",
-    rating: 5,
-    notes: { en: "Drain cleaning & sewer maintenance. Fast emergency response.", nl: "Rioolontstopping & rioolonderhoud. Snelle noodrespons." },
-  },
-  {
-    id: "SUP-012",
-    name: "ASSA ABLOY Entrance Systems",
-    category: "installations",
-    kvk: "24337859",
-    city: "Nieuwegein",
-    contactPerson: "D. Mulder",
-    email: "nl.entrance@assaabloy.com",
-    phone: "+31 30 291 4444",
-    website: "assaabloyentrance.nl",
-    contractStart: "2023-06-01",
-    contractEnd: "2026-05-31",
-    serviceIds: ["SVC-171"],
-    buildingCount: 4,
-    annualSpend: 8400,
-    status: "active",
-    rating: 4,
-    notes: { en: "Electric doors & access systems. 24h service contract.", nl: "Elektrische deuren & toegangssystemen. 24-uurs servicecontract." },
-  },
-  {
-    id: "SUP-013",
-    name: "SWB Wijkbeheer",
-    category: "management",
-    kvk: "51434218",
-    city: "Gorinchem",
-    contactPerson: "H. van der Berg",
-    email: "info@swb-wijkbeheer.nl",
-    phone: "+31 183 62 44 00",
-    website: "swb-wijkbeheer.nl",
-    contractStart: "2020-01-01",
-    contractEnd: "2025-12-31",
-    serviceIds: ["SVC-131", "SVC-137"],
-    buildingCount: 17,
-    annualSpend: 156000,
-    status: "active",
-    rating: 4,
-    notes: { en: "Local caretaker & social support services. Embedded in the community.", nl: "Lokale huismeester & woonondersteunende diensten. Geworteld in de wijk." },
-  },
-  {
-    id: "SUP-014",
-    name: "KPN Zakelijk",
-    category: "management",
-    kvk: "02045700",
-    city: "Den Haag",
-    contactPerson: "Accountteam Corporaties",
-    email: "corporaties@kpn.com",
-    phone: "+31 800 0403",
-    website: "kpn.com/zakelijk",
-    contractStart: "2024-07-01",
-    contractEnd: "2026-06-30",
-    serviceIds: ["SVC-142"],
-    buildingCount: 2,
-    annualSpend: 7200,
-    status: "active",
-    rating: 3,
-    notes: { en: "Communal internet for two complexes. Pilot project, may expand.", nl: "Collectief internet voor twee complexen. Pilotproject, mogelijk uitbreiding." },
-  },
-  {
-    id: "SUP-015",
-    name: "Centraal Beheer Verzekeringen",
-    category: "management",
-    kvk: "27099838",
-    city: "Apeldoorn",
-    contactPerson: "Verzekeringsdesk Wonen",
-    email: "wonen@centraalbeheer.nl",
-    phone: "+31 55 579 8111",
-    website: "centraalbeheer.nl",
-    contractStart: "2023-01-01",
-    contractEnd: "2025-12-31",
-    serviceIds: ["SVC-036"],
-    buildingCount: 1,
-    annualSpend: 3200,
-    status: "active",
-    rating: 4,
-    notes: { en: "Collective glass insurance policy. Single complex only.", nl: "Collectieve glasverzekering. Slechts één complex." },
-  },
-  {
-    id: "SUP-016",
-    name: "Hydro Building Systems BV",
-    category: "installations",
-    kvk: "08098654",
-    city: "Harderwijk",
-    contactPerson: "G. Dijkstra",
-    email: "service@hydrobuildingsystems.nl",
-    phone: "+31 341 46 3200",
-    website: "hydrobuildingsystems.nl",
-    contractStart: "2022-03-01",
-    contractEnd: "2025-02-28",
-    serviceIds: ["SVC-120"],
-    buildingCount: 3,
-    annualSpend: 5400,
-    status: "expiring",
-    rating: 3,
-    notes: { en: "Hydrophore pump maintenance. Contract expired, renewal pending.", nl: "Hydrofooronderhoud. Contract verlopen, verlenging in behandeling." },
-  },
-];
-
-export function getSupplier(id) {
-  return suppliers.find((s) => s.id === id);
-}
-
-export function getSuppliersByService(serviceId) {
-  return suppliers.filter((s) => s.serviceIds.includes(serviceId));
-}
-
-export function getSuppliersByCategory(categoryId) {
-  return suppliers.filter((s) => s.category === categoryId);
-}
-
-// ── Saved Views ──
-// Views are saved column/filter configurations per object type.
-// Each view defines which columns to show and which filters to apply.
-// objectType matches the sidebar object (buildings, vhe, services, meters, suppliers).
-
+// ── Saved views ──
 export const savedViews = [
-  // ── Complexes views ──
+  // ── Buildings views ──
   {
-    id: "view-all-complexes",
+    id: "view-all-buildings",
     objectType: "buildings",
-    name: { en: "All Complexes", nl: "Alle Complexen" },
+    name: { en: "All Buildings", nl: "Alle Gebouwen" },
     icon: "list",
     isDefault: true,
     columns: ["complex", "complexId", "location", "vhe", "components", "utilities", "dataQuality"],
     filters: {},
-    year: null, // null = current year
+    year: null,
   },
   {
     id: "view-settlement-2024",
@@ -1221,6 +1257,16 @@ export const savedViews = [
     columns: ["complex", "location", "vhe", "components", "settlementStatus", "netResult"],
     filters: {},
     year: 2025,
+  },
+  {
+    id: "view-settlement-2026",
+    objectType: "buildings",
+    name: { en: "Settlement 2026", nl: "Afrekening 2026" },
+    icon: "fileCheck",
+    isDefault: false,
+    columns: ["complex", "location", "vhe", "components", "settlementStatus", "netResult"],
+    filters: {},
+    year: 2026,
   },
 
   // ── Units views ──
@@ -1304,39 +1350,34 @@ export function getCategory(categoryId) {
 // ═══════════════════════════════════════════════════════════════════
 // LEDGER ENTRIES — journal entries per service per building
 // These represent actual booked costs from the ERP / financial system.
-// Housing corporations monitor these throughout the year to ensure
-// costs are correct, complete, and booked on the right Service + Building.
 // ═══════════════════════════════════════════════════════════════════
-
-const ledgerStatuses = ["booked", "pending", "flagged"];
 
 function generateLedgerEntries() {
   const entries = [];
   let idx = 1;
 
-  // For each building, generate entries for a realistic subset of services
   const serviceBuildingMap = [
     { bld: "BLD-001", svcs: ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-111","SVC-127","SVC-123"] },
-    { bld: "BLD-002", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-106","SVC-118","SVC-131","SVC-132","SVC-111","SVC-123","SVC-116"] },
+    { bld: "BLD-002", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-132","SVC-111","SVC-123","SVC-116","SVC-106"] },
     { bld: "BLD-003", svcs: ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-123","SVC-127"] },
-    { bld: "BLD-004", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-106","SVC-118","SVC-131","SVC-132","SVC-111","SVC-115","SVC-123","SVC-116"] },
+    { bld: "BLD-004", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-132","SVC-111","SVC-115","SVC-123","SVC-116","SVC-106"] },
     { bld: "BLD-005", svcs: ["SVC-108","SVC-102","SVC-118","SVC-131","SVC-123","SVC-115"] },
     { bld: "BLD-006", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-111","SVC-132","SVC-123"] },
     { bld: "BLD-007", svcs: ["SVC-108","SVC-102","SVC-105","SVC-131","SVC-118","SVC-127","SVC-123"] },
-    { bld: "BLD-008", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-106","SVC-118","SVC-131","SVC-132","SVC-111","SVC-115","SVC-123","SVC-116"] },
-    { bld: "BLD-009", svcs: ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-123"] },
+    { bld: "BLD-008", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-132","SVC-111","SVC-115","SVC-123","SVC-116","SVC-106","SVC-127"] },
+    { bld: "BLD-009", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-123","SVC-111","SVC-132","SVC-115","SVC-116","SVC-106","SVC-127","SVC-120"] },
     { bld: "BLD-010", svcs: ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-111","SVC-127","SVC-123","SVC-122"] },
-    { bld: "BLD-011", svcs: ["SVC-102","SVC-105","SVC-118","SVC-131","SVC-123"] },
-    { bld: "BLD-012", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-131","SVC-132","SVC-111","SVC-123","SVC-116"] },
-    { bld: "BLD-013", svcs: ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-123","SVC-127"] },
-    { bld: "BLD-014", svcs: ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-123"] },
+    { bld: "BLD-011", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-123","SVC-132","SVC-115"] },
+    { bld: "BLD-012", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-131","SVC-132","SVC-111","SVC-123","SVC-116","SVC-118","SVC-115","SVC-127"] },
+    { bld: "BLD-013", svcs: ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-123","SVC-127","SVC-104"] },
+    { bld: "BLD-014", svcs: ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-123","SVC-104"] },
     { bld: "BLD-015", svcs: ["SVC-108","SVC-102","SVC-105","SVC-131","SVC-127","SVC-123","SVC-091"] },
-    { bld: "BLD-016", svcs: ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-123","SVC-132"] },
-    { bld: "BLD-017", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-111","SVC-123","SVC-132","SVC-116"] },
+    { bld: "BLD-016", svcs: ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-123","SVC-132","SVC-104"] },
+    { bld: "BLD-017", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-111","SVC-123","SVC-132","SVC-116","SVC-115","SVC-106","SVC-127"] },
     { bld: "BLD-018", svcs: ["SVC-102","SVC-105","SVC-118","SVC-131","SVC-123","SVC-122"] },
-    { bld: "BLD-019", svcs: ["SVC-108","SVC-102","SVC-105","SVC-118","SVC-131","SVC-111","SVC-127","SVC-123"] },
-    { bld: "BLD-020", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-132","SVC-111","SVC-123","SVC-116"] },
-    { bld: "BLD-021", svcs: ["SVC-108","SVC-102","SVC-105","SVC-131","SVC-127","SVC-123","SVC-091"] },
+    { bld: "BLD-019", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-111","SVC-127","SVC-123"] },
+    { bld: "BLD-020", svcs: ["SVC-108","SVC-102","SVC-104","SVC-105","SVC-118","SVC-131","SVC-132","SVC-111","SVC-123","SVC-116","SVC-106","SVC-115","SVC-127"] },
+    { bld: "BLD-021", svcs: ["SVC-108","SVC-102","SVC-105","SVC-131","SVC-127","SVC-123","SVC-091","SVC-104"] },
   ];
 
   const descriptions = {
@@ -1355,6 +1396,7 @@ function generateLedgerEntries() {
     "SVC-116": ["Vervanging lampen", "Noodverlichting controle"],
     "SVC-122": ["Rioolreiniging", "Ontstopping collectief"],
     "SVC-091": ["Opbrengst zonnepanelen", "Saldering zonnepanelen"],
+    "SVC-120": ["Hydrofoor onderhoud", "Storingsdienst hydrofoor"],
   };
 
   const supplierMap = {
@@ -1373,73 +1415,79 @@ function generateLedgerEntries() {
     "SVC-116": "ISS Facility Services",
     "SVC-122": "Riool.nl (Rioned Groep)",
     "SVC-091": "",
+    "SVC-120": "Feenstra Verwarming B.V.",
   };
 
-  // Base monthly amounts per service (total for building, will scale by VHE)
   const baseAmounts = {
     "SVC-108": 185, "SVC-102": 45, "SVC-104": 65, "SVC-105": 65,
-    "SVC-106": 35, "SVC-118": 32, "SVC-131": 40, "SVC-132": 25,
-    "SVC-111": 18, "SVC-115": 22, "SVC-127": 28, "SVC-123": 22,
-    "SVC-116": 8, "SVC-122": 12, "SVC-091": -25,
+    "SVC-106": 35, "SVC-118": 55, "SVC-131": 120, "SVC-132": 35,
+    "SVC-111": 18, "SVC-115": 22, "SVC-127": 28, "SVC-123": 50,
+    "SVC-116": 8, "SVC-122": 12, "SVC-091": -25, "SVC-120": 12,
   };
 
-  // Generate Jan-Dec 2025 entries (we're in March 2026, so full year)
-  const months2025 = Array.from({ length: 12 }, (_, i) => i + 1);
+  // Generate 2024, 2025, and 2026 (Q1) ledger entries
+  const years = [
+    { year: 2024, months: Array.from({ length: 12 }, (_, i) => i + 1) },
+    { year: 2025, months: Array.from({ length: 12 }, (_, i) => i + 1) },
+    { year: 2026, months: Array.from({ length: 3 }, (_, i) => i + 1) },
+  ];
 
-  serviceBuildingMap.forEach(({ bld, svcs }) => {
-    const bldData = buildings.find(b => b.id === bld);
-    const vheCount = bldData ? bldData.vhe : 20;
+  years.forEach(({ year, months }) => {
+    serviceBuildingMap.forEach(({ bld, svcs }) => {
+      const bldData = buildings.find(b => b.id === bld);
+      const vheCount = bldData ? bldData.vhe : 20;
 
-    svcs.forEach(svc => {
-      const descs = descriptions[svc] || ["Maandbedrag"];
-      const supplier = supplierMap[svc] || "";
-      const baseAmt = baseAmounts[svc] || 30;
+      svcs.forEach(svc => {
+        const descs = descriptions[svc] || ["Maandbedrag"];
+        const supplier = supplierMap[svc] || "";
+        const baseAmt = baseAmounts[svc] || 30;
 
-      months2025.forEach(month => {
-        // Pick a description (cycle through available ones)
-        const desc = descs[(month - 1) % descs.length];
-        // Amount varies slightly per month (+/- 15%)
-        const variance = 0.85 + Math.random() * 0.3;
-        const amount = Math.round(baseAmt * vheCount * variance / 12 * 100) / 100;
-        const day = Math.min(28, 5 + Math.floor(Math.random() * 20));
-        const dateStr = `2025-${String(month).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
-        const invoiceRef = `INV-${String(month).padStart(2,"0")}${idx.toString().padStart(4,"0")}`;
+        months.forEach(month => {
+          const desc = descs[(month - 1) % descs.length];
+          const variance = 0.85 + Math.random() * 0.3;
+          const amount = Math.round(baseAmt * vheCount * variance / 12 * 100) / 100;
+          const day = Math.min(28, 5 + Math.floor(Math.random() * 20));
+          const dateStr = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+          const invoiceRef = `INV-${String(month).padStart(2, "0")}${idx.toString().padStart(4, "0")}`;
 
-        // Most entries booked, a few flagged or pending for recent months
-        let status = "booked";
-        if (month >= 11) {
-          const r = Math.random();
-          if (r < 0.15) status = "flagged";
-          else if (r < 0.30) status = "pending";
-        }
+          let status = "booked";
+          if (year === 2025 && month >= 11) {
+            const r = Math.random();
+            if (r < 0.15) status = "flagged";
+            else if (r < 0.30) status = "pending";
+          } else if (year === 2026) {
+            const r = Math.random();
+            if (r < 0.10) status = "flagged";
+            else if (r < 0.20) status = "pending";
+          }
 
-        // Flagged entries get a reason
-        let flag = null;
-        if (status === "flagged") {
-          const flags = [
-            { en: "Amount deviates >20% from budget", nl: "Bedrag wijkt >20% af van budget" },
-            { en: "Duplicate invoice suspected", nl: "Mogelijk dubbele factuur" },
-            { en: "Wrong cost center", nl: "Verkeerde kostenplaats" },
-            { en: "Missing supplier reference", nl: "Ontbrekende leveranciersreferentie" },
-          ];
-          flag = flags[Math.floor(Math.random() * flags.length)];
-        }
+          let flag = null;
+          if (status === "flagged") {
+            const flags = [
+              { en: "Amount deviates >20% from budget", nl: "Bedrag wijkt >20% af van budget" },
+              { en: "Duplicate invoice suspected", nl: "Mogelijk dubbele factuur" },
+              { en: "Wrong cost center", nl: "Verkeerde kostenplaats" },
+              { en: "Missing supplier reference", nl: "Ontbrekende leveranciersreferentie" },
+            ];
+            flag = flags[Math.floor(Math.random() * flags.length)];
+          }
 
-        entries.push({
-          id: `LED-${String(idx).padStart(5,"0")}`,
-          serviceId: svc,
-          buildingId: bld,
-          year: 2025,
-          month,
-          date: dateStr,
-          description: desc,
-          supplier,
-          invoiceRef,
-          amount,
-          status,
-          flag,
+          entries.push({
+            id: `LED-${String(idx).padStart(5, "0")}`,
+            serviceId: svc,
+            buildingId: bld,
+            year,
+            month,
+            date: dateStr,
+            description: desc,
+            supplier,
+            invoiceRef,
+            amount,
+            status,
+            flag,
+          });
+          idx++;
         });
-        idx++;
       });
     });
   });

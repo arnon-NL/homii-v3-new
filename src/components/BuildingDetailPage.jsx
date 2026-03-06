@@ -35,6 +35,7 @@ import {
   getSettlementChecks,
   serviceCategories,
   getLedgerSummaryByBuilding,
+  meters,
 } from "@/lib/mockData";
 
 /* ── Category icon + color config ── */
@@ -52,6 +53,7 @@ import {
   Ban,
   ShieldCheck,
   Flag,
+  Lock,
 } from "lucide-react";
 import { t, useLang } from "@/lib/i18n";
 import Breadcrumbs from "./Breadcrumbs";
@@ -254,9 +256,6 @@ export default function BuildingDetailPage() {
   );
 
   // Derived KPIs
-  const totalBudget = bsRelations.reduce((s, bs) => s + bs.budget, 0);
-  const totalActual = bsRelations.reduce((s, bs) => s + bs.actual, 0);
-  const variance = totalBudget - totalActual;
   const avgCompleteness =
     bsRelations.length > 0
       ? Math.round(
@@ -368,62 +367,6 @@ export default function BuildingDetailPage() {
               {/* ═══ OVERVIEW TAB ═══ */}
               <TabsContent value="overview">
                 <div className="mt-4 space-y-4">
-                  {/* KPI cards */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                    <KpiCard
-                      label={t("budgetProgress", lang)}
-                      value={fmt(totalBudget)}
-                      sub={`${t("actual", lang)}: ${fmt(totalActual)}`}
-                      icon={Activity}
-                      color={brand.navy}
-                    />
-                    <KpiCard
-                      label={t("variance", lang)}
-                      value={fmt(variance)}
-                      sub={
-                        variance >= 0
-                          ? t("underBudget", lang)
-                          : t("overBudget", lang)
-                      }
-                      icon={Activity}
-                      color={variance >= 0 ? brand.green : brand.red}
-                    />
-                    {isPastYear && settlement ? (
-                      <KpiCard
-                        label={t("settlementReadiness", lang)}
-                        value={
-                          settlement.netResult != null
-                            ? (settlement.netResult >= 0 ? "+" : "") + fmt(settlement.netResult)
-                            : "—"
-                        }
-                        sub={settlementStatusConfig[settlement.status]?.label[lang]}
-                        icon={settlementStatusConfig[settlement.status]?.icon || Circle}
-                        color={settlementStatusConfig[settlement.status]?.color}
-                      />
-                    ) : (
-                      <KpiCard
-                        label={t("settlementReadiness", lang)}
-                        value={`${avgCompleteness}%`}
-                        sub={`${completeCount}/${bsRelations.length} ${t("services", lang).toLowerCase()}`}
-                        icon={CheckCircle2}
-                        color={
-                          avgCompleteness >= 100
-                            ? brand.green
-                            : avgCompleteness >= 75
-                            ? brand.amber
-                            : brand.red
-                        }
-                      />
-                    )}
-                    <KpiCard
-                      label={t("activeServices", lang)}
-                      value={bsRelations.length}
-                      sub={`${mainMeters.length} ${t("mainMeters", lang).toLowerCase()}`}
-                      icon={Wrench}
-                      color={brand.blue}
-                    />
-                  </div>
-
                   {/* Alerts */}
                   {activityList
                     .filter((a) => a.type === "alert")
@@ -577,77 +520,6 @@ export default function BuildingDetailPage() {
                             </>
                           );
                         })()}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* ── Te verdelen componenten (cost components to distribute) ── */}
-                  <Card className="border-slate-200 bg-white">
-                    <CardContent className="p-5">
-                      <h3 className="text-[13px] font-semibold text-slate-600 mb-3">
-                        {lang === "nl" ? "Te verdelen componenten" : "Cost Components"}
-                      </h3>
-                      <div className="space-y-3">
-                        {/* Variable costs */}
-                        <div>
-                          <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
-                            {lang === "nl" ? "Variabele kosten" : "Variable costs"}
-                          </div>
-                          <div className="space-y-1.5">
-                            {bsRelations.filter(bs => {
-                              const svc = getService(bs.serviceId);
-                              return svc?.variable;
-                            }).map(bs => {
-                              const svc = getService(bs.serviceId);
-                              return (
-                                <div key={bs.id} className="flex items-center justify-between gap-3">
-                                  <span className="text-[12px] text-slate-600 truncate">{svc?.name[lang] || svc?.name.en}</span>
-                                  <div className="flex items-center gap-4 shrink-0">
-                                    <span className="text-[12px] tabular-nums text-slate-500">{fmt(bs.actual)} / {fmt(bs.budget)}</span>
-                                    <span className={`text-[11px] tabular-nums font-medium ${bs.actual <= bs.budget ? "text-emerald-600" : "text-red-500"}`}>
-                                      {bs.actual <= bs.budget ? "−" : "+"}{fmt(Math.abs(bs.budget - bs.actual))}
-                                    </span>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                        {/* Fixed / shared costs */}
-                        <div>
-                          <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
-                            {lang === "nl" ? "Gedeelde & vaste kosten" : "Shared & fixed costs"}
-                          </div>
-                          <div className="space-y-1.5">
-                            {bsRelations.filter(bs => {
-                              const svc = getService(bs.serviceId);
-                              return !svc?.variable;
-                            }).map(bs => {
-                              const svc = getService(bs.serviceId);
-                              return (
-                                <div key={bs.id} className="flex items-center justify-between gap-3">
-                                  <span className="text-[12px] text-slate-600 truncate">{svc?.name[lang] || svc?.name.en}</span>
-                                  <div className="flex items-center gap-4 shrink-0">
-                                    <span className="text-[12px] tabular-nums text-slate-500">{fmt(bs.actual)} / {fmt(bs.budget)}</span>
-                                    <span className={`text-[11px] tabular-nums font-medium ${bs.actual <= bs.budget ? "text-emerald-600" : "text-red-500"}`}>
-                                      {bs.actual <= bs.budget ? "−" : "+"}{fmt(Math.abs(bs.budget - bs.actual))}
-                                    </span>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                        {/* Total */}
-                        <div className="pt-2 border-t border-slate-200 flex items-center justify-between">
-                          <span className="text-[12px] font-semibold text-slate-700">{lang === "nl" ? "Totaal" : "Total"}</span>
-                          <div className="flex items-center gap-4">
-                            <span className="text-[13px] tabular-nums font-bold" style={{ color: brand.navy }}>{fmt(totalActual)} / {fmt(totalBudget)}</span>
-                            <span className={`text-[12px] tabular-nums font-bold ${variance >= 0 ? "text-emerald-600" : "text-red-500"}`}>
-                              {variance >= 0 ? "−" : "+"}{fmt(Math.abs(variance))}
-                            </span>
-                          </div>
-                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -817,6 +689,7 @@ export default function BuildingDetailPage() {
                               <tbody className="divide-y divide-slate-100">
                                 {group.items.map((bs) => {
                                   const v = bs.budget - bs.actual;
+                                  const ledger = ledgerByService[bs.serviceId];
                                   return (
                                     <tr
                                       key={bs.id}
@@ -831,11 +704,31 @@ export default function BuildingDetailPage() {
                                         </span>
                                       </td>
                                       <td className="px-3 sm:px-4 py-2.5">
-                                        <div
-                                          className="text-[13px] font-medium"
-                                          style={{ color: brand.navy }}
-                                        >
-                                          {bs.service?.name[lang] || bs.serviceId}
+                                        <div className="flex items-center gap-2">
+                                          <div
+                                            className="text-[13px] font-medium"
+                                            style={{ color: brand.navy }}
+                                          >
+                                            {bs.service?.name[lang] || bs.serviceId}
+                                          </div>
+                                          {isPastYear && settlement && (settlement.status === "distributed" || settlement.status === "approved") && (
+                                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-slate-100 text-slate-600">
+                                              <Lock size={8} />
+                                              {t("locked", lang)}
+                                            </span>
+                                          )}
+                                          {ledger?.flagged > 0 && (
+                                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-red-50 text-red-600">
+                                              <AlertTriangle size={8} />
+                                              {ledger.flagged}
+                                            </span>
+                                          )}
+                                          {ledger?.pending > 0 && (
+                                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-semibold bg-amber-50 text-amber-600">
+                                              <Clock size={8} />
+                                              {ledger.pending}
+                                            </span>
+                                          )}
                                         </div>
                                       </td>
                                       <td className="px-3 sm:px-4 py-2.5">
@@ -1187,6 +1080,37 @@ export default function BuildingDetailPage() {
                                                   ? `${t("teruggave", lang)}: +${fmt(totalNet)}`
                                                   : `${t("naheffing", lang)}: ${fmt(totalNet)}`}
                                               </span>
+                                            </div>
+                                          </div>
+                                        );
+                                      })()}
+
+                                      {/* Submeters */}
+                                      {(() => {
+                                        const vheMeters = meters.filter(m => m.vheId === v.id && m.type === "sub");
+                                        if (vheMeters.length === 0) return null;
+                                        return (
+                                          <div className="mt-3 pt-3 border-t border-slate-100">
+                                            <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                                              {lang === "nl" ? "Submeters" : "Submeters"}
+                                            </div>
+                                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                              {vheMeters.map(meter => {
+                                                const reading = meter.readings?.[year];
+                                                const utilityLabels = { heat: { en: "Heat", nl: "Warmte" }, water: { en: "Water", nl: "Water" }, warmWater: { en: "Hot Water", nl: "Warm water" }, electricity: { en: "Electricity", nl: "Elektra" } };
+                                                const label = utilityLabels[meter.utility]?.[lang] || meter.utility;
+                                                return (
+                                                  <div key={meter.id} className="bg-slate-50 rounded-lg px-3 py-2">
+                                                    <div className="text-[10px] text-slate-400 uppercase">{label}</div>
+                                                    <div className="text-[13px] font-semibold tabular-nums" style={{ color: brand.navy }}>
+                                                      {reading ? `${reading.consumption?.toFixed(1)} ${meter.unit}` : "—"}
+                                                    </div>
+                                                    <div className="text-[10px] text-slate-400">
+                                                      {reading ? `${reading.start?.toFixed(1)} → ${reading.end?.toFixed(1)}` : lang === "nl" ? "Geen stand" : "No reading"}
+                                                    </div>
+                                                  </div>
+                                                );
+                                              })}
                                             </div>
                                           </div>
                                         );

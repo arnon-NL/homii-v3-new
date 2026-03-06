@@ -93,6 +93,17 @@ const dict = {
   meterHealth:       { en: "Meter Health",     nl: "Meterstatus" },
   readingsUpToDate:  { en: "Readings up to date", nl: "Standen actueel" },
   readingsOverdue:   { en: "Readings overdue", nl: "Standen verlopen" },
+  submeter:          { en: "Submeter",         nl: "Submeter" },
+  submeters:         { en: "Submeters",        nl: "Submeters" },
+  mainMeter:         { en: "Main Meter",       nl: "Hoofdmeter" },
+  meterReading:      { en: "Meter Reading",    nl: "Meterstand" },
+  noReading:         { en: "No reading",       nl: "Geen stand" },
+  heat:              { en: "Heat",             nl: "Warmte" },
+  water:             { en: "Water",            nl: "Water" },
+  warmWater:         { en: "Hot Water",        nl: "Warm water" },
+  electricity:       { en: "Electricity",      nl: "Elektra" },
+  locked:            { en: "Locked",           nl: "Vergrendeld" },
+  historical:        { en: "Historical",       nl: "Historisch" },
 
   // Supplier list columns
   supplier:          { en: "Supplier",            nl: "Leverancier" },
