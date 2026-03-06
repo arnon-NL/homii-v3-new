@@ -8,6 +8,7 @@ import PlaceholderPage from "./PlaceholderPage";
 import BuildingListPage from "./BuildingListPage";
 import ServiceListPage from "./ServiceListPage";
 import BuildingDetailPage from "./BuildingDetailPage";
+import SupplierListPage from "./SupplierListPage";
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -109,10 +110,8 @@ export default function App() {
             />
             <Route path="/services" element={<ServiceListPage />} />
             <Route path="/services/:serviceId" element={<PlaceholderPage title={t("servicesTitle", lang)} />} />
-            <Route
-              path="/suppliers"
-              element={<PlaceholderPage title={t("suppliersTitle", lang)} />}
-            />
+            <Route path="/suppliers" element={<SupplierListPage />} />
+            <Route path="/suppliers/:supplierId" element={<PlaceholderPage title={t("suppliersTitle", lang)} />} />
             <Route
               path="/meters"
               element={<PlaceholderPage title={t("metersTitle", lang)} />}

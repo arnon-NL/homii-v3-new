@@ -15,6 +15,9 @@ import {
   Send,
   Circle,
   LayoutGrid,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import { buildings, getSettlementsByYear, getView } from "@/lib/mockData";
@@ -122,32 +125,6 @@ function NetResult({ value, lang }) {
   );
 }
 
-/* ── Year picker ── */
-const currentYear = new Date().getFullYear();
-const availableYears = [currentYear - 2, currentYear - 1, currentYear];
-
-function YearPicker({ year, setYear, disabled }) {
-  return (
-    <div className="inline-flex items-center rounded-lg bg-slate-100 p-0.5">
-      {availableYears.map((y) => (
-        <button
-          key={y}
-          onClick={() => !disabled && setYear(y)}
-          className={`px-3 h-7 rounded-md text-xs font-medium tabular-nums transition-all ${
-            year === y
-              ? "bg-white text-slate-900 shadow-sm"
-              : disabled
-              ? "text-slate-300 cursor-not-allowed"
-              : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          {y}
-        </button>
-      ))}
-    </div>
-  );
-}
-
 /* ── Data quality filter options ── */
 const qualityFilters = [
   { value: "all",     label: { en: "All",     nl: "Alle" } },
@@ -156,28 +133,32 @@ const qualityFilters = [
   { value: "error",   label: { en: "Error",   nl: "Fout" } },
 ];
 
+/* ── Utility filter options ── */
+const utilityFilterOptions = [
+  { value: "heat",        label: { en: "Heat",       nl: "Warmte" },     icon: Flame,      color: "#EF4444" },
+  { value: "water",       label: { en: "Water",      nl: "Water" },      icon: Droplets,   color: "#3B82F6" },
+  { value: "warmWater",   label: { en: "Warm water", nl: "Warm water" }, icon: ShowerHead,  color: "#F59E0B" },
+  { value: "electricity", label: { en: "Electricity",nl: "Elektriciteit"},icon: Zap,        color: "#8B5CF6" },
+];
+
 /* ── Column definitions ── */
 const allColumns = {
-  complex:          { align: "left" },
-  complexId:        { align: "left" },
-  location:         { align: "left" },
-  vhe:              { align: "right" },
-  components:       { align: "right" },
-  utilities:        { align: "left" },
-  budgetProgress:   { align: "left" },
-  settlementStatus: { align: "center", label: { en: "Settlement", nl: "Afrekening" } },
-  netResult:        { align: "right",  label: { en: "Net Result", nl: "Netto Resultaat" } },
-  dataQuality:      { align: "center" },
+  complex:          { align: "left",   sortable: false },
+  complexId:        { align: "left",   sortable: false },
+  location:         { align: "left",   sortable: false },
+  vhe:              { align: "right",  sortable: true },
+  components:       { align: "right",  sortable: true },
+  utilities:        { align: "left",   sortable: true, sortKey: "utilityCount" },
+  budgetProgress:   { align: "left",   sortable: false },
+  settlementStatus: { align: "center", sortable: false, label: { en: "Settlement", nl: "Afrekening" } },
+  netResult:        { align: "right",  sortable: false, label: { en: "Net Result", nl: "Netto Resultaat" } },
+  dataQuality:      { align: "center", sortable: false },
 };
 
-/* ── Default columns (no view active) — year-aware ── */
-function getDefaultColumns(isPastYear) {
-  return [
-    "complex", "complexId", "location", "vhe", "components", "utilities",
-    ...(isPastYear ? ["settlementStatus", "netResult"] : ["budgetProgress"]),
-    "dataQuality",
-  ];
-}
+/* ── Default columns for Complexes (no view) — core object attributes only ── */
+const defaultComplexColumns = [
+  "complex", "complexId", "location", "vhe", "components", "utilities", "dataQuality",
+];
 
 /* ── Main component ── */
 export default function BuildingListPage() {
@@ -186,33 +167,39 @@ export default function BuildingListPage() {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const [qualityFilter, setQualityFilter] = useState("all");
+  const [utilityFilters, setUtilityFilters] = useState([]);
   const [settlementFilter, setSettlementFilter] = useState("all");
+  const [sortCol, setSortCol] = useState(null); // null | "vhe" | "components" | "utilityCount"
+  const [sortDir, setSortDir] = useState("desc"); // "asc" | "desc"
 
   // Resolve active view from URL
   const viewId = searchParams.get("view");
   const activeView = viewId ? getView(viewId) : null;
 
-  // Year: locked by view or user-controlled
-  const [userYear, setUserYear] = useState(currentYear);
-  const year = activeView?.year ?? userYear;
-  const yearLocked = activeView?.year != null;
+  // Views can lock a year (settlement views)
+  const isViewWithYear = activeView?.year != null;
+  const year = activeView?.year ?? null;
+  const currentYear = new Date().getFullYear();
+  const isPastYear = year != null && year < currentYear;
 
-  const isPastYear = year < currentYear;
-  const settlements = useMemo(() => getSettlementsByYear(year), [year]);
+  const settlements = useMemo(() => {
+    if (year == null) return [];
+    return getSettlementsByYear(year);
+  }, [year]);
 
   // Resolve which columns to show
   const visibleColumns = useMemo(() => {
     if (activeView?.columns?.length) return activeView.columns;
-    return getDefaultColumns(isPastYear);
-  }, [activeView, isPastYear]);
+    return defaultComplexColumns;
+  }, [activeView]);
 
   // Build enriched list: building + settlement for selected year
   const enriched = useMemo(() => {
     return buildings.map((b) => {
-      const stl = settlements.find((s) => s.buildingId === b.id);
-      return { ...b, settlement: stl };
+      const stl = year != null ? settlements.find((s) => s.buildingId === b.id) : null;
+      return { ...b, settlement: stl, utilityCount: b.utilities.length };
     });
-  }, [settlements]);
+  }, [settlements, year]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -224,18 +211,32 @@ export default function BuildingListPage() {
         b.location.toLowerCase().includes(q);
       const matchQuality =
         qualityFilter === "all" || b.dataQuality === qualityFilter;
+      const matchUtility =
+        utilityFilters.length === 0 ||
+        utilityFilters.every((u) => b.utilities.includes(u));
       const matchSettlement =
         !isPastYear ||
         settlementFilter === "all" ||
         b.settlement?.status === settlementFilter;
-      return matchSearch && matchQuality && matchSettlement;
+      return matchSearch && matchQuality && matchUtility && matchSettlement;
     });
-  }, [search, qualityFilter, enriched, isPastYear, settlementFilter]);
+  }, [search, qualityFilter, utilityFilters, enriched, isPastYear, settlementFilter]);
+
+  // Sort
+  const sorted = useMemo(() => {
+    if (!sortCol) return filtered;
+    const key = sortCol;
+    return [...filtered].sort((a, b) => {
+      const av = a[key] ?? 0;
+      const bv = b[key] ?? 0;
+      return sortDir === "asc" ? av - bv : bv - av;
+    });
+  }, [filtered, sortCol, sortDir]);
 
   // Settlement summary counts for past year
   const settlementSummary = useMemo(() => {
     if (!isPastYear) return null;
-    const counts = { not_started: 0, in_review: 0, approved: 0, distributed: 0 };
+    const counts = { not_started: 0, monitoring: 0, in_review: 0, approved: 0, distributed: 0 };
     settlements.forEach((s) => {
       if (counts[s.status] !== undefined) counts[s.status]++;
     });
@@ -243,12 +244,31 @@ export default function BuildingListPage() {
   }, [settlements, isPastYear]);
 
   const showSettlement = visibleColumns.includes("settlementStatus");
-  const showBudget = visibleColumns.includes("budgetProgress");
 
   // Page title: view name or default
   const pageTitle = activeView
     ? (activeView.name[lang] || activeView.name.en)
     : t("buildingsTitle", lang);
+
+  // Toggle sort on a column
+  function handleSort(colKey) {
+    const col = allColumns[colKey];
+    if (!col?.sortable) return;
+    const key = col.sortKey || colKey;
+    if (sortCol === key) {
+      setSortDir(sortDir === "asc" ? "desc" : "asc");
+    } else {
+      setSortCol(key);
+      setSortDir("desc");
+    }
+  }
+
+  // Toggle utility filter
+  function toggleUtility(u) {
+    setUtilityFilters((prev) =>
+      prev.includes(u) ? prev.filter((x) => x !== u) : [...prev, u]
+    );
+  }
 
   /* ── Cell renderer ── */
   function renderCell(col, b) {
@@ -325,11 +345,23 @@ export default function BuildingListPage() {
     }
   }
 
+  /* ── Sort icon helper ── */
+  function SortIcon({ colKey }) {
+    const col = allColumns[colKey];
+    if (!col?.sortable) return null;
+    const key = col.sortKey || colKey;
+    const isActive = sortCol === key;
+    if (!isActive) return <ArrowUpDown size={10} className="ml-1 text-slate-300" />;
+    return sortDir === "asc"
+      ? <ArrowUp size={10} className="ml-1 text-slate-600" />
+      : <ArrowDown size={10} className="ml-1 text-slate-600" />;
+  }
+
   return (
     <div className="flex-1 overflow-y-auto">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
 
-        {/* Title + view badge + year + count */}
+        {/* Title + view badge + count */}
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-baseline gap-2.5">
             <h1 className="text-xl font-semibold" style={{ color: brand.navy }}>
@@ -341,12 +373,17 @@ export default function BuildingListPage() {
                 {lang === "nl" ? "Weergave" : "View"}
               </span>
             )}
-            <span className="text-sm text-slate-400">{filtered.length}</span>
+            <span className="text-sm text-slate-400">{sorted.length}</span>
           </div>
-          <YearPicker year={year} setYear={setUserYear} disabled={yearLocked} />
+          {/* Year badge for settlement views */}
+          {isViewWithYear && (
+            <span className="inline-flex items-center px-3 py-1 rounded-lg bg-slate-100 text-sm font-semibold tabular-nums text-slate-600">
+              {year}
+            </span>
+          )}
         </div>
 
-        {/* Settlement summary bar (past year only) */}
+        {/* Settlement summary bar (past year view only) */}
         {isPastYear && settlementSummary && showSettlement && (
           <div className="flex flex-wrap items-center gap-2 mb-4 p-3 rounded-lg bg-slate-50 border border-slate-200">
             <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mr-2">
@@ -354,6 +391,7 @@ export default function BuildingListPage() {
             </span>
             {Object.entries(settlementSummary).map(([status, count]) => {
               const cfg = settlementConfig[status];
+              if (!cfg) return null;
               const Icon = cfg.icon;
               const isActive = settlementFilter === status;
               return (
@@ -415,14 +453,42 @@ export default function BuildingListPage() {
               </button>
             ))}
           </div>
+
+          {/* Utility filter (only on default complexes view, not settlement views) */}
+          {!isViewWithYear && (
+            <div className="flex items-center gap-1">
+              {utilityFilterOptions.map((u) => {
+                const Icon = u.icon;
+                const isActive = utilityFilters.includes(u.value);
+                return (
+                  <button
+                    key={u.value}
+                    onClick={() => toggleUtility(u.value)}
+                    className={`w-7 h-7 rounded-md flex items-center justify-center transition-all ${
+                      isActive
+                        ? "ring-2 ring-offset-1 shadow-sm"
+                        : "hover:bg-slate-100"
+                    }`}
+                    style={{
+                      background: isActive ? u.color + "15" : "transparent",
+                      ringColor: isActive ? u.color : undefined,
+                    }}
+                    title={u.label[lang] || u.label.en}
+                  >
+                    <Icon size={14} style={{ color: isActive ? u.color : "#94A3B8" }} />
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* ── Mobile card view ── */}
         <div className="block md:hidden space-y-3">
-          {filtered.map((b) => (
+          {sorted.map((b) => (
             <button
               key={b.id}
-              onClick={() => navigate(`/buildings/${b.id}`)}
+              onClick={() => navigate(`/buildings/${b.id}${isViewWithYear ? `?year=${year}` : ""}`)}
               className="w-full text-left rounded-lg border border-slate-200 bg-white p-4 hover:border-[#3EB1C8] hover:shadow-md transition-all"
             >
               <div className="flex items-start justify-between mb-2">
@@ -456,14 +522,11 @@ export default function BuildingListPage() {
                   <NetResult value={b.settlement.netResult} lang={lang} />
                 </div>
               ) : (
-                <div className="flex items-center justify-between gap-3">
-                  <UtilityIcons utilities={b.utilities} lang={lang} />
-                  <BudgetBar spent={b.budgetSpent} total={b.budgetTotal} />
-                </div>
+                <UtilityIcons utilities={b.utilities} lang={lang} />
               )}
             </button>
           ))}
-          {filtered.length === 0 && (
+          {sorted.length === 0 && (
             <div className="px-4 py-8 text-center text-sm text-slate-400">
               {t("noResults", lang)}
             </div>
@@ -477,28 +540,35 @@ export default function BuildingListPage() {
               <tr className="border-b border-slate-200 bg-slate-50/80">
                 {visibleColumns.map((colKey) => {
                   const col = allColumns[colKey] || { align: "left" };
+                  const isSortable = col.sortable;
                   return (
                     <th
                       key={colKey}
-                      className={`text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 sm:px-4 py-2.5 text-${col.align} whitespace-nowrap`}
+                      className={`text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 sm:px-4 py-2.5 text-${col.align} whitespace-nowrap ${
+                        isSortable ? "cursor-pointer select-none hover:text-slate-700" : ""
+                      }`}
+                      onClick={() => handleSort(colKey)}
                     >
-                      {col.label ? (col.label[lang] || col.label.en) : t(colKey, lang)}
+                      <span className="inline-flex items-center">
+                        {col.label ? (col.label[lang] || col.label.en) : t(colKey, lang)}
+                        {isSortable && <SortIcon colKey={colKey} />}
+                      </span>
                     </th>
                   );
                 })}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filtered.map((b) => (
+              {sorted.map((b) => (
                 <tr
                   key={b.id}
                   className="hover:bg-slate-50/80 transition-colors cursor-pointer"
-                  onClick={() => navigate(`/buildings/${b.id}`)}
+                  onClick={() => navigate(`/buildings/${b.id}${isViewWithYear ? `?year=${year}` : ""}`)}
                 >
                   {visibleColumns.map((colKey) => renderCell(colKey, b))}
                 </tr>
               ))}
-              {filtered.length === 0 && (
+              {sorted.length === 0 && (
                 <tr>
                   <td
                     colSpan={visibleColumns.length}

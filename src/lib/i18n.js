@@ -95,6 +95,16 @@ const dict = {
   readingsUpToDate:  { en: "Readings up to date", nl: "Standen actueel" },
   readingsOverdue:   { en: "Readings overdue", nl: "Standen verlopen" },
 
+  // Supplier list columns
+  supplier:          { en: "Supplier",            nl: "Leverancier" },
+  supplierServices:  { en: "Services",            nl: "Diensten" },
+  annualSpend:       { en: "Annual Spend",        nl: "Jaaromzet" },
+  rating:            { en: "Rating",              nl: "Beoordeling" },
+  contractEnd:       { en: "Contract End",        nl: "Contracteinde" },
+  city:              { en: "City",                nl: "Plaats" },
+  kvk:               { en: "KVK",                 nl: "KVK" },
+  contactPerson:     { en: "Contact",             nl: "Contactpersoon" },
+
   // Boolean labels
   yes:               { en: "Yes",          nl: "Ja" },
   no:                { en: "No",           nl: "Nee" },
