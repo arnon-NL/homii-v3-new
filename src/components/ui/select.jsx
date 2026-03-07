@@ -25,7 +25,7 @@ function SelectTrigger({ className, children }) {
   }, [ctx.open]);
   return (
     <button ref={ref} type="button" onClick={() => ctx.setOpen(!ctx.open)}
-      className={cn("flex h-10 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50", className)}>
+      className={cn("flex h-10 items-center justify-between rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50", className)}>
       {children}
       <svg className="ml-2 h-4 w-4 opacity-50 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -43,7 +43,7 @@ function SelectContent({ className, children }) {
   const ctx = React.useContext(SelectContext);
   if (!ctx.open) return null;
   return (
-    <div className={cn("absolute z-50 mt-1 min-w-[8rem] w-full overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95", className)}>
+    <div className={cn("absolute z-50 mt-1 min-w-[8rem] w-full overflow-hidden rounded-lg border bg-popover text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95", className)}>
       <div className="p-1 max-h-60 overflow-auto">{children}</div>
     </div>
   );
@@ -58,7 +58,7 @@ function SelectItem({ value, className, children }) {
   }, [children, value]);
   return (
     <div onClick={() => { ctx.onValueChange(value); ctx.setOpen(false); }}
-      className={cn("relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground", isSelected && "bg-accent text-accent-foreground", className)}>
+      className={cn("relative flex w-full cursor-pointer select-none items-center rounded-lg py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground", isSelected && "bg-accent text-accent-foreground", className)}>
       {isSelected && (
         <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

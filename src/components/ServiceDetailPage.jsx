@@ -48,7 +48,7 @@ const fmtDate = (d) => {
 
 /* ── Status config ── */
 const statusConfig = {
-  booked:  { color: brand.green, bg: "#F0FDF4", label: { en: "Booked", nl: "Geboekt" }, icon: CheckCircle2 },
+  booked:  { color: brand.blue, bg: "#F0FAFB", label: { en: "Booked", nl: "Geboekt" }, icon: CheckCircle2 },
   pending: { color: brand.amber, bg: "#FFFBEB", label: { en: "Pending", nl: "In afwachting" }, icon: Clock },
   flagged: { color: brand.red, bg: "#FEF2F2", label: { en: "Flagged", nl: "Gemarkeerd" }, icon: AlertTriangle },
 };
@@ -60,7 +60,7 @@ function LedgerStatusBadge({ status }) {
   const lang = useLang();
   return (
     <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium"
+      className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium"
       style={{ background: cfg.bg, color: cfg.color }}
     >
       <Icon size={10} />
@@ -86,15 +86,15 @@ function MonthlyBarChart({ entries, budgetPerMonth }) {
         const h = maxVal > 0 ? (val / maxVal) * 44 : 0;
         const overBudget = budgetPerMonth && val > budgetPerMonth * 1.15;
         return (
-          <div key={i} className="flex flex-col items-center gap-0.5" style={{ width: 18 }}>
+          <div key={i} className="flex flex-col items-center gap-1" style={{ width: 18 }}>
             <div
-              className="w-3 rounded-sm transition-all"
+              className="w-3 rounded-lg transition-colors"
               style={{
                 height: Math.max(2, h),
                 background: overBudget ? brand.red : val > 0 ? brand.blue : "#E2E8F0",
               }}
             />
-            <span className="text-[8px] text-slate-400">{monthLabels[i]}</span>
+            <span className="text-[11px] text-slate-400">{monthLabels[i]}</span>
           </div>
         );
       })}
@@ -195,7 +195,7 @@ export default function ServiceDetailPage() {
               <span className="text-[11px] font-mono text-slate-400">{service.code}</span>
               {category && (
                 <span
-                  className="text-[10px] font-medium px-1.5 py-0.5 rounded-full"
+                  className="text-[11px] font-medium px-2 py-1 rounded-full"
                   style={{ background: "#F1F5F9", color: brand.subtle }}
                 >
                   {category.label[lang]}
@@ -207,8 +207,8 @@ export default function ServiceDetailPage() {
             </h1>
           </div>
           <div
-            className="px-3 py-1 rounded-full text-[12px] font-semibold"
-            style={{ background: "#EFF6FF", color: brand.navy }}
+            className="px-3 py-1 rounded-full text-xs font-semibold"
+            style={{ background: "#F8FAFC", color: brand.navy }}
           >
             {year}
           </div>
@@ -227,25 +227,25 @@ export default function ServiceDetailPage() {
               label: { en: "Variance", nl: "Afwijking" },
               value: fmtEur(totalBooked - totalBudget),
               sub: `${totalBudget > 0 ? (((totalBooked - totalBudget) / totalBudget) * 100).toFixed(1) : 0}%`,
-              color: totalBooked > totalBudget ? brand.red : brand.green,
+              color: totalBooked > totalBudget ? brand.red : brand.blue,
             },
             {
               label: { en: "Completeness", nl: "Volledigheid" },
               value: `${completeness}%`,
               sub: `${allEntries.length} ${lang === "nl" ? "boekingen" : "entries"}`,
-              color: completeness >= 90 ? brand.green : completeness >= 70 ? brand.amber : brand.red,
+              color: completeness >= 90 ? brand.blue : completeness >= 70 ? brand.amber : brand.red,
             },
             {
               label: { en: "Flagged", nl: "Gemarkeerd" },
               value: totalFlagged,
               sub: lang === "nl" ? "Vereist actie" : "Needs action",
-              color: totalFlagged > 0 ? brand.red : brand.green,
+              color: totalFlagged > 0 ? brand.red : brand.blue,
             },
             {
               label: { en: "Pending", nl: "In afwachting" },
               value: totalPending,
               sub: lang === "nl" ? "Nog te boeken" : "Awaiting booking",
-              color: totalPending > 0 ? brand.amber : brand.green,
+              color: totalPending > 0 ? brand.amber : brand.blue,
             },
           ].map((card, i) => (
             <div
@@ -256,7 +256,7 @@ export default function ServiceDetailPage() {
                 {card.label[lang]}
               </div>
               <div
-                className="text-[18px] font-bold tabular-nums"
+                className="text-base font-semibold tabular-nums"
                 style={{ color: card.color }}
               >
                 {card.value}
@@ -270,7 +270,7 @@ export default function ServiceDetailPage() {
         <div className="rounded-lg border border-slate-200 bg-white p-4 mb-6">
           <div className="flex items-center gap-2 mb-3">
             <BarChart3 size={14} className="text-slate-400" />
-            <span className="text-[13px] font-semibold" style={{ color: brand.navy }}>
+            <span className="text-sm font-semibold" style={{ color: brand.navy }}>
               {lang === "nl" ? "Maandoverzicht alle complexen" : "Monthly Overview All Complexes"}
             </span>
           </div>
@@ -289,7 +289,7 @@ export default function ServiceDetailPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={`${t("search", lang)} ${lang === "nl" ? "complexen" : "complexes"}...`}
-              className="w-full h-8 pl-8 pr-3 text-sm rounded-lg border border-slate-200 bg-white text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#3EB1C8]/30 focus:border-[#3EB1C8] transition-all"
+              className="w-full h-8 pl-8 pr-3 text-sm rounded-lg border border-slate-200 bg-white text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#3EB1C8]/30 focus:border-[#3EB1C8] transition-colors"
             />
           </div>
 
@@ -303,7 +303,7 @@ export default function ServiceDetailPage() {
               <button
                 key={f.value}
                 onClick={() => setStatusFilter(f.value)}
-                className={`px-3 h-7 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+                className={`px-3 h-7 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
                   statusFilter === f.value
                     ? "bg-white text-slate-900 shadow-sm"
                     : "text-slate-500 hover:text-slate-700"
@@ -314,7 +314,7 @@ export default function ServiceDetailPage() {
             ))}
           </div>
 
-          <span className="text-[12px] text-slate-400 ml-auto">
+          <span className="text-xs text-slate-400 ml-auto">
             {buildingRows.length} {lang === "nl" ? "complexen" : "complexes"}
           </span>
         </div>
@@ -333,7 +333,7 @@ export default function ServiceDetailPage() {
             return (
               <div
                 key={row.building.id}
-                className="rounded-lg border bg-white overflow-hidden transition-all"
+                className="rounded-lg border bg-white overflow-hidden transition-colors"
                 style={{
                   borderColor: hasIssues ? "#FDE68A" : "#E2E8F0",
                 }}
@@ -358,7 +358,7 @@ export default function ServiceDetailPage() {
                     <div className="flex items-center gap-2">
                       <Building2 size={12} className="text-slate-400 shrink-0" />
                       <span
-                        className="text-[13px] font-medium truncate"
+                        className="text-sm font-medium truncate"
                         style={{ color: brand.navy }}
                       >
                         {row.building.complex}
@@ -391,12 +391,12 @@ export default function ServiceDetailPage() {
 
                   {/* Amounts */}
                   <div className="text-right shrink-0">
-                    <div className="text-[13px] font-semibold tabular-nums" style={{ color: brand.navy }}>
+                    <div className="text-sm font-semibold tabular-nums" style={{ color: brand.navy }}>
                       {fmtEur(row.total)}
                     </div>
                     <div
                       className="text-[11px] tabular-nums flex items-center justify-end gap-1"
-                      style={{ color: row.variance > 0 ? brand.red : brand.green }}
+                      style={{ color: row.variance > 0 ? brand.red : brand.blue }}
                     >
                       {row.variance > 0 ? (
                         <TrendingUp size={10} />
@@ -427,22 +427,22 @@ export default function ServiceDetailPage() {
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="bg-slate-50/60 border-b border-slate-100">
-                            <th className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-left">
+                            <th className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-left">
                               {t("date", lang)}
                             </th>
-                            <th className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-left">
+                            <th className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-left">
                               {t("description", lang)}
                             </th>
-                            <th className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-left hidden lg:table-cell">
+                            <th className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-left hidden lg:table-cell">
                               {t("supplier", lang)}
                             </th>
-                            <th className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-left hidden md:table-cell">
+                            <th className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-left hidden md:table-cell">
                               {lang === "nl" ? "Factuur" : "Invoice"}
                             </th>
-                            <th className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-right">
+                            <th className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-right">
                               {lang === "nl" ? "Bedrag" : "Amount"}
                             </th>
-                            <th className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-center">
+                            <th className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2 text-center">
                               {t("status", lang)}
                             </th>
                           </tr>
@@ -458,30 +458,30 @@ export default function ServiceDetailPage() {
                                   : {}
                               }
                             >
-                              <td className="px-4 py-2.5 text-[12px] text-slate-500 tabular-nums whitespace-nowrap">
+                              <td className="px-4 py-3 text-xs text-slate-500 tabular-nums whitespace-nowrap">
                                 {fmtDate(entry.date)}
                               </td>
-                              <td className="px-4 py-2.5">
-                                <div className="text-[12px] text-slate-700">
+                              <td className="px-4 py-3">
+                                <div className="text-xs text-slate-700">
                                   {entry.description}
                                 </div>
                                 {entry.flag && (
-                                  <div className="text-[10px] mt-0.5 flex items-center gap-1" style={{ color: brand.red }}>
+                                  <div className="text-[11px] mt-0.5 flex items-center gap-1" style={{ color: brand.red }}>
                                     <AlertTriangle size={9} />
                                     {entry.flag[lang] || entry.flag.en}
                                   </div>
                                 )}
                               </td>
-                              <td className="px-4 py-2.5 text-[12px] text-slate-500 hidden lg:table-cell">
+                              <td className="px-4 py-3 text-xs text-slate-500 hidden lg:table-cell">
                                 {entry.supplier || "—"}
                               </td>
-                              <td className="px-4 py-2.5 text-[11px] font-mono text-slate-400 hidden md:table-cell">
+                              <td className="px-4 py-3 text-[11px] font-mono text-slate-400 hidden md:table-cell">
                                 {entry.invoiceRef}
                               </td>
-                              <td className="px-4 py-2.5 text-right text-[12px] font-medium tabular-nums" style={{ color: brand.navy }}>
+                              <td className="px-4 py-3 text-right text-xs font-medium tabular-nums" style={{ color: brand.navy }}>
                                 {fmtEur2(entry.amount)}
                               </td>
-                              <td className="px-4 py-2.5 text-center">
+                              <td className="px-4 py-3 text-center">
                                 <LedgerStatusBadge status={entry.status} />
                               </td>
                             </tr>
@@ -491,7 +491,7 @@ export default function ServiceDetailPage() {
                           <tr className="border-t border-slate-200 bg-slate-50/60">
                             <td
                               colSpan={4}
-                              className="px-4 py-2.5 text-[12px] font-semibold text-slate-500"
+                              className="px-4 py-3 text-xs font-semibold text-slate-500"
                             >
                               {lang === "nl" ? "Totaal" : "Total"} ·{" "}
                               <span className="font-normal text-slate-400">
@@ -499,7 +499,7 @@ export default function ServiceDetailPage() {
                                 {fmtEur(row.budgetForService)}
                               </span>
                             </td>
-                            <td className="px-4 py-2.5 text-right text-[13px] font-bold tabular-nums" style={{ color: brand.navy }}>
+                            <td className="px-4 py-3 text-right text-sm font-semibold tabular-nums" style={{ color: brand.navy }}>
                               {fmtEur2(row.total)}
                             </td>
                             <td />
@@ -509,13 +509,13 @@ export default function ServiceDetailPage() {
                     </div>
 
                     {/* View building detail link */}
-                    <div className="px-4 py-2.5 border-t border-slate-100 bg-slate-50/30">
+                    <div className="px-4 py-3 border-t border-slate-100 bg-slate-50/30">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/buildings/${row.building.id}`);
                         }}
-                        className="text-[12px] font-medium hover:underline transition-colors"
+                        className="text-xs font-medium hover:underline transition-colors"
                         style={{ color: brand.blue }}
                       >
                         {lang === "nl"

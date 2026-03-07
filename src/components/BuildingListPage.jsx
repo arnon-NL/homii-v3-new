@@ -27,14 +27,14 @@ import { StatusBadge } from "./ui/status-badge";
 /* ── Utility icon map ── */
 const utilityConfig = {
   heat:        { icon: Flame,      color: "#EF4444", label: { en: "Heat",       nl: "Warmte" } },
-  water:       { icon: Droplets,   color: "#3B82F6", label: { en: "Water",      nl: "Water" } },
+  water:       { icon: Droplets,   color: "#64748B", label: { en: "Water",      nl: "Water" } },
   warmWater:   { icon: ShowerHead, color: "#F59E0B", label: { en: "Warm water", nl: "Warm water" } },
-  electricity: { icon: Zap,        color: "#8B5CF6", label: { en: "Electricity",nl: "Elektriciteit" } },
+  electricity: { icon: Zap,        color: "#64748B", label: { en: "Electricity",nl: "Elektriciteit" } },
 };
 
 function UtilityIcons({ utilities, lang }) {
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex items-center gap-2">
       {utilities.map((u) => {
         const cfg = utilityConfig[u];
         if (!cfg) return null;
@@ -46,7 +46,7 @@ function UtilityIcons({ utilities, lang }) {
             style={{ background: cfg.color + "15" }}
             title={cfg.label[lang] || cfg.label.en}
           >
-            <Icon size={13} style={{ color: cfg.color }} />
+            <Icon size={14} style={{ color: cfg.color }} />
           </div>
         );
       })}
@@ -64,18 +64,18 @@ function BudgetBar({ spent, total }) {
     <div className="min-w-[120px]">
       <div className="flex items-center justify-between mb-1">
         <span className="text-[11px] text-slate-500 tabular-nums">{fmt(spent)}</span>
-        <span className="text-[10px] text-slate-400 tabular-nums">{fmt(total)}</span>
+        <span className="text-[11px] text-slate-400 tabular-nums">{fmt(total)}</span>
       </div>
       <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden">
         <div
-          className="h-full rounded-full transition-all duration-500"
+          className="h-full rounded-full transition-colors duration-500"
           style={{
             width: `${pct}%`,
             background: isOver ? brand.red : pct > 70 ? brand.amber : brand.blue,
           }}
         />
       </div>
-      <div className="text-[10px] text-slate-400 mt-0.5 tabular-nums text-right">
+      <div className="text-[11px] text-slate-400 mt-0.5 tabular-nums text-right">
         {pct.toFixed(0)}%
       </div>
     </div>
@@ -85,10 +85,10 @@ function BudgetBar({ spent, total }) {
 /* ── Settlement badge ── */
 const settlementConfig = {
   not_started:  { icon: Circle,        color: "#94A3B8", bg: "#F8FAFC", label: { en: "Not started",  nl: "Niet gestart" } },
-  monitoring:   { icon: Clock,         color: "#3B82F6", bg: "#EFF6FF", label: { en: "Monitoring",   nl: "Monitoring" } },
+  monitoring:   { icon: Clock,         color: "#94A3B8", bg: "#F8FAFC", label: { en: "Monitoring",   nl: "Monitoring" } },
   in_review:    { icon: AlertTriangle, color: "#F59E0B", bg: "#FFFBEB", label: { en: "In review",    nl: "In controle" } },
-  approved:     { icon: FileCheck,     color: "#22C55E", bg: "#F0FDF4", label: { en: "Approved",     nl: "Goedgekeurd" } },
-  distributed:  { icon: Send,          color: "#8B5CF6", bg: "#F5F3FF", label: { en: "Distributed",  nl: "Afgerekend" } },
+  approved:     { icon: FileCheck,     color: "#3EB1C8", bg: "#F0FAFB", label: { en: "Approved",     nl: "Goedgekeurd" } },
+  distributed:  { icon: Send,          color: "#94A3B8", bg: "#F8FAFC", label: { en: "Distributed",  nl: "Afgerekend" } },
 };
 
 function SettlementBadge({ status, lang }) {
@@ -96,7 +96,7 @@ function SettlementBadge({ status, lang }) {
   const Icon = cfg.icon;
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[11px] font-medium whitespace-nowrap"
+      className="inline-flex items-center gap-2 px-2 py-1 rounded-full text-[11px] font-medium whitespace-nowrap"
       style={{ background: cfg.bg, color: cfg.color }}
     >
       <Icon size={11} />
@@ -112,11 +112,11 @@ function NetResult({ value, lang }) {
   const fmt = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(Math.abs(value));
   return (
     <span
-      className="text-[12px] font-medium tabular-nums"
-      style={{ color: isPositive ? brand.green : brand.red }}
+      className="text-xs font-medium tabular-nums"
+      style={{ color: isPositive ? brand.blue : brand.red }}
     >
       {isPositive ? `+${fmt}` : `-${fmt}`}
-      <span className="text-[10px] font-normal ml-1 opacity-70">
+      <span className="text-[11px] font-normal ml-1 opacity-70">
         {isPositive
           ? (lang === "nl" ? "teruggave" : "refund")
           : (lang === "nl" ? "naheffing" : "surcharge")}
@@ -136,9 +136,9 @@ const qualityFilters = [
 /* ── Utility filter options ── */
 const utilityFilterOptions = [
   { value: "heat",        label: { en: "Heat",       nl: "Warmte" },     icon: Flame,      color: "#EF4444" },
-  { value: "water",       label: { en: "Water",      nl: "Water" },      icon: Droplets,   color: "#3B82F6" },
+  { value: "water",       label: { en: "Water",      nl: "Water" },      icon: Droplets,   color: "#64748B" },
   { value: "warmWater",   label: { en: "Warm water", nl: "Warm water" }, icon: ShowerHead,  color: "#F59E0B" },
-  { value: "electricity", label: { en: "Electricity",nl: "Elektriciteit"},icon: Zap,        color: "#8B5CF6" },
+  { value: "electricity", label: { en: "Electricity",nl: "Elektriciteit"},icon: Zap,        color: "#64748B" },
 ];
 
 /* ── Column definitions ── */
@@ -278,9 +278,9 @@ export default function BuildingListPage() {
           <td key={col} className="px-3 sm:px-4 py-3">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded flex items-center justify-center bg-slate-100">
-                <Building2 size={13} className="text-slate-400" />
+                <Building2 size={14} className="text-slate-400" />
               </div>
-              <span className="text-[13px] font-medium" style={{ color: brand.navy }}>
+              <span className="text-sm font-medium" style={{ color: brand.navy }}>
                 {b.complex}
               </span>
             </div>
@@ -289,25 +289,25 @@ export default function BuildingListPage() {
       case "complexId":
         return (
           <td key={col} className="px-3 sm:px-4 py-3">
-            <span className="text-[12px] font-mono text-slate-500">{b.complexId}</span>
+            <span className="text-xs font-mono text-slate-500">{b.complexId}</span>
           </td>
         );
       case "location":
         return (
-          <td key={col} className="px-3 sm:px-4 py-3 text-[13px] text-slate-600">
+          <td key={col} className="px-3 sm:px-4 py-3 text-sm text-slate-600">
             {b.location}
           </td>
         );
       case "vhe":
         return (
           <td key={col} className="px-3 sm:px-4 py-3 text-right">
-            <span className="text-[13px] font-semibold tabular-nums text-slate-700">{b.vhe}</span>
+            <span className="text-sm font-semibold tabular-nums text-slate-700">{b.vhe}</span>
           </td>
         );
       case "components":
         return (
           <td key={col} className="px-3 sm:px-4 py-3 text-right">
-            <span className="text-[13px] tabular-nums text-slate-600">{b.components}</span>
+            <span className="text-sm tabular-nums text-slate-600">{b.components}</span>
           </td>
         );
       case "utilities":
@@ -363,12 +363,12 @@ export default function BuildingListPage() {
 
         {/* Title + view badge + count */}
         <div className="flex items-center justify-between mb-5">
-          <div className="flex items-baseline gap-2.5">
+          <div className="flex items-baseline gap-3">
             <h1 className="text-xl font-semibold" style={{ color: brand.navy }}>
               {pageTitle}
             </h1>
             {activeView && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-medium text-slate-500">
+              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-100 text-[11px] font-medium text-slate-500">
                 <LayoutGrid size={10} />
                 {lang === "nl" ? "Weergave" : "View"}
               </span>
@@ -400,7 +400,7 @@ export default function BuildingListPage() {
                   onClick={() =>
                     setSettlementFilter(isActive ? "all" : status)
                   }
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[12px] font-medium transition-all ${
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     isActive
                       ? "ring-2 ring-offset-1 shadow-sm"
                       : "hover:bg-white"
@@ -412,7 +412,7 @@ export default function BuildingListPage() {
                   }}
                 >
                   <Icon size={12} />
-                  <span className="tabular-nums font-bold">{count}</span>
+                  <span className="tabular-nums font-semibold">{count}</span>
                   <span className="hidden sm:inline">{cfg.label[lang] || cfg.label.en}</span>
                 </button>
               );
@@ -433,7 +433,7 @@ export default function BuildingListPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={`${t("search", lang)}...`}
-              className="w-full h-8 pl-8 pr-3 text-sm rounded-lg border border-slate-200 bg-white text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#3EB1C8]/30 focus:border-[#3EB1C8] transition-all"
+              className="w-full h-8 pl-8 pr-3 text-sm rounded-lg border border-slate-200 bg-white text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#3EB1C8]/30 focus:border-[#3EB1C8] transition-colors"
             />
           </div>
 
@@ -443,7 +443,7 @@ export default function BuildingListPage() {
               <button
                 key={f.value}
                 onClick={() => setQualityFilter(f.value)}
-                className={`px-3 h-7 rounded-md text-xs font-medium transition-all ${
+                className={`px-3 h-7 rounded-lg text-xs font-medium transition-colors ${
                   qualityFilter === f.value
                     ? "bg-white text-slate-900 shadow-sm"
                     : "text-slate-500 hover:text-slate-700"
@@ -464,7 +464,7 @@ export default function BuildingListPage() {
                   <button
                     key={u.value}
                     onClick={() => toggleUtility(u.value)}
-                    className={`w-7 h-7 rounded-md flex items-center justify-center transition-all ${
+                    className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
                       isActive
                         ? "ring-2 ring-offset-1 shadow-sm"
                         : "hover:bg-slate-100"
@@ -489,12 +489,12 @@ export default function BuildingListPage() {
             <button
               key={b.id}
               onClick={() => navigate(`/buildings/${b.id}${isViewWithYear ? `?year=${year}` : ""}`)}
-              className="w-full text-left rounded-lg border border-slate-200 bg-white p-4 hover:border-[#3EB1C8] hover:shadow-md transition-all"
+              className="w-full text-left rounded-lg border border-slate-200 bg-white p-4 hover:border-[#3EB1C8] hover:shadow-md transition-colors"
             >
               <div className="flex items-start justify-between mb-2">
                 <div>
                   <div
-                    className="text-[13px] font-semibold"
+                    className="text-sm font-semibold"
                     style={{ color: brand.navy }}
                   >
                     {b.complex}
@@ -544,7 +544,7 @@ export default function BuildingListPage() {
                   return (
                     <th
                       key={colKey}
-                      className={`text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 sm:px-4 py-2.5 text-${col.align} whitespace-nowrap ${
+                      className={`text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-3 sm:px-4 py-3 text-${col.align} whitespace-nowrap ${
                         isSortable ? "cursor-pointer select-none hover:text-slate-700" : ""
                       }`}
                       onClick={() => handleSort(colKey)}

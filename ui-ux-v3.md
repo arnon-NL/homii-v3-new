@@ -25,8 +25,9 @@ When reviewing UI/UX, follow this sequence:
 1. **Understand what you're looking at** — Read the code, screenshot, or description. Identify: what type of page is this (list, detail, form, dashboard)? What domain does it serve? Who are the users?
 2. **Run the information architecture check** — This is the most important layer. See the "Information Architecture" section below.
 3. **Run the interaction and state checks** — See "Interaction Design" and "State Coverage."
-4. **Run the visual and component checks** — See "Minimalist Color Philosophy", "Minimalist Typography Philosophy", "Visual Hierarchy", "Visual Anti-Patterns", and "Component Patterns."
-5. **Produce a structured report** — Use the output format described at the bottom.
+4. **Run the visual system checks** — See "Minimalist Color Philosophy", "Minimalist Typography Philosophy", "Spacing System Philosophy", "Border Radius Philosophy", "Icon Sizing Philosophy", "Elevation & Shadow Philosophy", "Interactive Element Sizing Philosophy", and "Motion & Transition Philosophy."
+5. **Run the visual hierarchy and component checks** — See "Visual Hierarchy", "Visual Anti-Patterns", and "Component Patterns."
+6. **Produce a structured report** — Use the output format described at the bottom.
 
 Don't skip straight to visual polish. The most expensive UI/UX bugs are structural ones (wrong navigation, misplaced concepts, missing states), not cosmetic ones.
 
@@ -310,6 +311,251 @@ When reviewing typography in any interface, run this audit:
 
 ---
 
+## Spacing System Philosophy
+
+Spacing is the invisible backbone of visual quality. Users can't articulate why an interface feels "polished" or "sloppy," but inconsistent spacing is almost always the answer. Apple, Attio, and Notion all use a strict spatial grid — every margin, padding, and gap snaps to a predictable rhythm. This creates a visual cadence that the eye perceives as order.
+
+**The core rule: Every spacing value must be a multiple of 4px.** This is the "4px grid" used by virtually every top-tier design system (Apple HIG, Material Design, GitHub Primer, Linear). It means the only valid spacing values are: 0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64. No half-steps (6px, 10px, 14px). No arbitrary values.
+
+### Maximum Spacing Budget
+
+A well-designed B2B data tool should use **at most 7-8 distinct spacing values** across the entire application, drawn from the 4px grid:
+
+| Token | Value | Tailwind | Use cases |
+|-------|-------|----------|-----------|
+| **xs** | 4px | `gap-1`, `p-1` | Inline element gaps (icon + label), tight badge padding |
+| **sm** | 8px | `gap-2`, `p-2`, `px-2` | Compact list item padding, small card internal gaps |
+| **md** | 12px | `gap-3`, `p-3`, `px-3` | Standard table cell padding, card internal gaps |
+| **base** | 16px | `gap-4`, `p-4`, `px-4` | Card padding, section gaps, primary container padding |
+| **lg** | 24px | `gap-6`, `p-6`, `px-6` | Section separation, card-to-card gaps |
+| **xl** | 32px | `gap-8`, `py-8` | Major section breaks, empty state vertical padding |
+| **2xl** | 48px | `py-12` | Page-level vertical margins (rarely needed) |
+
+### Values That Should NOT Exist
+
+**No half-step values (gap-1.5, gap-2.5, py-0.5, px-1.5).** These break the 4px grid and create subpixel rendering differences across screens. The 0.5 in Tailwind maps to 2px — which is below the minimum useful spacing for most elements. If 4px feels too tight and 8px feels too loose, the problem is usually in the element sizing, not the spacing.
+
+**No 10px, 14px, or 18px.** These fall between grid lines and create the same "slightly off" feeling as 13px text. Round to the nearest 4px multiple: 10→8 or 12, 14→12 or 16, 18→16 or 20.
+
+**No mixing of px-3 and px-4 for the same element type.** If table cells use `px-3` (12px), ALL table cells must use `px-3`. If cards use `px-4` (16px), ALL cards must use `px-4`. The inconsistency between adjacent elements of the same type is more damaging than choosing the "wrong" value consistently.
+
+### Spacing Hierarchy Rule
+
+Spacing should increase as you move outward from content to container:
+
+1. **Inline** (within a component): xs–sm (4–8px)
+2. **Intra-component** (padding inside a card/row): sm–md (8–12px)
+3. **Inter-component** (gap between cards/sections): base–lg (16–24px)
+4. **Page-level** (major section breaks): lg–xl (24–32px)
+
+**Never use a larger spacing value inside a component than between components.** If card internal padding is 24px but the gap between cards is 16px, the visual grouping breaks — elements inside the card feel further apart than cards from each other.
+
+### Practical Spacing Audit Checklist
+
+- [ ] Count distinct gap values. Target: ≤7, all multiples of 4px.
+- [ ] Count distinct padding values. Target: ≤6 distinct px-* and py-* values, all multiples of 4px.
+- [ ] Check for half-step values (gap-1.5, gap-2.5, py-0.5, px-1.5). Flag and round to nearest 4px multiple.
+- [ ] Verify same element types use identical spacing (all table cells same padding, all cards same padding).
+- [ ] Check spacing hierarchy: inline < intra-component < inter-component < page-level.
+- [ ] Verify no arbitrary Tailwind values (`p-[7px]`, `gap-[11px]`).
+
+---
+
+## Border Radius Philosophy
+
+Border radius is one of the strongest subconscious signals of visual consistency. When different elements use different radii, the interface feels assembled from parts rather than designed as a whole. Apple uses one radius system-wide. Notion uses one radius plus `rounded-full` for pills. Attio is similar: one radius for containers, full-round for avatars and pills.
+
+**The core rule: Use at most 2 radius values across the entire application.** One "container radius" for cards, modals, dropdowns, and inputs. One "pill radius" (`rounded-full`) for badges, avatars, filter pills, and toggle buttons. Nothing else.
+
+### Maximum Radius Budget
+
+| Token | Value | Tailwind | Use cases |
+|-------|-------|----------|-----------|
+| **container** | 8px | `rounded-lg` | Cards, modals, dropdowns, inputs, buttons, table containers, tooltips |
+| **pill** | 9999px | `rounded-full` | Badges, avatars, filter pills, year pills, status indicators, toggle buttons |
+| **none** | 0px | `rounded-none` | Table rows (inside a rounded container), dividers, full-bleed sections |
+
+That's it. Three values, two of which are the real design tokens.
+
+### Radii That Should NOT Exist
+
+**No `rounded-sm` (4px) or `rounded-md` (6px) as separate tokens.** The visual difference between 4px, 6px, and 8px radius is imperceptible at small sizes and creates "nearly the same but not quite" inconsistency. Pick one and use it everywhere. We recommend `rounded-lg` (8px) because it matches the modern, slightly softer aesthetic of Attio/Notion/Linear. Apple's macOS uses ~10px for windows and ~6px for controls — but the key insight is they committed to one value per context.
+
+**No mixing rounded-md for buttons and rounded-lg for cards.** If the card has 8px corners and the button inside has 6px corners, the relationship feels arbitrary. When everything shares the same radius, the interface reads as a unified system.
+
+### Practical Radius Audit Checklist
+
+- [ ] Count distinct border-radius values. Target: 2 (container + pill) + optional `rounded-none`.
+- [ ] Check for `rounded-sm` or `rounded-md`. Flag and consolidate to the container radius.
+- [ ] Verify buttons and inputs use the same radius as their parent cards.
+- [ ] Verify all badges/pills/avatars use `rounded-full`.
+
+---
+
+## Icon Sizing Philosophy
+
+Icons are the punctuation of a UI — they guide the eye and reinforce meaning. But when icon sizes vary by 1-2px across the interface, they create the same "drift" problem as typography. Apple uses exactly 3 icon sizes in their system apps. Notion uses 2. Attio uses 2-3.
+
+**The core rule: Use at most 3 icon sizes, each mapped to a semantic role.** An icon should never be sized ad-hoc to "fit" a particular layout. The layout should accommodate the standard icon sizes.
+
+### Maximum Icon Size Budget
+
+| Token | Size | Use cases |
+|-------|------|-----------|
+| **sm** | 14px | Inline with caption/micro text: meta labels, breadcrumbs, badge icons, secondary indicators |
+| **md** | 16px | Inline with body text: table row icons, nav items, button icons, form field icons |
+| **lg** | 20px | Standalone or heading-level: page header actions, empty state icons, KPI card icons |
+
+Three sizes. Every icon in the application is one of these three. No 9px, 10px, 11px, 12px, 13px, 18px — these intermediate sizes create visual noise without adding hierarchy.
+
+### Sizes That Should NOT Exist
+
+**No icons below 14px.** At 12px or smaller, icons lose detail and become unrecognizable blobs, especially on non-retina screens. If the icon needs to be this small, the space is too tight for an icon — use text or remove it.
+
+**No 1-2px differences between icons in the same context.** If one table row uses `size={13}` and another uses `size={14}`, the inconsistency is visible but not meaningful. Standardize to the role-based size.
+
+**No icons larger than 20px in data-dense views.** Icons at 24px+ dominate the visual hierarchy and compete with actual content. Reserve large icons (24-48px) exclusively for empty states, onboarding, and illustration contexts — never in tables, cards, or list items.
+
+### Icon Style Consistency
+
+Beyond size, icon *style* must be uniform:
+
+- **One icon library.** Don't mix Lucide, Heroicons, and Phosphor. Each library has a different stroke width, corner radius, and visual weight.
+- **One stroke width.** If using Lucide (1.5px default), never mix with 2px-stroke icons.
+- **Consistent optical alignment.** Icons should vertically center with their adjacent text. Use `items-center` consistently.
+
+### Practical Icon Audit Checklist
+
+- [ ] Count distinct icon sizes (the `size={}` prop). Target: ≤3.
+- [ ] Check for icons below 14px. Flag and promote to 14px (sm).
+- [ ] Check for icons in the 15-19px range. Flag and consolidate to 16px (md) or 20px (lg).
+- [ ] Verify one icon library used across the entire app.
+- [ ] Check that icons are vertically aligned with adjacent text.
+
+---
+
+## Elevation & Shadow Philosophy
+
+Shadow and elevation signal depth — what's "above" what. Apple uses shadows only for floating elements (menus, modals, popovers). Notion uses essentially zero shadows in its default view — cards are defined by borders, not shadows. Attio uses one subtle shadow for hover states and floating panels.
+
+**The core rule: Use at most 2 shadow levels across the entire application.** The page is flat by default. Only elements that float above the page (dropdowns, modals, tooltips, popovers) get shadow. Cards, tables, and containers live at the base level and use borders for definition, not shadows.
+
+### Maximum Shadow Budget
+
+| Token | Tailwind | Use cases |
+|-------|----------|-----------|
+| **none** | (default) | Cards, tables, containers, sections — everything at the base level |
+| **subtle** | `shadow-sm` | Hover states on interactive cards, sticky headers, floating action buttons |
+| **elevated** | `shadow-md` | Dropdowns, modals, tooltips, popovers — elements that float above the page |
+
+Two shadow values plus the default (no shadow). That's it.
+
+### Shadows That Should NOT Exist
+
+**No `shadow-lg` or `shadow-xl` in the base interface.** These heavy shadows belong in marketing pages, hero sections, and image galleries — not in data-dense B2B tools. They make elements look like they're physically hovering above the page, which contradicts the flat, information-first aesthetic.
+
+**No `shadow-sm` on static cards.** If a card is always visible and doesn't float or move, it should be defined by its border (`border border-slate-200`), not by shadow. Shadow implies interactivity or elevation — using it on every card cheapens the signal.
+
+**No mixing shadow levels for the same element type.** If dropdown menus use `shadow-md`, all dropdowns use `shadow-md`. If some modals use `shadow-lg` and others use `shadow-md`, the depth system is broken.
+
+### The Border-First Principle
+
+Attio and Notion both follow this rule: **borders define containers, shadows define floaters.** A card has a 1px border. A dropdown has a shadow (and may also have a border). A table has a border around it. A modal has a shadow. This distinction makes the depth hierarchy instinctive.
+
+### Practical Shadow Audit Checklist
+
+- [ ] Count distinct shadow values. Target: ≤2 (`shadow-sm` + `shadow-md`) plus default (none).
+- [ ] Check for `shadow-lg` or `shadow-xl`. Flag and downgrade to `shadow-md` or remove.
+- [ ] Check for `shadow-sm` on static (non-interactive) cards. Replace with border.
+- [ ] Verify floating elements (dropdowns, modals, tooltips) all share the same shadow level.
+- [ ] Verify base-level elements (cards, tables, sections) use border, not shadow.
+
+---
+
+## Interactive Element Sizing Philosophy
+
+Control sizing — the height and padding of buttons, inputs, filter pills, and select elements — is where "the UI doesn't quite feel right" problems often hide. When a filter pill is 28px tall, an input is 32px, and a button is 40px, nothing lines up. Apple HIG defines exactly 3 control sizes. Linear uses 2. Attio uses 2.
+
+**The core rule: Use at most 3 control heights, each mapped to a context.** Every interactive element snaps to one of these heights. No in-between values.
+
+### Maximum Control Height Budget
+
+| Token | Height | Tailwind | Use cases |
+|-------|--------|----------|-----------|
+| **compact** | 28px | `h-7` | Filter pills, year pills, tab buttons, badge-like controls, inline actions |
+| **standard** | 32px | `h-8` | Text inputs, select dropdowns, search fields, secondary buttons |
+| **prominent** | 40px | `h-10` | Primary action buttons, main CTAs, modal action buttons |
+
+Three heights. Every clickable/tappable element in the application is one of these three.
+
+### Heights That Should NOT Exist
+
+**No h-9 (36px).** This falls between standard and prominent and creates "almost but not quite" misalignment. If an element feels too small at 32px and too large at 40px, the issue is usually padding or font size, not height.
+
+**No h-6 (24px) for interactive elements.** At 24px, the touch/click target is too small for comfortable interaction (Apple recommends 44px minimum touch target on mobile, 28px minimum on desktop). Use h-7 (28px) as the floor.
+
+**No h-12 (48px) in data-dense views.** 48px buttons dominate the visual hierarchy and waste vertical space. Reserve for landing pages and onboarding, not for tool UIs.
+
+### Alignment Rule
+
+**All controls on the same row must share the same height.** A search input (`h-8`) next to filter pills (`h-7`) next to a button (`h-10`) creates a jagged baseline that looks sloppy. When controls share a row, they all use the same height token — typically `compact` for filter bars and `standard` for form rows.
+
+### Practical Control Sizing Audit Checklist
+
+- [ ] Count distinct control heights (h-* classes on interactive elements). Target: ≤3.
+- [ ] Check for h-9 or h-11. Flag and consolidate to nearest standard height.
+- [ ] Check for interactive elements below h-7 (28px). Flag as too small for comfortable interaction.
+- [ ] Verify all controls on the same row share the same height.
+- [ ] Verify buttons, inputs, and selects in the same form share the same height.
+
+---
+
+## Motion & Transition Philosophy
+
+Animation is the final layer of polish. Apple's animations feel "inevitable" — they're so smooth and purposeful that you don't notice them. Notion barely animates at all, and when it does, it's instant and subtle. Attio uses very restrained hover transitions. The common thread: animation should be invisible. The moment a user notices a transition, it's too slow or too flashy.
+
+**The core rule: Animate only opacity and transform. Animate only on user-initiated interactions. Keep durations under 200ms.**
+
+### Transition Budget
+
+| Property | Tailwind | When to use |
+|----------|----------|-------------|
+| **Colors** | `transition-colors` | Hover/focus state changes: button backgrounds, link colors, border highlights |
+| **Opacity** | `transition-opacity` | Fade in/out: tooltips appearing, elements entering/leaving, skeleton loading |
+| **Transform** | `transition-transform` | Micro-interactions: chevron rotation on expand, scale on press, slide-in panels |
+
+Three transition properties. Never `transition-all` — it's a performance anti-pattern that animates layout properties (width, height, padding, margin), causing jank and repaints. It also animates properties you didn't intend to animate, creating unexpected visual noise.
+
+### Duration Scale
+
+| Token | Duration | Use cases |
+|-------|----------|-----------|
+| **instant** | 100ms | Color changes, opacity toggles, focus rings |
+| **fast** | 150ms | Hover states, expand/collapse, tooltip show/hide |
+| **smooth** | 200ms | Panel slides, modal entrance, page transitions |
+
+**Nothing above 200ms in a data tool.** Users of B2B tools are performing repetitive, efficiency-focused tasks. A 300ms animation that plays every time they hover a table row costs cumulative seconds per session. Notion's hover transitions are ~100ms. Attio's are ~120ms.
+
+### Animations That Should NOT Exist
+
+**No `transition-all`.** This is the most common animation anti-pattern. It animates every CSS property that changes, including layout-triggering ones (width, height, padding). This causes browser repaints on every frame, degrading scroll performance. Always specify exactly which property to animate.
+
+**No bounce, spring, or elastic easing in data tools.** These belong in consumer apps and games. In a financial tool, a bouncing button undermines credibility. Use `ease-out` (Tailwind default) for all transitions.
+
+**No loading spinners longer than 2 seconds without feedback.** If an operation takes more than 2s, show a skeleton screen or progress bar — not an infinite spinner. Spinners beyond 2s create anxiety.
+
+**No animation on initial page load.** Elements should appear immediately, already in their final state. "Fade-in on scroll" and "stagger animation" patterns are for marketing sites, not tools.
+
+### Practical Motion Audit Checklist
+
+- [ ] Count `transition-all` occurrences. Target: 0. Replace each with specific property.
+- [ ] Verify all transition durations are ≤200ms (Tailwind `duration-100`, `duration-150`, `duration-200`).
+- [ ] Check for bounce/spring/elastic easing. Flag and replace with ease-out.
+- [ ] Verify animations only trigger on user interaction (hover, click, focus), never on load.
+- [ ] Check for layout-animating transitions (width, height, padding). Flag and remove or replace with transform.
+
+---
+
 ## Visual Hierarchy
 
 ### Information Density
@@ -381,6 +627,26 @@ Certain visual patterns that seem logical in isolation create a cartoonish or un
 ### Weight Stacking
 
 **Don't use more than 3 font weights on a single page.** When regular, medium, semibold, bold, and extrabold all appear in the same view, the hierarchy collapses — every weight competes and none wins. The fix: regular for body, medium for emphasis, semibold for headings. That's it.
+
+### Half-Step Spacing
+
+**Don't use Tailwind half-step values (gap-1.5, gap-2.5, py-0.5, px-1.5).** These map to 6px, 10px, 2px, and 6px — all off the 4px grid. They create subpixel rendering artifacts on non-retina screens and break the spatial rhythm that makes an interface feel "tight." Round to the nearest 4px multiple.
+
+### Radius Soup
+
+**Don't use 3+ border-radius values (rounded-sm, rounded-md, rounded-lg) as if they're meaningfully different.** At button and card sizes, the difference between 4px, 6px, and 8px radius is invisible. Yet mixing them creates a subtle "assembled from parts" feeling. Pick one container radius and commit. Apple's entire macOS uses essentially one radius per context.
+
+### Heavy Shadows on Static Elements
+
+**Don't put `shadow-lg` or `shadow-xl` on cards, panels, or containers that don't float.** Heavy shadows make elements look like they're physically hovering, which contradicts the flat, information-dense aesthetic. Use borders for static containers, shadow-sm for hover states, and shadow-md for floating elements (dropdowns, modals). That's the complete depth system.
+
+### Jagged Control Heights
+
+**Don't mix 3+ different heights on controls in the same row.** A search input at h-8, filter pills at h-7, and a button at h-10 creates a ragged baseline that looks unpolished. All controls sharing a horizontal row must share the same height token.
+
+### transition-all Everywhere
+
+**Don't use `transition-all` as a default.** It animates layout properties (width, height, padding) on every change, causing browser repaints and unexpected visual noise. Always specify the exact property: `transition-colors` for hover states, `transition-opacity` for fade effects, `transition-transform` for scale/rotation. This is both a performance and a design discipline issue.
 
 ---
 

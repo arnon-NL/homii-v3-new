@@ -58,10 +58,10 @@ import { StatusBadge } from "./ui/status-badge";
 
 /* ── Category icon + color config ── */
 const categoryConfig = {
-  energy:        { icon: Zap,        color: "#EF4444", bg: "#FEF2F2" },
-  installations: { icon: Wrench,     color: "#8B5CF6", bg: "#F5F3FF" },
-  cleaning:      { icon: Sparkles,   color: "#22C55E", bg: "#F0FDF4" },
-  management:    { icon: HardHat,    color: "#F59E0B", bg: "#FFFBEB" },
+  energy:        { icon: Zap,        color: "#64748B", bg: "#F8FAFC" },
+  installations: { icon: Wrench,     color: "#64748B", bg: "#F8FAFC" },
+  cleaning:      { icon: Sparkles,   color: "#64748B", bg: "#F8FAFC" },
+  management:    { icon: HardHat,    color: "#64748B", bg: "#F8FAFC" },
   other:         { icon: FolderOpen, color: "#64748B", bg: "#F8FAFC" },
 };
 
@@ -88,7 +88,7 @@ const fmt = (v) =>
 
 /* ── Ledger status config ── */
 const ledgerStatusCfg = {
-  booked:  { color: brand.green, bg: "#F0FDF4", label: { en: "Booked", nl: "Geboekt" }, icon: CheckCircle2 },
+  booked:  { color: brand.blue, bg: "#F0FAFB", label: { en: "Booked", nl: "Geboekt" }, icon: CheckCircle2 },
   pending: { color: brand.amber, bg: "#FFFBEB", label: { en: "Pending", nl: "In afwachting" }, icon: Clock },
   flagged: { color: brand.red,   bg: "#FEF2F2", label: { en: "Flagged", nl: "Gemarkeerd" }, icon: AlertTriangle },
 };
@@ -99,10 +99,10 @@ function LedgerStatusBadge({ status, lang }) {
   const Icon = cfg.icon;
   return (
     <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium"
+      className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium"
       style={{ background: cfg.bg, color: cfg.color }}
     >
-      <Icon size={10} />
+      <Icon size={14} />
       {cfg.label[lang]}
     </span>
   );
@@ -111,38 +111,38 @@ function LedgerStatusBadge({ status, lang }) {
 /* ── Utility icon ── */
 const utilityIcon = {
   heat: { icon: Flame, color: "#EF4444" },
-  water: { icon: Droplets, color: "#3B82F6" },
-  electricity: { icon: Zap, color: "#8B5CF6" },
+  water: { icon: Droplets, color: "#64748B" },
+  electricity: { icon: Zap, color: "#64748B" },
 };
 
 /* ── Activity icon ── */
 const activityIcons = {
   meter_reading: { icon: Gauge, color: brand.blue },
-  ledger_entry: { icon: FileText, color: brand.green },
+  ledger_entry: { icon: FileText, color: brand.blue },
   distribution: { icon: Activity, color: brand.amber },
-  contract_change: { icon: Users, color: brand.midBlue },
+  contract_change: { icon: Users, color: brand.blue },
   alert: { icon: AlertTriangle, color: brand.red },
 };
 
 /* ── Settlement status config ── */
 const settlementStatusConfig = {
   not_started:  { icon: Circle,        color: "#94A3B8", bg: "#F8FAFC", label: { en: "Not started",  nl: "Niet gestart" } },
-  monitoring:   { icon: Clock,         color: "#3B82F6", bg: "#EFF6FF", label: { en: "Monitoring",   nl: "Monitoring" } },
+  monitoring:   { icon: Clock,         color: "#94A3B8", bg: "#F8FAFC", label: { en: "Monitoring",   nl: "Monitoring" } },
   in_review:    { icon: AlertTriangle, color: "#F59E0B", bg: "#FFFBEB", label: { en: "In review",    nl: "In controle" } },
-  approved:     { icon: FileCheck,     color: "#22C55E", bg: "#F0FDF4", label: { en: "Approved",     nl: "Goedgekeurd" } },
-  distributed:  { icon: Send,          color: "#8B5CF6", bg: "#F5F3FF", label: { en: "Distributed",  nl: "Afgerekend" } },
+  approved:     { icon: FileCheck,     color: "#3EB1C8", bg: "#F0FAFB", label: { en: "Approved",     nl: "Goedgekeurd" } },
+  distributed:  { icon: Send,          color: "#94A3B8", bg: "#F8FAFC", label: { en: "Distributed",  nl: "Afgerekend" } },
 };
 
 /* ── Settlement check icon ── */
 function CheckIcon({ passed, label }) {
   return (
-    <div className="flex items-center gap-1.5" title={label}>
+    <div className="flex items-center gap-2" title={label}>
       {passed ? (
-        <CheckCircle2 size={13} className="text-green-500" />
+        <CheckCircle2 size={14} className="text-green-500" />
       ) : passed === false ? (
-        <AlertTriangle size={13} className="text-amber-500" />
+        <AlertTriangle size={14} className="text-amber-500" />
       ) : (
-        <Circle size={13} className="text-slate-300" />
+        <Circle size={14} className="text-slate-300" />
       )}
       <span className={`text-[11px] ${passed ? "text-slate-600" : passed === false ? "text-amber-600 font-medium" : "text-slate-400"}`}>
         {label}
@@ -153,8 +153,8 @@ function CheckIcon({ passed, label }) {
 
 /* ── Settlement check status badge ── */
 const checkStatusConfig = {
-  approved: { icon: CheckCircle2, color: "#22C55E", bg: "#F0FDF4", label: { en: "Approved",  nl: "Goedgekeurd" } },
-  verified: { icon: ShieldCheck,  color: "#3B82F6", bg: "#EFF6FF", label: { en: "Verified",  nl: "Geverifieerd" } },
+  approved: { icon: CheckCircle2, color: "#3EB1C8", bg: "#F0FAFB", label: { en: "Approved",  nl: "Goedgekeurd" } },
+  verified: { icon: ShieldCheck,  color: "#94A3B8", bg: "#F8FAFC", label: { en: "Verified",  nl: "Geverifieerd" } },
   flagged:  { icon: Flag,         color: "#EF4444", bg: "#FEF2F2", label: { en: "Flagged",   nl: "Gemarkeerd" } },
   pending:  { icon: Clock,        color: "#94A3B8", bg: "#F8FAFC", label: { en: "Pending",   nl: "In afwachting" } },
 };
@@ -164,10 +164,10 @@ function CheckStatusBadge({ status, lang }) {
   const Icon = cfg.icon;
   return (
     <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium"
+      className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium"
       style={{ background: cfg.bg, color: cfg.color }}
     >
-      <Icon size={10} />
+      <Icon size={14} />
       {cfg.label[lang] || cfg.label.en}
     </span>
   );
@@ -182,7 +182,7 @@ function YearSelector({ year, setYear }) {
         <button
           key={y}
           onClick={() => setYear(y)}
-          className={`px-3 h-7 rounded-md text-xs font-medium tabular-nums transition-all ${
+          className={`px-3 h-7 rounded-lg text-xs font-medium tabular-nums transition-colors ${
             year === y
               ? "bg-white text-slate-900 shadow-sm"
               : "text-slate-400 hover:text-slate-600"
@@ -345,15 +345,15 @@ export default function BuildingDetailPage() {
               </div>
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-slate-500">
                 <span className="flex items-center gap-1">
-                  <MapPin size={11} /> {building.location}
+                  <MapPin size={14} /> {building.location}
                 </span>
                 <span className="w-px h-3 bg-slate-200" />
                 <span className="flex items-center gap-1">
-                  <Hash size={11} /> {building.complexId}
+                  <Hash size={14} /> {building.complexId}
                 </span>
                 <span className="w-px h-3 bg-slate-200" />
                 <span className="flex items-center gap-1">
-                  <Home size={11} /> {building.vhe} VHE
+                  <Home size={14} /> {building.vhe} VHE
                 </span>
               </div>
             </div>
@@ -386,7 +386,7 @@ export default function BuildingDetailPage() {
                   <TabsTrigger
                     key={tab.value}
                     value={tab.value}
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#3EB1C8] data-[state=active]:text-slate-900 data-[state=active]:shadow-none px-4 text-[13px] text-slate-400 hover:text-slate-600 transition-colors whitespace-nowrap"
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#3EB1C8] data-[state=active]:text-slate-900 data-[state=active]:shadow-none px-4 text-sm text-slate-400 hover:text-slate-600 transition-colors whitespace-nowrap"
                   >
                     {tab.label}
                   </TabsTrigger>
@@ -414,15 +414,15 @@ export default function BuildingDetailPage() {
                                   className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
                                   style={{ background: sCfg?.bg }}
                                 >
-                                  <SIcon size={18} style={{ color: sCfg?.color }} />
+                                  <SIcon size={20} style={{ color: sCfg?.color }} />
                                 </div>
                               );
                             })()}
                             <div>
-                              <p className="text-[13px] font-semibold" style={{ color: brand.navy }}>
+                              <p className="text-sm font-semibold" style={{ color: brand.navy }}>
                                 {lang === "nl" ? "Afrekening" : "Settlement"} {year}
                               </p>
-                              <p className="text-[12px] text-slate-500">
+                              <p className="text-xs text-slate-500">
                                 {settlementStatusConfig[settlement.status]?.label[lang]}
                                 {settlement.approvedAt && (
                                   <span className="ml-2 text-slate-400">
@@ -435,8 +435,8 @@ export default function BuildingDetailPage() {
                           {settlement.netResult != null && (
                             <div className="text-right">
                               <span
-                                className="text-lg font-bold tabular-nums"
-                                style={{ color: settlement.netResult >= 0 ? brand.green : brand.red }}
+                                className="text-lg font-semibold tabular-nums"
+                                style={{ color: settlement.netResult >= 0 ? brand.blue : brand.red }}
                               >
                                 {settlement.netResult >= 0 ? "+" : ""}{fmt(settlement.netResult)}
                               </span>
@@ -457,7 +457,7 @@ export default function BuildingDetailPage() {
                     <div
                       className="h-1"
                       style={{
-                        background: verdictStatus === "on_track" ? brand.green
+                        background: verdictStatus === "on_track" ? brand.blue
                           : verdictStatus === "review" ? brand.amber
                           : brand.red,
                       }}
@@ -468,28 +468,28 @@ export default function BuildingDetailPage() {
                           <div
                             className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
                             style={{
-                              background: verdictStatus === "on_track" ? "#F0FDF4"
+                              background: verdictStatus === "on_track" ? "#F0FAFB"
                                 : verdictStatus === "review" ? "#FFFBEB"
                                 : "#FEF2F2",
                             }}
                           >
                             {verdictStatus === "on_track" ? (
-                              <CheckCircle2 size={18} style={{ color: brand.green }} />
+                              <CheckCircle2 size={20} style={{ color: brand.blue }} />
                             ) : verdictStatus === "review" ? (
-                              <Clock size={18} style={{ color: brand.amber }} />
+                              <Clock size={20} style={{ color: brand.amber }} />
                             ) : (
-                              <AlertTriangle size={18} style={{ color: brand.red }} />
+                              <AlertTriangle size={20} style={{ color: brand.red }} />
                             )}
                           </div>
                           <div>
-                            <p className="text-[14px] font-semibold" style={{ color: brand.navy }}>
+                            <p className="text-sm font-semibold" style={{ color: brand.navy }}>
                               {verdictStatus === "on_track"
                                 ? (lang === "nl" ? "Complex op koers" : "Building on track")
                                 : verdictStatus === "review"
                                   ? (lang === "nl" ? "Aandacht nodig" : "Needs review")
                                   : (lang === "nl" ? "Actie vereist" : "Action required")}
                             </p>
-                            <p className="text-[12px] text-slate-500 mt-0.5">
+                            <p className="text-xs text-slate-500 mt-0.5">
                               {fmt(totalActual)} {lang === "nl" ? "van" : "of"} {fmt(totalBudget)} ({budgetPct}%)
                               <span className="mx-1.5 text-slate-300">·</span>
                               {lang === "nl" ? "Jaar" : "Year"}: {yearPct}% {lang === "nl" ? "verstreken" : "elapsed"}
@@ -501,31 +501,31 @@ export default function BuildingDetailPage() {
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-4 text-[12px]">
+                        <div className="flex items-center gap-4 text-xs">
                           <div className="text-center">
-                            <span className="text-lg font-bold tabular-nums" style={{ color: brand.green }}>
+                            <span className="text-lg font-semibold tabular-nums" style={{ color: brand.blue }}>
                               {servicesUnderBudget}
                             </span>
-                            <p className="text-[10px] text-slate-400 uppercase tracking-wider">
+                            <p className="text-[11px] text-slate-400 uppercase tracking-wider">
                               {lang === "nl" ? "op koers" : "on track"}
                             </p>
                           </div>
                           {servicesOverBudget > 0 && (
                             <div className="text-center">
-                              <span className="text-lg font-bold tabular-nums" style={{ color: brand.amber }}>
+                              <span className="text-lg font-semibold tabular-nums" style={{ color: brand.amber }}>
                                 {servicesOverBudget}
                               </span>
-                              <p className="text-[10px] text-slate-400 uppercase tracking-wider">
+                              <p className="text-[11px] text-slate-400 uppercase tracking-wider">
                                 {lang === "nl" ? "boven budget" : "over budget"}
                               </p>
                             </div>
                           )}
                           {flaggedCount > 0 && (
                             <div className="text-center">
-                              <span className="text-lg font-bold tabular-nums" style={{ color: brand.red }}>
+                              <span className="text-lg font-semibold tabular-nums" style={{ color: brand.red }}>
                                 {flaggedCount}
                               </span>
-                              <p className="text-[10px] text-slate-400 uppercase tracking-wider">
+                              <p className="text-[11px] text-slate-400 uppercase tracking-wider">
                                 {lang === "nl" ? "gemarkeerd" : "flagged"}
                               </p>
                             </div>
@@ -542,19 +542,19 @@ export default function BuildingDetailPage() {
                         <table className="w-full text-sm">
                           <thead>
                             <tr className="border-b border-slate-200 bg-slate-50/50">
-                              <th className="text-left text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-2.5 whitespace-nowrap">
+                              <th className="text-left text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-3 whitespace-nowrap">
                                 {lang === "nl" ? "Dienst" : "Service"}
                               </th>
-                              <th className="text-right text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-2.5 whitespace-nowrap">
+                              <th className="text-right text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-3 whitespace-nowrap">
                                 {lang === "nl" ? "Budget" : "Budget"}
                               </th>
-                              <th className="text-right text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-2.5 whitespace-nowrap">
+                              <th className="text-right text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-3 whitespace-nowrap">
                                 {lang === "nl" ? "Werkelijk" : "Actual"}
                               </th>
-                              <th className="text-center text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-2.5 whitespace-nowrap hidden sm:table-cell w-[120px]">
+                              <th className="text-center text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-3 whitespace-nowrap hidden sm:table-cell w-[120px]">
                                 {lang === "nl" ? "Voortgang" : "Progress"}
                               </th>
-                              <th className="text-center text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-2.5 w-10">
+                              <th className="text-center text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-3 w-10">
                               </th>
                             </tr>
                           </thead>
@@ -573,7 +573,7 @@ export default function BuildingDetailPage() {
                               if (hasFlagged || overBudget) rowStatus = "attention";
                               else if (aheadOfPace) rowStatus = "review";
 
-                              const statusColor = rowStatus === "ok" ? brand.green
+                              const statusColor = rowStatus === "ok" ? brand.blue
                                 : rowStatus === "review" ? brand.amber
                                 : brand.red;
 
@@ -591,14 +591,14 @@ export default function BuildingDetailPage() {
                                     setExpandedService(bs.serviceId);
                                   }}
                                 >
-                                  <td className="px-4 py-2.5">
-                                    <div className="flex items-center gap-2.5">
+                                  <td className="px-4 py-3">
+                                    <div className="flex items-center gap-3">
                                       <div
                                         className="w-1.5 h-8 rounded-full shrink-0"
                                         style={{ background: statusColor }}
                                       />
                                       <div>
-                                        <span className="text-[12px] font-medium text-slate-800 group-hover:text-slate-900">
+                                        <span className="text-xs font-medium text-slate-800 group-hover:text-slate-900">
                                           {bs.service?.name[lang] || bs.serviceId}
                                         </span>
                                         <span className="text-[11px] text-slate-400 ml-2 font-mono">
@@ -607,30 +607,30 @@ export default function BuildingDetailPage() {
                                       </div>
                                     </div>
                                   </td>
-                                  <td className="px-3 py-2.5 text-right text-[12px] font-mono text-slate-500 tabular-nums">
+                                  <td className="px-3 py-3 text-right text-xs text-slate-500 tabular-nums">
                                     {fmt(bs.budget)}
                                   </td>
-                                  <td className="px-3 py-2.5 text-right text-[12px] font-mono tabular-nums font-medium" style={{ color: brand.navy }}>
+                                  <td className="px-3 py-3 text-right text-xs tabular-nums font-medium" style={{ color: brand.navy }}>
                                     {fmt(bs.actual)}
                                   </td>
-                                  <td className="px-3 py-2.5 hidden sm:table-cell">
+                                  <td className="px-3 py-3 hidden sm:table-cell">
                                     <div className="flex items-center gap-2">
                                       <div className="flex-1 h-[4px] rounded-full bg-slate-100 overflow-hidden">
                                         <div
-                                          className="h-full rounded-full transition-all"
+                                          className="h-full rounded-full transition-colors"
                                           style={{
                                             width: `${Math.min(bsPct, 100)}%`,
                                             background: barColor,
                                           }}
                                         />
                                       </div>
-                                      <span className="text-[10px] font-mono text-slate-400 tabular-nums w-[32px] text-right">
+                                      <span className="text-[11px] text-slate-400 tabular-nums w-[32px] text-right">
                                         {bsPct}%
                                       </span>
                                     </div>
                                   </td>
-                                  <td className="px-3 py-2.5 text-center">
-                                    <ChevronRight size={13} className="text-slate-300 group-hover:text-slate-500 transition-colors mx-auto" />
+                                  <td className="px-3 py-3 text-center">
+                                    <ChevronRight size={14} className="text-slate-300 group-hover:text-slate-500 transition-colors mx-auto" />
                                   </td>
                                 </tr>
                               );
@@ -639,32 +639,32 @@ export default function BuildingDetailPage() {
                           {/* Footer */}
                           <tfoot>
                             <tr className="border-t border-slate-200 bg-slate-50/50">
-                              <td className="px-4 py-2.5 text-[12px] font-semibold text-slate-600">
+                              <td className="px-4 py-3 text-xs font-semibold text-slate-600">
                                 {lang === "nl" ? "Totaal" : "Total"} ({enrichedBs.length} {lang === "nl" ? "diensten" : "services"})
                               </td>
-                              <td className="px-3 py-2.5 text-right text-[12px] font-mono font-semibold text-slate-600 tabular-nums">
+                              <td className="px-3 py-3 text-right text-xs font-semibold text-slate-600 tabular-nums">
                                 {fmt(totalBudget)}
                               </td>
-                              <td className="px-3 py-2.5 text-right text-[12px] font-mono font-semibold tabular-nums" style={{ color: brand.navy }}>
+                              <td className="px-3 py-3 text-right text-xs font-semibold tabular-nums" style={{ color: brand.navy }}>
                                 {fmt(totalActual)}
                               </td>
-                              <td className="px-3 py-2.5 hidden sm:table-cell">
+                              <td className="px-3 py-3 hidden sm:table-cell">
                                 <div className="flex items-center gap-2">
                                   <div className="flex-1 h-[4px] rounded-full bg-slate-100 overflow-hidden">
                                     <div
-                                      className="h-full rounded-full transition-all"
+                                      className="h-full rounded-full transition-colors"
                                       style={{
                                         width: `${Math.min(budgetPct, 100)}%`,
                                         background: !isOnPace ? brand.amber : brand.blue,
                                       }}
                                     />
                                   </div>
-                                  <span className="text-[10px] font-mono text-slate-400 tabular-nums w-[32px] text-right">
+                                  <span className="text-[11px] text-slate-400 tabular-nums w-[32px] text-right">
                                     {budgetPct}%
                                   </span>
                                 </div>
                               </td>
-                              <td className="px-3 py-2.5" />
+                              <td className="px-3 py-3" />
                             </tr>
                           </tfoot>
                         </table>
@@ -688,7 +688,7 @@ export default function BuildingDetailPage() {
                               className="text-amber-500 mt-0.5 shrink-0"
                             />
                             <div>
-                              <p className="text-[12px] text-slate-700">
+                              <p className="text-xs text-slate-700">
                                 {alert.description[lang] || alert.description.en}
                               </p>
                               <p className="text-[11px] text-slate-400 mt-0.5">
@@ -736,10 +736,10 @@ export default function BuildingDetailPage() {
                               className="w-5 h-5 rounded flex items-center justify-center"
                               style={{ background: cfg?.bg, color: cfg?.color }}
                             >
-                              <GroupIcon size={11} />
+                              <GroupIcon size={14} />
                             </div>
                             <span
-                              className="text-[12px] font-semibold uppercase tracking-wider"
+                              className="text-xs font-semibold uppercase tracking-wider"
                               style={{ color: cfg?.color }}
                             >
                               {group.label[lang] || group.label.en}
@@ -763,7 +763,7 @@ export default function BuildingDetailPage() {
                               const overBudget = v < 0;
                               const svcPct = bs.budget > 0 ? (bs.actual / bs.budget) * 100 : 0;
                               const svcAheadOfPace = svcPct > yearPct + 10;
-                              let rowStatusColor = brand.green;
+                              let rowStatusColor = brand.blue;
                               if (hasFlagged || overBudget) rowStatusColor = brand.red;
                               else if (svcAheadOfPace) rowStatusColor = brand.amber;
 
@@ -785,19 +785,19 @@ export default function BuildingDetailPage() {
                                         style={{ background: rowStatusColor }}
                                       />
                                       <ChevronRight
-                                        size={13}
+                                        size={14}
                                         className={`text-slate-400 transition-transform duration-150 shrink-0 ${isExpanded ? "rotate-90" : ""}`}
                                       />
                                       <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2">
-                                          <span className="text-[13px] font-semibold text-slate-800">
+                                          <span className="text-sm font-semibold text-slate-800">
                                             {bs.service?.name[lang] || bs.serviceId}
                                           </span>
                                           <span className="text-[11px] font-mono text-slate-400">
                                             {bs.service?.code}
                                           </span>
                                           {bs.service?.metered && (
-                                            <span className="text-[9px] px-1.5 py-0.5 rounded-full font-medium text-slate-500 bg-slate-100">
+                                            <span className="text-[11px] px-2 py-1 rounded-full font-medium text-slate-500 bg-slate-100">
                                               {lang === "nl" ? "Gemeten" : "Metered"}
                                             </span>
                                           )}
@@ -814,17 +814,17 @@ export default function BuildingDetailPage() {
                                                   style={{ width: `${Math.min(pct, 100)}%`, background: barCol }}
                                                 />
                                               </div>
-                                              <span className="text-[9px] font-mono text-slate-400 tabular-nums">{pct}%</span>
+                                              <span className="text-[11px] text-slate-400 tabular-nums">{pct}%</span>
                                             </div>
                                           );
                                         })()}
                                       </div>
                                       <div className="flex items-center gap-4 shrink-0">
                                         <div className="text-right">
-                                          <p className="text-[12px] font-mono tabular-nums font-medium" style={{ color: brand.navy }}>
+                                          <p className="text-xs tabular-nums font-medium" style={{ color: brand.navy }}>
                                             {fmt(bs.actual)}
                                           </p>
-                                          <p className="text-[10px] text-slate-400 tabular-nums">
+                                          <p className="text-[11px] text-slate-400 tabular-nums">
                                             {lang === "nl" ? "van" : "of"} {fmt(bs.budget)}
                                           </p>
                                         </div>
@@ -846,7 +846,7 @@ export default function BuildingDetailPage() {
                                               <div className="flex items-center gap-3">
                                                 <div className="flex-1 h-[6px] rounded-full bg-slate-100 overflow-hidden relative">
                                                   <div
-                                                    className="h-full rounded-full transition-all"
+                                                    className="h-full rounded-full transition-colors"
                                                     style={{ width: `${Math.min(pct, 100)}%`, background: barCol }}
                                                   />
                                                   {/* Year pace marker */}
@@ -858,11 +858,11 @@ export default function BuildingDetailPage() {
                                                     />
                                                   )}
                                                 </div>
-                                                <span className="text-[11px] font-mono text-slate-500 tabular-nums shrink-0">
+                                                <span className="text-[11px] text-slate-500 tabular-nums shrink-0">
                                                   {pct}% {lang === "nl" ? "van budget" : "of budget"}
                                                 </span>
                                               </div>
-                                              <div className="flex items-center justify-between mt-1.5 text-[10px] text-slate-400">
+                                              <div className="flex items-center justify-between mt-1.5 text-[11px] text-slate-400">
                                                 <span>{fmt(bs.actual)} / {fmt(bs.budget)}</span>
                                                 <span>
                                                   {lang === "nl" ? "Jaar" : "Year"} {yearPct}% {lang === "nl" ? "verstreken" : "elapsed"}
@@ -902,7 +902,7 @@ export default function BuildingDetailPage() {
                                                 return (
                                                   <div
                                                     key={cc.id}
-                                                    className="flex items-center justify-between text-[11px] px-3 py-2 rounded-md bg-white border border-slate-100"
+                                                    className="flex items-center justify-between text-[11px] px-3 py-2 rounded-lg bg-white border border-slate-100"
                                                   >
                                                     <div className="flex items-center gap-2 flex-1 min-w-0">
                                                       <span className="font-medium text-slate-700">{cc.name[lang] || cc.name.en}</span>
@@ -911,15 +911,15 @@ export default function BuildingDetailPage() {
                                                       )}
                                                     </div>
                                                     <div className="flex items-center gap-3 shrink-0 ml-2">
-                                                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-50 text-slate-500">
+                                                      <span className="text-[11px] px-2 py-1 rounded bg-slate-50 text-slate-500">
                                                         {freqLabel}
                                                       </span>
                                                       {cc.unit && cc.unitPrice && (
-                                                        <span className="text-[10px] text-slate-400 font-mono">
+                                                        <span className="text-[11px] text-slate-400 tabular-nums">
                                                           €{Math.abs(cc.unitPrice).toFixed(2)}/{cc.unit}
                                                         </span>
                                                       )}
-                                                      <span className="font-mono text-slate-600 tabular-nums">
+                                                      <span className="text-slate-600 tabular-nums">
                                                         {fmtEur2(ccActualEstimate)}
                                                       </span>
                                                     </div>
@@ -968,13 +968,13 @@ export default function BuildingDetailPage() {
                                               <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider mb-2">
                                                 {lang === "nl" ? "Verbruikscontrole" : "Consumption Check"}
                                               </p>
-                                              <div className="px-3 py-2.5 rounded-md bg-white border border-slate-100">
+                                              <div className="px-3 py-3 rounded-lg bg-white border border-slate-100">
                                                 <div className="grid grid-cols-3 gap-4 text-[11px]">
                                                   <div>
                                                     <p className="text-slate-400 mb-1">
                                                       {lang === "nl" ? "Verbruik" : "Consumption"}
                                                     </p>
-                                                    <p className="font-mono font-medium text-slate-700 tabular-nums">
+                                                    <p className="font-medium text-slate-700 tabular-nums">
                                                       {totalConsumption.toLocaleString("nl-NL")} {unit}
                                                     </p>
                                                   </div>
@@ -982,10 +982,10 @@ export default function BuildingDetailPage() {
                                                     <p className="text-slate-400 mb-1">
                                                       {lang === "nl" ? "Verwachte kosten" : "Expected cost"}
                                                     </p>
-                                                    <p className="font-mono font-medium text-slate-700 tabular-nums">
+                                                    <p className="font-medium text-slate-700 tabular-nums">
                                                       {fmtEur2(expectedCost)}
                                                     </p>
-                                                    <p className="text-[9px] text-slate-400 mt-0.5">
+                                                    <p className="text-[11px] text-slate-400 mt-0.5">
                                                       {totalConsumption.toLocaleString("nl-NL")} × €{avgUnitPrice.toFixed(2)}/{unit}
                                                     </p>
                                                   </div>
@@ -993,12 +993,12 @@ export default function BuildingDetailPage() {
                                                     <p className="text-slate-400 mb-1">
                                                       {lang === "nl" ? "Geboekt" : "Booked"}
                                                     </p>
-                                                    <p className="font-mono font-medium tabular-nums" style={{ color: brand.navy }}>
+                                                    <p className="font-medium tabular-nums" style={{ color: brand.navy }}>
                                                       {fmtEur2(bs.actual)}
                                                     </p>
                                                     {Math.abs(variancePct) > 15 && (
                                                       <p
-                                                        className="text-[9px] font-medium mt-0.5"
+                                                        className="text-[11px] font-medium mt-0.5"
                                                         style={{ color: variancePct > 0 ? brand.red : brand.amber }}
                                                       >
                                                         {variancePct > 0 ? "+" : ""}{variancePct}% {lang === "nl" ? "afwijking" : "variance"}
@@ -1007,7 +1007,7 @@ export default function BuildingDetailPage() {
                                                   </div>
                                                 </div>
                                                 {Math.abs(variancePct) > 50 && (
-                                                  <p className="text-[10px] text-slate-400 mt-2 italic">
+                                                  <p className="text-[11px] text-slate-400 mt-2 italic">
                                                     {lang === "nl"
                                                       ? "Let op: verschil kan komen door vastrecht, netbeheer, of seizoenscorrectie"
                                                       : "Note: variance may include fixed charges, grid costs, or seasonal adjustments"}
@@ -1026,7 +1026,7 @@ export default function BuildingDetailPage() {
                                             </p>
                                             <div className="space-y-1">
                                               {ledgerEntries.slice(0, 6).map((entry) => (
-                                                <div key={entry.id} className="flex items-center justify-between text-[11px] px-3 py-1.5 rounded-md bg-white border border-slate-100">
+                                                <div key={entry.id} className="flex items-center justify-between text-[11px] px-3 py-1.5 rounded-lg bg-white border border-slate-100">
                                                   <div className="flex items-center gap-2 flex-1 min-w-0">
                                                     <span className="text-slate-400 tabular-nums shrink-0">{fmtDate(entry.date)}</span>
                                                     <span className="text-slate-600 truncate">
@@ -1036,13 +1036,13 @@ export default function BuildingDetailPage() {
                                                     </span>
                                                   </div>
                                                   <div className="flex items-center gap-2 shrink-0 ml-2">
-                                                    <span className="font-mono text-slate-700 tabular-nums">{fmtEur2(entry.amount)}</span>
+                                                    <span className="text-slate-700 tabular-nums">{fmtEur2(entry.amount)}</span>
                                                     <LedgerStatusBadge status={entry.status} lang={lang} />
                                                   </div>
                                                 </div>
                                               ))}
                                               {ledgerEntries.length > 6 && (
-                                                <p className="text-[10px] text-slate-400 italic px-3 py-1">
+                                                <p className="text-[11px] text-slate-400 italic px-3 py-1">
                                                   + {ledgerEntries.length - 6} {lang === "nl" ? "meer" : "more"}
                                                 </p>
                                               )}
@@ -1065,7 +1065,7 @@ export default function BuildingDetailPage() {
                                             }}
                                           >
                                             {lang === "nl" ? "Bekijk alle complexen" : "View all buildings"}
-                                            <ArrowUpRight size={11} />
+                                            <ArrowUpRight size={14} />
                                           </button>
                                         </div>
                                       </div>
@@ -1087,7 +1087,7 @@ export default function BuildingDetailPage() {
                 <div className="mt-4 space-y-4">
                   {/* Main meters */}
                   <div>
-                    <h3 className="text-[13px] font-semibold text-slate-600 mb-3">
+                    <h3 className="text-sm font-semibold text-slate-600 mb-3">
                       {lang === "nl" ? "Hoofdmeters" : "Main Meters"}
                     </h3>
                     {mainMeters.length === 0 ? (
@@ -1112,7 +1112,7 @@ export default function BuildingDetailPage() {
                                       <Icon size={14} style={{ color: ui.color || "#94A3B8" }} />
                                     </div>
                                     <div className="min-w-0">
-                                      <p className="text-[12px] text-slate-700 font-medium">{m.meterNumber}</p>
+                                      <p className="text-xs text-slate-700 font-medium">{m.meterNumber}</p>
                                       <p className="text-[11px] text-slate-400">{t(m.utility, lang)} · {m.unit}</p>
                                     </div>
                                   </div>
@@ -1123,26 +1123,26 @@ export default function BuildingDetailPage() {
 
                                 <div className="grid grid-cols-3 gap-3 px-3 py-2 bg-slate-50 rounded">
                                   <div>
-                                    <p className="text-[10px] text-slate-500 uppercase font-medium">
+                                    <p className="text-[11px] text-slate-500 uppercase font-medium">
                                       {lang === "nl" ? "Huidig" : "Current"}
                                     </p>
-                                    <p className="text-[13px] font-bold text-slate-900">
+                                    <p className="text-sm font-semibold text-slate-900">
                                       {(m.lastReading || 0).toLocaleString("nl-NL")}
                                     </p>
                                   </div>
                                   <div>
-                                    <p className="text-[10px] text-slate-500 uppercase font-medium">
+                                    <p className="text-[11px] text-slate-500 uppercase font-medium">
                                       {lang === "nl" ? "Verbruik" : "Consumption"}
                                     </p>
-                                    <p className="text-[13px] font-bold text-slate-900">
+                                    <p className="text-sm font-semibold text-slate-900">
                                       {(m.consumption || 0).toLocaleString("nl-NL")} {m.unit}
                                     </p>
                                   </div>
                                   <div>
-                                    <p className="text-[10px] text-slate-500 uppercase font-medium">
+                                    <p className="text-[11px] text-slate-500 uppercase font-medium">
                                       {lang === "nl" ? "Aflezing" : "Reading date"}
                                     </p>
-                                    <p className="text-[13px] font-bold text-slate-900">
+                                    <p className="text-sm font-semibold text-slate-900">
                                       {m.readingDate}
                                     </p>
                                   </div>
@@ -1158,7 +1158,7 @@ export default function BuildingDetailPage() {
                   {/* Sub meters */}
                   {subMeters.length > 0 && (
                     <div>
-                      <h3 className="text-[13px] font-semibold text-slate-600 mb-3">
+                      <h3 className="text-sm font-semibold text-slate-600 mb-3">
                         {lang === "nl" ? "Submeters" : "Sub Meters"} ({subMeters.length})
                       </h3>
                       <div className="space-y-2">
@@ -1177,11 +1177,11 @@ export default function BuildingDetailPage() {
                                       <Icon size={14} style={{ color: ui.color || "#94A3B8" }} />
                                     </div>
                                     <div className="min-w-0">
-                                      <p className="text-[12px] text-slate-700 font-medium">{m.meterNumber}</p>
+                                      <p className="text-xs text-slate-700 font-medium">{m.meterNumber}</p>
                                       <p className="text-[11px] text-slate-400">{m.vheId}</p>
                                     </div>
                                   </div>
-                                  <span className="text-[13px] font-bold tabular-nums" style={{ color: brand.navy }}>
+                                  <span className="text-sm font-semibold tabular-nums" style={{ color: brand.navy }}>
                                     {(m.consumption || 0).toLocaleString("nl-NL")} {m.unit}
                                   </span>
                                 </div>
@@ -1217,11 +1217,11 @@ export default function BuildingDetailPage() {
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3 flex-1 min-w-0">
                                   <ChevronRight
-                                    size={13}
+                                    size={14}
                                     className={`text-slate-400 transition-transform duration-150 shrink-0 ${isExpanded ? "rotate-90" : ""}`}
                                   />
                                   <div className="min-w-0">
-                                    <p className="text-[12px] text-slate-700 font-medium truncate">
+                                    <p className="text-xs text-slate-700 font-medium truncate">
                                       {vhe.address}
                                     </p>
                                     <p className="text-[11px] text-slate-400">
@@ -1288,7 +1288,7 @@ export default function BuildingDetailPage() {
                                 <Icon size={14} style={{ color: cfg.color || brand.blue }} />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-[12px] text-slate-700 font-medium">
+                                <p className="text-xs text-slate-700 font-medium">
                                   {typeof activity.description === "object" ? (activity.description[lang] || activity.description.en) : activity.description}
                                 </p>
                                 <p className="text-[11px] text-slate-400 mt-1">

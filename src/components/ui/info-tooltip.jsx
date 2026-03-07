@@ -13,7 +13,7 @@ export function InfoTooltip({ text, size = 13 }) {
         <Info size={size} />
       </button>
       {show && (
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-64 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[11px] text-slate-500 leading-relaxed shadow-lg pointer-events-none">
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-50 w-64 rounded-lg border border-slate-200 bg-white px-3 py-3 text-[11px] text-slate-500 leading-relaxed shadow-md pointer-events-none">
           {text}
           <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px w-2 h-2 rotate-45 bg-white border-b border-r border-slate-200" />
         </div>
@@ -24,7 +24,7 @@ export function InfoTooltip({ text, size = 13 }) {
 
 export function TimePeriodLabel({ text, period, className = "" }) {
   return (
-    <span className={`text-[10px] font-medium text-slate-400 bg-slate-100 rounded px-1.5 py-0.5 ${className}`}>
+    <span className={`text-[11px] font-medium text-slate-400 bg-slate-100 rounded px-2 py-1 ${className}`}>
       {text || period}
     </span>
   );
