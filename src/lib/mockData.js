@@ -1411,6 +1411,70 @@ function generateLedgerEntries() {
     "SVC-120": ["Hydrofoor onderhoud", "Storingsdienst hydrofoor"],
   };
 
+  const descToCostCategory = {
+    // SVC-108 Warmtekosten
+    "Maandnota warmtelevering": "CC-108-01",     // Gas delivery
+    "Vastrecht warmte": "CC-108-04",              // Heat transport (standing)
+    "Nacalculatie warmteverbruik": "CC-108-01",   // Gas delivery adjustment
+    "Meetdiensten warmte": "CC-108-03",           // Metering services
+    "Transportkosten warmtenet": "CC-108-04",     // Heat transport
+    // SVC-102 Koud water
+    "Maandnota waterlevering": "CC-102-01",       // Water supply
+    "Vastrecht drinkwater": "CC-102-02",          // Standing charge
+    "Rioolheffing gemeenschappelijk": "CC-102-03",// Sewer levy
+    // SVC-104 Warm water
+    "Maandnota warm water": "CC-104-01",          // Hot water delivery
+    "Vastrecht warm water": "CC-104-02",          // Standing charge
+    "Nacalculatie warmwaterverbruik": "CC-104-01", // Hot water adjustment
+    // SVC-105 Elektra algemeen
+    "Maandnota elektra algemeen": "CC-105-01",    // Electricity supply
+    "Vastrecht elektra": "CC-105-02",             // Standing charge
+    "Verbruik trappenhuisverlichting": "CC-105-01",// Electricity supply
+    "Verbruik parkeergarage": "CC-105-01",        // Electricity supply
+    // SVC-106 Elektra woonruimte
+    "Maandnota elektra woonruimte": "CC-106-01",  // Electricity supply
+    "Vastrecht elektra individueel": "CC-106-02",  // Standing charge
+    // SVC-118 Schoonmaak
+    "Schoonmaak algemene ruimten": "CC-118-01",
+    "Schoonmaak trappenhuis": "CC-118-01",
+    "Glasbewassing": "CC-118-01",
+    // SVC-131 Huismeester
+    "Huismeesterdiensten": "CC-131-01",
+    "Kleine reparaties": "CC-131-01",
+    "Sociale dienstverlening": "CC-131-01",
+    // SVC-132 Lift
+    "Onderhoudscontract lift": "CC-132-01",       // Elevator maintenance
+    "Storingsafhandeling lift": "CC-132-01",
+    "Keuring lift": "CC-132-02",                  // Elevator inspection
+    // SVC-111 Meters
+    "Plaatsing verbruiksmeters": "CC-111-01",
+    "IJking meters": "CC-111-01",
+    "Afleesservice": "CC-111-01",
+    // SVC-115 Storingsdienst
+    "24-uur storingsdienst CV": "CC-115-01",
+    "Noodreparatie verwarming": "CC-115-01",
+    // SVC-127 Ventilatie
+    "Onderhoud ventilatie": "CC-127-01",
+    "Filtervervanging MV": "CC-127-01",
+    "Energieverbruik ventilatie": "CC-127-01",
+    // SVC-123 Tuinonderhoud
+    "Tuinonderhoud": "CC-123-01",                 // Landscaping
+    "Groenvoorziening seizoen": "CC-123-02",      // Seasonal work
+    "Snoeiwerkzaamheden": "CC-123-02",
+    // SVC-116 Lampen
+    "Vervanging lampen": "CC-116-01",
+    "Noodverlichting controle": "CC-116-01",
+    // SVC-122 Riool
+    "Rioolreiniging": "CC-122-01",
+    "Ontstopping collectief": "CC-122-01",
+    // SVC-091 Zonnepanelen
+    "Opbrengst zonnepanelen": "CC-091-01",
+    "Saldering zonnepanelen": "CC-091-01",
+    // SVC-120 Hydrofoor
+    "Hydrofoor onderhoud": "CC-120-01",
+    "Storingsdienst hydrofoor": "CC-120-01",
+  };
+
   const supplierMap = {
     "SVC-108": "ENGIE Energie Nederland",
     "SVC-102": "Oasen",
@@ -1484,10 +1548,17 @@ function generateLedgerEntries() {
             flag = flags[Math.floor(Math.random() * flags.length)];
           }
 
+          // Resolve description string for lookup
+          const descStr = typeof desc === "object" ? desc.en : desc;
+          const mappedCcId = descToCostCategory[descStr] || null;
+          // ~5% unassigned for data quality signal
+          const costCategoryId = (mappedCcId && Math.random() > 0.05) ? mappedCcId : null;
+
           entries.push({
             id: `LED-${String(idx).padStart(5, "0")}`,
             serviceId: svc,
             buildingId: bld,
+            costCategoryId,
             year,
             month,
             date: dateStr,
@@ -1521,6 +1592,23 @@ export function getLedgerByBuilding(buildingId, year = 2025) {
 
 export function getLedgerByServiceAndBuilding(serviceId, buildingId, year = 2025) {
   return ledgerEntries.filter(e => e.serviceId === serviceId && e.buildingId === buildingId && e.year === year);
+}
+
+export function getLedgerGroupedByCostCategory(serviceId, buildingId, year = 2025) {
+  const entries = getLedgerByServiceAndBuilding(serviceId, buildingId, year);
+  const grouped = {};
+  const unassigned = [];
+
+  entries.forEach(e => {
+    if (e.costCategoryId) {
+      if (!grouped[e.costCategoryId]) grouped[e.costCategoryId] = [];
+      grouped[e.costCategoryId].push(e);
+    } else {
+      unassigned.push(e);
+    }
+  });
+
+  return { grouped, unassigned };
 }
 
 export function getLedgerSummaryByService(serviceId, year = 2025) {

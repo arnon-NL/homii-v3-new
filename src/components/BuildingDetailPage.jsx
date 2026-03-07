@@ -21,7 +21,9 @@ import {
   FileText,
   Users,
   ChevronRight,
+  ChevronDown,
   Circle,
+  HelpCircle,
   FileCheck,
   Send,
   ShieldCheck,
@@ -40,7 +42,7 @@ import {
   getSettlementChecks,
   serviceCategories,
   getLedgerSummaryByBuilding,
-  getLedgerByServiceAndBuilding,
+  getLedgerGroupedByCostCategory,
   meters,
   getCostCategoriesByService,
   isFeatureEnabled,
@@ -207,6 +209,8 @@ export default function BuildingDetailPage() {
   const [activeTab, setActiveTab] = useState("overview");
   const [expandedVhe, setExpandedVhe] = useState(null);
   const [expandedService, setExpandedService] = useState(null);
+  const [expandedCostCats, setExpandedCostCats] = useState({});  // { [ccId]: true }
+  const toggleCostCat = (ccId) => setExpandedCostCats((prev) => ({ ...prev, [ccId]: !prev[ccId] }));
 
   const building = getBuilding(buildingId);
 
@@ -826,10 +830,9 @@ export default function BuildingDetailPage() {
                               const v = bs.budget - bs.actual;
                               const ledger = ledgerByService[bs.serviceId];
                               const costCats = getCostCategoriesByService(bs.serviceId);
-                              const ledgerEntries = isExpanded
-                                ? getLedgerByServiceAndBuilding(bs.serviceId, buildingId, year)
-                                    .sort((a, b) => b.date.localeCompare(a.date))
-                                : [];
+                              const { grouped: ledgerByCc, unassigned: unassignedEntries } = isExpanded
+                                ? getLedgerGroupedByCostCategory(bs.serviceId, buildingId, year)
+                                : { grouped: {}, unassigned: [] };
 
                               // Row status (budget-based)
                               const hasFlagged = (ledger?.flagged || 0) > 0;
@@ -950,7 +953,52 @@ export default function BuildingDetailPage() {
                                           );
                                         })()}
 
-                                        {/* Section B: Cost Categories */}
+                                        {/* Section B: Consumption insight (metered services — cross-cutting, stays at service level) */}
+                                        {isFeatureEnabled("consumptionControl") && bs.service?.metered && (() => {
+                                          const utilityMap = {
+                                            "SVC-108": "heat", "SVC-107": "heat",
+                                            "SVC-102": "water", "SVC-104": "water",
+                                            "SVC-105": "electricity", "SVC-106": "electricity",
+                                            "SVC-110": "electricity", "SVC-133": "electricity",
+                                          };
+                                          const utilType = utilityMap[bs.serviceId];
+                                          const svcMeters = meterList.filter((m) => m.utility === utilType && m.type === "main");
+                                          const totalConsumption = svcMeters.reduce((s, m) => s + (m.consumption || 0), 0);
+                                          const meteredCats = costCats.filter((cc) => cc.unit && cc.unitPrice);
+                                          const avgUnitPrice = meteredCats.length > 0
+                                            ? meteredCats.reduce((s, cc) => s + Math.abs(cc.unitPrice) * cc.budgetShare, 0) / meteredCats.reduce((s, cc) => s + cc.budgetShare, 0)
+                                            : 0;
+                                          const expectedCost = totalConsumption * avgUnitPrice;
+                                          const variancePct = expectedCost > 0 ? Math.round(((bs.actual - expectedCost) / expectedCost) * 100) : 0;
+                                          const unit = meteredCats[0]?.unit || "—";
+                                          if (totalConsumption === 0 || avgUnitPrice === 0) return null;
+                                          return (
+                                            <div className="px-3 py-3 rounded-lg bg-white border border-slate-100">
+                                              <div className="grid grid-cols-3 gap-4 text-[11px]">
+                                                <div>
+                                                  <p className="text-slate-400 mb-1">{lang === "nl" ? "Verbruik" : "Consumption"}</p>
+                                                  <p className="font-medium text-slate-700 tabular-nums">{totalConsumption.toLocaleString("nl-NL")} {unit}</p>
+                                                </div>
+                                                <div>
+                                                  <p className="text-slate-400 mb-1">{lang === "nl" ? "Verwachte kosten" : "Expected cost"}</p>
+                                                  <p className="font-medium text-slate-700 tabular-nums">{fmtEur2(expectedCost)}</p>
+                                                  <p className="text-[11px] text-slate-400 mt-0.5">{totalConsumption.toLocaleString("nl-NL")} × €{avgUnitPrice.toFixed(2)}/{unit}</p>
+                                                </div>
+                                                <div>
+                                                  <p className="text-slate-400 mb-1">{lang === "nl" ? "Geboekt" : "Booked"}</p>
+                                                  <p className="font-medium tabular-nums" style={{ color: brand.navy }}>{fmtEur2(bs.actual)}</p>
+                                                  {Math.abs(variancePct) > 15 && (
+                                                    <p className="text-[11px] font-medium mt-0.5" style={{ color: variancePct > 0 ? brand.red : brand.amber }}>
+                                                      {variancePct > 0 ? "+" : ""}{variancePct}% {lang === "nl" ? "afwijking" : "variance"}
+                                                    </p>
+                                                  )}
+                                                </div>
+                                              </div>
+                                            </div>
+                                          );
+                                        })()}
+
+                                        {/* Section C: Cost Categories with nested Ledger Entries */}
                                         <div>
                                           <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider mb-2">
                                             {lang === "nl" ? "Kostensoorten" : "Cost Categories"} ({costCats.length})
@@ -960,42 +1008,101 @@ export default function BuildingDetailPage() {
                                               {lang === "nl" ? "Geen kostensoorten geconfigureerd" : "No cost categories configured"}
                                             </p>
                                           ) : (
-                                            <div className="space-y-1">
+                                            <div className="space-y-1.5">
                                               {costCats.map((cc) => {
+                                                const ccEntries = (ledgerByCc[cc.id] || []).sort((a, b) => b.date.localeCompare(a.date));
+                                                const ccActual = ccEntries.reduce((s, e) => s + e.amount, 0);
                                                 const ccBudget = bs.budget * cc.budgetShare;
-                                                // Simple proportional YTD estimate
-                                                const ccActualEstimate = bs.actual * cc.budgetShare;
+                                                const ccPct = ccBudget > 0 ? Math.round((ccActual / ccBudget) * 100) : 0;
+                                                const ccOver = ccActual > ccBudget;
+                                                const ccAhead = ccPct > yearPct + 10;
+                                                const ccBarCol = ccOver ? brand.red : ccAhead ? brand.amber : brand.blue;
+                                                const isCcExpanded = expandedCostCats[cc.id];
+                                                const ccFlagged = ccEntries.filter((e) => e.status === "flagged").length;
+
                                                 const freqLabel = {
-                                                  monthly: lang === "nl" ? "maandelijks" : "monthly",
-                                                  quarterly: lang === "nl" ? "per kwartaal" : "quarterly",
-                                                  annual: lang === "nl" ? "jaarlijks" : "annual",
-                                                  irregular: lang === "nl" ? "onregelmatig" : "irregular",
+                                                  monthly: lang === "nl" ? "mnd" : "mo",
+                                                  quarterly: lang === "nl" ? "kw" : "qtr",
+                                                  annual: lang === "nl" ? "jr" : "yr",
+                                                  irregular: lang === "nl" ? "onr" : "irr",
                                                 }[cc.invoiceFrequency] || cc.invoiceFrequency;
 
                                                 return (
-                                                  <div
-                                                    key={cc.id}
-                                                    className="flex items-center justify-between text-[11px] px-3 py-2 rounded-lg bg-white border border-slate-100"
-                                                  >
-                                                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                                                      <span className="font-medium text-slate-700">{cc.name[lang] || cc.name.en}</span>
-                                                      {cc.supplier && (
-                                                        <span className="text-slate-400 truncate">· {cc.supplier}</span>
-                                                      )}
-                                                    </div>
-                                                    <div className="flex items-center gap-3 shrink-0 ml-2">
-                                                      <span className="text-[11px] px-2 py-1 rounded bg-slate-50 text-slate-500">
-                                                        {freqLabel}
-                                                      </span>
-                                                      {cc.unit && cc.unitPrice && (
-                                                        <span className="text-[11px] text-slate-400 tabular-nums">
-                                                          €{Math.abs(cc.unitPrice).toFixed(2)}/{cc.unit}
+                                                  <div key={cc.id} className="rounded-lg bg-white border border-slate-100 overflow-hidden">
+                                                    {/* Cost Category header row — clickable */}
+                                                    <div
+                                                      className="flex items-center gap-2.5 px-3 py-2.5 cursor-pointer hover:bg-slate-50/50 transition-colors"
+                                                      onClick={() => toggleCostCat(cc.id)}
+                                                    >
+                                                      {isCcExpanded
+                                                        ? <ChevronDown size={12} className="text-slate-400 shrink-0" />
+                                                        : <ChevronRight size={12} className="text-slate-400 shrink-0" />
+                                                      }
+                                                      <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center gap-1.5">
+                                                          <span className="text-[11px] font-medium text-slate-700">{cc.name[lang] || cc.name.en}</span>
+                                                          {cc.supplier && (
+                                                            <span className="text-[11px] text-slate-400 truncate hidden sm:inline">· {cc.supplier}</span>
+                                                          )}
+                                                          {ccFlagged > 0 && (
+                                                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-50 font-medium" style={{ color: brand.red }}>
+                                                              {ccFlagged} ⚑
+                                                            </span>
+                                                          )}
+                                                        </div>
+                                                        {/* Mini progress bar */}
+                                                        <div className="flex items-center gap-1.5 mt-1 max-w-[120px]">
+                                                          <div className="flex-1 h-[2px] rounded-full bg-slate-100 overflow-hidden">
+                                                            <div className="h-full rounded-full" style={{ width: `${Math.min(ccPct, 100)}%`, background: ccBarCol }} />
+                                                          </div>
+                                                          <span className="text-[10px] text-slate-400 tabular-nums">{ccPct}%</span>
+                                                        </div>
+                                                      </div>
+                                                      <div className="flex items-center gap-2.5 shrink-0 text-[11px]">
+                                                        <span className="text-slate-400 tabular-nums hidden sm:inline">{freqLabel}</span>
+                                                        {cc.unit && cc.unitPrice && (
+                                                          <span className="text-slate-400 tabular-nums hidden sm:inline">€{Math.abs(cc.unitPrice).toFixed(2)}/{cc.unit}</span>
+                                                        )}
+                                                        <span className="font-medium tabular-nums" style={{ color: ccOver ? brand.red : brand.navy }}>
+                                                          {fmtEur2(ccActual)}
                                                         </span>
-                                                      )}
-                                                      <span className="text-slate-600 tabular-nums">
-                                                        {fmtEur2(ccActualEstimate)}
-                                                      </span>
+                                                        <span className="text-slate-400 tabular-nums">
+                                                          / {fmtEur2(ccBudget)}
+                                                        </span>
+                                                      </div>
                                                     </div>
+
+                                                    {/* Expanded: nested ledger entries */}
+                                                    {isCcExpanded && ccEntries.length > 0 && (
+                                                      <div className="border-t border-slate-100 bg-slate-50/30">
+                                                        {ccEntries.slice(0, 8).map((entry) => (
+                                                          <div key={entry.id} className="flex items-center justify-between text-[11px] px-3 py-1.5 pl-8 border-b border-slate-50 last:border-b-0">
+                                                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                              <span className="text-slate-400 tabular-nums shrink-0">{fmtDate(entry.date)}</span>
+                                                              <span className="text-slate-600 truncate">
+                                                                {typeof entry.description === "object" ? (entry.description[lang] || entry.description.en) : entry.description}
+                                                              </span>
+                                                            </div>
+                                                            <div className="flex items-center gap-2 shrink-0 ml-2">
+                                                              <span className="text-slate-700 tabular-nums">{fmtEur2(entry.amount)}</span>
+                                                              <LedgerStatusBadge status={entry.status} lang={lang} />
+                                                            </div>
+                                                          </div>
+                                                        ))}
+                                                        {ccEntries.length > 8 && (
+                                                          <p className="text-[10px] text-slate-400 italic px-3 pl-8 py-1.5">
+                                                            + {ccEntries.length - 8} {lang === "nl" ? "meer" : "more"}
+                                                          </p>
+                                                        )}
+                                                      </div>
+                                                    )}
+                                                    {isCcExpanded && ccEntries.length === 0 && (
+                                                      <div className="border-t border-slate-100 bg-slate-50/30 px-3 pl-8 py-2">
+                                                        <p className="text-[10px] text-slate-400 italic">
+                                                          {lang === "nl" ? "Geen boekingen gevonden" : "No entries found"}
+                                                        </p>
+                                                      </div>
+                                                    )}
                                                   </div>
                                                 );
                                               })}
@@ -1003,109 +1110,22 @@ export default function BuildingDetailPage() {
                                           )}
                                         </div>
 
-                                        {/* Section C: Consumption vs Cost check (metered services only) */}
-                                        {isFeatureEnabled("consumptionControl") && bs.service?.metered && (() => {
-                                          // Find meter(s) for this service's utility type
-                                          const utilityMap = {
-                                            "SVC-108": "heat", "SVC-107": "heat",
-                                            "SVC-102": "water", "SVC-104": "water",
-                                            "SVC-105": "electricity", "SVC-106": "electricity",
-                                            "SVC-110": "electricity", "SVC-133": "electricity",
-                                          };
-                                          const utilType = utilityMap[bs.serviceId];
-                                          const svcMeters = meterList.filter(
-                                            (m) => m.utility === utilType && m.type === "main"
-                                          );
-                                          const totalConsumption = svcMeters.reduce(
-                                            (s, m) => s + (m.consumption || 0), 0
-                                          );
-                                          // Find weighted unit price from cost categories
-                                          const meteredCats = costCats.filter(
-                                            (cc) => cc.unit && cc.unitPrice
-                                          );
-                                          const avgUnitPrice = meteredCats.length > 0
-                                            ? meteredCats.reduce(
-                                                (s, cc) => s + Math.abs(cc.unitPrice) * cc.budgetShare, 0
-                                              ) / meteredCats.reduce((s, cc) => s + cc.budgetShare, 0)
-                                            : 0;
-                                          const expectedCost = totalConsumption * avgUnitPrice;
-                                          const variancePct = bs.actual > 0
-                                            ? Math.round(((bs.actual - expectedCost) / expectedCost) * 100)
-                                            : 0;
-                                          const unit = meteredCats[0]?.unit || "—";
-
-                                          if (totalConsumption === 0 || avgUnitPrice === 0) return null;
-
-                                          return (
-                                            <div>
-                                              <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider mb-2">
-                                                {lang === "nl" ? "Verbruikscontrole" : "Consumption Check"}
-                                              </p>
-                                              <div className="px-3 py-3 rounded-lg bg-white border border-slate-100">
-                                                <div className="grid grid-cols-3 gap-4 text-[11px]">
-                                                  <div>
-                                                    <p className="text-slate-400 mb-1">
-                                                      {lang === "nl" ? "Verbruik" : "Consumption"}
-                                                    </p>
-                                                    <p className="font-medium text-slate-700 tabular-nums">
-                                                      {totalConsumption.toLocaleString("nl-NL")} {unit}
-                                                    </p>
-                                                  </div>
-                                                  <div>
-                                                    <p className="text-slate-400 mb-1">
-                                                      {lang === "nl" ? "Verwachte kosten" : "Expected cost"}
-                                                    </p>
-                                                    <p className="font-medium text-slate-700 tabular-nums">
-                                                      {fmtEur2(expectedCost)}
-                                                    </p>
-                                                    <p className="text-[11px] text-slate-400 mt-0.5">
-                                                      {totalConsumption.toLocaleString("nl-NL")} × €{avgUnitPrice.toFixed(2)}/{unit}
-                                                    </p>
-                                                  </div>
-                                                  <div>
-                                                    <p className="text-slate-400 mb-1">
-                                                      {lang === "nl" ? "Geboekt" : "Booked"}
-                                                    </p>
-                                                    <p className="font-medium tabular-nums" style={{ color: brand.navy }}>
-                                                      {fmtEur2(bs.actual)}
-                                                    </p>
-                                                    {Math.abs(variancePct) > 15 && (
-                                                      <p
-                                                        className="text-[11px] font-medium mt-0.5"
-                                                        style={{ color: variancePct > 0 ? brand.red : brand.amber }}
-                                                      >
-                                                        {variancePct > 0 ? "+" : ""}{variancePct}% {lang === "nl" ? "afwijking" : "variance"}
-                                                      </p>
-                                                    )}
-                                                  </div>
-                                                </div>
-                                                {Math.abs(variancePct) > 50 && (
-                                                  <p className="text-[11px] text-slate-400 mt-2 italic">
-                                                    {lang === "nl"
-                                                      ? "Let op: verschil kan komen door vastrecht, netbeheer, of seizoenscorrectie"
-                                                      : "Note: variance may include fixed charges, grid costs, or seasonal adjustments"}
-                                                  </p>
-                                                )}
-                                              </div>
-                                            </div>
-                                          );
-                                        })()}
-
-                                        {/* Section D: Ledger entries (drill-down) */}
-                                        {isFeatureEnabled("ledger") && ledgerEntries.length > 0 && (
+                                        {/* Section D: Unclassified entries — data quality signal */}
+                                        {unassignedEntries.length > 0 && (
                                           <div>
-                                            <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider mb-2">
-                                              {lang === "nl" ? "Boekingen" : "Ledger Entries"} ({ledgerEntries.length})
-                                            </p>
-                                            <div className="space-y-1">
-                                              {ledgerEntries.slice(0, 6).map((entry) => (
-                                                <div key={entry.id} className="flex items-center justify-between text-[11px] px-3 py-1.5 rounded-lg bg-white border border-slate-100">
+                                            <div className="flex items-center gap-1.5 mb-2">
+                                              <HelpCircle size={12} style={{ color: brand.amber }} />
+                                              <p className="text-[11px] text-amber-600 font-medium uppercase tracking-wider">
+                                                {lang === "nl" ? "Niet-geclassificeerd" : "Unclassified"} ({unassignedEntries.length})
+                                              </p>
+                                            </div>
+                                            <div className="rounded-lg bg-amber-50/30 border border-amber-100 overflow-hidden">
+                                              {unassignedEntries.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5).map((entry) => (
+                                                <div key={entry.id} className="flex items-center justify-between text-[11px] px-3 py-1.5 border-b border-amber-50 last:border-b-0">
                                                   <div className="flex items-center gap-2 flex-1 min-w-0">
                                                     <span className="text-slate-400 tabular-nums shrink-0">{fmtDate(entry.date)}</span>
                                                     <span className="text-slate-600 truncate">
-                                                      {typeof entry.description === "object"
-                                                        ? (entry.description[lang] || entry.description.en)
-                                                        : entry.description}
+                                                      {typeof entry.description === "object" ? (entry.description[lang] || entry.description.en) : entry.description}
                                                     </span>
                                                   </div>
                                                   <div className="flex items-center gap-2 shrink-0 ml-2">
@@ -1114,9 +1134,9 @@ export default function BuildingDetailPage() {
                                                   </div>
                                                 </div>
                                               ))}
-                                              {ledgerEntries.length > 6 && (
-                                                <p className="text-[11px] text-slate-400 italic px-3 py-1">
-                                                  + {ledgerEntries.length - 6} {lang === "nl" ? "meer" : "more"}
+                                              {unassignedEntries.length > 5 && (
+                                                <p className="text-[10px] text-amber-500 italic px-3 py-1.5">
+                                                  + {unassignedEntries.length - 5} {lang === "nl" ? "meer" : "more"}
                                                 </p>
                                               )}
                                             </div>
