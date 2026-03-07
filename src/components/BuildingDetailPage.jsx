@@ -393,8 +393,156 @@ export default function BuildingDetailPage() {
                 ))}
               </TabsList>
 
-              {/* ═══ OVERVIEW TAB — MONITORING COCKPIT ═══ */}
+              {/* ═══ OVERVIEW TAB — SERVICE CHARGE HEALTH DASHBOARD ═══ */}
               <TabsContent value="overview">
+                {(() => {
+                  // ── Compute attention items (cross-cutting insights) ──
+                  const attentionItems = [];
+
+                  // 1. Services running ahead of budget pace
+                  enrichedBs.forEach((bs) => {
+                    const bsPct = bs.budget > 0 ? (bs.actual / bs.budget) * 100 : 0;
+                    if (bsPct > yearPct + 10) {
+                      const overBy = Math.round(bsPct - yearPct);
+                      attentionItems.push({
+                        id: `budget-${bs.serviceId}`,
+                        severity: bsPct > 100 ? "error" : "warning",
+                        icon: AlertTriangle,
+                        text: {
+                          en: `${bs.service?.name.en || bs.serviceId} is ${overBy}pp ahead of budget pace (${Math.round(bsPct)}% spent, year ${yearPct}% elapsed)`,
+                          nl: `${bs.service?.name.nl || bs.serviceId} loopt ${overBy}pp voor op budgettempo (${Math.round(bsPct)}% besteed, jaar ${yearPct}% verstreken)`,
+                        },
+                        action: () => { setActiveTab("services"); setExpandedService(bs.serviceId); },
+                        actionLabel: { en: "View service", nl: "Bekijk dienst" },
+                      });
+                    }
+                  });
+
+                  // 2. Flagged ledger entries
+                  const totalFlaggedEntries = Object.entries(ledgerByService).reduce((sum, [, l]) => sum + (l.flagged || 0), 0);
+                  const totalPendingEntries = Object.entries(ledgerByService).reduce((sum, [, l]) => sum + (l.pending || 0), 0);
+                  if (totalFlaggedEntries > 0) {
+                    attentionItems.push({
+                      id: "flagged-ledger",
+                      severity: "error",
+                      icon: Flag,
+                      text: {
+                        en: `${totalFlaggedEntries} ledger ${totalFlaggedEntries === 1 ? "entry" : "entries"} flagged for review`,
+                        nl: `${totalFlaggedEntries} ${totalFlaggedEntries === 1 ? "boeking" : "boekingen"} gemarkeerd voor controle`,
+                      },
+                      action: () => setActiveTab("services"),
+                      actionLabel: { en: "Review", nl: "Bekijk" },
+                    });
+                  }
+                  if (totalPendingEntries > 0) {
+                    attentionItems.push({
+                      id: "pending-ledger",
+                      severity: "info",
+                      icon: Clock,
+                      text: {
+                        en: `${totalPendingEntries} ledger ${totalPendingEntries === 1 ? "entry" : "entries"} pending approval`,
+                        nl: `${totalPendingEntries} ${totalPendingEntries === 1 ? "boeking" : "boekingen"} wachten op goedkeuring`,
+                      },
+                      action: () => setActiveTab("services"),
+                      actionLabel: { en: "Review", nl: "Bekijk" },
+                    });
+                  }
+
+                  // 3. Overdue meter readings
+                  const overdueMeters = meterList.filter((m) => m.status === "warning");
+                  if (overdueMeters.length > 0) {
+                    attentionItems.push({
+                      id: "overdue-meters",
+                      severity: "warning",
+                      icon: Gauge,
+                      text: {
+                        en: `${overdueMeters.length} meter ${overdueMeters.length === 1 ? "reading" : "readings"} overdue (${overdueMeters.map((m) => m.meterNumber).join(", ")})`,
+                        nl: `${overdueMeters.length} meter${overdueMeters.length === 1 ? "stand" : "standen"} achterstallig (${overdueMeters.map((m) => m.meterNumber).join(", ")})`,
+                      },
+                      action: () => setActiveTab("meters"),
+                      actionLabel: { en: "View meters", nl: "Bekijk meters" },
+                    });
+                  }
+
+                  // 4. Consumption vs cost variance (metered services)
+                  if (isFeatureEnabled("consumptionControl")) {
+                    const utilityMap = {
+                      "SVC-108": "heat", "SVC-107": "heat",
+                      "SVC-102": "water", "SVC-104": "water",
+                      "SVC-105": "electricity", "SVC-106": "electricity",
+                      "SVC-110": "electricity", "SVC-133": "electricity",
+                    };
+                    enrichedBs.filter((bs) => bs.service?.metered).forEach((bs) => {
+                      const utilType = utilityMap[bs.serviceId];
+                      if (!utilType) return;
+                      const svcMeters = meterList.filter((m) => m.utility === utilType && m.type === "main");
+                      const totalConsumption = svcMeters.reduce((s, m) => s + (m.consumption || 0), 0);
+                      const meteredCats = getCostCategoriesByService(bs.serviceId).filter((cc) => cc.unit && cc.unitPrice);
+                      const avgUnitPrice = meteredCats.length > 0
+                        ? meteredCats.reduce((s, cc) => s + Math.abs(cc.unitPrice) * cc.budgetShare, 0) / meteredCats.reduce((s, cc) => s + cc.budgetShare, 0)
+                        : 0;
+                      if (totalConsumption === 0 || avgUnitPrice === 0) return;
+                      const expectedCost = totalConsumption * avgUnitPrice;
+                      const variancePct = Math.round(((bs.actual - expectedCost) / expectedCost) * 100);
+                      if (Math.abs(variancePct) > 20) {
+                        attentionItems.push({
+                          id: `consumption-${bs.serviceId}`,
+                          severity: Math.abs(variancePct) > 50 ? "error" : "warning",
+                          icon: Activity,
+                          text: {
+                            en: `${bs.service?.name.en}: invoiced cost ${variancePct > 0 ? "+" : ""}${variancePct}% vs consumption-based estimate`,
+                            nl: `${bs.service?.name.nl}: geboekte kosten ${variancePct > 0 ? "+" : ""}${variancePct}% t.o.v. verbruiksschatting`,
+                          },
+                          action: () => { setActiveTab("services"); setExpandedService(bs.serviceId); },
+                          actionLabel: { en: "Investigate", nl: "Onderzoek" },
+                        });
+                      }
+                    });
+                  }
+
+                  // 5. Settlement check failures (past year)
+                  if (isPastYear && sChecks.length > 0) {
+                    const failedChecks = sChecks.filter((sc) => sc.status === "flagged" || sc.status === "pending");
+                    const incompleteChecks = sChecks.filter((sc) => !sc.ledgerComplete);
+                    if (failedChecks.length > 0) {
+                      attentionItems.push({
+                        id: "settlement-checks",
+                        severity: "error",
+                        icon: FileCheck,
+                        text: {
+                          en: `${failedChecks.length} settlement ${failedChecks.length === 1 ? "check" : "checks"} ${failedChecks.some((sc) => sc.status === "flagged") ? "flagged" : "pending"}`,
+                          nl: `${failedChecks.length} afrekening${failedChecks.length === 1 ? "scontrole" : "scontroles"} ${failedChecks.some((sc) => sc.status === "flagged") ? "gemarkeerd" : "in afwachting"}`,
+                        },
+                        action: null,
+                        actionLabel: null,
+                      });
+                    }
+                    if (incompleteChecks.length > 0) {
+                      attentionItems.push({
+                        id: "incomplete-ledger",
+                        severity: "warning",
+                        icon: FileText,
+                        text: {
+                          en: `${incompleteChecks.length} ${incompleteChecks.length === 1 ? "service has" : "services have"} incomplete ledger data for settlement`,
+                          nl: `${incompleteChecks.length} ${incompleteChecks.length === 1 ? "dienst heeft" : "diensten hebben"} onvolledige boekingsdata voor afrekening`,
+                        },
+                        action: null,
+                        actionLabel: null,
+                      });
+                    }
+                  }
+
+                  // Sort: errors first, then warnings, then info
+                  const severityOrder = { error: 0, warning: 1, info: 2 };
+                  attentionItems.sort((a, b) => (severityOrder[a.severity] ?? 9) - (severityOrder[b.severity] ?? 9));
+
+                  const severityStyles = {
+                    error:   { border: "border-red-200",   bg: "bg-red-50/50",   iconColor: brand.red },
+                    warning: { border: "border-amber-200", bg: "bg-amber-50/50", iconColor: brand.amber },
+                    info:    { border: "border-slate-200", bg: "bg-slate-50/50", iconColor: brand.muted },
+                  };
+
+                  return (
                 <div className="mt-4 space-y-4">
                   {/* Settlement banner (past year only) */}
                   {isPastYear && settlement && (
@@ -535,171 +683,96 @@ export default function BuildingDetailPage() {
                     </CardContent>
                   </Card>
 
-                  {/* ── Layer 2: Single merged service table ── */}
-                  <Card className="border-slate-200 bg-white overflow-hidden">
-                    <CardContent className="p-0">
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="border-b border-slate-200 bg-slate-50/50">
-                              <th className="text-left text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-4 py-3 whitespace-nowrap">
-                                {lang === "nl" ? "Dienst" : "Service"}
-                              </th>
-                              <th className="text-right text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-3 whitespace-nowrap">
-                                {lang === "nl" ? "Budget" : "Budget"}
-                              </th>
-                              <th className="text-right text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-3 whitespace-nowrap">
-                                {lang === "nl" ? "Werkelijk" : "Actual"}
-                              </th>
-                              <th className="text-center text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-3 whitespace-nowrap hidden sm:table-cell w-[120px]">
-                                {lang === "nl" ? "Voortgang" : "Progress"}
-                              </th>
-                              <th className="text-center text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-3 w-10">
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-100">
-                            {enrichedBs.map((bs) => {
-                              const v = bs.budget - bs.actual;
-                              const ledger = ledgerByService[bs.serviceId];
-
-                              // Row-level status: budget variance + flags
-                              const hasFlagged = (ledger?.flagged || 0) > 0;
-                              const overBudget = v < 0;
-                              const bsPct = bs.budget > 0 ? Math.round((bs.actual / bs.budget) * 100) : 0;
-                              const aheadOfPace = bsPct > yearPct + 10;
-
-                              let rowStatus = "ok";
-                              if (hasFlagged || overBudget) rowStatus = "attention";
-                              else if (aheadOfPace) rowStatus = "review";
-
-                              const statusColor = rowStatus === "ok" ? brand.blue
-                                : rowStatus === "review" ? brand.amber
-                                : brand.red;
-
-                              // Progress bar color
-                              const barColor = overBudget ? brand.red
-                                : aheadOfPace ? brand.amber
-                                : brand.blue;
-
-                              return (
-                                <tr
-                                  key={bs.id}
-                                  className="hover:bg-slate-50/80 transition-colors cursor-pointer group"
-                                  onClick={() => {
-                                    setActiveTab("services");
-                                    setExpandedService(bs.serviceId);
-                                  }}
-                                >
-                                  <td className="px-4 py-3">
-                                    <div className="flex items-center gap-3">
-                                      <div
-                                        className="w-1.5 h-8 rounded-full shrink-0"
-                                        style={{ background: statusColor }}
-                                      />
-                                      <div>
-                                        <span className="text-xs font-medium text-slate-800 group-hover:text-slate-900">
-                                          {bs.service?.name[lang] || bs.serviceId}
-                                        </span>
-                                        <span className="text-[11px] text-slate-400 ml-2 font-mono">
-                                          {bs.service?.code}
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </td>
-                                  <td className="px-3 py-3 text-right text-xs text-slate-500 tabular-nums">
-                                    {fmt(bs.budget)}
-                                  </td>
-                                  <td className="px-3 py-3 text-right text-xs tabular-nums font-medium" style={{ color: brand.navy }}>
-                                    {fmt(bs.actual)}
-                                  </td>
-                                  <td className="px-3 py-3 hidden sm:table-cell">
-                                    <div className="flex items-center gap-2">
-                                      <div className="flex-1 h-[4px] rounded-full bg-slate-100 overflow-hidden">
-                                        <div
-                                          className="h-full rounded-full transition-colors"
-                                          style={{
-                                            width: `${Math.min(bsPct, 100)}%`,
-                                            background: barColor,
-                                          }}
-                                        />
-                                      </div>
-                                      <span className="text-[11px] text-slate-400 tabular-nums w-[32px] text-right">
-                                        {bsPct}%
-                                      </span>
-                                    </div>
-                                  </td>
-                                  <td className="px-3 py-3 text-center">
-                                    <ChevronRight size={14} className="text-slate-300 group-hover:text-slate-500 transition-colors mx-auto" />
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                          {/* Footer */}
-                          <tfoot>
-                            <tr className="border-t border-slate-200 bg-slate-50/50">
-                              <td className="px-4 py-3 text-xs font-semibold text-slate-600">
-                                {lang === "nl" ? "Totaal" : "Total"} ({enrichedBs.length} {lang === "nl" ? "diensten" : "services"})
-                              </td>
-                              <td className="px-3 py-3 text-right text-xs font-semibold text-slate-600 tabular-nums">
-                                {fmt(totalBudget)}
-                              </td>
-                              <td className="px-3 py-3 text-right text-xs font-semibold tabular-nums" style={{ color: brand.navy }}>
-                                {fmt(totalActual)}
-                              </td>
-                              <td className="px-3 py-3 hidden sm:table-cell">
-                                <div className="flex items-center gap-2">
-                                  <div className="flex-1 h-[4px] rounded-full bg-slate-100 overflow-hidden">
-                                    <div
-                                      className="h-full rounded-full transition-colors"
-                                      style={{
-                                        width: `${Math.min(budgetPct, 100)}%`,
-                                        background: !isOnPace ? brand.amber : brand.blue,
-                                      }}
-                                    />
-                                  </div>
-                                  <span className="text-[11px] text-slate-400 tabular-nums w-[32px] text-right">
-                                    {budgetPct}%
-                                  </span>
+                  {/* ── Layer 2: Attention Items (exception-only insights) ── */}
+                  {attentionItems.length > 0 ? (
+                    <Card className="border-slate-200 bg-white overflow-hidden">
+                      <CardContent className="p-0">
+                        <div className="px-4 py-3 border-b border-slate-100">
+                          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                            {lang === "nl" ? "Aandachtspunten" : "Attention items"}
+                            <span className="ml-1.5 text-slate-300">({attentionItems.length})</span>
+                          </p>
+                        </div>
+                        <div className="divide-y divide-slate-100">
+                          {attentionItems.map((item) => {
+                            const sty = severityStyles[item.severity] || severityStyles.info;
+                            const ItemIcon = item.icon;
+                            return (
+                              <div
+                                key={item.id}
+                                className={`flex items-start gap-3 px-4 py-3 ${sty.bg}`}
+                              >
+                                <ItemIcon
+                                  size={14}
+                                  className="mt-0.5 shrink-0"
+                                  style={{ color: sty.iconColor }}
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs text-slate-700 leading-relaxed">
+                                    {item.text[lang] || item.text.en}
+                                  </p>
                                 </div>
-                              </td>
-                              <td className="px-3 py-3" />
-                            </tr>
-                          </tfoot>
-                        </table>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* ── Layer 3: Alerts (only if any exist) ── */}
-                  {activityList.filter((a) => a.type === "alert").length > 0 && (
-                    <div className="space-y-2">
-                      {activityList
-                        .filter((a) => a.type === "alert")
-                        .slice(0, 3)
-                        .map((alert) => (
-                          <div
-                            key={alert.id}
-                            className="flex items-start gap-3 px-4 py-3 rounded-lg border border-amber-200 bg-amber-50/50"
-                          >
-                            <AlertTriangle
-                              size={14}
-                              className="text-amber-500 mt-0.5 shrink-0"
-                            />
-                            <div>
-                              <p className="text-xs text-slate-700">
-                                {alert.description[lang] || alert.description.en}
-                              </p>
-                              <p className="text-[11px] text-slate-400 mt-0.5">
-                                {alert.date}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
+                                {item.action && (
+                                  <button
+                                    onClick={item.action}
+                                    className="text-[11px] font-medium shrink-0 px-2 py-0.5 rounded hover:bg-slate-100 transition-colors"
+                                    style={{ color: brand.blue }}
+                                  >
+                                    {item.actionLabel[lang] || item.actionLabel.en} →
+                                  </button>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="flex items-center gap-3 px-4 py-5 rounded-lg border border-slate-200 bg-white">
+                      <CheckCircle2 size={16} style={{ color: brand.blue }} className="shrink-0" />
+                      <p className="text-xs text-slate-500">
+                        {lang === "nl"
+                          ? "Geen aandachtspunten — alle diensten zijn op koers."
+                          : "No attention items — all services are on track."}
+                      </p>
                     </div>
                   )}
+
+                  {/* ── Layer 3: Recent Activity ── */}
+                  {activityList.length > 0 && (
+                    <Card className="border-slate-200 bg-white overflow-hidden">
+                      <CardContent className="p-0">
+                        <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                            {lang === "nl" ? "Recente activiteit" : "Recent activity"}
+                          </p>
+                          <button
+                            onClick={() => setActiveTab("activity")}
+                            className="text-[11px] font-medium hover:underline transition-colors"
+                            style={{ color: brand.blue }}
+                          >
+                            {lang === "nl" ? "Bekijk alles" : "View all"} →
+                          </button>
+                        </div>
+                        <div className="divide-y divide-slate-100">
+                          {activityList.slice(0, 5).map((act) => (
+                            <div key={act.id} className="flex items-start gap-3 px-4 py-2.5">
+                              <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs text-slate-600 truncate">
+                                  {act.description[lang] || act.description.en}
+                                </p>
+                                <p className="text-[11px] text-slate-400">{act.date}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
                 </div>
+                );
+                })()}
               </TabsContent>
 
               {/* ═══ SERVICES TAB — DETAIL & INVESTIGATION ═══ */}
