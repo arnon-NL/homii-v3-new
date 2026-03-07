@@ -26,7 +26,6 @@ import {
   Send,
   ShieldCheck,
   Flag,
-  Lock,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import {
@@ -44,7 +43,6 @@ import {
   getLedgerByServiceAndBuilding,
   meters,
   getCostCategoriesByService,
-  getMonthlyCloseGridForBuilding,
   isFeatureEnabled,
 } from "@/lib/mockData";
 import { t, useLang } from "@/lib/i18n";
@@ -250,11 +248,6 @@ export default function BuildingDetailPage() {
     () => getLedgerSummaryByBuilding(buildingId, year),
     [buildingId, year]
   );
-  const monthlyCloseGrid = useMemo(
-    () => getMonthlyCloseGridForBuilding(buildingId, year),
-    [buildingId, year]
-  );
-
   // Derived KPIs
   const avgCompleteness =
     bsRelations.length > 0
@@ -295,32 +288,34 @@ export default function BuildingDetailPage() {
   const totalActual = enrichedBs.reduce((s, bs) => s + bs.actual, 0);
   const variance = totalBudget - totalActual;
 
-  // Monthly close aggregation
+  // Budget progress tracking
   const now = new Date();
   const thisYear = now.getFullYear();
   const currentMonth = year < thisYear ? 12 : year === thisYear ? now.getMonth() : 0;
-  const servicesOnTrack = monthlyCloseGrid.filter(
-    (row) => row.overallStatus === "closed"
-  ).length;
-  const servicesNeedReview = monthlyCloseGrid.filter(
-    (row) => row.overallStatus === "review"
-  ).length;
-  const servicesOpen = monthlyCloseGrid.filter(
-    (row) => row.overallStatus === "open"
-  ).length;
 
   const flaggedCount = enrichedBs.reduce((s, bs) => {
     const ledger = ledgerByService[bs.serviceId];
     return s + (ledger?.flagged || 0);
   }, 0);
 
-  // Overall building health verdict
+  // Per-service budget status
   const budgetPct = totalBudget > 0 ? Math.round((totalActual / totalBudget) * 100) : 0;
   const yearPct = Math.round((currentMonth / 12) * 100);
-  const isOnPace = budgetPct <= yearPct + 10; // within 10pp of expected pace
-  const verdictStatus = servicesOpen > 0 || flaggedCount > 2
+  const isOnPace = budgetPct <= yearPct + 10;
+
+  const servicesUnderBudget = enrichedBs.filter((bs) => {
+    const pct = bs.budget > 0 ? (bs.actual / bs.budget) * 100 : 0;
+    return pct <= yearPct + 10;
+  }).length;
+  const servicesOverBudget = enrichedBs.filter((bs) => {
+    const pct = bs.budget > 0 ? (bs.actual / bs.budget) * 100 : 0;
+    return pct > yearPct + 10;
+  }).length;
+
+  // Overall building health verdict (budget-based)
+  const verdictStatus = servicesOverBudget > 2 || flaggedCount > 2
     ? "attention"
-    : servicesNeedReview > 0 || flaggedCount > 0
+    : servicesOverBudget > 0 || flaggedCount > 0
       ? "review"
       : "on_track";
 
@@ -509,29 +504,29 @@ export default function BuildingDetailPage() {
                         <div className="flex items-center gap-4 text-[12px]">
                           <div className="text-center">
                             <span className="text-lg font-bold tabular-nums" style={{ color: brand.green }}>
-                              {servicesOnTrack}
+                              {servicesUnderBudget}
                             </span>
                             <p className="text-[10px] text-slate-400 uppercase tracking-wider">
                               {lang === "nl" ? "op koers" : "on track"}
                             </p>
                           </div>
-                          {servicesNeedReview > 0 && (
+                          {servicesOverBudget > 0 && (
                             <div className="text-center">
                               <span className="text-lg font-bold tabular-nums" style={{ color: brand.amber }}>
-                                {servicesNeedReview}
+                                {servicesOverBudget}
                               </span>
                               <p className="text-[10px] text-slate-400 uppercase tracking-wider">
-                                {lang === "nl" ? "review" : "review"}
+                                {lang === "nl" ? "boven budget" : "over budget"}
                               </p>
                             </div>
                           )}
-                          {servicesOpen > 0 && (
+                          {flaggedCount > 0 && (
                             <div className="text-center">
                               <span className="text-lg font-bold tabular-nums" style={{ color: brand.red }}>
-                                {servicesOpen}
+                                {flaggedCount}
                               </span>
                               <p className="text-[10px] text-slate-400 uppercase tracking-wider">
-                                {lang === "nl" ? "open" : "open"}
+                                {lang === "nl" ? "gemarkeerd" : "flagged"}
                               </p>
                             </div>
                           )}
@@ -556,11 +551,9 @@ export default function BuildingDetailPage() {
                               <th className="text-right text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-2.5 whitespace-nowrap">
                                 {lang === "nl" ? "Werkelijk" : "Actual"}
                               </th>
-                              {isFeatureEnabled("monthlyClose") && (
-                                <th className="text-center text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-2 py-2.5 whitespace-nowrap hidden sm:table-cell">
-                                  {["J","F","M","A","M","J","J","A","S","O","N","D"].join("  ")}
-                                </th>
-                              )}
+                              <th className="text-center text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-2.5 whitespace-nowrap hidden sm:table-cell w-[120px]">
+                                {lang === "nl" ? "Voortgang" : "Progress"}
+                              </th>
                               <th className="text-center text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-2.5 w-10">
                               </th>
                             </tr>
@@ -569,23 +562,25 @@ export default function BuildingDetailPage() {
                             {enrichedBs.map((bs) => {
                               const v = bs.budget - bs.actual;
                               const ledger = ledgerByService[bs.serviceId];
-                              const closeRow = monthlyCloseGrid.find(
-                                (r) => r.serviceId === bs.serviceId
-                              );
 
-                              // Row-level status: combines budget variance + close status + flags
+                              // Row-level status: budget variance + flags
                               const hasFlagged = (ledger?.flagged || 0) > 0;
-                              const hasOpen = closeRow?.openCount > 0;
-                              const hasReview = closeRow?.reviewCount > 0;
                               const overBudget = v < 0;
+                              const bsPct = bs.budget > 0 ? Math.round((bs.actual / bs.budget) * 100) : 0;
+                              const aheadOfPace = bsPct > yearPct + 10;
 
-                              let rowStatus = "ok"; // green
-                              if (hasFlagged || overBudget || hasOpen) rowStatus = "attention"; // red
-                              else if (hasReview) rowStatus = "review"; // amber
+                              let rowStatus = "ok";
+                              if (hasFlagged || overBudget) rowStatus = "attention";
+                              else if (aheadOfPace) rowStatus = "review";
 
                               const statusColor = rowStatus === "ok" ? brand.green
                                 : rowStatus === "review" ? brand.amber
                                 : brand.red;
+
+                              // Progress bar color
+                              const barColor = overBudget ? brand.red
+                                : aheadOfPace ? brand.amber
+                                : brand.blue;
 
                               return (
                                 <tr
@@ -618,29 +613,22 @@ export default function BuildingDetailPage() {
                                   <td className="px-3 py-2.5 text-right text-[12px] font-mono tabular-nums font-medium" style={{ color: brand.navy }}>
                                     {fmt(bs.actual)}
                                   </td>
-                                  {isFeatureEnabled("monthlyClose") && closeRow && (
-                                    <td className="px-2 py-2.5 hidden sm:table-cell">
-                                      <div className="flex items-center justify-center gap-[3px]">
-                                        {closeRow.months.map((month, idx) => {
-                                          let dotColor = "#E2E8F0";
-                                          if (month.status === "closed") dotColor = brand.green;
-                                          else if (month.status === "review") dotColor = brand.amber;
-                                          else if (month.status === "open") dotColor = brand.red;
-                                          return (
-                                            <div
-                                              key={idx}
-                                              className="w-[6px] h-[6px] rounded-full"
-                                              style={{ background: dotColor }}
-                                              title={`${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][idx]}: ${month.status}`}
-                                            />
-                                          );
-                                        })}
+                                  <td className="px-3 py-2.5 hidden sm:table-cell">
+                                    <div className="flex items-center gap-2">
+                                      <div className="flex-1 h-[4px] rounded-full bg-slate-100 overflow-hidden">
+                                        <div
+                                          className="h-full rounded-full transition-all"
+                                          style={{
+                                            width: `${Math.min(bsPct, 100)}%`,
+                                            background: barColor,
+                                          }}
+                                        />
                                       </div>
-                                    </td>
-                                  )}
-                                  {isFeatureEnabled("monthlyClose") && !closeRow && (
-                                    <td className="px-2 py-2.5 hidden sm:table-cell" />
-                                  )}
+                                      <span className="text-[10px] font-mono text-slate-400 tabular-nums w-[32px] text-right">
+                                        {bsPct}%
+                                      </span>
+                                    </div>
+                                  </td>
                                   <td className="px-3 py-2.5 text-center">
                                     <ChevronRight size={13} className="text-slate-300 group-hover:text-slate-500 transition-colors mx-auto" />
                                   </td>
@@ -660,11 +648,22 @@ export default function BuildingDetailPage() {
                               <td className="px-3 py-2.5 text-right text-[12px] font-mono font-semibold tabular-nums" style={{ color: brand.navy }}>
                                 {fmt(totalActual)}
                               </td>
-                              {isFeatureEnabled("monthlyClose") && (
-                                <td className="px-2 py-2.5 text-center text-[11px] font-medium text-slate-500 hidden sm:table-cell">
-                                  {servicesOnTrack}/{enrichedBs.length} {lang === "nl" ? "op koers" : "on track"}
-                                </td>
-                              )}
+                              <td className="px-3 py-2.5 hidden sm:table-cell">
+                                <div className="flex items-center gap-2">
+                                  <div className="flex-1 h-[4px] rounded-full bg-slate-100 overflow-hidden">
+                                    <div
+                                      className="h-full rounded-full transition-all"
+                                      style={{
+                                        width: `${Math.min(budgetPct, 100)}%`,
+                                        background: !isOnPace ? brand.amber : brand.blue,
+                                      }}
+                                    />
+                                  </div>
+                                  <span className="text-[10px] font-mono text-slate-400 tabular-nums w-[32px] text-right">
+                                    {budgetPct}%
+                                  </span>
+                                </div>
+                              </td>
                               <td className="px-3 py-2.5" />
                             </tr>
                           </tfoot>
@@ -753,22 +752,20 @@ export default function BuildingDetailPage() {
                               const isExpanded = expandedService === bs.serviceId;
                               const v = bs.budget - bs.actual;
                               const ledger = ledgerByService[bs.serviceId];
-                              const closeRow = monthlyCloseGrid.find(
-                                (r) => r.serviceId === bs.serviceId
-                              );
                               const costCats = getCostCategoriesByService(bs.serviceId);
                               const ledgerEntries = isExpanded
                                 ? getLedgerByServiceAndBuilding(bs.serviceId, buildingId, year)
                                     .sort((a, b) => b.date.localeCompare(a.date))
                                 : [];
 
-                              // Row status
+                              // Row status (budget-based)
                               const hasFlagged = (ledger?.flagged || 0) > 0;
-                              const hasOpen = closeRow?.openCount > 0;
                               const overBudget = v < 0;
+                              const svcPct = bs.budget > 0 ? (bs.actual / bs.budget) * 100 : 0;
+                              const svcAheadOfPace = svcPct > yearPct + 10;
                               let rowStatusColor = brand.green;
-                              if (hasFlagged || overBudget || hasOpen) rowStatusColor = brand.red;
-                              else if (closeRow?.reviewCount > 0) rowStatusColor = brand.amber;
+                              if (hasFlagged || overBudget) rowStatusColor = brand.red;
+                              else if (svcAheadOfPace) rowStatusColor = brand.amber;
 
                               return (
                                 <Card
@@ -805,24 +802,22 @@ export default function BuildingDetailPage() {
                                             </span>
                                           )}
                                         </div>
-                                        {/* Compact monthly dots */}
-                                        {isFeatureEnabled("monthlyClose") && closeRow && (
-                                          <div className="flex items-center gap-[3px] mt-1">
-                                            {closeRow.months.map((month, idx) => {
-                                              let dotColor = "#E2E8F0";
-                                              if (month.status === "closed") dotColor = brand.green;
-                                              else if (month.status === "review") dotColor = brand.amber;
-                                              else if (month.status === "open") dotColor = brand.red;
-                                              return (
+                                        {/* Budget progress indicator */}
+                                        {(() => {
+                                          const pct = bs.budget > 0 ? Math.round((bs.actual / bs.budget) * 100) : 0;
+                                          const barCol = overBudget ? brand.red : svcAheadOfPace ? brand.amber : brand.blue;
+                                          return (
+                                            <div className="flex items-center gap-2 mt-1 max-w-[140px]">
+                                              <div className="flex-1 h-[3px] rounded-full bg-slate-100 overflow-hidden">
                                                 <div
-                                                  key={idx}
-                                                  className="w-[5px] h-[5px] rounded-full"
-                                                  style={{ background: dotColor }}
+                                                  className="h-full rounded-full"
+                                                  style={{ width: `${Math.min(pct, 100)}%`, background: barCol }}
                                                 />
-                                              );
-                                            })}
-                                          </div>
-                                        )}
+                                              </div>
+                                              <span className="text-[9px] font-mono text-slate-400 tabular-nums">{pct}%</span>
+                                            </div>
+                                          );
+                                        })()}
                                       </div>
                                       <div className="flex items-center gap-4 shrink-0">
                                         <div className="text-right">
@@ -839,44 +834,48 @@ export default function BuildingDetailPage() {
                                     {/* Expanded detail — progressive disclosure */}
                                     {isExpanded && (
                                       <div className="border-t border-slate-100 px-4 py-4 space-y-5 bg-slate-50/30">
-                                        {/* Section A: Monthly Closing Grid for this service */}
-                                        {isFeatureEnabled("monthlyClose") && closeRow && (
-                                          <div>
-                                            <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider mb-2">
-                                              {lang === "nl" ? "Maandafsluiting" : "Monthly Close"}
-                                            </p>
-                                            <div className="flex items-center gap-1">
-                                              {closeRow.months.map((month, idx) => {
-                                                let bg = "#F1F5F9"; // future
-                                                let fg = "#94A3B8";
-                                                let label = ["Jan","Feb","Mrt","Apr","Mei","Jun","Jul","Aug","Sep","Okt","Nov","Dec"][idx];
-                                                if (lang === "en") label = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][idx];
-                                                if (month.status === "closed") { bg = "#F0FDF4"; fg = brand.green; }
-                                                else if (month.status === "review") { bg = "#FFFBEB"; fg = brand.amber; }
-                                                else if (month.status === "open") { bg = "#FEF2F2"; fg = brand.red; }
-
-                                                return (
+                                        {/* Section A: Budget Progress for this service */}
+                                        {(() => {
+                                          const pct = bs.budget > 0 ? Math.round((bs.actual / bs.budget) * 100) : 0;
+                                          const barCol = overBudget ? brand.red : svcAheadOfPace ? brand.amber : brand.blue;
+                                          return (
+                                            <div>
+                                              <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider mb-2">
+                                                {lang === "nl" ? "Budget voortgang" : "Budget Progress"}
+                                              </p>
+                                              <div className="flex items-center gap-3">
+                                                <div className="flex-1 h-[6px] rounded-full bg-slate-100 overflow-hidden relative">
                                                   <div
-                                                    key={idx}
-                                                    className="flex flex-col items-center gap-1 flex-1"
-                                                    title={`${label}: ${month.status}`}
-                                                  >
+                                                    className="h-full rounded-full transition-all"
+                                                    style={{ width: `${Math.min(pct, 100)}%`, background: barCol }}
+                                                  />
+                                                  {/* Year pace marker */}
+                                                  {yearPct > 0 && yearPct < 100 && (
                                                     <div
-                                                      className="w-full h-6 rounded flex items-center justify-center"
-                                                      style={{ background: bg }}
-                                                    >
-                                                      {month.status === "closed" && <CheckCircle2 size={11} style={{ color: fg }} />}
-                                                      {month.status === "review" && <Clock size={11} style={{ color: fg }} />}
-                                                      {month.status === "open" && <AlertTriangle size={11} style={{ color: fg }} />}
-                                                      {month.status === "future" && <Lock size={9} style={{ color: fg }} />}
-                                                    </div>
-                                                    <span className="text-[8px] text-slate-400 uppercase">{label}</span>
-                                                  </div>
-                                                );
-                                              })}
+                                                      className="absolute top-[-2px] w-[2px] h-[10px] bg-slate-300 rounded-full"
+                                                      style={{ left: `${yearPct}%` }}
+                                                      title={`${lang === "nl" ? "Jaar" : "Year"}: ${yearPct}%`}
+                                                    />
+                                                  )}
+                                                </div>
+                                                <span className="text-[11px] font-mono text-slate-500 tabular-nums shrink-0">
+                                                  {pct}% {lang === "nl" ? "van budget" : "of budget"}
+                                                </span>
+                                              </div>
+                                              <div className="flex items-center justify-between mt-1.5 text-[10px] text-slate-400">
+                                                <span>{fmt(bs.actual)} / {fmt(bs.budget)}</span>
+                                                <span>
+                                                  {lang === "nl" ? "Jaar" : "Year"} {yearPct}% {lang === "nl" ? "verstreken" : "elapsed"}
+                                                  {pct > yearPct + 10 && (
+                                                    <span className="ml-1 text-amber-500 font-medium">
+                                                      · {lang === "nl" ? "voor op schema" : "ahead of pace"}
+                                                    </span>
+                                                  )}
+                                                </span>
+                                              </div>
                                             </div>
-                                          </div>
-                                        )}
+                                          );
+                                        })()}
 
                                         {/* Section B: Cost Categories */}
                                         <div>
