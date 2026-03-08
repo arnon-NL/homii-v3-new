@@ -73,20 +73,26 @@ export const shadow = {
 };
 
 // ─── Status semantic colors ──────────────────────────────
-// Anomaly-only principle: neutral is the default. Only warnings and errors get color.
+// 3-tier system: confirmed (brand blue) → warning (amber) → error (red)
+// Inactive/ended states stay neutral gray.
 export const status = {
+  confirmed: {
+    bg:   "bg-sky-50",
+    text: "text-sky-600",
+    dot:  brand.blue,       // #3EB1C8
+  },
   neutral: {
     bg:   "bg-slate-100",
     text: "text-slate-500",
     dot:  brand.muted,      // #94A3B8
   },
   warning: {
-    bg:   "bg-slate-100",
+    bg:   "bg-amber-50",
     text: "text-amber-600",
     dot:  brand.amber,      // #F59E0B
   },
   error: {
-    bg:   "bg-slate-100",
+    bg:   "bg-red-50",
     text: "text-red-600",
     dot:  brand.red,        // #EF4444
   },

@@ -54,9 +54,9 @@ const fmtDate = (d) => {
 
 /* ── Status config ── */
 const statusConfig = {
-  booked:  { color: brand.muted, bg: "#F8FAFC", label: { en: "Booked", nl: "Geboekt" }, icon: CheckCircle2 },
-  pending: { color: brand.amber, bg: "#F8FAFC", label: { en: "Pending", nl: "In afwachting" }, icon: Clock },
-  flagged: { color: brand.red, bg: "#F8FAFC", label: { en: "Flagged", nl: "Gemarkeerd" }, icon: AlertTriangle },
+  booked:  { color: brand.blue, bg: "#F0FAFB", label: { en: "Booked", nl: "Geboekt" }, icon: CheckCircle2 },
+  pending: { color: brand.amber, bg: "#FFFBEB", label: { en: "Pending", nl: "In afwachting" }, icon: Clock },
+  flagged: { color: brand.red, bg: "#FEF2F2", label: { en: "Flagged", nl: "Gemarkeerd" }, icon: AlertTriangle },
 };
 
 function LedgerStatusBadge({ status }) {
@@ -110,11 +110,11 @@ function MonthlyBarChart({ entries, budgetPerMonth }) {
 
 /* ── Utility config for energy view ── */
 const utilityConfig = {
-  heat: { label: { en: "Heat", nl: "Warmte" }, unit: "GJ", color: "#64748B" },
-  gas: { label: { en: "Gas", nl: "Gas" }, unit: "m³", color: "#64748B" },
-  water: { label: { en: "Water", nl: "Water" }, unit: "m³", color: "#64748B" },
-  warmWater: { label: { en: "Warm Water", nl: "Warm Water" }, unit: "m³", color: "#64748B" },
-  electricity: { label: { en: "Electricity", nl: "Elektriciteit" }, unit: "kWh", color: "#64748B" },
+  heat: { label: { en: "Heat", nl: "Warmte" }, unit: "GJ", color: "#EF4444" },
+  gas: { label: { en: "Gas", nl: "Gas" }, unit: "m³", color: "#F59E0B" },
+  water: { label: { en: "Water", nl: "Water" }, unit: "m³", color: "#3B82F6" },
+  warmWater: { label: { en: "Warm Water", nl: "Warm Water" }, unit: "m³", color: "#8B5CF6" },
+  electricity: { label: { en: "Electricity", nl: "Elektriciteit" }, unit: "kWh", color: "#F59E0B" },
 };
 
 /* ── Main component ── */
@@ -322,13 +322,13 @@ export default function ServiceDetailPage() {
                   label: { en: "Variance", nl: "Afwijking" },
                   value: fmtEur(energyTotalActual - energyTotalBudget),
                   sub: energyTotalBudget > 0 ? `${(((energyTotalActual - energyTotalBudget) / energyTotalBudget) * 100).toFixed(1)}%` : "—",
-                  color: energyTotalActual > energyTotalBudget ? brand.red : brand.subtle,
+                  color: energyTotalActual > energyTotalBudget ? brand.red : brand.blue,
                 },
                 {
                   label: { en: "Meters", nl: "Meters" },
                   value: energyTotalMeters,
                   sub: `${energyMainMeters} ${lang === "nl" ? "hoofdmeters" : "main meters"}`,
-                  color: brand.subtle,
+                  color: brand.blue,
                 },
               ].map((card, i) => (
                 <div key={i} className="rounded-lg border border-slate-200 bg-white p-3">
@@ -402,7 +402,7 @@ export default function ServiceDetailPage() {
                         {row.budget > 0 && (
                           <div
                             className="text-[11px] tabular-nums flex items-center justify-end gap-1"
-                            style={{ color: row.variance > 0 ? brand.red : brand.subtle }}
+                            style={{ color: row.variance > 0 ? brand.red : brand.blue }}
                           >
                             {row.variance > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                             {row.variancePct > 0 ? "+" : ""}{row.variancePct.toFixed(1)}%
@@ -503,25 +503,25 @@ export default function ServiceDetailPage() {
               label: { en: "Variance", nl: "Afwijking" },
               value: fmtEur(totalBooked - totalBudget),
               sub: `${totalBudget > 0 ? (((totalBooked - totalBudget) / totalBudget) * 100).toFixed(1) : 0}%`,
-              color: totalBooked > totalBudget ? brand.red : brand.subtle,
+              color: totalBooked > totalBudget ? brand.red : brand.blue,
             },
             {
               label: { en: "Completeness", nl: "Volledigheid" },
               value: `${completeness}%`,
               sub: `${allEntries.length} ${lang === "nl" ? "boekingen" : "entries"}`,
-              color: completeness >= 90 ? brand.subtle : completeness >= 70 ? brand.amber : brand.red,
+              color: completeness >= 90 ? brand.blue : completeness >= 70 ? brand.amber : brand.red,
             },
             {
               label: { en: "Flagged", nl: "Gemarkeerd" },
               value: totalFlagged,
               sub: lang === "nl" ? "Vereist actie" : "Needs action",
-              color: totalFlagged > 0 ? brand.red : brand.subtle,
+              color: totalFlagged > 0 ? brand.red : brand.blue,
             },
             {
               label: { en: "Pending", nl: "In afwachting" },
               value: totalPending,
               sub: lang === "nl" ? "Nog te boeken" : "Awaiting booking",
-              color: totalPending > 0 ? brand.amber : brand.subtle,
+              color: totalPending > 0 ? brand.amber : brand.blue,
             },
           ].map((card, i) => (
             <div
@@ -672,7 +672,7 @@ export default function ServiceDetailPage() {
                     </div>
                     <div
                       className="text-[11px] tabular-nums flex items-center justify-end gap-1"
-                      style={{ color: row.variance > 0 ? brand.red : brand.subtle }}
+                      style={{ color: row.variance > 0 ? brand.red : brand.blue }}
                     >
                       {row.variance > 0 ? (
                         <TrendingUp size={14} />

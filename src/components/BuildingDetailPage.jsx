@@ -67,9 +67,9 @@ import { StatusBadge } from "./ui/status-badge";
 
 /* ── Category icon + color config ── */
 const categoryConfig = {
-  energy:        { icon: Zap,        color: "#64748B", bg: "#F8FAFC" },
-  installations: { icon: Wrench,     color: "#64748B", bg: "#F8FAFC" },
-  cleaning:      { icon: Sparkles,   color: "#64748B", bg: "#F8FAFC" },
+  energy:        { icon: Zap,        color: "#F59E0B", bg: "#FFFBEB" },
+  installations: { icon: Wrench,     color: "#3B82F6", bg: "#EFF6FF" },
+  cleaning:      { icon: Sparkles,   color: "#8B5CF6", bg: "#F5F3FF" },
   management:    { icon: HardHat,    color: "#64748B", bg: "#F8FAFC" },
   other:         { icon: FolderOpen, color: "#64748B", bg: "#F8FAFC" },
 };
@@ -97,7 +97,7 @@ const fmt = (v) =>
 
 /* ── Ledger status config ── */
 const ledgerStatusCfg = {
-  booked:  { color: brand.muted, bg: "#F8FAFC", label: { en: "Booked", nl: "Geboekt" }, icon: CheckCircle2 },
+  booked:  { color: brand.blue, bg: "#F0FAFB", label: { en: "Booked", nl: "Geboekt" }, icon: CheckCircle2 },
   pending: { color: brand.amber, bg: "#FFFBEB", label: { en: "Pending", nl: "In afwachting" }, icon: Clock },
   flagged: { color: brand.red,   bg: "#FEF2F2", label: { en: "Flagged", nl: "Gemarkeerd" }, icon: AlertTriangle },
 };
@@ -119,17 +119,17 @@ function LedgerStatusBadge({ status, lang }) {
 
 /* ── Utility icon ── */
 const utilityIcon = {
-  heat: { icon: Flame, color: "#64748B" },
-  water: { icon: Droplets, color: "#64748B" },
-  electricity: { icon: Zap, color: "#64748B" },
+  heat: { icon: Flame, color: "#EF4444" },
+  water: { icon: Droplets, color: "#3B82F6" },
+  electricity: { icon: Zap, color: "#F59E0B" },
 };
 
 /* ── Activity icon ── */
 const activityIcons = {
-  meter_reading: { icon: Gauge, color: brand.muted },
-  ledger_entry: { icon: FileText, color: brand.muted },
+  meter_reading: { icon: Gauge, color: brand.blue },
+  ledger_entry: { icon: FileText, color: brand.blue },
   distribution: { icon: Activity, color: brand.amber },
-  contract_change: { icon: Users, color: brand.muted },
+  contract_change: { icon: Users, color: brand.blue },
   alert: { icon: AlertTriangle, color: brand.red },
 };
 
@@ -137,9 +137,9 @@ const activityIcons = {
 const settlementStatusConfig = {
   not_started:  { icon: Circle,        color: "#94A3B8", bg: "#F8FAFC", label: { en: "Not started",  nl: "Niet gestart" } },
   monitoring:   { icon: Clock,         color: "#94A3B8", bg: "#F8FAFC", label: { en: "Monitoring",   nl: "Monitoring" } },
-  in_review:    { icon: AlertTriangle, color: "#F59E0B", bg: "#F8FAFC", label: { en: "In review",    nl: "In controle" } },
-  approved:     { icon: FileCheck,     color: "#94A3B8", bg: "#F8FAFC", label: { en: "Approved",     nl: "Goedgekeurd" } },
-  distributed:  { icon: Send,          color: "#94A3B8", bg: "#F8FAFC", label: { en: "Distributed",  nl: "Afgerekend" } },
+  in_review:    { icon: AlertTriangle, color: "#F59E0B", bg: "#FFFBEB", label: { en: "In review",    nl: "In controle" } },
+  approved:     { icon: FileCheck,     color: "#3EB1C8", bg: "#F0FAFB", label: { en: "Approved",     nl: "Goedgekeurd" } },
+  distributed:  { icon: Send,          color: "#3EB1C8", bg: "#F0FAFB", label: { en: "Distributed",  nl: "Afgerekend" } },
 };
 
 /* ── Settlement check icon ── */
@@ -147,7 +147,7 @@ function CheckIcon({ passed, label }) {
   return (
     <div className="flex items-center gap-2" title={label}>
       {passed ? (
-        <CheckCircle2 size={14} className="text-slate-400" />
+        <CheckCircle2 size={14} className="text-sky-500" />
       ) : passed === false ? (
         <AlertTriangle size={14} className="text-amber-500" />
       ) : (
@@ -162,10 +162,10 @@ function CheckIcon({ passed, label }) {
 
 /* ── Settlement check status badge ── */
 const checkStatusConfig = {
-  approved: { icon: CheckCircle2, color: "#94A3B8", bg: "#F8FAFC", label: { en: "Approved",  nl: "Goedgekeurd" } },
-  verified: { icon: ShieldCheck,  color: "#94A3B8", bg: "#F8FAFC", label: { en: "Verified",  nl: "Geverifieerd" } },
+  approved: { icon: CheckCircle2, color: "#3EB1C8", bg: "#F0FAFB", label: { en: "Approved",  nl: "Goedgekeurd" } },
+  verified: { icon: ShieldCheck,  color: "#3EB1C8", bg: "#F0FAFB", label: { en: "Verified",  nl: "Geverifieerd" } },
   flagged:  { icon: Flag,         color: "#EF4444", bg: "#FEF2F2", label: { en: "Flagged",   nl: "Gemarkeerd" } },
-  pending:  { icon: Clock,        color: "#94A3B8", bg: "#F8FAFC", label: { en: "Pending",   nl: "In afwachting" } },
+  pending:  { icon: Clock,        color: "#F59E0B", bg: "#FFFBEB", label: { en: "Pending",   nl: "In afwachting" } },
 };
 
 function CheckStatusBadge({ status, lang }) {

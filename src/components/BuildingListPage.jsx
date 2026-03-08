@@ -33,10 +33,10 @@ import { StatusBadge } from "./ui/status-badge";
 
 /* ── Utility icon map ── */
 const utilityConfig = {
-  heat:        { icon: Flame,      color: "#64748B", label: { en: "Heat",       nl: "Warmte" } },
-  water:       { icon: Droplets,   color: "#64748B", label: { en: "Water",      nl: "Water" } },
-  warmWater:   { icon: ShowerHead, color: "#64748B", label: { en: "Warm water", nl: "Warm water" } },
-  electricity: { icon: Zap,        color: "#64748B", label: { en: "Electricity",nl: "Elektriciteit" } },
+  heat:        { icon: Flame,      color: "#EF4444", label: { en: "Heat",       nl: "Warmte" } },
+  water:       { icon: Droplets,   color: "#3B82F6", label: { en: "Water",      nl: "Water" } },
+  warmWater:   { icon: ShowerHead, color: "#8B5CF6", label: { en: "Warm water", nl: "Warm water" } },
+  electricity: { icon: Zap,        color: "#F59E0B", label: { en: "Electricity",nl: "Elektriciteit" } },
 };
 
 function UtilityIcons({ utilities, lang }) {
@@ -94,8 +94,8 @@ const settlementConfig = {
   not_started:  { icon: Circle,        color: "#94A3B8", bg: "#F8FAFC", label: { en: "Not started",  nl: "Niet gestart" } },
   monitoring:   { icon: Clock,         color: "#94A3B8", bg: "#F8FAFC", label: { en: "Monitoring",   nl: "Monitoring" } },
   in_review:    { icon: AlertTriangle, color: "#F59E0B", bg: "#F8FAFC", label: { en: "In review",    nl: "In controle" } },
-  approved:     { icon: FileCheck,     color: "#94A3B8", bg: "#F8FAFC", label: { en: "Approved",     nl: "Goedgekeurd" } },
-  distributed:  { icon: Send,          color: "#94A3B8", bg: "#F8FAFC", label: { en: "Distributed",  nl: "Afgerekend" } },
+  approved:     { icon: FileCheck,     color: "#3EB1C8", bg: "#F0FAFB", label: { en: "Approved",     nl: "Goedgekeurd" } },
+  distributed:  { icon: Send,          color: "#3EB1C8", bg: "#F0FAFB", label: { en: "Distributed",  nl: "Afgerekend" } },
 };
 
 function SettlementBadge({ status, lang }) {
@@ -120,7 +120,7 @@ function NetResult({ value, lang }) {
   return (
     <span
       className="text-xs font-medium tabular-nums"
-      style={{ color: isPositive ? brand.subtle : brand.red }}
+      style={{ color: isPositive ? brand.blue : brand.red }}
     >
       {isPositive ? `+${fmt}` : `-${fmt}`}
       <span className="text-[11px] font-normal ml-1 opacity-70">
@@ -142,10 +142,10 @@ const qualityFilters = [
 
 /* ── Utility filter options ── */
 const utilityFilterOptions = [
-  { value: "heat",        label: { en: "Heat",       nl: "Warmte" },     icon: Flame,      color: "#64748B" },
-  { value: "water",       label: { en: "Water",      nl: "Water" },      icon: Droplets,   color: "#64748B" },
-  { value: "warmWater",   label: { en: "Warm water", nl: "Warm water" }, icon: ShowerHead,  color: "#64748B" },
-  { value: "electricity", label: { en: "Electricity",nl: "Elektriciteit"},icon: Zap,        color: "#64748B" },
+  { value: "heat",        label: { en: "Heat",       nl: "Warmte" },     icon: Flame,      color: "#EF4444" },
+  { value: "water",       label: { en: "Water",      nl: "Water" },      icon: Droplets,   color: "#3B82F6" },
+  { value: "warmWater",   label: { en: "Warm water", nl: "Warm water" }, icon: ShowerHead,  color: "#8B5CF6" },
+  { value: "electricity", label: { en: "Electricity",nl: "Elektriciteit"},icon: Zap,        color: "#F59E0B" },
 ];
 
 /* ── Column definitions ── */
