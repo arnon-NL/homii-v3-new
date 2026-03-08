@@ -516,37 +516,26 @@ export default function ServiceDetailPage() {
                           const consPct = cons.endConsumption > 0 ? Math.round((cons.ytdConsumption / cons.endConsumption) * 100) : 0;
                           const consAhead = consPct > seasonPct + 10;
                           const consOver = consPct > 100;
-                          const barCol = consOver ? brand.red : consAhead ? brand.amber : brand.blue;
-                          const status = consOver
-                            ? { label: { nl: "Boven verwachting", en: "Above expected" }, color: brand.red }
-                            : consAhead
-                            ? { label: { nl: "Voor op schema", en: "Ahead of pace" }, color: brand.amber }
-                            : { label: { nl: "Op schema", en: "On pace" }, color: brand.blue };
+                          const barCol = consOver ? "#DC2626" : "#64748B";
 
                           return (
                             <div className="px-4 py-3 border-b border-slate-50">
-                              {/* Header with meter reference */}
-                              <div className="flex items-center justify-between mb-3">
-                                <div className="flex items-center gap-1.5">
-                                  <Gauge size={13} style={{ color: brand.amber }} />
-                                  <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: brand.amber }}>
-                                    {lang === "nl" ? "Verbruik" : "Consumption"}
-                                  </span>
+                              {/* Header with meter reference — muted */}
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+                                  <Gauge size={12} className="text-slate-400" />
+                                  <span>{lang === "nl" ? "Verbruik" : "Consumption"}</span>
                                   {cons.mainMeterNumber && (
-                                    <span className="text-[11px] text-slate-400 font-normal normal-case ml-1">
-                                      · {cons.mainMeterNumber}
-                                      {cons.allocationShare < 1 && ` (${Math.round(cons.allocationShare * 100)}%)`}
-                                    </span>
+                                    <span>· {cons.mainMeterNumber}{cons.allocationShare < 1 && ` (${Math.round(cons.allocationShare * 100)}%)`}</span>
                                   )}
                                 </div>
-                                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full" style={{ color: status.color, background: status.color + "12" }}>
-                                  {status.label[lang]}
-                                </span>
+                                {consOver && <span className="text-[10px] text-red-600 font-medium">{lang === "nl" ? "Boven verwachting" : "Above expected"}</span>}
+                                {!consOver && consAhead && <span className="text-[10px] text-slate-500">{lang === "nl" ? "Voor op schema" : "Ahead of pace"}</span>}
                               </div>
 
                               {/* Main consumption display */}
-                              <div className="flex items-baseline gap-2 mb-2">
-                                <span className="text-base font-semibold tabular-nums" style={{ color: brand.navy }}>
+                              <div className="flex items-baseline gap-2 mb-1.5">
+                                <span className="text-sm font-medium tabular-nums text-slate-700">
                                   {fmtNum(cons.ytdConsumption)} {cons.unit}
                                 </span>
                                 <span className="text-[11px] text-slate-400 tabular-nums">
@@ -555,36 +544,30 @@ export default function ServiceDetailPage() {
                               </div>
 
                               {/* Progress bar with pace marker */}
-                              <div className="flex items-center gap-2 mb-2">
-                                <div className="flex-1 h-[5px] rounded-full bg-slate-100 overflow-hidden relative">
+                              <div className="flex items-center gap-2 mb-1.5">
+                                <div className="flex-1 h-[4px] rounded-full bg-slate-100 overflow-hidden relative">
                                   <div className="h-full rounded-full" style={{ width: `${Math.min(consPct, 100)}%`, background: barCol }} />
                                   {seasonPct > 0 && seasonPct < 100 && (
-                                    <div className="absolute top-[-2px] w-[2px] h-[9px] rounded-full" style={{ left: `${seasonPct}%`, background: "#94A3B8" }} />
+                                    <div className="absolute top-[-1.5px] w-[1.5px] h-[7px] rounded-full bg-slate-300" style={{ left: `${seasonPct}%` }} />
                                   )}
                                 </div>
-                                <span className="text-[11px] text-slate-500 tabular-nums shrink-0 font-medium">{consPct}%</span>
+                                <span className="text-[11px] text-slate-400 tabular-nums shrink-0">{consPct}%</span>
                               </div>
 
-                              {/* End-of-year projection */}
+                              {/* End-of-year projection + rate */}
                               <div className="text-[11px] text-slate-400">
-                                {lang === "nl" ? "Verwacht einde jaar" : "Expected year-end"}: <span className="font-medium text-slate-600">{fmtNum(cons.endConsumption)} {cons.unit}</span>
-                                <span className="text-slate-300 mx-1">→</span>
-                                <span className="font-medium text-slate-600">{fmtEur2(cons.endCost)}</span>
-                                {cons.unitPrice > 0 && (
-                                  <span className="text-slate-300 ml-2">€{cons.unitPrice.toFixed(2)}/{cons.unit}</span>
-                                )}
+                                {lang === "nl" ? "Verwacht" : "Expected"}: {fmtNum(cons.endConsumption)} {cons.unit} → {fmtEur2(cons.endCost)}
+                                {cons.unitPrice > 0 && <span className="text-slate-300 ml-2">€{cons.unitPrice.toFixed(2)}/{cons.unit}</span>}
                               </div>
 
                               {/* Tenant impact */}
                               {cons.avgAdvance > 0 && (
-                                <div className="mt-2 text-[11px] text-slate-400 flex items-center gap-2 flex-wrap">
+                                <div className="mt-1.5 text-[11px] text-slate-400 flex items-center gap-2 flex-wrap">
                                   <span>{lang === "nl" ? "Gem. voorschot" : "Avg. advance"}: <span className="font-medium text-slate-600">{fmtEur2(cons.avgAdvance)}/{lang === "nl" ? "mnd" : "mo"}</span></span>
                                   {cons.endDebtorRisk > 0 && (
                                     <>
-                                      <span className="text-slate-300">·</span>
-                                      <span style={{ color: brand.amber }}>
-                                        {lang === "nl" ? "Debiteurrisico" : "Debtor risk"}: {fmtEur(cons.endDebtorRisk)}
-                                      </span>
+                                      <span className="text-slate-200">·</span>
+                                      <span className="text-slate-500">{lang === "nl" ? "Debiteurrisico" : "Debtor risk"}: {fmtEur(cons.endDebtorRisk)}</span>
                                     </>
                                   )}
                                 </div>
