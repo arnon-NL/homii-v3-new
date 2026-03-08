@@ -1240,30 +1240,35 @@ export default function BuildingDetailPage() {
                       ? data.serviceCategories
                       : data.serviceCategories.filter((c) => c.id === "energy");
 
-                    // Flat list: external services first, then internal
+                    // Split: external services first, then internal grouped by category
                     const visibleCatIds = new Set(visibleCategories.map((c) => c.id));
                     const allVisible = enrichedBs.filter((bs) => visibleCatIds.has(bs.service?.category));
                     const externalItems = allVisible.filter((bs) => kostenverdelerMap[bs.serviceId]);
                     const internalItems = allVisible.filter((bs) => !kostenverdelerMap[bs.serviceId]);
-                    const flatList = [...externalItems, ...internalItems];
 
-                    if (flatList.length === 0)
+                    if (allVisible.length === 0)
                       return (
                         <div className="px-4 py-8 text-center text-sm text-slate-400">
                           {t("noResults", lang)}
                         </div>
                       );
 
-                    // Find the divider index: between last external and first internal
-                    const dividerIndex = externalItems.length;
-
-                    // Build external supplier label for divider
+                    // Build external supplier label
                     const kvSuppliers = [...new Set(externalItems.flatMap((bs) =>
                       (kostenverdelerMap[bs.serviceId] || []).map((k) => k.shortName)
                     ))];
 
-                    return flatList.map((bs, idx) => {
-                              const isExternal = !!kostenverdelerMap[bs.serviceId];
+                    // Group internal items by category (preserving category order from visibleCategories)
+                    const categoryIconMap = { energy: Zap, installations: Wrench, cleaning: Sparkles, management: HardHat, other: FolderOpen };
+                    const internalByCategory = visibleCategories
+                      .map((cat) => ({
+                        ...cat,
+                        items: internalItems.filter((bs) => bs.service?.category === cat.id),
+                      }))
+                      .filter((cat) => cat.items.length > 0);
+
+                    // Build a combined render list: external items flat, then internal grouped
+                    const renderServiceCard = (bs) => {
                               const isExpanded = expandedService === bs.serviceId;
                               const v = bs.budget - bs.actual;
                               const ledger = ledgerByService[bs.serviceId];
@@ -1279,23 +1284,6 @@ export default function BuildingDetailPage() {
                               const svcAheadOfPace = svcPct > yearPct + 10;
                               return (
                               <React.Fragment key={bs.id}>
-                                {/* iOS-style inline section divider */}
-                                {idx === 0 && dividerIndex > 0 && (
-                                  <div className="flex items-center gap-2 pt-1 pb-1">
-                                    <span className="text-[11px] font-medium text-slate-400 tracking-wide">
-                                      {lang === "nl" ? "Extern" : "External"} · {kvSuppliers.join(", ")}
-                                    </span>
-                                    <div className="flex-1 h-px bg-slate-200" />
-                                  </div>
-                                )}
-                                {idx === dividerIndex && dividerIndex > 0 && dividerIndex < flatList.length && (
-                                  <div className="flex items-center gap-2 pt-3 pb-1">
-                                    <span className="text-[11px] font-medium text-slate-400 tracking-wide">
-                                      {lang === "nl" ? "Intern" : "Internal"}
-                                    </span>
-                                    <div className="flex-1 h-px bg-slate-200" />
-                                  </div>
-                                )}
                                 <Card
                                   className={`bg-white transition-shadow border-slate-200 ${isExpanded ? "shadow-md ring-1 ring-slate-200" : "hover:shadow-md cursor-pointer"}`}
                                 >
@@ -1642,7 +1630,53 @@ export default function BuildingDetailPage() {
                                 </Card>
                               </React.Fragment>
                               );
-                            });
+                    };
+
+                    return (
+                      <>
+                        {/* External services */}
+                        {externalItems.length > 0 && (
+                          <>
+                            <div className="flex items-center gap-2 pt-1 pb-1">
+                              <span className="text-[11px] font-medium text-slate-400 tracking-wide">
+                                {lang === "nl" ? "Extern" : "External"} · {kvSuppliers.join(", ")}
+                              </span>
+                              <div className="flex-1 h-px bg-slate-200" />
+                            </div>
+                            {externalItems.map(renderServiceCard)}
+                          </>
+                        )}
+
+                        {/* Internal services — grouped by category */}
+                        {internalByCategory.length > 0 && (
+                          <>
+                            <div className="flex items-center gap-2 pt-3 pb-1">
+                              <span className="text-[11px] font-medium text-slate-400 tracking-wide">
+                                {lang === "nl" ? "Intern" : "Internal"}
+                              </span>
+                              <div className="flex-1 h-px bg-slate-200" />
+                            </div>
+                            {internalByCategory.map((cat) => {
+                              const CatIcon = categoryIconMap[cat.id] || FolderOpen;
+                              return (
+                                <div key={cat.id}>
+                                  <div className="flex items-center gap-1.5 pt-2 pb-1">
+                                    <CatIcon size={12} className="text-slate-400" />
+                                    <span className="text-[11px] font-medium text-slate-500">
+                                      {cat.label?.[lang] || cat.label?.en || cat.id}
+                                    </span>
+                                    <span className="text-[11px] text-slate-300">{cat.items.length}</span>
+                                  </div>
+                                  <div className="space-y-2">
+                                    {cat.items.map(renderServiceCard)}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </>
+                        )}
+                      </>
+                    );
 
                   })()}
                 </div>
