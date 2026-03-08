@@ -1,0 +1,47 @@
+[
+  {
+    "id": "NOTE-001",
+    "buildingId": "8320",
+    "text": { "en": "Techem contract up for renewal Q1 2026 — check terms before auto-extend", "nl": "Techem-contract verlenging Q1 2026 — voorwaarden checken voor auto-verlenging" },
+    "author": "Anna de Vries",
+    "authorInitials": "AV",
+    "createdAt": "2026-01-12",
+    "pinned": true
+  },
+  {
+    "id": "NOTE-002",
+    "buildingId": "8320",
+    "text": { "en": "Unit 4B main meter replaced 3 Dec — old reading 12.450 GJ, new meter starts at 0", "nl": "Unit 4B hoofdmeter vervangen 3 dec — oude stand 12.450 GJ, nieuwe meter begint op 0" },
+    "author": "Pieter Jansen",
+    "authorInitials": "PJ",
+    "createdAt": "2025-12-03",
+    "pinned": true
+  },
+  {
+    "id": "NOTE-003",
+    "buildingId": "8320",
+    "text": { "en": "Elevator service category reclassified from 'installations' to 'management' per 2025 audit", "nl": "Lift servicecategorie geherclassificeerd van 'installaties' naar 'beheer' per audit 2025" },
+    "author": "Anna de Vries",
+    "authorInitials": "AV",
+    "createdAt": "2025-11-15",
+    "pinned": false
+  },
+  {
+    "id": "NOTE-004",
+    "buildingId": "7955",
+    "text": { "en": "Solar panels installed Aug 2025 — electricity cost category needs updated baseline", "nl": "Zonnepanelen geïnstalleerd aug 2025 — elektra kostencategorie heeft nieuwe baseline nodig" },
+    "author": "Pieter Jansen",
+    "authorInitials": "PJ",
+    "createdAt": "2025-08-20",
+    "pinned": true
+  },
+  {
+    "id": "NOTE-005",
+    "buildingId": "8727",
+    "text": { "en": "Building sold to Vestia — data handover pending", "nl": "Complex verkocht aan Vestia — dataoverdracht in afwachting" },
+    "author": "Anna de Vries",
+    "authorInitials": "AV",
+    "createdAt": "2026-02-14",
+    "pinned": true
+  }
+]

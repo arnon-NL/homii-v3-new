@@ -103,6 +103,12 @@ export {
   // --- Activity getters ---
   getActivitiesByBuilding,
 
+  // --- Task & note getters ---
+  tasks,
+  notes,
+  getTasksByBuilding,
+  getNotesByBuilding,
+
   // --- Config ---
   isFeatureEnabled,
   getModuleConfig,

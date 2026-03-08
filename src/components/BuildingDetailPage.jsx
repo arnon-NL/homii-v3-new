@@ -35,6 +35,11 @@ import {
   ArrowUpDown,
   Link2,
   Radio,
+  StickyNote,
+  Plus,
+  CalendarDays,
+  CircleDot,
+  ListChecks,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import {
@@ -59,6 +64,8 @@ import {
   getAvailableYears,
   getHeatingSeasonsByBuilding,
   getDistributionModelsByBuilding,
+  getTasksByBuilding,
+  getNotesByBuilding,
 } from "@/lib/mockData";
 import { useOrg } from "@/lib/OrgContext";
 import { t, useLang } from "@/lib/i18n";
@@ -315,6 +322,14 @@ export default function BuildingDetailPage() {
   );
   const activityList = useMemo(
     () => getActivitiesByBuilding(buildingId),
+    [buildingId]
+  );
+  const buildingTasks = useMemo(
+    () => getTasksByBuilding(buildingId),
+    [buildingId]
+  );
+  const buildingNotes = useMemo(
+    () => getNotesByBuilding(buildingId),
     [buildingId]
   );
   const settlement = useMemo(
@@ -1307,16 +1322,6 @@ export default function BuildingDetailPage() {
                                           <span className="text-[11px] font-mono text-slate-400">
                                             {bs.service?.code}
                                           </span>
-                                          {bs.service?.metered && (
-                                            <span className="text-[11px] px-2 py-1 rounded-full font-medium text-slate-500 bg-slate-100">
-                                              {lang === "nl" ? "Gemeten" : "Metered"}
-                                            </span>
-                                          )}
-                                          {kostenverdelerMap[bs.serviceId] && (
-                                            <span className="text-[11px] px-2 py-1 rounded-full font-medium text-slate-500 bg-slate-100">
-                                              ⇄ {kostenverdelerMap[bs.serviceId].map(k => k.shortName).join(", ")}
-                                            </span>
-                                          )}
                                         </div>
                                         {/* Budget progress indicator */}
                                         {(() => {

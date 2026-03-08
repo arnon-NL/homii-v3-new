@@ -1,0 +1,75 @@
+[
+  {
+    "id": "TSK-001",
+    "buildingId": "8320",
+    "serviceId": "SVC-108",
+    "title": { "en": "Review Techem Q1 invoice", "nl": "Controleer Techem Q1 factuur" },
+    "assignee": "Anna de Vries",
+    "assigneeInitials": "AV",
+    "priority": "high",
+    "status": "open",
+    "dueDate": "2026-03-15",
+    "createdAt": "2026-02-28"
+  },
+  {
+    "id": "TSK-002",
+    "buildingId": "8320",
+    "serviceId": null,
+    "title": { "en": "Schedule meter replacement unit 4B", "nl": "Plan metervervanging unit 4B" },
+    "assignee": "Pieter Jansen",
+    "assigneeInitials": "PJ",
+    "priority": "medium",
+    "status": "open",
+    "dueDate": "2026-03-22",
+    "createdAt": "2026-03-01"
+  },
+  {
+    "id": "TSK-003",
+    "buildingId": "8320",
+    "serviceId": "SVC-102",
+    "title": { "en": "Verify water cost allocation model", "nl": "Controleer waterkostenverdeling" },
+    "assignee": "Anna de Vries",
+    "assigneeInitials": "AV",
+    "priority": "low",
+    "status": "open",
+    "dueDate": "2026-04-01",
+    "createdAt": "2026-03-05"
+  },
+  {
+    "id": "TSK-004",
+    "buildingId": "8320",
+    "serviceId": null,
+    "title": { "en": "Confirm VHE count with Woonstad", "nl": "Bevestig VHE-telling bij Woonstad" },
+    "assignee": "Anna de Vries",
+    "assigneeInitials": "AV",
+    "priority": "medium",
+    "status": "done",
+    "dueDate": "2026-02-20",
+    "createdAt": "2026-02-10",
+    "completedAt": "2026-02-18"
+  },
+  {
+    "id": "TSK-005",
+    "buildingId": "7955",
+    "serviceId": "SVC-108",
+    "title": { "en": "Reconcile heating costs with Ista", "nl": "Afstemming verwarmingskosten met Ista" },
+    "assignee": "Pieter Jansen",
+    "assigneeInitials": "PJ",
+    "priority": "high",
+    "status": "open",
+    "dueDate": "2026-03-10",
+    "createdAt": "2026-02-25"
+  },
+  {
+    "id": "TSK-006",
+    "buildingId": "8727",
+    "serviceId": null,
+    "title": { "en": "Upload missing meter readings Dec", "nl": "Ontbrekende meterstanden dec uploaden" },
+    "assignee": "Anna de Vries",
+    "assigneeInitials": "AV",
+    "priority": "high",
+    "status": "open",
+    "dueDate": "2026-03-08",
+    "createdAt": "2026-03-01"
+  }
+]

@@ -25,6 +25,8 @@ import rSavedViews from "../../data/savedViews.json";
 import rActivities from "../../data/activities.json";
 import rHeatingSeasons from "../../data/heatingSeasons.json";
 import rModuleConfig from "../../data/moduleConfig.json";
+import rTasks from "../../data/tasks.json";
+import rNotes from "../../data/notes.json";
 
 // --- Portaal (energy-only — no ledger, settlement, or supplier data) ---
 import pBuildings from "../../data/portaal/buildings.json";
@@ -167,6 +169,8 @@ const rochdale = buildIndexes({
   activities: rActivities,
   moduleConfig: rModuleConfig,
   heatingSeasons: rHeatingSeasons,
+  tasks: rTasks,
+  notes: rNotes,
 });
 
 const portaal = buildIndexes({
@@ -190,6 +194,8 @@ const portaal = buildIndexes({
   activities: [],             // energy-only: no activity feed
   moduleConfig: pModuleConfig,
   heatingSeasons: pHeatingSeasons,
+  tasks: [],                  // energy-only: no tasks
+  notes: [],                  // energy-only: no notes
 });
 
 const datasets = {

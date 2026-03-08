@@ -391,6 +391,18 @@ export function getActivitiesByBuilding(buildingId) {
   return ds().activities.filter((a) => a.buildingId === String(buildingId));
 }
 
+/** Tasks */
+export const tasks = [];   // populated from ds()
+export function getTasksByBuilding(buildingId) {
+  return (ds().tasks || []).filter((t) => t.buildingId === String(buildingId));
+}
+
+/** Notes */
+export const notes = [];   // populated from ds()
+export function getNotesByBuilding(buildingId) {
+  return (ds().notes || []).filter((n) => n.buildingId === String(buildingId));
+}
+
 /** getSuppliersByCategory */
 export function getSuppliersByCategory(categoryId) {
   return ds().suppliers.filter(
