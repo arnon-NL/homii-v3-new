@@ -415,25 +415,43 @@ def extract_building_services(buildings, services):
 
 
 def _build_um_to_complex_map(buildings):
-    """Build a mapping from usage_monitor_building name → real_estate_complex id.
+    """Build a mapping from usage_monitor_building → real_estate_complex id.
 
     The two DB systems (usage_monitor_* and real_estate_*) have no direct FK.
-    We join by exact name match. Only ~5 of 39 UM buildings match.
+    We use a multi-pass matching strategy:
+      1. Exact name match
+      2. erp_id (with dashes removed) → RE complex key
+      3. erp_id base (before first dash) → RE complex key
     Returns: { um_building_name: complex_id_str, ... }
     Also returns: { um_object_number: complex_id_str, ... } for apt lookups.
     """
     bld_by_name = {b["complex"]: b["id"] for b in buildings}
+    bld_by_key = {b.get("complexId", ""): b["id"] for b in buildings if b.get("complexId")}
 
-    um_buildings = query("SELECT object_number, name FROM usage_monitor_building")
+    um_buildings = query("SELECT object_number, name, erp_id FROM usage_monitor_building")
     name_map = {}  # um_name → complex_id
     objnum_map = {}  # um_object_number_int → complex_id
     for ub in um_buildings:
+        cid = None
+
+        # Pass 1: exact name match
         cid = bld_by_name.get(ub["name"])
+
+        # Pass 2: erp_id (dashes removed) → RE key
+        if not cid and ub.get("erp_id"):
+            erp_nodash = ub["erp_id"].replace("-", "")
+            cid = bld_by_key.get(erp_nodash)
+
+        # Pass 3: erp_id base (before dash) → RE key
+        if not cid and ub.get("erp_id") and "-" in ub["erp_id"]:
+            erp_base = ub["erp_id"].split("-")[0]
+            cid = bld_by_key.get(erp_base)
+
         if cid:
             name_map[ub["name"]] = cid
             objnum_map[int(ub["object_number"])] = cid
 
-    print(f"  UM→Complex name matches: {len(name_map)} / {len(um_buildings)}")
+    print(f"  UM→Complex matches: {len(name_map)} / {len(um_buildings)}")
     return name_map, objnum_map
 
 
@@ -713,6 +731,68 @@ def extract_cost_attribution(apt_id_remap):
 
     print(f"  → {len(records)} cost attribution records (from matched buildings)")
     return records
+
+
+def extract_heating_seasons(buildings):
+    """Extract heating seasons from usage_monitor_heatingseason, mapped to complex IDs."""
+    print("Extracting heating seasons...")
+
+    _, objnum_map = _build_um_to_complex_map(buildings)
+
+    rows = query("""
+        SELECT hs.*, ub.object_number
+        FROM usage_monitor_heatingseason hs
+        JOIN usage_monitor_building ub ON hs.building_id = CAST(ub.object_number AS INTEGER)
+        ORDER BY hs.id
+    """)
+
+    seasons = []
+    for r in rows:
+        um_bld_id = int(r["object_number"])
+        bld_id = objnum_map.get(um_bld_id)
+        if not bld_id:
+            continue  # skip seasons for unmatched buildings
+
+        start = r.get("season_start") or ""
+        end = r.get("season_end") or ""
+        start_month = int(start[5:7]) if len(start) >= 7 else 1
+        end_month = int(end[5:7]) if len(end) >= 7 else 12
+        start_year = int(start[:4]) if len(start) >= 4 else 2024
+        end_year = int(end[:4]) if len(end) >= 4 else start_year
+
+        # Build yearLabel like "2024/25" or "2024" for calendar-year seasons
+        if start_month == 1 and end_month == 12:
+            year_label = str(start_year)
+            year_key = start_year
+        else:
+            year_label = f"{start_year}/{str(end_year)[-2:]}"
+            year_key = start_year
+
+        seasons.append({
+            "id": r["id"],
+            "buildingId": bld_id,
+            "seasonStart": start,
+            "seasonEnd": end,
+            "startMonth": start_month,
+            "endMonth": end_month,
+            "yearLabel": year_label,
+            "yearKey": year_key,
+            "gjPrice": r.get("gj_price"),
+            "m3Price": r.get("m3_price"),
+            "coldWaterM3Price": r.get("cold_water_m3_price"),
+            "warmWaterM3Price": r.get("warm_water_m3_price"),
+            "ytdTotalCost": r.get("ytd_total_cost"),
+            "ytdCostPerApartment": r.get("ytd_cost_per_apartment"),
+            "ytdDebtorRisk": r.get("ytd_debtor_risk"),
+            "avgAdvance": r.get("average_advance"),
+            "endCostPerApartment": r.get("end_cost_per_apartment"),
+            "endDebtorRisk": r.get("end_debtor_risk"),
+            "tenantExceedingBudget": r.get("ytd_count_tenants_significant_exceeding_budget"),
+            "dataIntegrity": r.get("data_integrity_status", 3),
+        })
+
+    print(f"  → {len(seasons)} heating seasons (from matched buildings)")
+    return seasons
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -1204,6 +1284,7 @@ def main():
     meters = real_meters + synth_meters
     print(f"  → {len(meters)} total meters")
     cost_attribution = extract_cost_attribution(apt_id_remap)
+    heating_seasons = extract_heating_seasons(buildings)
 
     # Enrich VHEs with voorschotBreakdown from building-services
     print("Enriching VHEs with voorschot breakdown...")
@@ -1262,6 +1343,7 @@ def main():
     write_json("vhes.json", vhes)
     write_json("meters.json", meters)
     write_json("costAttribution.json", cost_attribution)
+    write_json("heatingSeasons.json", heating_seasons)
     write_json("suppliers.json", suppliers)
     write_json("supplierCategories.json", supplier_categories)
     write_json("distributionMethods.json", distribution_methods)
@@ -1291,6 +1373,7 @@ def main():
     print(f"  VHEs:             {len(vhes)}")
     print(f"  Meters:           {len(meters)}")
     print(f"  Cost Attribution: {len(cost_attribution)}")
+    print(f"  Heating Seasons:  {len(heating_seasons)}")
     print(f"  Settlements:      {len(settlements)}")
     print(f"  Ledger Entries:   {len(ledger_entries)}")
     print(f"  Monthly Close:    {len(monthly_close)}")
