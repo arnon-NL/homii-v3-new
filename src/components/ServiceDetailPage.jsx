@@ -28,6 +28,7 @@ import {
   getBuildingServicesByService,
   getMetersByBuilding,
   getAvailableYears,
+  getSettlementsByYear,
   isFeatureEnabled,
   getHeatingSeasonsByBuilding,
 } from "@/lib/mockData";
@@ -110,6 +111,20 @@ function MonthlyBarChart({ entries, budgetPerMonth }) {
   );
 }
 
+/* ── Settlement status labels ── */
+const settlementStatusLabels = {
+  monitoring:  { en: "Monitoring", nl: "Monitoring" },
+  in_review:   { en: "In review", nl: "In controle" },
+  approved:    { en: "Approved", nl: "Goedgekeurd" },
+  distributed: { en: "Distributed", nl: "Afgerekend" },
+};
+const settlementStatusColors = {
+  monitoring: "#94A3B8",
+  in_review: "#F59E0B",
+  approved: "#3EB1C8",
+  distributed: "#3EB1C8",
+};
+
 /* ── Utility config for energy view ── */
 const utilityConfig = {
   heat: { label: { en: "Heat", nl: "Warmte" }, unit: "GJ", color: "#EF4444" },
@@ -140,6 +155,26 @@ export default function ServiceDetailPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [expandedBuilding, setExpandedBuilding] = useState(null);
+
+  const isPastYear = year < new Date().getFullYear();
+
+  // Settlement context for past years (aggregated across buildings for this service)
+  const settlementContext = useMemo(() => {
+    if (!hasLedger || !isPastYear) return null;
+    const settlements = getSettlementsByYear(year);
+    if (settlements.length === 0) return null;
+    const total = settlements.length;
+    const statusCounts = {};
+    for (const s of settlements) {
+      statusCounts[s.status] = (statusCounts[s.status] || 0) + 1;
+    }
+    // Determine dominant status
+    const dominantStatus = statusCounts.distributed >= total * 0.8 ? "distributed"
+      : statusCounts.approved >= total * 0.5 ? "approved"
+      : statusCounts.in_review >= total * 0.3 ? "in_review"
+      : "monitoring";
+    return { total, statusCounts, dominantStatus };
+  }, [year, hasLedger, isPastYear]);
 
   // ── Energy mode: building-service rows from buildingServices ──
   const energyBuildingRows = useMemo(() => {
@@ -299,6 +334,33 @@ export default function ServiceDetailPage() {
             ))}
           </div>
         </div>
+
+        {/* ── Settlement context strip (past year + ledger orgs only) ── */}
+        {settlementContext && (
+          <div className="flex items-center gap-2 mb-3 text-[12px] text-slate-500">
+            <span
+              className="w-1.5 h-1.5 rounded-full shrink-0"
+              style={{ background: settlementStatusColors[settlementContext.dominantStatus] }}
+            />
+            <span className="font-medium" style={{ color: settlementStatusColors[settlementContext.dominantStatus] }}>
+              {lang === "nl" ? "Afrekening" : "Settlement"} {year}
+            </span>
+            <span className="text-slate-300">·</span>
+            {Object.entries(settlementContext.statusCounts)
+              .sort(([a], [b]) => {
+                const order = { distributed: 0, approved: 1, in_review: 2, monitoring: 3 };
+                return (order[a] ?? 9) - (order[b] ?? 9);
+              })
+              .map(([status, count], i) => (
+                <React.Fragment key={status}>
+                  {i > 0 && <span className="text-slate-300">·</span>}
+                  <span style={{ color: settlementStatusColors[status] }}>
+                    {count} {settlementStatusLabels[status]?.[lang] || status}
+                  </span>
+                </React.Fragment>
+              ))}
+          </div>
+        )}
 
         {/* ── Cost basis indicator ── */}
         <div

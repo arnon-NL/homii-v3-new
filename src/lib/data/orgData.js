@@ -26,7 +26,7 @@ import rActivities from "../../data/activities.json";
 import rHeatingSeasons from "../../data/heatingSeasons.json";
 import rModuleConfig from "../../data/moduleConfig.json";
 
-// --- Portaal ---
+// --- Portaal (energy-only — no ledger, settlement, or supplier data) ---
 import pBuildings from "../../data/portaal/buildings.json";
 import pServices from "../../data/portaal/services.json";
 import pServiceCategories from "../../data/portaal/serviceCategories.json";
@@ -35,17 +35,10 @@ import pCostAttribution from "../../data/portaal/costAttribution.json";
 import pCostCategories from "../../data/portaal/costCategories.json";
 import pVhes from "../../data/portaal/vhes.json";
 import pMeters from "../../data/portaal/meters.json";
-import pLedger from "../../data/portaal/ledgerEntries.json";
-import pSettlements from "../../data/portaal/settlements.json";
-import pSettlementChecks from "../../data/portaal/settlementChecks.json";
-import pSuppliers from "../../data/portaal/suppliers.json";
-import pSupplierCategories from "../../data/portaal/supplierCategories.json";
 import pDistributionMethods from "../../data/portaal/distributionMethods.json";
 import pDistributionModels from "../../data/portaal/distributionModels.json";
-import pMonthlyClose from "../../data/portaal/monthlyCloseStatuses.json";
 import pHeatingSeasons from "../../data/portaal/heatingSeasons.json";
 import pSavedViews from "../../data/portaal/savedViews.json";
-import pActivities from "../../data/portaal/activities.json";
 import pModuleConfig from "../../data/portaal/moduleConfig.json";
 
 // ── Build indexes for a dataset ─────────────────────────────
@@ -185,16 +178,16 @@ const portaal = buildIndexes({
   costCategories: pCostCategories,
   vhes: pVhes,
   meters: pMeters,
-  ledgerEntries: pLedger,
-  settlements: pSettlements,
-  settlementChecks: pSettlementChecks,
-  suppliers: pSuppliers,
-  supplierCategories: pSupplierCategories,
+  ledgerEntries: [],          // energy-only: no ledger
+  settlements: [],            // energy-only: no settlements
+  settlementChecks: [],       // energy-only: no settlement checks
+  suppliers: [],              // energy-only: no suppliers
+  supplierCategories: [],     // energy-only: no supplier categories
   distributionMethods: pDistributionMethods,
   distributionModels: pDistributionModels,
-  monthlyCloseStatuses: pMonthlyClose,
+  monthlyCloseStatuses: [],   // energy-only: no monthly close
   savedViews: pSavedViews,
-  activities: pActivities,
+  activities: [],             // energy-only: no activity feed
   moduleConfig: pModuleConfig,
   heatingSeasons: pHeatingSeasons,
 });

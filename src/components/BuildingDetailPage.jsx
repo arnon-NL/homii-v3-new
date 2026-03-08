@@ -432,6 +432,58 @@ export default function BuildingDetailPage() {
           <YearSelector year={year} setYear={setYear} availableYears={availableYears} heatingSeasons={heatingSeasons} />
         </div>
 
+        {/* ── Settlement context strip (past year + ledger orgs only) ── */}
+        {isFeatureEnabled("ledger") && isPastYear && settlement && (
+          <div className="flex items-center gap-2 mb-4 text-[12px] text-slate-500">
+            {(() => {
+              const sCfg = settlementStatusConfig[settlement.status];
+              const SIcon = sCfg?.icon || Circle;
+              return (
+                <>
+                  <SIcon size={14} style={{ color: sCfg?.color }} />
+                  <span className="font-medium" style={{ color: sCfg?.color }}>
+                    {lang === "nl" ? "Afrekening" : "Settlement"} {year}
+                  </span>
+                  <span className="text-slate-300">·</span>
+                  <span>{sCfg?.label[lang]}</span>
+                  {settlement.approvedAt && (
+                    <>
+                      <span className="text-slate-300">·</span>
+                      <span className="text-slate-400">
+                        {lang === "nl" ? "Goedgekeurd" : "Approved"} {settlement.approvedAt}
+                      </span>
+                    </>
+                  )}
+                  {settlement.distributedAt && (
+                    <>
+                      <span className="text-slate-300">·</span>
+                      <span className="text-slate-400">
+                        {lang === "nl" ? "Afgerekend" : "Distributed"} {settlement.distributedAt}
+                      </span>
+                    </>
+                  )}
+                  {settlement.netResult != null && (
+                    <>
+                      <span className="text-slate-300 ml-auto">·</span>
+                      <span
+                        className="font-semibold tabular-nums"
+                        style={{ color: settlement.netResult >= 0 ? brand.blue : brand.red }}
+                      >
+                        {settlement.netResult >= 0 ? "+" : ""}{fmt(settlement.netResult)}
+                      </span>
+                      <span className="text-slate-400">
+                        {settlement.netResult >= 0
+                          ? (lang === "nl" ? "teruggave" : "refund")
+                          : (lang === "nl" ? "naheffing" : "surcharge")}
+                      </span>
+                    </>
+                  )}
+                </>
+              );
+            })()}
+          </div>
+        )}
+
         {/* ── Content: tabs + attribute panel ── */}
         <div className="flex flex-col xl:flex-row gap-6">
           <div className="flex-1 min-w-0">
@@ -619,62 +671,6 @@ export default function BuildingDetailPage() {
 
                   return (
                 <div className="mt-4 space-y-4">
-                  {/* Settlement banner (past year only, ledger orgs) */}
-                  {isFeatureEnabled("ledger") && isPastYear && settlement && (
-                    <Card className="border-slate-200 bg-white overflow-hidden">
-                      <div
-                        className="h-1"
-                        style={{ background: (settlementStatusConfig[settlement.status]?.color || "#94A3B8") }}
-                      />
-                      <CardContent className="p-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            {(() => {
-                              const sCfg = settlementStatusConfig[settlement.status];
-                              const SIcon = sCfg?.icon || Circle;
-                              return (
-                                <div
-                                  className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                                  style={{ background: sCfg?.bg }}
-                                >
-                                  <SIcon size={20} style={{ color: sCfg?.color }} />
-                                </div>
-                              );
-                            })()}
-                            <div>
-                              <p className="text-sm font-semibold" style={{ color: brand.navy }}>
-                                {lang === "nl" ? "Afrekening" : "Settlement"} {year}
-                              </p>
-                              <p className="text-xs text-slate-500">
-                                {settlementStatusConfig[settlement.status]?.label[lang]}
-                                {settlement.approvedAt && (
-                                  <span className="ml-2 text-slate-400">
-                                    {lang === "nl" ? "Goedgekeurd:" : "Approved:"} {settlement.approvedAt}
-                                  </span>
-                                )}
-                              </p>
-                            </div>
-                          </div>
-                          {settlement.netResult != null && (
-                            <div className="text-right">
-                              <span
-                                className="text-lg font-semibold tabular-nums"
-                                style={{ color: settlement.netResult >= 0 ? brand.blue : brand.red }}
-                              >
-                                {settlement.netResult >= 0 ? "+" : ""}{fmt(settlement.netResult)}
-                              </span>
-                              <p className="text-[11px] text-slate-400">
-                                {settlement.netResult >= 0
-                                  ? (lang === "nl" ? "teruggave" : "refund")
-                                  : (lang === "nl" ? "naheffing" : "surcharge")}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-
                   {/* ── Cost basis indicator ── */}
                   <div className="flex items-center gap-2 px-3 py-2 rounded-lg mb-3 text-[11px] bg-slate-50">
                     {isFeatureEnabled("ledger") ? (
@@ -706,80 +702,187 @@ export default function BuildingDetailPage() {
                     )}
                   </div>
 
-                  {/* ── Layer 1: Verdict Card ── */}
-                  <Card className="border-slate-200 bg-white overflow-hidden">
-                    <CardContent className="px-5 py-4">
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <div
-                            className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                            style={{
-                              background: verdictStatus === "on_track" ? "#F0FAFB"
-                                : verdictStatus === "review" ? "#FFFBEB"
-                                : "#FEF2F2",
-                            }}
-                          >
-                            {verdictStatus === "on_track" ? (
-                              <CheckCircle2 size={20} style={{ color: brand.blue }} />
-                            ) : verdictStatus === "review" ? (
-                              <Clock size={20} style={{ color: brand.amber }} />
-                            ) : (
-                              <AlertTriangle size={20} style={{ color: brand.red }} />
-                            )}
-                          </div>
+                  {/* ── Layer 1: Mode-aware Verdict Card ── */}
+                  {isFeatureEnabled("ledger") && isPastYear && settlement ? (
+                    /* ═══ SETTLEMENT MODE — Readiness cockpit ═══ */
+                    <Card className="border-slate-200 bg-white overflow-hidden">
+                      <CardContent className="px-5 py-4">
+                        {/* Settlement progress stepper */}
+                        <div className="flex items-center gap-1 mb-4">
+                          {["monitoring", "in_review", "approved", "distributed"].map((step, i, arr) => {
+                            const stepOrder = { monitoring: 0, in_review: 1, approved: 2, distributed: 3 };
+                            const currentOrder = stepOrder[settlement.status] ?? -1;
+                            const isComplete = stepOrder[step] <= currentOrder;
+                            const isCurrent = step === settlement.status;
+                            const cfg = settlementStatusConfig[step];
+                            return (
+                              <React.Fragment key={step}>
+                                <div className="flex items-center gap-1.5">
+                                  <div
+                                    className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-colors"
+                                    style={{
+                                      background: isCurrent ? cfg?.color : isComplete ? brand.blue : "#F1F5F9",
+                                      opacity: isComplete && !isCurrent ? 0.5 : 1,
+                                    }}
+                                  >
+                                    {isComplete ? (
+                                      <CheckCircle2 size={14} className="text-white" />
+                                    ) : (
+                                      <Circle size={14} style={{ color: "#CBD5E1" }} />
+                                    )}
+                                  </div>
+                                  <span
+                                    className={`text-[11px] ${isCurrent ? "font-semibold" : isComplete ? "font-medium" : ""} hidden sm:inline`}
+                                    style={{ color: isCurrent ? cfg?.color : isComplete ? brand.navy : "#94A3B8" }}
+                                  >
+                                    {cfg?.label[lang]}
+                                  </span>
+                                </div>
+                                {i < arr.length - 1 && (
+                                  <div
+                                    className="flex-1 h-px mx-1"
+                                    style={{ background: stepOrder[arr[i + 1]] <= currentOrder ? brand.blue : "#E2E8F0" }}
+                                  />
+                                )}
+                              </React.Fragment>
+                            );
+                          })}
+                        </div>
+
+                        {/* Settlement readiness summary */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                           <div>
                             <p className="text-sm font-semibold" style={{ color: brand.navy }}>
-                              {verdictStatus === "on_track"
-                                ? (lang === "nl" ? "Complex op koers" : "Building on track")
-                                : verdictStatus === "review"
-                                  ? (lang === "nl" ? "Aandacht nodig" : "Needs review")
-                                  : (lang === "nl" ? "Actie vereist" : "Action required")}
+                              {(() => {
+                                const passedChecks = sChecks.filter((sc) => sc.status === "approved" || sc.status === "verified").length;
+                                const totalChecks = sChecks.length;
+                                if (settlement.status === "distributed") return lang === "nl" ? "Afrekening afgerond" : "Settlement completed";
+                                if (settlement.status === "approved") return lang === "nl" ? "Goedgekeurd — klaar voor distributie" : "Approved — ready for distribution";
+                                if (totalChecks > 0 && passedChecks === totalChecks) return lang === "nl" ? "Alle controles geslaagd" : "All checks passed";
+                                return lang === "nl" ? "Afrekening in voorbereiding" : "Settlement in preparation";
+                              })()}
                             </p>
                             <p className="text-xs text-slate-500 mt-0.5">
-                              {fmt(totalActual)} {lang === "nl" ? "van" : "of"} {fmt(totalBudget)} ({budgetPct}%)
+                              {fmt(totalActual)} {lang === "nl" ? "werkelijk" : "actual"}
                               <span className="mx-1.5 text-slate-300">·</span>
-                              {lang === "nl" ? "Jaar" : "Year"}: {yearPct}% {lang === "nl" ? "verstreken" : "elapsed"}
-                              {!isOnPace && budgetPct > yearPct + 10 && (
-                                <span className="ml-1.5 text-amber-600 font-medium">
-                                  — {lang === "nl" ? "loopt voor op budget" : "ahead of budget pace"}
+                              {fmt(totalBudget)} {lang === "nl" ? "voorschot" : "advance"}
+                              <span className="mx-1.5 text-slate-300">·</span>
+                              <span style={{ color: totalBudget - totalActual >= 0 ? brand.blue : brand.red }}>
+                                {totalBudget - totalActual >= 0 ? "+" : ""}{fmt(totalBudget - totalActual)} {lang === "nl" ? "netto" : "net"}
+                              </span>
+                            </p>
+                          </div>
+                          {sChecks.length > 0 && (
+                            <div className="flex items-center gap-4 text-xs">
+                              <div className="text-center">
+                                <span className="text-lg font-semibold tabular-nums" style={{ color: brand.blue }}>
+                                  {sChecks.filter((sc) => sc.status === "approved" || sc.status === "verified").length}
                                 </span>
+                                <p className="text-[11px] text-slate-400 uppercase tracking-wider">
+                                  {lang === "nl" ? "geslaagd" : "passed"}
+                                </p>
+                              </div>
+                              {sChecks.filter((sc) => sc.status === "flagged").length > 0 && (
+                                <div className="text-center">
+                                  <span className="text-lg font-semibold tabular-nums" style={{ color: brand.red }}>
+                                    {sChecks.filter((sc) => sc.status === "flagged").length}
+                                  </span>
+                                  <p className="text-[11px] text-slate-400 uppercase tracking-wider">
+                                    {lang === "nl" ? "gemarkeerd" : "flagged"}
+                                  </p>
+                                </div>
                               )}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-4 text-xs">
-                          <div className="text-center">
-                            <span className="text-lg font-semibold tabular-nums" style={{ color: brand.blue }}>
-                              {servicesUnderBudget}
-                            </span>
-                            <p className="text-[11px] text-slate-400 uppercase tracking-wider">
-                              {lang === "nl" ? "op koers" : "on track"}
-                            </p>
-                          </div>
-                          {servicesOverBudget > 0 && (
-                            <div className="text-center">
-                              <span className="text-lg font-semibold tabular-nums" style={{ color: brand.amber }}>
-                                {servicesOverBudget}
-                              </span>
-                              <p className="text-[11px] text-slate-400 uppercase tracking-wider">
-                                {lang === "nl" ? "boven budget" : "over budget"}
-                              </p>
-                            </div>
-                          )}
-                          {flaggedCount > 0 && (
-                            <div className="text-center">
-                              <span className="text-lg font-semibold tabular-nums" style={{ color: brand.red }}>
-                                {flaggedCount}
-                              </span>
-                              <p className="text-[11px] text-slate-400 uppercase tracking-wider">
-                                {lang === "nl" ? "gemarkeerd" : "flagged"}
-                              </p>
+                              {sChecks.filter((sc) => sc.status === "pending").length > 0 && (
+                                <div className="text-center">
+                                  <span className="text-lg font-semibold tabular-nums" style={{ color: brand.amber }}>
+                                    {sChecks.filter((sc) => sc.status === "pending").length}
+                                  </span>
+                                  <p className="text-[11px] text-slate-400 uppercase tracking-wider">
+                                    {lang === "nl" ? "in afwachting" : "pending"}
+                                  </p>
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    /* ═══ MONITORING MODE — Budget pace verdict ═══ */
+                    <Card className="border-slate-200 bg-white overflow-hidden">
+                      <CardContent className="px-5 py-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
+                              style={{
+                                background: verdictStatus === "on_track" ? "#F0FAFB"
+                                  : verdictStatus === "review" ? "#FFFBEB"
+                                  : "#FEF2F2",
+                              }}
+                            >
+                              {verdictStatus === "on_track" ? (
+                                <CheckCircle2 size={20} style={{ color: brand.blue }} />
+                              ) : verdictStatus === "review" ? (
+                                <Clock size={20} style={{ color: brand.amber }} />
+                              ) : (
+                                <AlertTriangle size={20} style={{ color: brand.red }} />
+                              )}
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold" style={{ color: brand.navy }}>
+                                {verdictStatus === "on_track"
+                                  ? (lang === "nl" ? "Complex op koers" : "Building on track")
+                                  : verdictStatus === "review"
+                                    ? (lang === "nl" ? "Aandacht nodig" : "Needs review")
+                                    : (lang === "nl" ? "Actie vereist" : "Action required")}
+                              </p>
+                              <p className="text-xs text-slate-500 mt-0.5">
+                                {fmt(totalActual)} {lang === "nl" ? "van" : "of"} {fmt(totalBudget)} ({budgetPct}%)
+                                <span className="mx-1.5 text-slate-300">·</span>
+                                {lang === "nl" ? "Jaar" : "Year"}: {yearPct}% {lang === "nl" ? "verstreken" : "elapsed"}
+                                {!isOnPace && budgetPct > yearPct + 10 && (
+                                  <span className="ml-1.5 text-amber-600 font-medium">
+                                    — {lang === "nl" ? "loopt voor op budget" : "ahead of budget pace"}
+                                  </span>
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4 text-xs">
+                            <div className="text-center">
+                              <span className="text-lg font-semibold tabular-nums" style={{ color: brand.blue }}>
+                                {servicesUnderBudget}
+                              </span>
+                              <p className="text-[11px] text-slate-400 uppercase tracking-wider">
+                                {lang === "nl" ? "op koers" : "on track"}
+                              </p>
+                            </div>
+                            {servicesOverBudget > 0 && (
+                              <div className="text-center">
+                                <span className="text-lg font-semibold tabular-nums" style={{ color: brand.amber }}>
+                                  {servicesOverBudget}
+                                </span>
+                                <p className="text-[11px] text-slate-400 uppercase tracking-wider">
+                                  {lang === "nl" ? "boven budget" : "over budget"}
+                                </p>
+                              </div>
+                            )}
+                            {flaggedCount > 0 && (
+                              <div className="text-center">
+                                <span className="text-lg font-semibold tabular-nums" style={{ color: brand.red }}>
+                                  {flaggedCount}
+                                </span>
+                                <p className="text-[11px] text-slate-400 uppercase tracking-wider">
+                                  {lang === "nl" ? "gemarkeerd" : "flagged"}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
 
                   {/* ── Layer 2: Attention Items (exception-only insights) ── */}
                   {attentionItems.length > 0 ? (
