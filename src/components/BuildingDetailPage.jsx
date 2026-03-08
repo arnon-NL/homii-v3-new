@@ -1403,6 +1403,9 @@ export default function BuildingDetailPage() {
                                           <span className="text-[11px] font-mono text-slate-400">
                                             {bs.service?.code}
                                           </span>
+                                          {(bs.consumption?.mainMeterId || bs.consumption?.meterCount > 0) && (
+                                            <Gauge size={13} className="text-slate-400 shrink-0" />
+                                          )}
                                         </div>
                                         {/* Budget progress indicator */}
                                         {(() => {
