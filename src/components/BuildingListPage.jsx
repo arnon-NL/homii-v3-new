@@ -18,6 +18,7 @@ import {
   SlidersHorizontal,
   MapPin,
   Trash2,
+  ArrowUpRight,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import { useOrg } from "@/lib/OrgContext";
@@ -173,6 +174,7 @@ export default function BuildingListPage() {
   const [qualityFilter, setQualityFilter] = useState("all");
   const [utilityFilters, setUtilityFilters] = useState([]);
   const [locationFilter, setLocationFilter] = useState("all");
+  const [kvFilter, setKvFilter] = useState(false);
   const [sortCol, setSortCol] = useState(null);
   const [sortDir, setSortDir] = useState("desc");
   const { data, orgId } = useOrg();
@@ -202,13 +204,29 @@ export default function BuildingListPage() {
   // Columns — always default for now (settlement views handled separately)
   const visibleColumns = defaultComplexColumns;
 
+  // Build set of building IDs that have at least one external kostenverdeler service
+  const buildingsWithExternalKv = useMemo(() => {
+    const kvServiceIds = new Set();
+    (data.suppliers || []).forEach((s) => {
+      if (s.kostenverdeler && s.serviceIds) {
+        s.serviceIds.forEach((sid) => kvServiceIds.add(sid));
+      }
+    });
+    const ids = new Set();
+    (data.buildingServices || []).forEach((bs) => {
+      if (kvServiceIds.has(bs.serviceId)) ids.add(bs.buildingId);
+    });
+    return ids;
+  }, [data.suppliers, data.buildingServices]);
+
   // Enrich buildings
   const enriched = useMemo(() => {
     return data.buildings.map((b) => ({
       ...b,
       utilityCount: b.utilities.length,
+      hasExternalKv: buildingsWithExternalKv.has(b.id),
     }));
-  }, [data.buildings]);
+  }, [data.buildings, buildingsWithExternalKv]);
 
   // Filter
   const filtered = useMemo(() => {
@@ -226,9 +244,10 @@ export default function BuildingListPage() {
         utilityFilters.every((u) => b.utilities.includes(u));
       const matchLocation =
         locationFilter === "all" || b.location === locationFilter;
-      return matchSearch && matchQuality && matchUtility && matchLocation;
+      const matchKv = !kvFilter || b.hasExternalKv;
+      return matchSearch && matchQuality && matchUtility && matchLocation && matchKv;
     });
-  }, [search, qualityFilter, utilityFilters, locationFilter, enriched]);
+  }, [search, qualityFilter, utilityFilters, locationFilter, kvFilter, enriched]);
 
   // Sort
   const sorted = useMemo(() => {
@@ -250,13 +269,14 @@ export default function BuildingListPage() {
   }, [sorted, page]);
 
   // Reset page when filters change
-  useMemo(() => setPage(0), [search, qualityFilter, utilityFilters, locationFilter]);
+  useMemo(() => setPage(0), [search, qualityFilter, utilityFilters, locationFilter, kvFilter]);
 
   // Check if any filters are active
   const hasActiveFilters =
     qualityFilter !== "all" ||
     utilityFilters.length > 0 ||
     locationFilter !== "all" ||
+    kvFilter ||
     sortCol !== null ||
     search !== "";
 
@@ -266,6 +286,7 @@ export default function BuildingListPage() {
       qualityFilter,
       utilityFilters: [...utilityFilters],
       locationFilter,
+      kvFilter,
       sortCol,
       sortDir,
       search,
@@ -277,6 +298,7 @@ export default function BuildingListPage() {
     setQualityFilter(f.qualityFilter || "all");
     setUtilityFilters(f.utilityFilters || []);
     setLocationFilter(f.locationFilter || "all");
+    setKvFilter(f.kvFilter || false);
     setSortCol(f.sortCol || null);
     setSortDir(f.sortDir || "desc");
     setSearch(f.search || "");
@@ -309,6 +331,7 @@ export default function BuildingListPage() {
     setQualityFilter("all");
     setUtilityFilters([]);
     setLocationFilter("all");
+    setKvFilter(false);
     setSortCol(null);
     setSortDir("desc");
     setSearch("");
@@ -347,6 +370,12 @@ export default function BuildingListPage() {
               <span className="text-sm font-medium" style={{ color: brand.navy }}>
                 {b.complex}
               </span>
+              {b.hasExternalKv && (
+                <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-medium">
+                  <ArrowUpRight size={10} />
+                  KV
+                </span>
+              )}
             </div>
           </td>
         );
@@ -547,6 +576,20 @@ export default function BuildingListPage() {
             })}
           </div>
 
+          {/* Kostenverdeler filter */}
+          <button
+            onClick={() => setKvFilter((v) => !v)}
+            className={`h-7 rounded-lg flex items-center gap-1 px-2 text-[11px] font-medium transition-colors ${
+              kvFilter
+                ? "ring-2 ring-offset-1 ring-slate-400 shadow-sm bg-slate-100 text-slate-700"
+                : "hover:bg-slate-100 text-slate-400"
+            }`}
+            title={lang === "nl" ? "Externe kostenverdeling" : "External cost distribution"}
+          >
+            <ArrowUpRight size={13} />
+            <span className="hidden sm:inline">KV</span>
+          </button>
+
           {/* Divider */}
           <div className="w-px h-5 bg-slate-200 mx-1" />
 
@@ -716,7 +759,15 @@ export default function BuildingListPage() {
                 </span>
               </div>
 
-              <UtilityIcons utilities={b.utilities} lang={lang} />
+              <div className="flex items-center gap-2">
+                <UtilityIcons utilities={b.utilities} lang={lang} />
+                {b.hasExternalKv && (
+                  <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-medium">
+                    <ArrowUpRight size={10} />
+                    KV
+                  </span>
+                )}
+              </div>
             </button>
           ))}
           {sorted.length === 0 && (
