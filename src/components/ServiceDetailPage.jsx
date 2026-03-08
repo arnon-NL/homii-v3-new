@@ -309,26 +309,26 @@ export default function ServiceDetailPage() {
             <>
               <FileText size={14} style={{ color: brand.blue }} />
               <span className="font-medium" style={{ color: brand.blue }}>
-                {lang === "nl" ? "Op basis van boekingen" : "Based on ledger entries"}
+                {lang === "nl" ? "Kosten uit grootboek" : "Costs from ledger"}
               </span>
               <span className="text-slate-400">·</span>
               <span className="text-slate-500">
                 {lang === "nl"
-                  ? "Werkelijke kosten uit facturen en boekingen"
-                  : "Actual costs from invoices and bookings"}
+                  ? "Werkelijke kosten op basis van facturen en boekingen per kostensoort"
+                  : "Actual costs from invoices and bookings per cost category"}
               </span>
             </>
           ) : (
             <>
               <Gauge size={14} style={{ color: brand.amber }} />
               <span className="font-medium" style={{ color: brand.amber }}>
-                {lang === "nl" ? "Op basis van verbruiksdata" : "Based on consumption data"}
+                {lang === "nl" ? "Kosten uit verbruiksdata" : "Costs from consumption data"}
               </span>
               <span className="text-slate-400">·</span>
               <span className="text-slate-500">
                 {lang === "nl"
-                  ? "Verwachte kosten berekend op meterdata en prognose"
-                  : "Expected costs calculated from metering data and forecast"}
+                  ? "Verwachte kosten berekend op meterdata — geen kostensoorten beschikbaar"
+                  : "Expected costs calculated from metering data — no cost categories available"}
               </span>
             </>
           )}
