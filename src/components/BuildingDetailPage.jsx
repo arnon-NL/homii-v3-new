@@ -1468,9 +1468,13 @@ export default function BuildingDetailPage() {
                                         setExpandedService(isExpanded ? null : bs.serviceId)
                                       }
                                     >
+                                      {(() => {
+                                        const CatIcon = categoryIconMap[bs.service?.category] || FolderOpen;
+                                        return <CatIcon size={14} style={{ color: brand.blue }} className="shrink-0" />;
+                                      })()}
                                       <ChevronRight
                                         size={14}
-                                        className={`text-slate-400 transition-transform duration-150 shrink-0 ${isExpanded ? "rotate-90" : ""}`}
+                                        className={`text-slate-400 transition-transform duration-150 shrink-0 -ml-1.5 ${isExpanded ? "rotate-90" : ""}`}
                                       />
                                       <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2">
@@ -1487,7 +1491,7 @@ export default function BuildingDetailPage() {
                                         {/* Budget progress indicator */}
                                         {(() => {
                                           const pct = bs.budget > 0 ? Math.round((bs.actual / bs.budget) * 100) : 0;
-                                          const barCol = overBudget ? "#DC2626" : "#64748B";
+                                          const barCol = overBudget ? "#DC2626" : brand.blue;
                                           return (
                                             <div className="flex items-center gap-2 mt-1 max-w-[140px]">
                                               <div className="flex-1 h-[3px] rounded-full bg-slate-100 overflow-hidden">
