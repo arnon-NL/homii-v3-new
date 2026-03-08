@@ -124,13 +124,13 @@ function LedgerStatusBadge({ status, lang }) {
   );
 }
 
-/* ── Utility icon (all neutral — differentiate by icon shape) ── */
+/* ── Utility icon — tinted per utility type ── */
 const utilityIcon = {
-  heat: { icon: Flame, color: "#64748B" },
-  water: { icon: Droplets, color: "#64748B" },
-  electricity: { icon: Zap, color: "#64748B" },
-  gas: { icon: Flame, color: "#64748B" },
-  "water-hot": { icon: Droplets, color: "#64748B" },
+  heat: { icon: Flame, color: "#EF4444", bg: "#FEE2E2" },
+  water: { icon: Droplets, color: "#3B82F6", bg: "#DBEAFE" },
+  electricity: { icon: Zap, color: "#F59E0B", bg: "#FEF3C7" },
+  gas: { icon: Flame, color: "#F97316", bg: "#FFF7ED" },
+  "water-hot": { icon: Droplets, color: "#EC4899", bg: "#FCE7F3" },
 };
 
 /* ── Activity icon ── */
@@ -1824,14 +1824,59 @@ export default function BuildingDetailPage() {
               {/* ═══ METERS TAB — Physical meter inventory ═══ */}
               {isFeatureEnabled("consumption") && <TabsContent value="meters">
                 <div className="mt-4 space-y-4">
+                  {/* Summary strip */}
+                  {(() => {
+                    const totalMain = mainMeters.length;
+                    const totalSub = subMeters.length;
+                    const overdueMain = mainMeters.filter((m) => {
+                      const d = m.latestDate ? Math.floor((new Date() - new Date(m.latestDate)) / 86400000) : 999;
+                      return d >= 90;
+                    }).length;
+                    const staleMain = mainMeters.filter((m) => {
+                      const d = m.latestDate ? Math.floor((new Date() - new Date(m.latestDate)) / 86400000) : 999;
+                      return d >= 30 && d < 90;
+                    }).length;
+                    const uniqueUtils = [...new Set(mainMeters.map((m) => m.utility))];
+
+                    return (
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div className="rounded-lg border border-slate-200 bg-white px-3 py-2.5">
+                          <p className="text-[11px] text-slate-400 font-medium">{lang === "nl" ? "Hoofdmeters" : "Main meters"}</p>
+                          <div className="flex items-baseline gap-2">
+                            <p className="text-lg font-bold tabular-nums" style={{ color: brand.navy }}>{totalMain}</p>
+                            <div className="flex items-center gap-1">
+                              {uniqueUtils.map((u) => {
+                                const uCfg = utilityIcon[u] || {};
+                                const UIcon = uCfg.icon || Gauge;
+                                return <UIcon key={u} size={12} style={{ color: uCfg.color || "#94A3B8" }} />;
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="rounded-lg border border-slate-200 bg-white px-3 py-2.5">
+                          <p className="text-[11px] text-slate-400 font-medium">{lang === "nl" ? "Submeters" : "Sub meters"}</p>
+                          <p className="text-lg font-bold tabular-nums" style={{ color: brand.navy }}>{totalSub}</p>
+                        </div>
+                        <div className={`rounded-lg border px-3 py-2.5 ${overdueMain > 0 ? "border-red-200 bg-red-50/30" : "border-slate-200 bg-white"}`}>
+                          <p className="text-[11px] text-slate-400 font-medium">{lang === "nl" ? "Achterstallig" : "Overdue"}</p>
+                          <p className={`text-lg font-bold tabular-nums ${overdueMain > 0 ? "text-red-600" : "text-slate-400"}`}>{overdueMain}</p>
+                        </div>
+                        <div className={`rounded-lg border px-3 py-2.5 ${staleMain > 0 ? "border-amber-200 bg-amber-50/30" : "border-slate-200 bg-white"}`}>
+                          <p className="text-[11px] text-slate-400 font-medium">{lang === "nl" ? "Verouderd" : "Stale"}</p>
+                          <p className={`text-lg font-bold tabular-nums ${staleMain > 0 ? "text-amber-600" : "text-slate-400"}`}>{staleMain}</p>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
                   {/* Dismounted meter filter */}
                   {dismountedCount > 0 && (
                     <div className="flex items-center justify-end">
                       <button
                         onClick={() => setShowDismounted(!showDismounted)}
-                        className="flex items-center gap-1 text-[11px] font-medium text-slate-400 hover:text-slate-600 transition-colors"
+                        className="flex items-center gap-1.5 text-[11px] font-medium text-slate-400 hover:text-slate-600 transition-colors"
                       >
-                        <span className={`w-3.5 h-3.5 rounded border transition-colors flex items-center justify-center ${showDismounted ? 'bg-slate-700 border-slate-700' : 'border-slate-300'}`}>
+                        <span className={`w-3.5 h-3.5 rounded border transition-colors flex items-center justify-center ${showDismounted ? 'border-[#3EB1C8] bg-[#3EB1C8]' : 'border-slate-300'}`}>
                           {showDismounted && <CheckCircle2 size={10} className="text-white" />}
                         </span>
                         {lang === "nl" ? `Gedemonteerde meters tonen (${dismountedCount})` : `Show dismounted meters (${dismountedCount})`}
@@ -1841,12 +1886,21 @@ export default function BuildingDetailPage() {
 
                   {/* ── Main Meters ── */}
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-600 mb-3">
-                      {lang === "nl" ? "Hoofdmeters" : "Main Meters"} ({mainMeters.length})
-                    </h3>
+                    <div className="flex items-center gap-2 mb-3">
+                      <h3 className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                        {lang === "nl" ? "Hoofdmeters" : "Main Meters"}
+                      </h3>
+                      <div className="flex-1 h-px bg-slate-200" />
+                      <span className="text-[11px] text-slate-400">{mainMeters.length}</span>
+                    </div>
                     {mainMeters.length === 0 ? (
-                      <div className="rounded-lg border border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-400">
-                        {lang === "nl" ? "Geen hoofdmeters geregistreerd" : "No main meters registered"}
+                      <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50/50 px-4 py-10 text-center">
+                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3">
+                          <Gauge size={18} className="text-slate-400" />
+                        </div>
+                        <p className="text-sm font-medium text-slate-500">
+                          {lang === "nl" ? "Geen hoofdmeters geregistreerd" : "No main meters registered"}
+                        </p>
                       </div>
                     ) : (
                       <div className="space-y-2">
@@ -1857,9 +1911,9 @@ export default function BuildingDetailPage() {
                           const daysSinceReading = m.latestDate ? Math.floor((new Date() - new Date(m.latestDate)) / 86400000) : 999;
                           const quality = daysSinceReading < 30 ? "good" : daysSinceReading < 90 ? "warning" : "overdue";
                           const qualityCfg = {
-                            good: { color: "#64748B", label: lang === "nl" ? "Actueel" : "Up to date" },
-                            warning: { color: "#F59E0B", label: lang === "nl" ? "Verouderd" : "Stale" },
-                            overdue: { color: "#EF4444", label: lang === "nl" ? "Achterstallig" : "Overdue" },
+                            good: { color: "#16A34A", bg: "bg-emerald-50", label: lang === "nl" ? "Actueel" : "Up to date" },
+                            warning: { color: "#F59E0B", bg: "bg-amber-50", label: lang === "nl" ? "Verouderd" : "Stale" },
+                            overdue: { color: "#EF4444", bg: "bg-red-50", label: lang === "nl" ? "Achterstallig" : "Overdue" },
                           }[quality];
 
                           return (
@@ -1868,62 +1922,66 @@ export default function BuildingDetailPage() {
                                 {/* Row 1: Meter identity */}
                                 <div className="flex items-center justify-between mb-2">
                                   <div className="flex items-center gap-2.5 min-w-0">
-                                    <div className="w-8 h-8 rounded flex items-center justify-center bg-slate-50 shrink-0">
-                                      <Icon size={14} className="text-slate-400" />
+                                    <div
+                                      className="w-8 h-8 rounded-md flex items-center justify-center shrink-0"
+                                      style={{ background: ui.bg || "#F1F5F9", color: ui.color || "#64748B" }}
+                                    >
+                                      <Icon size={15} />
                                     </div>
                                     <div className="min-w-0">
-                                      <p className="text-xs font-medium text-slate-700">{m.meterNumber}</p>
-                                      <p className="text-[11px] text-slate-400">
-                                        {t(m.utility, lang)} · {m.unit}
-                                        {m.meterType && <> · {m.meterType}</>}
-                                      </p>
+                                      <div className="flex items-center gap-2">
+                                        <p className="text-sm font-semibold" style={{ color: brand.navy }}>{m.meterNumber}</p>
+                                        <span className="text-[11px] text-slate-400">
+                                          {t(m.utility, lang)} · {m.unit}
+                                          {m.meterType && <> · {m.meterType}</>}
+                                        </span>
+                                      </div>
+                                      <div className="flex items-center gap-1.5 text-[11px] text-slate-400 mt-0.5">
+                                        {m.ean && <span>EAN <span className="font-mono text-slate-500">{m.ean}</span></span>}
+                                        {m.provider && (
+                                          <>
+                                            {m.ean && <span className="w-px h-2.5 bg-slate-200" />}
+                                            <span>{m.provider}</span>
+                                          </>
+                                        )}
+                                        {m.vendorId && (
+                                          <>
+                                            <span className="w-px h-2.5 bg-slate-200" />
+                                            <span className="font-mono">{m.vendorId}</span>
+                                          </>
+                                        )}
+                                      </div>
                                     </div>
                                   </div>
                                   <div className="flex items-center gap-2 ml-2">
                                     {m.dismounted && (
-                                      <span className="px-1.5 py-0.5 rounded text-[11px] bg-slate-100 text-slate-400">
+                                      <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-400">
                                         {lang === "nl" ? "Gedemonteerd" : "Dismounted"}
                                       </span>
                                     )}
-                                    <span className="text-[11px] font-medium" style={{ color: qualityCfg.color }}>
+                                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${qualityCfg.bg}`} style={{ color: qualityCfg.color }}>
                                       {qualityCfg.label}
                                     </span>
                                   </div>
                                 </div>
 
-                                {/* Row 2: Physical details */}
-                                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-400 mb-3 pl-10">
-                                  {m.ean && (
-                                    <span>EAN <span className="font-mono text-slate-500">{m.ean}</span></span>
-                                  )}
-                                  {m.provider && (
-                                    <span>{lang === "nl" ? "Leverancier" : "Supplier"}: <span className="text-slate-500">{m.provider}</span></span>
-                                  )}
-                                  {m.vendorId && (
-                                    <span>Vendor: <span className="font-mono text-slate-500">{m.vendorId}</span></span>
-                                  )}
-                                  {m.latestDate && (
-                                    <span>{lang === "nl" ? "Laatste aflezing" : "Last reading"}: <span className="text-slate-500">{fmtDate(m.latestDate)}</span></span>
-                                  )}
-                                </div>
-
-                                {/* Row 3: Reading values */}
-                                <div className="grid grid-cols-3 gap-3 px-3 py-2 bg-slate-50 rounded">
+                                {/* Reading values */}
+                                <div className="grid grid-cols-3 gap-3 px-3 py-2.5 rounded-lg border border-slate-100 bg-slate-50/50 ml-10">
                                   <div>
-                                    <p className="text-[11px] text-slate-400">{lang === "nl" ? "Meterstand" : "Reading"}</p>
-                                    <p className="text-sm font-semibold text-slate-900 tabular-nums">
+                                    <p className="text-[11px] text-slate-400 font-medium">{lang === "nl" ? "Meterstand" : "Reading"}</p>
+                                    <p className="text-sm font-bold tabular-nums" style={{ color: brand.navy }}>
                                       {(m.lastReading || 0).toLocaleString("nl-NL")}
                                     </p>
                                   </div>
                                   <div>
-                                    <p className="text-[11px] text-slate-400">{lang === "nl" ? "Verbruik" : "Consumption"}</p>
-                                    <p className="text-sm font-semibold text-slate-900 tabular-nums">
-                                      {(m.consumption || 0).toLocaleString("nl-NL")} {m.unit}
+                                    <p className="text-[11px] text-slate-400 font-medium">{lang === "nl" ? "Verbruik" : "Consumption"}</p>
+                                    <p className="text-sm font-bold tabular-nums" style={{ color: brand.navy }}>
+                                      {(m.consumption || 0).toLocaleString("nl-NL")} <span className="text-xs font-normal text-slate-400">{m.unit}</span>
                                     </p>
                                   </div>
                                   <div>
-                                    <p className="text-[11px] text-slate-400">{lang === "nl" ? "Aflees­datum" : "Reading date"}</p>
-                                    <p className="text-sm font-semibold text-slate-900">{m.readingDate}</p>
+                                    <p className="text-[11px] text-slate-400 font-medium">{lang === "nl" ? "Aflees­datum" : "Reading date"}</p>
+                                    <p className="text-sm font-medium text-slate-600">{m.readingDate || "—"}</p>
                                   </div>
                                 </div>
                               </div>
@@ -1937,22 +1995,27 @@ export default function BuildingDetailPage() {
                   {/* ── Sub Meters — table format for scalability ── */}
                   {subMeters.length > 0 && (
                     <div>
-                      <h3 className="text-sm font-semibold text-slate-600 mb-3">
-                        {lang === "nl" ? "Submeters" : "Sub Meters"} ({subMeters.length})
-                      </h3>
+                      <div className="flex items-center gap-2 mb-3">
+                        <h3 className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                          {lang === "nl" ? "Submeters" : "Sub Meters"}
+                        </h3>
+                        <div className="flex-1 h-px bg-slate-200" />
+                        <span className="text-[11px] text-slate-400">{subMeters.length}</span>
+                      </div>
                       <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
                         <div className="overflow-x-auto">
                           <table className="w-full text-xs">
                             <thead>
                               <tr className="bg-slate-50/80 border-b border-slate-100">
-                                <th className="text-left px-3 py-2 font-semibold text-slate-500 text-[11px]">{lang === "nl" ? "Meter" : "Meter"}</th>
-                                <th className="text-left px-3 py-2 font-semibold text-slate-500 text-[11px]">VHE</th>
-                                <th className="text-left px-3 py-2 font-semibold text-slate-500 text-[11px] hidden sm:table-cell">{lang === "nl" ? "Utiliteit" : "Utility"}</th>
-                                <th className="text-left px-3 py-2 font-semibold text-slate-500 text-[11px] hidden md:table-cell">{lang === "nl" ? "Type" : "Type"}</th>
-                                <th className="text-left px-3 py-2 font-semibold text-slate-500 text-[11px] hidden md:table-cell">{lang === "nl" ? "Leverancier" : "Supplier"}</th>
-                                <th className="text-right px-3 py-2 font-semibold text-slate-500 text-[11px]">{lang === "nl" ? "Verbruik" : "Consumption"}</th>
-                                <th className="text-left px-3 py-2 font-semibold text-slate-500 text-[11px] hidden sm:table-cell">{lang === "nl" ? "Aflezing" : "Reading"}</th>
-                                <th className="text-left px-3 py-2 font-semibold text-slate-500 text-[11px] hidden lg:table-cell">{lang === "nl" ? "Kwaliteit" : "Quality"}</th>
+                                <th className="w-5 px-2 py-2.5"></th>
+                                <th className="text-left px-3 py-2.5 font-semibold text-slate-500 text-[11px]">{lang === "nl" ? "Meter" : "Meter"}</th>
+                                <th className="text-left px-3 py-2.5 font-semibold text-slate-500 text-[11px]">VHE</th>
+                                <th className="text-left px-3 py-2.5 font-semibold text-slate-500 text-[11px] hidden sm:table-cell">{lang === "nl" ? "Utiliteit" : "Utility"}</th>
+                                <th className="text-left px-3 py-2.5 font-semibold text-slate-500 text-[11px] hidden md:table-cell">{lang === "nl" ? "Type" : "Type"}</th>
+                                <th className="text-left px-3 py-2.5 font-semibold text-slate-500 text-[11px] hidden md:table-cell">{lang === "nl" ? "Leverancier" : "Supplier"}</th>
+                                <th className="text-right px-3 py-2.5 font-semibold text-slate-500 text-[11px]">{lang === "nl" ? "Verbruik" : "Consumption"}</th>
+                                <th className="text-left px-3 py-2.5 font-semibold text-slate-500 text-[11px] hidden sm:table-cell">{lang === "nl" ? "Aflezing" : "Reading"}</th>
+                                <th className="text-center px-3 py-2.5 font-semibold text-slate-500 text-[11px] hidden lg:table-cell">{lang === "nl" ? "Status" : "Status"}</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50">
@@ -1963,23 +2026,31 @@ export default function BuildingDetailPage() {
                                 return visibleSubs.map((m) => {
                                   const vhe = m.vheId ? getVhe(m.vheId) : null;
                                   const daysSince = m.latestDate ? Math.floor((new Date() - new Date(m.latestDate)) / 86400000) : 999;
-                                  const qColor = daysSince < 30 ? "#64748B" : daysSince < 90 ? "#F59E0B" : "#EF4444";
-                                  const qLabel = daysSince < 30 ? (lang === "nl" ? "OK" : "OK") : daysSince < 90 ? (lang === "nl" ? "Verouderd" : "Stale") : (lang === "nl" ? "Achterstallig" : "Overdue");
+                                  const qCfg = daysSince < 30
+                                    ? { color: "#16A34A", bg: "bg-emerald-50", label: "OK" }
+                                    : daysSince < 90
+                                    ? { color: "#F59E0B", bg: "bg-amber-50", label: lang === "nl" ? "Verouderd" : "Stale" }
+                                    : { color: "#EF4444", bg: "bg-red-50", label: lang === "nl" ? "Achterstallig" : "Overdue" };
+                                  const subUi = utilityIcon[m.utility] || {};
+                                  const SubIcon = subUi.icon || Gauge;
                                   return (
                                     <tr key={m.id} className="hover:bg-slate-50/50">
-                                      <td className="px-3 py-2 text-slate-700 font-mono text-[11px]">{m.meterNumber}</td>
-                                      <td className="px-3 py-2 text-slate-600 text-[11px] max-w-[160px] truncate">
+                                      <td className="px-2 py-2.5">
+                                        <SubIcon size={12} style={{ color: subUi.color || "#94A3B8" }} />
+                                      </td>
+                                      <td className="px-3 py-2.5 font-mono text-[11px]" style={{ color: brand.navy }}>{m.meterNumber}</td>
+                                      <td className="px-3 py-2.5 text-slate-600 text-[11px] max-w-[160px] truncate font-medium">
                                         {vhe ? `${vhe.unit} · ${vhe.address}` : (m.vheId || "—")}
                                       </td>
-                                      <td className="px-3 py-2 text-slate-500 text-[11px] hidden sm:table-cell">{t(m.utility, lang)}</td>
-                                      <td className="px-3 py-2 text-slate-500 text-[11px] font-mono hidden md:table-cell">{m.meterType || "—"}</td>
-                                      <td className="px-3 py-2 text-slate-500 text-[11px] hidden md:table-cell">{m.provider || "—"}</td>
-                                      <td className="px-3 py-2 text-right font-medium tabular-nums text-slate-700 text-[11px]">
-                                        {(m.consumption || 0).toLocaleString("nl-NL")} {m.unit}
+                                      <td className="px-3 py-2.5 text-slate-500 text-[11px] hidden sm:table-cell">{t(m.utility, lang)}</td>
+                                      <td className="px-3 py-2.5 text-slate-500 text-[11px] font-mono hidden md:table-cell">{m.meterType || "—"}</td>
+                                      <td className="px-3 py-2.5 text-slate-500 text-[11px] hidden md:table-cell">{m.provider || "—"}</td>
+                                      <td className="px-3 py-2.5 text-right font-semibold tabular-nums text-[11px]" style={{ color: brand.navy }}>
+                                        {(m.consumption || 0).toLocaleString("nl-NL")} <span className="text-slate-400 font-normal">{m.unit}</span>
                                       </td>
-                                      <td className="px-3 py-2 text-slate-500 text-[11px] hidden sm:table-cell">{m.readingDate || "—"}</td>
-                                      <td className="px-3 py-2 hidden lg:table-cell">
-                                        <span className="text-[11px] font-medium" style={{ color: qColor }}>{qLabel}</span>
+                                      <td className="px-3 py-2.5 text-slate-500 text-[11px] hidden sm:table-cell">{m.readingDate || "—"}</td>
+                                      <td className="px-3 py-2.5 hidden lg:table-cell text-center">
+                                        <span className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-semibold ${qCfg.bg}`} style={{ color: qCfg.color }}>{qCfg.label}</span>
                                       </td>
                                     </tr>
                                   );
@@ -1989,8 +2060,8 @@ export default function BuildingDetailPage() {
                           </table>
                         </div>
                         {subMeters.length > 50 && (
-                          <div className="px-3 py-2 border-t border-slate-100 text-center">
-                            <span className="text-[11px] text-slate-400">
+                          <div className="px-3 py-2.5 border-t border-slate-100 text-center bg-slate-50/50">
+                            <span className="text-[11px] text-slate-500 font-medium">
                               {lang === "nl" ? `Eerste 50 van ${subMeters.length} submeters getoond` : `Showing first 50 of ${subMeters.length} sub meters`}
                             </span>
                           </div>
