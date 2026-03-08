@@ -721,32 +721,7 @@ export default function ServiceDetailPage() {
           </div>
         </div>
 
-        {/* ── Settlement context strip (past year + ledger orgs only) ── */}
-        {settlementContext && (
-          <div className="flex items-center gap-2 mb-3 text-[12px] text-slate-500">
-            <span
-              className="w-1.5 h-1.5 rounded-full shrink-0"
-              style={{ background: settlementStatusColors[settlementContext.dominantStatus] }}
-            />
-            <span className="font-medium" style={{ color: settlementStatusColors[settlementContext.dominantStatus] }}>
-              {lang === "nl" ? "Afrekening" : "Settlement"} {year}
-            </span>
-            <span className="text-slate-300">·</span>
-            {Object.entries(settlementContext.statusCounts)
-              .sort(([a], [b]) => {
-                const order = { distributed: 0, approved: 1, in_review: 2, monitoring: 3 };
-                return (order[a] ?? 9) - (order[b] ?? 9);
-              })
-              .map(([status, count], i) => (
-                <React.Fragment key={status}>
-                  {i > 0 && <span className="text-slate-300">·</span>}
-                  <span style={{ color: settlementStatusColors[status] }}>
-                    {count} {settlementStatusLabels[status]?.[lang] || status}
-                  </span>
-                </React.Fragment>
-              ))}
-          </div>
-        )}
+        {/* Settlement context strip removed — not a current use case */}
 
         {/* ═══════════════════════════════════════════════════ */}
         {/* ENERGY MODE — building-service overview with meters */}
@@ -1040,18 +1015,6 @@ export default function ServiceDetailPage() {
               sub: `${allEntries.length} ${lang === "nl" ? "boekingen" : "entries"}`,
               color: completeness >= 90 ? brand.blue : completeness >= 70 ? brand.amber : brand.red,
             },
-            {
-              label: { en: "Flagged", nl: "Gemarkeerd" },
-              value: totalFlagged,
-              sub: lang === "nl" ? "Vereist actie" : "Needs action",
-              color: totalFlagged > 0 ? brand.red : brand.blue,
-            },
-            {
-              label: { en: "Pending", nl: "In afwachting" },
-              value: totalPending,
-              sub: lang === "nl" ? "Nog te boeken" : "Awaiting booking",
-              color: totalPending > 0 ? brand.amber : brand.blue,
-            },
           ].map((card, i) => (
             <div
               key={i}
@@ -1071,19 +1034,7 @@ export default function ServiceDetailPage() {
           ))}
         </div>
 
-        {/* ── Monthly distribution chart ── */}
-        <div className="rounded-lg border border-slate-200 bg-white p-4 mb-6">
-          <div className="flex items-center gap-2 mb-3">
-            <BarChart3 size={14} className="text-slate-400" />
-            <span className="text-sm font-semibold" style={{ color: brand.navy }}>
-              {lang === "nl" ? "Maandoverzicht alle complexen" : "Monthly Overview All Complexes"}
-            </span>
-          </div>
-          <MonthlyBarChart
-            entries={allEntries}
-            budgetPerMonth={totalBudget / 12}
-          />
-        </div>
+        {/* Monthly overview all complexes bar removed */}
 
         {/* ── Filter bar ── */}
         <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -1102,8 +1053,6 @@ export default function ServiceDetailPage() {
             {[
               { value: "all", label: { en: "All", nl: "Alle" } },
               { value: "issues", label: { en: "Issues", nl: "Aandachtspunten" } },
-              { value: "flagged", label: { en: "Flagged", nl: "Gemarkeerd" } },
-              { value: "pending", label: { en: "Pending", nl: "In afwachting" } },
             ].map((f) => (
               <button
                 key={f.value}
@@ -1133,15 +1082,10 @@ export default function ServiceDetailPage() {
                   .filter((e) => e.buildingId === row.building.id)
                   .sort((a, b) => b.date.localeCompare(a.date))
               : [];
-            const hasIssues = row.flagged > 0 || row.pending > 0;
-
             return (
               <div
                 key={row.building.id}
-                className="rounded-lg border bg-white overflow-hidden transition-colors"
-                style={{
-                  borderColor: hasIssues ? "#FDE68A" : "#E2E8F0",
-                }}
+                className="rounded-lg border border-slate-200 bg-white overflow-hidden transition-colors"
               >
                 {/* Building summary row */}
                 <button
@@ -1178,21 +1122,7 @@ export default function ServiceDetailPage() {
                     </div>
                   </div>
 
-                  {/* Status indicators */}
-                  <div className="hidden sm:flex items-center gap-3 shrink-0">
-                    {row.flagged > 0 && (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-medium" style={{ color: brand.red }}>
-                        <AlertTriangle size={14} />
-                        {row.flagged}
-                      </span>
-                    )}
-                    {row.pending > 0 && (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-medium" style={{ color: brand.amber }}>
-                        <Clock size={14} />
-                        {row.pending}
-                      </span>
-                    )}
-                  </div>
+                  {/* Status indicators removed */}
 
                   {/* Amounts */}
                   <div className="text-right shrink-0">
@@ -1217,15 +1147,6 @@ export default function ServiceDetailPage() {
                 {/* Expanded: ledger entries */}
                 {isExpanded && (
                   <div className="border-t border-slate-100">
-                    {/* Mini bar */}
-                    <div className="px-4 py-3 bg-slate-50/50 border-b border-slate-100">
-                      <MonthlyBarChart
-                        entries={allEntries.filter(
-                          (e) => e.buildingId === row.building.id
-                        )}
-                        budgetPerMonth={row.budgetForService / 12}
-                      />
-                    </div>
 
                     {/* Cost Categories with Meter Connection */}
                     {isFeatureEnabled("consumption") && (
