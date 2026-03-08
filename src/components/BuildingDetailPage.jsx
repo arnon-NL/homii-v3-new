@@ -345,14 +345,17 @@ export default function BuildingDetailPage() {
   const mainMeters = meterList.filter((m) => m.type === "main");
   const subMeters = meterList.filter((m) => m.type === "sub");
 
-  // Kostenverdeler map: serviceId (e.g. "SVC-108") → supplier name(s)
+  // Kostenverdeler map: serviceId (e.g. "SVC-108") → [{id, name, shortName}]
   const kostenverdelerMap = useMemo(() => {
     const map = {};
     (data.suppliers || []).forEach((s) => {
       if (s.kostenverdeler && s.serviceIds) {
+        const shortName = s.name
+          .replace(/\s+(BV|B\.V\.|NV|N\.V\.)$/i, "")
+          .replace(/\s+Energy Services$/i, "");
         s.serviceIds.forEach((sid) => {
           if (!map[sid]) map[sid] = [];
-          map[sid].push(s.name);
+          map[sid].push({ id: s.id, name: s.name, shortName });
         });
       }
     });
@@ -1236,46 +1239,61 @@ export default function BuildingDetailPage() {
                     const visibleCategories = isFeatureEnabled("nonUtilityServices")
                       ? data.serviceCategories
                       : data.serviceCategories.filter((c) => c.id === "energy");
-                    const grouped = visibleCategories
-                      .map((cat) => ({
-                        ...cat,
-                        items: enrichedBs.filter(
-                          (bs) => bs.service?.category === cat.id
-                        ),
-                      }))
-                      .filter((g) => g.items.length > 0);
 
-                    if (grouped.length === 0)
+                    // Split services into external (kostenverdeler) and internal
+                    const externalBs = enrichedBs.filter((bs) => kostenverdelerMap[bs.serviceId]);
+                    const internalBs = enrichedBs.filter((bs) => !kostenverdelerMap[bs.serviceId]);
+
+                    // Collect unique kostenverdeler names
+                    const kvNames = [...new Set(
+                      externalBs.flatMap((bs) => (kostenverdelerMap[bs.serviceId] || []).map((k) => k.shortName))
+                    )];
+
+                    // Group function: takes a set of bs items and returns category groups
+                    const groupByCategory = (items) =>
+                      visibleCategories
+                        .map((cat) => ({
+                          ...cat,
+                          items: items.filter((bs) => bs.service?.category === cat.id),
+                        }))
+                        .filter((g) => g.items.length > 0);
+
+                    const externalGrouped = groupByCategory(externalBs);
+                    const internalGrouped = groupByCategory(internalBs);
+
+                    if (externalGrouped.length === 0 && internalGrouped.length === 0)
                       return (
                         <div className="px-4 py-8 text-center text-sm text-slate-400">
                           {t("noResults", lang)}
                         </div>
                       );
 
-                    return grouped.map((group) => {
-                      const cfg = categoryConfig[group.id];
-                      const GroupIcon = cfg?.icon || Wrench;
-                      return (
-                        <div key={group.id}>
-                          {/* Category header */}
-                          <div className="flex items-center gap-2 mb-2">
-                            <div
-                              className="w-5 h-5 rounded flex items-center justify-center"
-                              style={{ background: cfg?.bg, color: cfg?.color }}
-                            >
-                              <GroupIcon size={14} />
+                    // Render a set of category groups with their service cards
+                    const renderGroups = (groups) =>
+                      groups.map((group) => {
+                        const cfg = categoryConfig[group.id];
+                        const GroupIcon = cfg?.icon || Wrench;
+                        return (
+                          <div key={group.id}>
+                            {/* Category header */}
+                            <div className="flex items-center gap-2 mb-2">
+                              <div
+                                className="w-5 h-5 rounded flex items-center justify-center"
+                                style={{ background: cfg?.bg, color: cfg?.color }}
+                              >
+                                <GroupIcon size={14} />
+                              </div>
+                              <span
+                                className="text-xs font-semibold uppercase tracking-wider"
+                                style={{ color: cfg?.color }}
+                              >
+                                {group.label[lang] || group.label.en}
+                              </span>
                             </div>
-                            <span
-                              className="text-xs font-semibold uppercase tracking-wider"
-                              style={{ color: cfg?.color }}
-                            >
-                              {group.label[lang] || group.label.en}
-                            </span>
-                          </div>
 
-                          {/* Service rows */}
-                          <div className="space-y-2 mb-5">
-                            {group.items.map((bs) => {
+                            {/* Service rows */}
+                            <div className="space-y-2 mb-5">
+                              {group.items.map((bs) => {
                               const isExpanded = expandedService === bs.serviceId;
                               const v = bs.budget - bs.actual;
                               const ledger = ledgerByService[bs.serviceId];
@@ -1321,7 +1339,7 @@ export default function BuildingDetailPage() {
                                           )}
                                           {kostenverdelerMap[bs.serviceId] && (
                                             <span className="text-[11px] px-2 py-1 rounded-full font-medium text-slate-500 bg-slate-100">
-                                              ⇄ {kostenverdelerMap[bs.serviceId].join(", ")}
+                                              ⇄ {kostenverdelerMap[bs.serviceId].map(k => k.shortName).join(", ")}
                                             </span>
                                           )}
                                         </div>
@@ -1565,6 +1583,37 @@ export default function BuildingDetailPage() {
                         </div>
                       );
                     });
+
+                    return (
+                      <>
+                        {/* ── External: Kostenverdeler services ── */}
+                        {externalGrouped.length > 0 && (
+                          <div>
+                            <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-200">
+                              <ArrowUpRight size={14} style={{ color: brand.blue }} />
+                              <span className="text-sm font-semibold" style={{ color: brand.navy }}>
+                                {lang === "nl" ? "Externe kostenverdeling" : "External cost distribution"}
+                                {kvNames.length > 0 && <span className="text-slate-400 font-normal"> — {kvNames.join(", ")}</span>}
+                              </span>
+                            </div>
+                            {renderGroups(externalGrouped)}
+                          </div>
+                        )}
+
+                        {/* ── Internal: Housing corporation services ── */}
+                        {internalGrouped.length > 0 && (
+                          <div>
+                            <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-200">
+                              <Building2 size={14} style={{ color: brand.blue }} />
+                              <span className="text-sm font-semibold" style={{ color: brand.navy }}>
+                                {lang === "nl" ? "Interne kostenverdeling" : "Internal cost distribution"}
+                              </span>
+                            </div>
+                            {renderGroups(internalGrouped)}
+                          </div>
+                        )}
+                      </>
+                    );
                   })()}
                 </div>
                 )}
