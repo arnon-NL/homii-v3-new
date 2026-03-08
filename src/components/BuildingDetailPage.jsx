@@ -1652,11 +1652,20 @@ export default function BuildingDetailPage() {
 
                     if (meterConsumption.length === 0) {
                       return (
-                        <div className="rounded-lg border border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-400">
-                          <Radio size={16} className="mx-auto mb-2 text-slate-300" />
-                          {lang === "nl"
-                            ? "Geen hoofdmeters geregistreerd voor dit gebouw"
-                            : "No main meters registered for this building"}
+                        <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50/50 px-4 py-10 text-center">
+                          <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-3">
+                            <Radio size={18} className="text-slate-400" />
+                          </div>
+                          <p className="text-sm font-medium text-slate-500">
+                            {lang === "nl"
+                              ? "Geen hoofdmeters geregistreerd"
+                              : "No main meters registered"}
+                          </p>
+                          <p className="text-xs text-slate-400 mt-1">
+                            {lang === "nl"
+                              ? "Verbruiksgegevens worden zichtbaar zodra meters zijn gekoppeld"
+                              : "Consumption data will appear once meters are linked"}
+                          </p>
                         </div>
                       );
                     }
@@ -1664,19 +1673,19 @@ export default function BuildingDetailPage() {
                     const fmtNum = (n) => Math.round(n).toLocaleString("nl-NL");
 
                     const utilLabels = {
-                      electricity: { icon: Zap, label: lang === "nl" ? "Elektriciteit" : "Electricity" },
-                      heat: { icon: Flame, label: lang === "nl" ? "Warmte" : "Heat" },
-                      gas: { icon: Flame, label: "Gas" },
-                      water: { icon: Droplets, label: "Water" },
-                      "water-hot": { icon: Droplets, label: lang === "nl" ? "Warm water" : "Hot water" },
+                      electricity: { icon: Zap, label: lang === "nl" ? "Elektriciteit" : "Electricity", color: "#F59E0B", bg: "#FEF3C7" },
+                      heat: { icon: Flame, label: lang === "nl" ? "Warmte" : "Heat", color: "#EF4444", bg: "#FEE2E2" },
+                      gas: { icon: Flame, label: "Gas", color: "#F97316", bg: "#FFF7ED" },
+                      water: { icon: Droplets, label: "Water", color: "#3B82F6", bg: "#DBEAFE" },
+                      "water-hot": { icon: Droplets, label: lang === "nl" ? "Warm water" : "Hot water", color: "#EC4899", bg: "#FCE7F3" },
                     };
 
                     return meterConsumption.map(({ meter, linkedBs, ytdConsumption, endConsumption, ytdCost, endCost, unitPrice }) => {
                       const consPct = endConsumption > 0 ? Math.round((ytdConsumption / endConsumption) * 100) : 0;
                       const consOver = consPct > 100;
                       const consAhead = consPct > yearPct + 10;
-                      const barCol = consOver ? "#DC2626" : "#64748B";
-                      const util = utilLabels[meter.utility] || { icon: Gauge, label: meter.utility };
+                      const barCol = consOver ? "#DC2626" : consAhead ? "#F59E0B" : brand.blue;
+                      const util = utilLabels[meter.utility] || { icon: Gauge, label: meter.utility, color: "#64748B", bg: "#F1F5F9" };
                       const UtilIcon = util.icon;
 
                       return (
@@ -1684,12 +1693,15 @@ export default function BuildingDetailPage() {
                           {/* Meter header — physical info */}
                           <div className="px-4 py-3 flex items-center justify-between">
                             <div className="flex items-center gap-2.5 min-w-0">
-                              <div className="w-7 h-7 rounded flex items-center justify-center bg-slate-50 shrink-0">
-                                <UtilIcon size={14} className="text-slate-400" />
+                              <div
+                                className="w-7 h-7 rounded-md flex items-center justify-center shrink-0"
+                                style={{ background: util.bg, color: util.color }}
+                              >
+                                <UtilIcon size={14} />
                               </div>
                               <div className="min-w-0">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-xs font-medium text-slate-700">{util.label}</span>
+                                  <span className="text-sm font-semibold" style={{ color: brand.navy }}>{util.label}</span>
                                   <span className="text-[11px] text-slate-400 font-mono">{meter.meterNumber}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5 text-[11px] text-slate-400 mt-0.5">
@@ -1710,8 +1722,8 @@ export default function BuildingDetailPage() {
                               </div>
                             </div>
                             <div className="text-right shrink-0 ml-2">
-                              <p className="text-xs font-medium tabular-nums text-slate-700">
-                                {fmtNum(ytdConsumption)} {meter.unit}
+                              <p className="text-sm font-bold tabular-nums" style={{ color: brand.navy }}>
+                                {fmtNum(ytdConsumption)} <span className="text-xs font-normal text-slate-400">{meter.unit}</span>
                               </p>
                               <p className="text-[11px] text-slate-400 tabular-nums">
                                 {lang === "nl" ? "van" : "of"} {fmtNum(Math.round(endConsumption))} {lang === "nl" ? "verwacht" : "expected"}
@@ -1722,38 +1734,52 @@ export default function BuildingDetailPage() {
                           {/* Consumption progress */}
                           <div className="px-4 pb-3 space-y-2">
                             <div>
-                              <div className="flex items-center gap-2 mb-1">
-                                <div className="flex-1 h-[4px] rounded-full bg-slate-100 overflow-hidden relative">
-                                  <div className="h-full rounded-full" style={{ width: `${Math.min(consPct, 100)}%`, background: barCol }} />
+                              <div className="flex items-center gap-2 mb-1.5">
+                                <div className="flex-1 h-[5px] rounded-full bg-slate-100 overflow-hidden relative">
+                                  <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(consPct, 100)}%`, background: barCol }} />
                                   {yearPct > 0 && yearPct < 100 && (
-                                    <div className="absolute top-[-1.5px] w-[1.5px] h-[7px] rounded-full bg-slate-300" style={{ left: `${yearPct}%` }} />
+                                    <div className="absolute top-[-2px] w-[2px] h-[9px] rounded-full bg-slate-300" style={{ left: `${yearPct}%` }} />
                                   )}
                                 </div>
-                                <span className="text-[11px] text-slate-400 tabular-nums shrink-0">{consPct}%</span>
+                                <span className="text-[11px] font-semibold tabular-nums shrink-0" style={{ color: barCol }}>{consPct}%</span>
                               </div>
-                              <div className="flex items-center justify-between text-[11px] text-slate-400">
-                                <span>
-                                  {fmt(ytdCost)} {lang === "nl" ? "kosten" : "cost"}
-                                  <span className="text-slate-200 mx-1">·</span>
-                                  {fmt(Math.round(endCost))} {lang === "nl" ? "verwacht" : "forecasted"}
+                              <div className="flex items-center justify-between text-[11px]">
+                                <div className="flex items-center gap-3 text-slate-400">
+                                  <span className="inline-flex items-center gap-1">
+                                    <span className="font-medium text-slate-600 tabular-nums">{fmt(ytdCost)}</span>
+                                    {lang === "nl" ? "kosten" : "cost"}
+                                  </span>
+                                  <span className="w-px h-3 bg-slate-200" />
+                                  <span className="inline-flex items-center gap-1">
+                                    <span className="tabular-nums">{fmt(Math.round(endCost))}</span>
+                                    {lang === "nl" ? "verwacht" : "expected"}
+                                  </span>
                                   {unitPrice > 0 && (
                                     <>
-                                      <span className="text-slate-200 mx-1">·</span>
-                                      €{unitPrice.toFixed(2)}/{meter.unit}
+                                      <span className="w-px h-3 bg-slate-200" />
+                                      <span className="font-mono tabular-nums">€{unitPrice.toFixed(2)}/{meter.unit}</span>
                                     </>
                                   )}
-                                </span>
-                                {consOver && <span className="text-red-600 font-medium">{lang === "nl" ? "Boven verwachting" : "Above expected"}</span>}
-                                {!consOver && consAhead && <span className="text-slate-500">{lang === "nl" ? "Voor op schema" : "Ahead of pace"}</span>}
+                                </div>
+                                {consOver && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-red-50 text-red-600 font-semibold">
+                                    {lang === "nl" ? "Boven verwachting" : "Above expected"}
+                                  </span>
+                                )}
+                                {!consOver && consAhead && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 font-medium">
+                                    {lang === "nl" ? "Voor op schema" : "Ahead of pace"}
+                                  </span>
+                                )}
                               </div>
                             </div>
 
                             {/* Linked services */}
                             {linkedBs.length > 0 && (
-                              <div className="pt-2 border-t border-slate-50">
-                                <div className="flex items-center gap-1.5 mb-1.5">
+                              <div className="pt-2 border-t border-slate-100">
+                                <div className="flex items-center gap-1.5 mb-2">
                                   <Link2 size={11} className="text-slate-300" />
-                                  <span className="text-[11px] text-slate-400 font-medium">
+                                  <span className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">
                                     {lang === "nl" ? "Gekoppelde diensten" : "Linked services"}
                                   </span>
                                 </div>
@@ -1762,14 +1788,14 @@ export default function BuildingDetailPage() {
                                     const share = bs.consumption?.allocationShare || 1;
                                     const allocCost = (bs.consumption?.endCost || 0);
                                     return (
-                                      <div key={bs.id} className="flex items-center justify-between text-[11px] pl-4">
-                                        <div className="flex items-center gap-1.5 text-slate-500">
-                                          <span>{bs.service?.name?.[lang] || bs.serviceCode}</span>
+                                      <div key={bs.id} className="flex items-center justify-between text-[11px] pl-4 py-0.5">
+                                        <div className="flex items-center gap-1.5">
+                                          <span className="text-slate-600">{bs.service?.name?.[lang] || bs.serviceCode}</span>
                                           {share < 1 && (
-                                            <span className="text-slate-300">({Math.round(share * 100)}%)</span>
+                                            <span className="text-slate-300 font-mono">({Math.round(share * 100)}%)</span>
                                           )}
                                         </div>
-                                        <span className="text-slate-500 tabular-nums">{fmt(allocCost)}</span>
+                                        <span className="text-slate-600 font-medium tabular-nums">{fmt(allocCost)}</span>
                                       </div>
                                     );
                                   })}
@@ -1783,11 +1809,13 @@ export default function BuildingDetailPage() {
                   })()}
 
                   {/* Year progress context */}
-                  <div className="flex items-center gap-2 text-[11px] text-slate-300 pt-1">
-                    <div className="w-20 h-[3px] rounded-full bg-slate-100 overflow-hidden">
-                      <div className="h-full rounded-full bg-slate-200" style={{ width: `${yearPct}%` }} />
+                  <div className="flex items-center gap-2 text-[11px] text-slate-400 pt-2">
+                    <div className="w-20 h-[3px] rounded-full bg-slate-200 overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: `${yearPct}%`, background: brand.blue }} />
                     </div>
-                    <span className="tabular-nums">{lang === "nl" ? "Jaar" : "Year"} {yearPct}%</span>
+                    <span className="tabular-nums font-medium">{lang === "nl" ? "Jaar" : "Year"} {yearPct}%</span>
+                    <span className="text-slate-300">·</span>
+                    <span className="text-slate-400">{lang === "nl" ? "De staande streep toont de jaarpositie" : "Tick mark shows year position"}</span>
                   </div>
                 </div>
               </TabsContent>
@@ -2064,10 +2092,43 @@ export default function BuildingDetailPage() {
                   const endedCount = enrichedVheList.filter((v) => v.contractStatus === "Ended").length;
                   const vacantCount = enrichedVheList.filter((v) => v.contractStatus === "Vacant").length;
 
+                  // Summary stats
+                  const totalAdvance = enrichedVheList.reduce((s, v) => s + (v.advance || 0), 0);
+                  const totalSuggested = enrichedVheList.reduce((s, v) => s + (v.suggested || 0), 0);
+                  const totalDiff = totalSuggested - totalAdvance;
+                  const needsAdjustment = enrichedVheList.filter((v) => Math.abs(v.diff) > 5).length;
+
                   return (
                     <>
+                      {/* Summary strip */}
+                      <div className="mt-4 mb-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div className="rounded-lg border border-slate-200 bg-white px-3 py-2.5">
+                          <p className="text-[11px] text-slate-400 font-medium">{lang === "nl" ? "Eenheden" : "Units"}</p>
+                          <p className="text-lg font-bold tabular-nums" style={{ color: brand.navy }}>{enrichedVheList.length}</p>
+                        </div>
+                        <div className="rounded-lg border border-slate-200 bg-white px-3 py-2.5">
+                          <p className="text-[11px] text-slate-400 font-medium">{lang === "nl" ? "Voorschot / mnd" : "Advance / mo"}</p>
+                          <p className="text-lg font-bold tabular-nums" style={{ color: brand.navy }}>{fmt(totalAdvance)}</p>
+                        </div>
+                        <div className="rounded-lg border border-slate-200 bg-white px-3 py-2.5">
+                          <p className="text-[11px] text-slate-400 font-medium">{lang === "nl" ? "Advies / mnd" : "Suggested / mo"}</p>
+                          <p className="text-lg font-bold tabular-nums text-slate-500">{fmt(totalSuggested)}</p>
+                        </div>
+                        <div className={`rounded-lg border px-3 py-2.5 ${Math.abs(totalDiff) > 50 ? "border-red-200 bg-red-50/30" : "border-slate-200 bg-white"}`}>
+                          <p className="text-[11px] text-slate-400 font-medium">{lang === "nl" ? "Aanpassing nodig" : "Needs adjustment"}</p>
+                          <div className="flex items-baseline gap-2">
+                            <p className={`text-lg font-bold tabular-nums ${totalDiff > 5 ? "text-red-600" : totalDiff < -5 ? "text-emerald-600" : "text-slate-400"}`}>
+                              {totalDiff > 0 ? "+" : ""}{fmt(totalDiff)}
+                            </p>
+                            {needsAdjustment > 0 && (
+                              <span className="text-[11px] text-slate-400">{needsAdjustment} {lang === "nl" ? "eenheden" : "units"}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
                       {/* Toolbar: search + filter */}
-                      <div className="mt-4 mb-3 flex items-center gap-2 flex-wrap">
+                      <div className="mb-3 flex items-center gap-2 flex-wrap">
                         <div className="relative flex-1 min-w-[160px] max-w-xs">
                           <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-300" />
                           <input
@@ -2075,7 +2136,7 @@ export default function BuildingDetailPage() {
                             value={vheSearch}
                             onChange={(e) => setVheSearch(e.target.value)}
                             placeholder={lang === "nl" ? "Zoek adres of eenheid..." : "Search address or unit..."}
-                            className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-1 focus:ring-slate-300"
+                            className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-1 focus:ring-[#3EB1C8]/30 focus:border-[#3EB1C8]"
                           />
                         </div>
                         <div className="flex items-center gap-0.5 rounded-lg border border-slate-200 bg-white p-0.5">
@@ -2088,9 +2149,9 @@ export default function BuildingDetailPage() {
                             <button
                               key={f.key}
                               onClick={() => setVheContractFilter(f.key)}
-                              className={`px-2 py-1 rounded text-[11px] transition-colors ${
+                              className={`px-2.5 py-1 rounded-md text-[11px] transition-colors ${
                                 vheContractFilter === f.key
-                                  ? "bg-slate-100 text-slate-700 font-medium"
+                                  ? "bg-[#3EB1C8]/10 text-[#3EB1C8] font-semibold"
                                   : "text-slate-400 hover:text-slate-600"
                               }`}
                             >
@@ -2124,10 +2185,13 @@ export default function BuildingDetailPage() {
                               <tbody className="divide-y divide-slate-50">
                                 {sortedVhes.map((vhe) => {
                                   const isExp = expandedVhe === vhe.id;
-                                  const contractColor = vhe.contractStatus === "Active" ? "text-slate-600"
-                                    : vhe.contractStatus === "Ended" ? "text-slate-400"
-                                    : "text-amber-600";
-                                  const diffColor = vhe.diff > 5 ? "text-red-600" : vhe.diff < -5 ? "text-slate-500" : "text-slate-400";
+                                  const contractCfg = {
+                                    Active: { bg: "bg-emerald-50", text: "text-emerald-700", label: lang === "nl" ? "Actief" : "Active" },
+                                    Ended: { bg: "bg-slate-100", text: "text-slate-500", label: lang === "nl" ? "Beëindigd" : "Ended" },
+                                    Vacant: { bg: "bg-amber-50", text: "text-amber-700", label: lang === "nl" ? "Leeg" : "Vacant" },
+                                  }[vhe.contractStatus] || { bg: "bg-slate-100", text: "text-slate-500", label: vhe.contractStatus };
+                                  const diffColor = vhe.diff > 5 ? "text-red-600" : vhe.diff < -5 ? "text-emerald-600" : "text-slate-400";
+                                  const diffBg = Math.abs(vhe.diff) > 5 ? (vhe.diff > 5 ? "bg-red-50" : "bg-emerald-50") : "";
 
                                   return (
                                     <React.Fragment key={vhe.id}>
@@ -2135,57 +2199,63 @@ export default function BuildingDetailPage() {
                                         className={`cursor-pointer transition-colors ${isExp ? "bg-slate-50" : "hover:bg-slate-50/50"}`}
                                         onClick={() => setExpandedVhe(isExp ? null : vhe.id)}
                                       >
-                                        <td className="px-2 py-2">
+                                        <td className="px-2 py-2.5">
                                           <ChevronRight
                                             size={12}
                                             className={`text-slate-400 transition-transform duration-150 ${isExp ? "rotate-90" : ""}`}
                                           />
                                         </td>
-                                        <td className="px-3 py-2 text-slate-600 font-mono tabular-nums">{vhe.unit}</td>
-                                        <td className="px-3 py-2 text-slate-700 font-medium max-w-[180px] truncate">{vhe.address}</td>
-                                        <td className="px-3 py-2 text-slate-500 tabular-nums">{vhe.m2 || "—"}</td>
-                                        <td className={`px-3 py-2 text-[11px] font-medium ${contractColor}`}>{vhe.contractStatus}</td>
-                                        <td className="px-3 py-2 text-slate-500 text-[11px] hidden lg:table-cell">
+                                        <td className="px-3 py-2.5 text-slate-600 font-mono tabular-nums">{vhe.unit}</td>
+                                        <td className="px-3 py-2.5 font-medium max-w-[180px] truncate" style={{ color: brand.navy }}>{vhe.address}</td>
+                                        <td className="px-3 py-2.5 text-slate-500 tabular-nums">{vhe.m2 || "—"}</td>
+                                        <td className="px-3 py-2.5">
+                                          <span className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-semibold ${contractCfg.bg} ${contractCfg.text}`}>
+                                            {contractCfg.label}
+                                          </span>
+                                        </td>
+                                        <td className="px-3 py-2.5 text-slate-500 text-[11px] hidden lg:table-cell">
                                           {vhe.since ? fmtDate(vhe.since) : "—"}
                                         </td>
-                                        <td className="px-3 py-2 text-right font-medium tabular-nums text-slate-700">{fmt(vhe.advance)}</td>
-                                        <td className="px-3 py-2 text-right tabular-nums text-slate-500">{fmt(vhe.suggested)}</td>
-                                        <td className={`px-3 py-2 text-right font-medium tabular-nums ${diffColor}`}>
-                                          {vhe.diff > 0 ? "+" : ""}{fmt(vhe.diff)}
+                                        <td className="px-3 py-2.5 text-right font-semibold tabular-nums" style={{ color: brand.navy }}>{fmt(vhe.advance)}</td>
+                                        <td className="px-3 py-2.5 text-right tabular-nums text-slate-500">{fmt(vhe.suggested)}</td>
+                                        <td className={`px-3 py-2.5 text-right font-semibold tabular-nums ${diffColor}`}>
+                                          <span className={`inline-flex px-1.5 py-0.5 rounded ${diffBg}`}>
+                                            {vhe.diff > 0 ? "+" : ""}{fmt(vhe.diff)}
+                                          </span>
                                         </td>
                                       </tr>
                                       {isExp && (
                                         <tr>
                                           <td colSpan={9} className="p-0">
-                                            <div className="px-4 py-3 bg-slate-50/70 border-t border-slate-100">
+                                            <div className="px-5 py-3 bg-white border-t border-slate-100">
                                               {/* Per-service breakdown */}
                                               {vhe.suggestedBreakdown?.length > 0 ? (
                                                 <div>
-                                                  <h4 className="text-[11px] font-semibold text-slate-500 mb-2">
+                                                  <h4 className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
                                                     {lang === "nl" ? "Voorschot per dienst" : "Advance per service"}
                                                   </h4>
-                                                  <div className="rounded-lg border border-slate-100 bg-white overflow-hidden">
+                                                  <div className="rounded-lg border border-slate-100 overflow-hidden">
                                                     <table className="w-full text-[11px]">
                                                       <thead>
-                                                        <tr className="bg-slate-50/50 border-b border-slate-50">
-                                                          <th className="text-left px-3 py-1.5 text-slate-400 font-medium">{lang === "nl" ? "Dienst" : "Service"}</th>
-                                                          <th className="text-right px-3 py-1.5 text-slate-400 font-medium">{lang === "nl" ? "Huidig" : "Current"}</th>
-                                                          <th className="text-right px-3 py-1.5 text-slate-400 font-medium">{lang === "nl" ? "Advies" : "Suggested"}</th>
-                                                          <th className="text-right px-3 py-1.5 text-slate-400 font-medium">{lang === "nl" ? "Verschil" : "Diff"}</th>
+                                                        <tr className="bg-slate-50/80 border-b border-slate-100">
+                                                          <th className="text-left px-3 py-1.5 text-slate-400 font-semibold">{lang === "nl" ? "Dienst" : "Service"}</th>
+                                                          <th className="text-right px-3 py-1.5 text-slate-400 font-semibold">{lang === "nl" ? "Huidig" : "Current"}</th>
+                                                          <th className="text-right px-3 py-1.5 text-slate-400 font-semibold">{lang === "nl" ? "Advies" : "Suggested"}</th>
+                                                          <th className="text-right px-3 py-1.5 text-slate-400 font-semibold">{lang === "nl" ? "Verschil" : "Diff"}</th>
                                                         </tr>
                                                       </thead>
                                                       <tbody className="divide-y divide-slate-50">
                                                         {vhe.suggestedBreakdown.map((item) => {
                                                           const svc = getService(item.s);
-                                                          const itemDiffColor = item.diff > 2 ? "text-red-600" : item.diff < -2 ? "text-slate-500" : "text-slate-400";
+                                                          const itemDiffColor = item.diff > 2 ? "text-red-600" : item.diff < -2 ? "text-emerald-600" : "text-slate-400";
                                                           return (
-                                                            <tr key={item.s}>
-                                                              <td className="px-3 py-1.5 text-slate-600">
+                                                            <tr key={item.s} className="hover:bg-slate-50/50">
+                                                              <td className="px-3 py-1.5 text-slate-600 font-medium">
                                                                 {svc?.name?.[lang] || item.s}
                                                               </td>
-                                                              <td className="px-3 py-1.5 text-right tabular-nums text-slate-700">{fmtEur2(item.current)}</td>
+                                                              <td className="px-3 py-1.5 text-right tabular-nums font-medium" style={{ color: brand.navy }}>{fmtEur2(item.current)}</td>
                                                               <td className="px-3 py-1.5 text-right tabular-nums text-slate-500">{fmtEur2(item.suggested)}</td>
-                                                              <td className={`px-3 py-1.5 text-right tabular-nums font-medium ${itemDiffColor}`}>
+                                                              <td className={`px-3 py-1.5 text-right tabular-nums font-semibold ${itemDiffColor}`}>
                                                                 {item.diff > 0 ? "+" : ""}{fmtEur2(item.diff)}
                                                               </td>
                                                             </tr>
@@ -2193,11 +2263,11 @@ export default function BuildingDetailPage() {
                                                         })}
                                                       </tbody>
                                                       <tfoot>
-                                                        <tr className="border-t border-slate-100 bg-slate-50/50">
-                                                          <td className="px-3 py-1.5 font-semibold text-slate-600">{lang === "nl" ? "Totaal" : "Total"}</td>
-                                                          <td className="px-3 py-1.5 text-right font-semibold tabular-nums text-slate-700">{fmtEur2(vhe.advance)}</td>
-                                                          <td className="px-3 py-1.5 text-right font-semibold tabular-nums text-slate-500">{fmtEur2(vhe.suggested)}</td>
-                                                          <td className={`px-3 py-1.5 text-right font-semibold tabular-nums ${diffColor}`}>
+                                                        <tr className="border-t border-slate-200 bg-slate-50/80">
+                                                          <td className="px-3 py-2 font-bold text-slate-700">{lang === "nl" ? "Totaal" : "Total"}</td>
+                                                          <td className="px-3 py-2 text-right font-bold tabular-nums" style={{ color: brand.navy }}>{fmtEur2(vhe.advance)}</td>
+                                                          <td className="px-3 py-2 text-right font-bold tabular-nums text-slate-500">{fmtEur2(vhe.suggested)}</td>
+                                                          <td className={`px-3 py-2 text-right font-bold tabular-nums ${diffColor}`}>
                                                             {vhe.diff > 0 ? "+" : ""}{fmtEur2(vhe.diff)}
                                                           </td>
                                                         </tr>
@@ -2234,23 +2304,23 @@ export default function BuildingDetailPage() {
                                 })}
                               </tbody>
                               <tfoot>
-                                <tr className="bg-slate-50/80 border-t border-slate-200">
-                                  <td colSpan={6} className="px-3 py-2 text-[11px] font-semibold text-slate-500">
+                                <tr className="bg-slate-50 border-t-2 border-slate-200">
+                                  <td colSpan={6} className="px-3 py-2.5 text-[11px] font-bold text-slate-600 uppercase tracking-wider">
                                     {filtered.length === enrichedVheList.length
                                       ? `${lang === "nl" ? "Totaal" : "Total"} (${enrichedVheList.length})`
                                       : `${filtered.length} / ${enrichedVheList.length} ${lang === "nl" ? "eenheden" : "units"}`
                                     }
                                   </td>
-                                  <td className="px-3 py-2 text-right text-xs font-bold tabular-nums text-slate-700">
+                                  <td className="px-3 py-2.5 text-right text-xs font-bold tabular-nums" style={{ color: brand.navy }}>
                                     {fmt(sortedVhes.reduce((s, v) => s + (v.advance || 0), 0))}
                                   </td>
-                                  <td className="px-3 py-2 text-right text-xs font-bold tabular-nums text-slate-500">
+                                  <td className="px-3 py-2.5 text-right text-xs font-bold tabular-nums text-slate-500">
                                     {fmt(sortedVhes.reduce((s, v) => s + (v.suggested || 0), 0))}
                                   </td>
-                                  <td className="px-3 py-2 text-right text-xs font-bold tabular-nums text-slate-700">
+                                  <td className="px-3 py-2.5 text-right text-xs font-bold tabular-nums">
                                     {(() => {
-                                      const totalDiff = sortedVhes.reduce((s, v) => s + (v.diff || 0), 0);
-                                      return <span className={totalDiff > 0 ? "text-red-600" : "text-slate-500"}>{totalDiff > 0 ? "+" : ""}{fmt(totalDiff)}</span>;
+                                      const fDiff = sortedVhes.reduce((s, v) => s + (v.diff || 0), 0);
+                                      return <span className={fDiff > 5 ? "text-red-600" : fDiff < -5 ? "text-emerald-600" : "text-slate-500"}>{fDiff > 0 ? "+" : ""}{fmt(fDiff)}</span>;
                                     })()}
                                   </td>
                                 </tr>
