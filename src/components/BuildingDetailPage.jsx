@@ -1234,57 +1234,35 @@ export default function BuildingDetailPage() {
                     </div>
                   );
                 })() : (
-                <div className="mt-4 space-y-4">
+                <div className="mt-4 space-y-2">
                   {(() => {
                     const visibleCategories = isFeatureEnabled("nonUtilityServices")
                       ? data.serviceCategories
                       : data.serviceCategories.filter((c) => c.id === "energy");
 
-                    // Group by category, sorting external (kostenverdeler) services first within each group
-                    const grouped = visibleCategories
-                      .map((cat) => ({
-                        ...cat,
-                        items: enrichedBs
-                          .filter((bs) => bs.service?.category === cat.id)
-                          .sort((a, b) => {
-                            const aExt = kostenverdelerMap[a.serviceId] ? 0 : 1;
-                            const bExt = kostenverdelerMap[b.serviceId] ? 0 : 1;
-                            return aExt - bExt;
-                          }),
-                      }))
-                      .filter((g) => g.items.length > 0);
+                    // Flat list: external services first, then internal
+                    const visibleCatIds = new Set(visibleCategories.map((c) => c.id));
+                    const allVisible = enrichedBs.filter((bs) => visibleCatIds.has(bs.service?.category));
+                    const externalItems = allVisible.filter((bs) => kostenverdelerMap[bs.serviceId]);
+                    const internalItems = allVisible.filter((bs) => !kostenverdelerMap[bs.serviceId]);
+                    const flatList = [...externalItems, ...internalItems];
 
-                    if (grouped.length === 0)
+                    if (flatList.length === 0)
                       return (
                         <div className="px-4 py-8 text-center text-sm text-slate-400">
                           {t("noResults", lang)}
                         </div>
                       );
 
-                    return grouped.map((group) => {
-                      const cfg = categoryConfig[group.id];
-                      const GroupIcon = cfg?.icon || Wrench;
-                      return (
-                        <div key={group.id}>
-                          {/* Category header */}
-                          <div className="flex items-center gap-2 mb-2">
-                            <div
-                              className="w-5 h-5 rounded flex items-center justify-center"
-                              style={{ background: cfg?.bg, color: cfg?.color }}
-                            >
-                              <GroupIcon size={14} />
-                            </div>
-                            <span
-                              className="text-xs font-semibold uppercase tracking-wider"
-                              style={{ color: cfg?.color }}
-                            >
-                              {group.label[lang] || group.label.en}
-                            </span>
-                          </div>
+                    // Find the divider index: between last external and first internal
+                    const dividerIndex = externalItems.length;
 
-                          {/* Service rows */}
-                          <div className="space-y-2 mb-5">
-                            {group.items.map((bs) => {
+                    // Build external supplier label for divider
+                    const kvSuppliers = [...new Set(externalItems.flatMap((bs) =>
+                      (kostenverdelerMap[bs.serviceId] || []).map((k) => k.shortName)
+                    ))];
+
+                    return flatList.map((bs, idx) => {
                               const isExternal = !!kostenverdelerMap[bs.serviceId];
                               const isExpanded = expandedService === bs.serviceId;
                               const v = bs.budget - bs.actual;
@@ -1300,9 +1278,26 @@ export default function BuildingDetailPage() {
                               const svcPct = bs.budget > 0 ? (bs.actual / bs.budget) * 100 : 0;
                               const svcAheadOfPace = svcPct > yearPct + 10;
                               return (
+                              <React.Fragment key={bs.id}>
+                                {/* iOS-style inline section divider */}
+                                {idx === 0 && dividerIndex > 0 && (
+                                  <div className="flex items-center gap-2 pt-1 pb-1">
+                                    <span className="text-[11px] font-medium text-slate-400 tracking-wide">
+                                      {lang === "nl" ? "Extern" : "External"} · {kvSuppliers.join(", ")}
+                                    </span>
+                                    <div className="flex-1 h-px bg-slate-200" />
+                                  </div>
+                                )}
+                                {idx === dividerIndex && dividerIndex > 0 && dividerIndex < flatList.length && (
+                                  <div className="flex items-center gap-2 pt-3 pb-1">
+                                    <span className="text-[11px] font-medium text-slate-400 tracking-wide">
+                                      {lang === "nl" ? "Intern" : "Internal"}
+                                    </span>
+                                    <div className="flex-1 h-px bg-slate-200" />
+                                  </div>
+                                )}
                                 <Card
-                                  key={bs.id}
-                                  className={`bg-white transition-shadow ${isExternal ? "border-l-2 border-l-slate-400 border-y border-r border-slate-200" : "border-slate-200"} ${isExpanded ? "shadow-md ring-1 ring-slate-200" : "hover:shadow-md cursor-pointer"}`}
+                                  className={`bg-white transition-shadow border-slate-200 ${isExpanded ? "shadow-md ring-1 ring-slate-200" : "hover:shadow-md cursor-pointer"}`}
                                 >
                                   <CardContent className="p-0">
                                     {/* Summary row — always visible */}
@@ -1624,12 +1619,9 @@ export default function BuildingDetailPage() {
                                     )}
                                   </CardContent>
                                 </Card>
+                              </React.Fragment>
                               );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    });
+                            });
 
                   })()}
                 </div>
