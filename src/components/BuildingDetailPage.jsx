@@ -1389,18 +1389,21 @@ export default function BuildingDetailPage() {
                                           );
                                         })()}
 
-                                        {/* Section B: Consumption / Meter link (metered services only) */}
+                                        {/* Section B: Consumption cost estimate (metered services only) */}
                                         {bs.consumption?.mainMeterId && (() => {
                                           const c = bs.consumption;
                                           const linkedMeter = allMeters.find((m) => m.id === c.mainMeterId);
                                           const fmtNum = (n) => Math.round(n).toLocaleString("nl-NL");
+                                          const consCostPct = (c.endCost || 0) > 0 ? Math.round(((c.ytdCost || 0) / c.endCost) * 100) : 0;
+                                          const costDiffVsBudget = (c.endCost || 0) - bs.budget;
+                                          const costDiffPct = bs.budget > 0 ? Math.round((costDiffVsBudget / bs.budget) * 100) : 0;
                                           return (
                                             <div className="rounded-lg border border-slate-100 bg-white p-3">
                                               <div className="flex items-center justify-between mb-2">
                                                 <div className="flex items-center gap-1.5">
                                                   <Gauge size={12} className="text-slate-400" />
                                                   <span className="text-[11px] text-slate-500 font-medium uppercase tracking-wider">
-                                                    {lang === "nl" ? "Verbruik" : "Consumption"}
+                                                    {lang === "nl" ? "Verbruikskosten" : "Consumption cost"}
                                                   </span>
                                                 </div>
                                                 <button
@@ -1416,30 +1419,48 @@ export default function BuildingDetailPage() {
                                                   <ArrowUpRight size={11} />
                                                 </button>
                                               </div>
-                                              <div className="grid grid-cols-3 gap-3 text-[11px]">
+                                              <div className="grid grid-cols-2 gap-3 text-[11px] mb-2">
                                                 <div>
-                                                  <p className="text-slate-400 mb-0.5">{lang === "nl" ? "YTD verbruik" : "YTD consumption"}</p>
-                                                  <p className="font-medium text-slate-700 tabular-nums">{fmtNum(c.ytdConsumption)} {c.unit}</p>
+                                                  <p className="text-slate-400 mb-0.5">{lang === "nl" ? "Huidige kosten" : "Current cost"}</p>
+                                                  <p className="text-sm font-bold tabular-nums" style={{ color: brand.navy }}>{fmt(c.ytdCost || 0)}</p>
                                                 </div>
                                                 <div>
-                                                  <p className="text-slate-400 mb-0.5">{lang === "nl" ? "Verwacht" : "Expected"}</p>
-                                                  <p className="font-medium text-slate-700 tabular-nums">{fmtNum(c.endConsumption)} {c.unit}</p>
-                                                </div>
-                                                <div>
-                                                  <p className="text-slate-400 mb-0.5">{lang === "nl" ? "Eenheidsprijs" : "Unit price"}</p>
-                                                  <p className="font-medium text-slate-700 tabular-nums">€{c.unitPrice?.toFixed(2)}/{c.unit}</p>
+                                                  <p className="text-slate-400 mb-0.5">{lang === "nl" ? "Verwachte eindkosten" : "Expected end cost"}</p>
+                                                  <p className="text-sm font-bold tabular-nums text-slate-500">{fmt(Math.round(c.endCost || 0))}</p>
                                                 </div>
                                               </div>
-                                              {c.meterCount > 0 && (
-                                                <p className="text-[11px] text-slate-400 mt-2">
-                                                  {c.meterCount} {lang === "nl" ? "submeters" : "sub-meters"}
-                                                  {c.tenantExceedingBudget > 0 && (
-                                                    <span className="text-amber-600 ml-1">
-                                                      · {c.tenantExceedingBudget} {lang === "nl" ? "boven voorschot" : "over advance"}
-                                                    </span>
-                                                  )}
-                                                </p>
+                                              {/* Comparison with budget */}
+                                              {bs.budget > 0 && (c.endCost || 0) > 0 && (
+                                                <div className="flex items-center gap-2 text-[11px] mb-2 px-2 py-1.5 rounded bg-slate-50">
+                                                  <span className="text-slate-400">{lang === "nl" ? "vs. budget" : "vs. budget"}</span>
+                                                  <span className="font-medium tabular-nums text-slate-500">{fmt(bs.budget)}</span>
+                                                  <span className="text-slate-300">→</span>
+                                                  <span className={`font-semibold tabular-nums ${Math.abs(costDiffPct) > 10 ? (costDiffVsBudget > 0 ? "text-red-600" : "text-emerald-600") : "text-slate-500"}`}>
+                                                    {costDiffVsBudget > 0 ? "+" : ""}{fmt(costDiffVsBudget)} ({costDiffPct > 0 ? "+" : ""}{costDiffPct}%)
+                                                  </span>
+                                                </div>
                                               )}
+                                              {/* Physical consumption context */}
+                                              <div className="flex items-center gap-3 text-[11px] text-slate-400">
+                                                <span className="tabular-nums">{fmtNum(c.ytdConsumption)} / {fmtNum(c.endConsumption)} {c.unit}</span>
+                                                {c.unitPrice > 0 && (
+                                                  <>
+                                                    <span className="w-px h-3 bg-slate-200" />
+                                                    <span className="font-mono tabular-nums">€{c.unitPrice?.toFixed(2)}/{c.unit}</span>
+                                                  </>
+                                                )}
+                                                {c.meterCount > 0 && (
+                                                  <>
+                                                    <span className="w-px h-3 bg-slate-200" />
+                                                    <span>{c.meterCount} {lang === "nl" ? "submeters" : "sub-meters"}</span>
+                                                  </>
+                                                )}
+                                                {c.tenantExceedingBudget > 0 && (
+                                                  <span className="text-amber-600 font-medium">
+                                                    · {c.tenantExceedingBudget} {lang === "nl" ? "boven voorschot" : "over advance"}
+                                                  </span>
+                                                )}
+                                              </div>
                                             </div>
                                           );
                                         })()}
