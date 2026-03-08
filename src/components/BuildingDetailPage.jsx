@@ -40,6 +40,7 @@ import {
   CalendarDays,
   CircleDot,
   ListChecks,
+  Lock,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import {
@@ -210,22 +211,27 @@ function YearSelector({ year, setYear, availableYears, heatingSeasons }) {
   }, [heatingSeasons]);
 
   const years = availableYears && availableYears.length > 0 ? availableYears : [2024, 2025, 2026];
+  const currentYear = new Date().getFullYear();
   return (
     <div className="inline-flex flex-col items-start gap-1">
       <div className="inline-flex items-center rounded-lg bg-slate-100 p-0.5">
         {years.map((y) => {
           const season = seasonMap[y];
           const label = season ? season.yearLabel : String(y);
+          const isPast = y < currentYear;
           return (
             <button
               key={y}
               onClick={() => setYear(y)}
-              className={`px-3 h-7 rounded-lg text-xs font-medium tabular-nums transition-colors ${
+              className={`px-3 h-7 rounded-lg text-xs font-medium tabular-nums transition-colors flex items-center gap-1 ${
                 year === y
-                  ? "bg-white text-slate-900 shadow-sm"
+                  ? isPast
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "bg-white text-slate-900 shadow-sm"
                   : "text-slate-400 hover:text-slate-600"
               }`}
             >
+              {isPast && <Lock size={10} className={year === y ? "text-slate-400" : "text-slate-300"} />}
               {label}
             </button>
           );
@@ -662,11 +668,18 @@ export default function BuildingDetailPage() {
                     .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
                   const overdueTasks = openTasks.filter((t) => new Date(t.dueDate) < new Date());
 
-                  // Merge action queue: overdue tasks first, then warnings, then upcoming tasks
+                  // Merge action queue — year-contextual
+                  // Past years: only settlement-related warnings (no operational tasks)
+                  // Current year: overdue tasks, warnings, upcoming tasks
                   const actionQueue = [];
-                  overdueTasks.forEach((t) => actionQueue.push({ type: "task", severity: "error", item: t }));
-                  warnings.forEach((w) => actionQueue.push({ type: "warning", severity: w.severity, item: w }));
-                  openTasks.filter((t) => !overdueTasks.includes(t)).forEach((t) => actionQueue.push({ type: "task", severity: "info", item: t }));
+                  if (isPastYear) {
+                    // Settlement mode: only show year-specific warnings (settlement checks, flagged entries, budget variances)
+                    warnings.forEach((w) => actionQueue.push({ type: "warning", severity: w.severity, item: w }));
+                  } else {
+                    overdueTasks.forEach((t) => actionQueue.push({ type: "task", severity: "error", item: t }));
+                    warnings.forEach((w) => actionQueue.push({ type: "warning", severity: w.severity, item: w }));
+                    openTasks.filter((t) => !overdueTasks.includes(t)).forEach((t) => actionQueue.push({ type: "task", severity: "info", item: t }));
+                  }
 
                   // Notes
                   const pinnedNotes = buildingNotes.filter((n) => n.pinned).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -696,58 +709,110 @@ export default function BuildingDetailPage() {
                   return (
                 <div className="mt-4 space-y-4">
 
-                  {/* Layer 0: Pulse Strip */}
+                  {/* Layer 0: Pulse Strip — adapts to year context */}
                   <div className="flex flex-wrap items-center gap-x-5 gap-y-1 px-1 text-[13px]">
-                    <span className="tabular-nums" style={{ color: brand.navy }}>
-                      <span className="font-semibold">{fmt(totalBudget)}</span>
-                      <span className="text-slate-400 ml-1">budget</span>
-                    </span>
-                    <span className="w-px h-3.5 bg-slate-200" />
-                    <span className="tabular-nums">
-                      <span
-                        className="font-semibold"
-                        style={{ color: !isOnPace && budgetPct > yearPct + 10 ? brand.amber : brand.navy }}
-                      >
-                        {budgetPct}%
-                      </span>
-                      <span className="text-slate-400 ml-1">{lang === "nl" ? "besteed" : "spent"}</span>
-                    </span>
-                    <span className="w-px h-3.5 bg-slate-200" />
-                    <span className="tabular-nums" style={{ color: brand.navy }}>
-                      <span className="font-semibold">{activeVhe}</span>
-                      <span className="text-slate-400 ml-1">VHE</span>
-                    </span>
-                    {openTasks.length > 0 && (
+                    {isPastYear ? (
                       <>
+                        {/* Past year: settlement-focused KPIs */}
+                        <span className="tabular-nums" style={{ color: brand.navy }}>
+                          <span className="font-semibold">{fmt(totalActual)}</span>
+                          <span className="text-slate-400 ml-1">{lang === "nl" ? "werkelijk" : "actual"}</span>
+                        </span>
+                        <span className="w-px h-3.5 bg-slate-200" />
+                        <span className="tabular-nums" style={{ color: brand.navy }}>
+                          <span className="font-semibold">{fmt(totalBudget)}</span>
+                          <span className="text-slate-400 ml-1">{lang === "nl" ? "voorschot" : "advance"}</span>
+                        </span>
                         <span className="w-px h-3.5 bg-slate-200" />
                         <span className="tabular-nums">
                           <span
                             className="font-semibold"
-                            style={{ color: overdueTasks.length > 0 ? brand.red : brand.navy }}
+                            style={{ color: variance >= 0 ? brand.blue : brand.red }}
                           >
-                            {openTasks.length}
+                            {variance >= 0 ? "+" : ""}{fmt(variance)}
                           </span>
                           <span className="text-slate-400 ml-1">
-                            {openTasks.length === 1
-                              ? (lang === "nl" ? "open taak" : "open task")
-                              : (lang === "nl" ? "open taken" : "open tasks")}
+                            {variance >= 0
+                              ? (lang === "nl" ? "teruggave" : "refund")
+                              : (lang === "nl" ? "naheffing" : "surcharge")}
                           </span>
                         </span>
+                        <span className="w-px h-3.5 bg-slate-200" />
+                        <span className="tabular-nums" style={{ color: brand.navy }}>
+                          <span className="font-semibold">{activeVhe}</span>
+                          <span className="text-slate-400 ml-1">VHE</span>
+                        </span>
+                        {warnings.length > 0 && (
+                          <>
+                            <span className="w-px h-3.5 bg-slate-200" />
+                            <span className="tabular-nums">
+                              <span className="font-semibold" style={{ color: brand.amber }}>
+                                {warnings.length}
+                              </span>
+                              <span className="text-slate-400 ml-1">
+                                {warnings.length === 1
+                                  ? (lang === "nl" ? "issue" : "issue")
+                                  : (lang === "nl" ? "issues" : "issues")}
+                              </span>
+                            </span>
+                          </>
+                        )}
                       </>
-                    )}
-                    {warnings.length > 0 && (
+                    ) : (
                       <>
+                        {/* Current year: operational KPIs */}
+                        <span className="tabular-nums" style={{ color: brand.navy }}>
+                          <span className="font-semibold">{fmt(totalBudget)}</span>
+                          <span className="text-slate-400 ml-1">budget</span>
+                        </span>
                         <span className="w-px h-3.5 bg-slate-200" />
                         <span className="tabular-nums">
-                          <span className="font-semibold" style={{ color: brand.amber }}>
-                            {warnings.length}
+                          <span
+                            className="font-semibold"
+                            style={{ color: !isOnPace && budgetPct > yearPct + 10 ? brand.amber : brand.navy }}
+                          >
+                            {budgetPct}%
                           </span>
-                          <span className="text-slate-400 ml-1">
-                            {warnings.length === 1
-                              ? (lang === "nl" ? "waarschuwing" : "warning")
-                              : (lang === "nl" ? "waarschuwingen" : "warnings")}
-                          </span>
+                          <span className="text-slate-400 ml-1">{lang === "nl" ? "besteed" : "spent"}</span>
                         </span>
+                        <span className="w-px h-3.5 bg-slate-200" />
+                        <span className="tabular-nums" style={{ color: brand.navy }}>
+                          <span className="font-semibold">{activeVhe}</span>
+                          <span className="text-slate-400 ml-1">VHE</span>
+                        </span>
+                        {openTasks.length > 0 && (
+                          <>
+                            <span className="w-px h-3.5 bg-slate-200" />
+                            <span className="tabular-nums">
+                              <span
+                                className="font-semibold"
+                                style={{ color: overdueTasks.length > 0 ? brand.red : brand.navy }}
+                              >
+                                {openTasks.length}
+                              </span>
+                              <span className="text-slate-400 ml-1">
+                                {openTasks.length === 1
+                                  ? (lang === "nl" ? "open taak" : "open task")
+                                  : (lang === "nl" ? "open taken" : "open tasks")}
+                              </span>
+                            </span>
+                          </>
+                        )}
+                        {warnings.length > 0 && (
+                          <>
+                            <span className="w-px h-3.5 bg-slate-200" />
+                            <span className="tabular-nums">
+                              <span className="font-semibold" style={{ color: brand.amber }}>
+                                {warnings.length}
+                              </span>
+                              <span className="text-slate-400 ml-1">
+                                {warnings.length === 1
+                                  ? (lang === "nl" ? "waarschuwing" : "warning")
+                                  : (lang === "nl" ? "waarschuwingen" : "warnings")}
+                              </span>
+                            </span>
+                          </>
+                        )}
                       </>
                     )}
                   </div>
@@ -757,9 +822,15 @@ export default function BuildingDetailPage() {
                     <Card className="border-slate-200 bg-white overflow-hidden">
                       <CardContent className="p-0">
                         <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2">
-                          <ListChecks size={13} className="text-slate-400" />
+                          {isPastYear ? (
+                            <FileCheck size={13} className="text-slate-400" />
+                          ) : (
+                            <ListChecks size={13} className="text-slate-400" />
+                          )}
                           <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                            {lang === "nl" ? "Acties" : "Actions"}
+                            {isPastYear
+                              ? (lang === "nl" ? "Afrekeningsissues" : "Settlement issues")
+                              : (lang === "nl" ? "Acties" : "Actions")}
                             <span className="ml-1.5 text-slate-300">({actionQueue.length})</span>
                           </p>
                         </div>
@@ -823,9 +894,13 @@ export default function BuildingDetailPage() {
                     <div className="flex items-center gap-3 px-4 py-4 rounded-lg border border-slate-200 bg-white">
                       <CheckCircle2 size={15} style={{ color: brand.blue }} className="shrink-0" />
                       <p className="text-xs text-slate-500">
-                        {lang === "nl"
-                          ? "Alles op orde — geen openstaande acties."
-                          : "All clear — no open actions."}
+                        {isPastYear
+                          ? (lang === "nl"
+                            ? "Geen openstaande afrekeningsissues."
+                            : "No open settlement issues.")
+                          : (lang === "nl"
+                            ? "Alles op orde — geen openstaande acties."
+                            : "All clear — no open actions.")}
                       </p>
                     </div>
                   )}
@@ -978,13 +1053,15 @@ export default function BuildingDetailPage() {
                             {allNotes.length > 0 && <span className="ml-1 text-slate-300">({allNotes.length})</span>}
                           </p>
                         </div>
-                        <button
-                          className="flex items-center gap-1 text-[11px] font-medium transition-colors hover:opacity-80"
-                          style={{ color: brand.blue }}
-                        >
-                          <Plus size={12} />
-                          {lang === "nl" ? "Toevoegen" : "Add"}
-                        </button>
+                        {!isPastYear && (
+                          <button
+                            className="flex items-center gap-1 text-[11px] font-medium transition-colors hover:opacity-80"
+                            style={{ color: brand.blue }}
+                          >
+                            <Plus size={12} />
+                            {lang === "nl" ? "Toevoegen" : "Add"}
+                          </button>
+                        )}
                       </div>
                       {allNotes.length > 0 ? (
                         <div className="divide-y divide-slate-100">
