@@ -67,6 +67,7 @@
     "contractEnd": "2026-06-30",
     "serviceIds": [
       "SVC-108",
+      "SVC-GDH108",
       "SVC-111"
     ],
     "buildingCount": 14,
