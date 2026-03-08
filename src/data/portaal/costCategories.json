@@ -2,7 +2,7 @@
   {
     "id": "CC-EM-consumption",
     "serviceId": "SVC-EM-heat",
-    "label": {
+    "name": {
       "en": "Consumption",
       "nl": "Verbruik"
     },
@@ -13,7 +13,7 @@
   {
     "id": "CC-EM-fixed",
     "serviceId": "SVC-EM-heat",
-    "label": {
+    "name": {
       "en": "Fixed charges",
       "nl": "Vast tarief"
     },
@@ -24,7 +24,7 @@
   {
     "id": "CC-EM-metering",
     "serviceId": "SVC-EM-heat",
-    "label": {
+    "name": {
       "en": "Metering costs",
       "nl": "Meetkosten"
     },
@@ -35,7 +35,7 @@
   {
     "id": "CC-EM-gas-consumption",
     "serviceId": "SVC-EM-gas",
-    "label": {
+    "name": {
       "en": "Gas consumption",
       "nl": "Gasverbruik"
     },
@@ -46,7 +46,7 @@
   {
     "id": "CC-EM-gas-fixed",
     "serviceId": "SVC-EM-gas",
-    "label": {
+    "name": {
       "en": "Standing charge",
       "nl": "Vastrecht"
     },

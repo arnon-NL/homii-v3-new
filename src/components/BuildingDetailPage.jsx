@@ -1342,7 +1342,7 @@ export default function BuildingDetailPage() {
                                                       }
                                                       <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-1.5">
-                                                          <span className="text-[11px] font-medium text-slate-700">{cc.name[lang] || cc.name.en}</span>
+                                                          <span className="text-[11px] font-medium text-slate-700">{(cc.name || cc.label)?.[lang] || (cc.name || cc.label)?.en || cc.id}</span>
                                                           {cc.supplier && (
                                                             <span className="text-[11px] text-slate-400 truncate hidden sm:inline">· {cc.supplier}</span>
                                                           )}
