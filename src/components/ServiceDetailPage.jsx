@@ -14,6 +14,8 @@ import {
   TrendingDown,
   Filter,
   BarChart3,
+  Gauge,
+  Info,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import { t, useLang } from "@/lib/i18n";
@@ -298,6 +300,40 @@ export default function ServiceDetailPage() {
           </div>
         </div>
 
+        {/* ── Cost basis indicator ── */}
+        <div
+          className="flex items-center gap-2 px-3 py-2 rounded-lg mb-4 text-[11px]"
+          style={{ background: hasLedger ? "#F0FAFB" : "#FFFBEB" }}
+        >
+          {hasLedger ? (
+            <>
+              <FileText size={14} style={{ color: brand.blue }} />
+              <span className="font-medium" style={{ color: brand.blue }}>
+                {lang === "nl" ? "Op basis van boekingen" : "Based on ledger entries"}
+              </span>
+              <span className="text-slate-400">·</span>
+              <span className="text-slate-500">
+                {lang === "nl"
+                  ? "Werkelijke kosten uit facturen en boekingen"
+                  : "Actual costs from invoices and bookings"}
+              </span>
+            </>
+          ) : (
+            <>
+              <Gauge size={14} style={{ color: brand.amber }} />
+              <span className="font-medium" style={{ color: brand.amber }}>
+                {lang === "nl" ? "Op basis van verbruiksdata" : "Based on consumption data"}
+              </span>
+              <span className="text-slate-400">·</span>
+              <span className="text-slate-500">
+                {lang === "nl"
+                  ? "Verwachte kosten berekend op meterdata en prognose"
+                  : "Expected costs calculated from metering data and forecast"}
+              </span>
+            </>
+          )}
+        </div>
+
         {/* ═══════════════════════════════════════════════════ */}
         {/* ENERGY MODE — building-service overview with meters */}
         {/* ═══════════════════════════════════════════════════ */}
@@ -315,13 +351,13 @@ export default function ServiceDetailPage() {
                 {
                   label: { en: "Total Budget", nl: "Totaal budget" },
                   value: fmtEur(energyTotalBudget),
-                  sub: `${lang === "nl" ? "Werkelijk" : "Actual"}: ${fmtEur(energyTotalActual)}`,
+                  sub: `${lang === "nl" ? "Verwacht" : "Expected"}: ${fmtEur(energyTotalActual)}`,
                   color: brand.navy,
                 },
                 {
                   label: { en: "Variance", nl: "Afwijking" },
                   value: fmtEur(energyTotalActual - energyTotalBudget),
-                  sub: energyTotalBudget > 0 ? `${(((energyTotalActual - energyTotalBudget) / energyTotalBudget) * 100).toFixed(1)}%` : "—",
+                  sub: energyTotalBudget > 0 ? `${(((energyTotalActual - energyTotalBudget) / energyTotalBudget) * 100).toFixed(1)}% · ${lang === "nl" ? "prognose" : "forecast"}` : "—",
                   color: energyTotalActual > energyTotalBudget ? brand.red : brand.blue,
                 },
                 {
@@ -394,10 +430,13 @@ export default function ServiceDetailPage() {
                         )}
                         <span className="text-slate-400">{row.subMeters.length} sub</span>
                       </div>
-                      {/* Budget */}
+                      {/* Expected cost */}
                       <div className="text-right shrink-0">
                         <div className="text-sm font-semibold tabular-nums" style={{ color: brand.navy }}>
                           {fmtEur(row.actual)}
+                        </div>
+                        <div className="text-[11px] text-slate-400">
+                          {lang === "nl" ? "verwacht" : "expected"}
                         </div>
                         {row.budget > 0 && (
                           <div

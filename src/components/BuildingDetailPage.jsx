@@ -668,6 +668,40 @@ export default function BuildingDetailPage() {
                     </Card>
                   )}
 
+                  {/* ── Cost basis indicator ── */}
+                  <div
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg mb-3 text-[11px]"
+                    style={{ background: isFeatureEnabled("ledger") ? "#F0FAFB" : "#FFFBEB" }}
+                  >
+                    {isFeatureEnabled("ledger") ? (
+                      <>
+                        <FileText size={14} style={{ color: brand.blue }} />
+                        <span className="font-medium" style={{ color: brand.blue }}>
+                          {lang === "nl" ? "Op basis van boekingen" : "Based on ledger entries"}
+                        </span>
+                        <span className="text-slate-400">·</span>
+                        <span className="text-slate-500">
+                          {lang === "nl"
+                            ? "Werkelijke kosten uit facturen en boekingen"
+                            : "Actual costs from invoices and bookings"}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <Gauge size={14} style={{ color: brand.amber }} />
+                        <span className="font-medium" style={{ color: brand.amber }}>
+                          {lang === "nl" ? "Op basis van verbruiksdata" : "Based on consumption data"}
+                        </span>
+                        <span className="text-slate-400">·</span>
+                        <span className="text-slate-500">
+                          {lang === "nl"
+                            ? "Verwachte kosten berekend op meterdata en prognose"
+                            : "Expected costs calculated from metering data and forecast"}
+                        </span>
+                      </>
+                    )}
+                  </div>
+
                   {/* ── Layer 1: Verdict Card ── */}
                   <Card className="border-slate-200 bg-white overflow-hidden">
                     <CardContent className="px-5 py-4">
@@ -1222,6 +1256,32 @@ export default function BuildingDetailPage() {
                                     {/* Expanded detail — progressive disclosure */}
                                     {isExpanded && (
                                       <div className="border-t border-slate-100 px-4 py-4 space-y-5 bg-slate-50/30">
+                                        {/* Cost basis indicator */}
+                                        <div
+                                          className="flex items-center gap-2 px-3 py-2 rounded-lg text-[11px]"
+                                          style={{ background: isFeatureEnabled("ledger") ? "#F0FAFB" : "#FFFBEB" }}
+                                        >
+                                          {isFeatureEnabled("ledger") ? (
+                                            <>
+                                              <FileText size={14} style={{ color: brand.blue }} />
+                                              <span className="font-medium" style={{ color: brand.blue }}>
+                                                {lang === "nl" ? "Kosten op basis van boekingen" : "Costs based on ledger entries"}
+                                              </span>
+                                            </>
+                                          ) : (
+                                            <>
+                                              <Gauge size={14} style={{ color: brand.amber }} />
+                                              <span className="font-medium" style={{ color: brand.amber }}>
+                                                {lang === "nl" ? "Kosten op basis van verbruiksdata" : "Costs based on consumption data"}
+                                              </span>
+                                              <span className="text-slate-400">·</span>
+                                              <span className="text-slate-500">
+                                                {lang === "nl" ? "prognose" : "forecast"}
+                                              </span>
+                                            </>
+                                          )}
+                                        </div>
+
                                         {/* Section A: Budget Progress for this service */}
                                         {(() => {
                                           const pct = bs.budget > 0 ? Math.round((bs.actual / bs.budget) * 100) : 0;
