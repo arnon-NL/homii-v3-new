@@ -242,9 +242,19 @@ export default function BuildingDetailPage() {
   const lang = useLang();
   const { data, orgId } = useOrg();
   const availableYears = useMemo(() => getAvailableYears(), []);
+  // Years this specific building has service data for
+  const buildingYears = useMemo(() => {
+    const allBs = getBuildingServices(buildingId);
+    return [...new Set(allBs.map((bs) => bs.year))].sort((a, b) => a - b);
+  }, [buildingId]);
   const [year, setYear] = useState(() => {
-    const yrs = getAvailableYears();
     const currentYear = new Date().getFullYear();
+    // Prefer current year if this building has data for it
+    if (buildingYears.includes(currentYear)) return currentYear;
+    // Fall back to latest year this building has data for
+    if (buildingYears.length > 0) return buildingYears[buildingYears.length - 1];
+    // Last resort: global available years
+    const yrs = getAvailableYears();
     if (yrs.includes(currentYear)) return currentYear;
     return yrs.length > 0 ? yrs[yrs.length - 1] : 2025;
   });
