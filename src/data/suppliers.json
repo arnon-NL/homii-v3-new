@@ -56,6 +56,7 @@
     "id": "SUP-003",
     "name": "Techem Energy Services BV",
     "category": "metering",
+    "kostenverdeler": true,
     "kvk": "30141780",
     "city": "Arnhem",
     "contactPerson": "J. Hendriks",
@@ -73,8 +74,8 @@
     "status": "active",
     "rating": 3,
     "notes": {
-      "en": "Metering services.",
-      "nl": "Meetdiensten."
+      "en": "Metering and billing services for heating and hot water.",
+      "nl": "Meet- en afrekendiensten voor verwarming en warm water."
     }
   },
   {

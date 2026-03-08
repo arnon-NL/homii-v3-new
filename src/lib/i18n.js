@@ -115,6 +115,13 @@ const dict = {
   kvk:               { en: "KVK",                 nl: "KVK" },
   contactPerson:     { en: "Contact",             nl: "Contactpersoon" },
 
+  // Kostenverdeler (external distribution)
+  externalDistribution: { en: "External Distribution", nl: "Extern verdeeld" },
+  distributedBy:     { en: "Distributed by", nl: "Verdeeld door" },
+  internalDistribution: { en: "Internal Distribution", nl: "Eigen verdeling" },
+  changesVia:        { en: "Changes via",    nl: "Wijzigingen via" },
+  kostenverdeler:    { en: "Cost distributor", nl: "Kostenverdeler" },
+
   // Boolean labels
   yes:               { en: "Yes",          nl: "Ja" },
   no:                { en: "No",           nl: "Nee" },
