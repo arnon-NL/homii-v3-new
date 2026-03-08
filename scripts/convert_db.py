@@ -601,36 +601,76 @@ def extract_vhes(buildings, services):
     return vhes, apt_id_remap
 
 
-def extract_meters(buildings, apt_id_remap):
-    """Extract meters from usage_monitor_meterstatus, mapped to complex IDs."""
+def extract_meters(buildings, apt_id_remap, heating_seasons):
+    """Extract meters from usage_monitor_meterstatus, deduplicated by serial number.
+
+    The DB stores one meterstatus row per meter per heating season. A physical
+    meter with serial '00003446693MGNLD01' will appear 3-4 times (once per
+    season). We deduplicate to one record per physical meter, keeping the
+    latest season's data, matching how Portaal structures its meters.
+    """
     print("Extracting meters...")
 
     _, objnum_map = _build_um_to_complex_map(buildings)
 
+    # Build heatingseason lookup for seasonId enrichment
+    hs_by_id = {hs["id"]: hs for hs in heating_seasons}
+
     rows = query("""
-        SELECT ms.*, a.building_id as um_bld_id, a.id as apartment_db_id
+        SELECT ms.*, a.building_id as um_bld_id, a.id as apartment_db_id,
+               hs.season_start, hs.season_end
         FROM usage_monitor_meterstatus ms
         LEFT JOIN usage_monitor_apartment a ON ms.apartment_id = a.id
-        ORDER BY ms.id
+        LEFT JOIN usage_monitor_heatingseason hs ON ms.heating_season_id = hs.id
+        ORDER BY ms.serial_number, hs.season_start DESC
     """)
 
-    meters = []
-    for r in rows:
-        meter_type = r.get("meter_type", "O")
-        utility = METER_TYPE_MAP.get(meter_type, "other")
+    # Deduplicate: keep the latest season's row per serial_number
+    seen_serials = {}  # serial_number → best row
+    skipped_orphan = 0
+    skipped_unmatched = 0
 
+    for r in rows:
         um_bld_id = r.get("um_bld_id")
         if not um_bld_id:
-            continue  # skip orphaned meters
+            skipped_orphan += 1
+            continue
 
         bld_id = objnum_map.get(um_bld_id)
         if not bld_id:
-            continue  # skip meters from unmatched buildings
+            skipped_unmatched += 1
+            continue
+
+        serial = r.get("serial_number") or f"M-{r['id']}"
+
+        # Keep the row with the latest season_start (rows are ordered DESC)
+        if serial in seen_serials:
+            continue  # already have a newer season for this meter
+        seen_serials[serial] = (r, bld_id)
+
+    # Build meter records from deduplicated rows
+    meters = []
+    for serial, (r, bld_id) in seen_serials.items():
+        meter_type = r.get("meter_type", "O")
+        utility = METER_TYPE_MAP.get(meter_type, "other")
 
         # Remap VHE ID
         old_vhe = f"VHE-{r['apartment_db_id']}" if r["apartment_db_id"] else None
         vhe_id = apt_id_remap.get(old_vhe) if old_vhe else None
         is_sub = vhe_id is not None
+
+        # Determine status from dismounted_date
+        dismounted = bool(r.get("dismounted_date"))
+        status = "dismounted" if dismounted else "active"
+        if not dismounted and r.get("data_integrity_status", 1) >= 3:
+            status = "error"
+
+        # Season enrichment
+        hs_id = r.get("heating_season_id")
+        hs = hs_by_id.get(hs_id)
+        season_id = hs_id if hs else None
+        year_key = hs.get("yearKey") if hs else None
+        year_label = hs.get("yearLabel") if hs else None
 
         meters.append({
             "id": f"MTR-{r['id']}",
@@ -638,16 +678,27 @@ def extract_meters(buildings, apt_id_remap):
             "vheId": vhe_id,
             "type": "sub" if is_sub else "main",
             "utility": utility,
-            "meterNumber": r.get("serial_number") or f"M-{r['id']}",
+            "meterType": meter_type,
+            "meterNumber": serial,
             "ean": None,
             "unit": {"heat": "GJ", "water": "m³", "warmWater": "m³", "electricity": "kWh", "gas": "m³"}.get(utility, ""),
-            "readings": {},
-            "status": "active",
+            "status": status,
+            "dismounted": dismounted,
+            "dismountedDate": r.get("dismounted_date"),
             "provider": r.get("provider") or "",
+            "proportion": r.get("proportion"),
             "latestDate": r.get("latest_date"),
+            "seasonId": season_id,
+            "yearKey": year_key,
+            "yearLabel": year_label,
+            "vendorId": r.get("vendor_id"),
         })
 
-    print(f"  → {len(meters)} real meters")
+    print(f"  → {len(meters)} unique physical meters (from {len(rows)} meterstatus rows)")
+    if skipped_orphan:
+        print(f"    Skipped {skipped_orphan} orphaned rows (no apartment)")
+    if skipped_unmatched:
+        print(f"    Skipped {skipped_unmatched} rows from unmatched buildings")
     return meters
 
 
@@ -1445,18 +1496,17 @@ def main():
     service_categories = extract_service_categories()
     building_services = extract_building_services(buildings, services)
     vhes, apt_id_remap = extract_vhes(buildings, services)
-    real_meters = extract_meters(buildings, apt_id_remap)
-    synth_meters = generate_synthetic_meters(buildings, real_meters, vhes)
-    meters = real_meters + synth_meters
-    print(f"  → {len(meters)} total meters")
     cost_attribution = extract_cost_attribution(apt_id_remap)
     heating_seasons = extract_heating_seasons(buildings)
 
+    # Extract meters (deduplicated by serial, enriched with season data)
+    real_meters = extract_meters(buildings, apt_id_remap, heating_seasons)
+    synth_meters = generate_synthetic_meters(buildings, real_meters, vhes)
+    meters = real_meters + synth_meters
+    print(f"  → {len(meters)} total meters")
+
     # Enrich energy building-services with consumption data from heatingSeasons
     building_services = enrich_energy_building_services(building_services, heating_seasons, buildings)
-
-    # Enrich meters with meterType and seasonId
-    meters = enrich_meters_with_season(meters, heating_seasons)
 
     # Enrich VHEs with voorschotBreakdown from building-services
     print("Enriching VHEs with voorschot breakdown...")
