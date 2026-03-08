@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import React, { useState, useMemo, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Search,
   Building2,
@@ -10,23 +10,16 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  CheckCircle2,
-  Clock,
-  AlertTriangle,
-  FileCheck,
-  Send,
-  Circle,
-  LayoutGrid,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  Bookmark,
   Save,
   X,
-  Eye,
+  SlidersHorizontal,
+  MapPin,
+  Trash2,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
-import { getSettlementsByYear, getView } from "@/lib/mockData";
 import { useOrg } from "@/lib/OrgContext";
 import { t, useLang } from "@/lib/i18n";
 import { StatusBadge } from "./ui/status-badge";
@@ -89,49 +82,6 @@ function BudgetBar({ spent, total }) {
   );
 }
 
-/* ── Settlement badge ── */
-const settlementConfig = {
-  not_started:  { icon: Circle,        color: "#94A3B8", bg: "#F8FAFC", label: { en: "Not started",  nl: "Niet gestart" } },
-  monitoring:   { icon: Clock,         color: "#94A3B8", bg: "#F8FAFC", label: { en: "Monitoring",   nl: "Monitoring" } },
-  in_review:    { icon: AlertTriangle, color: "#F59E0B", bg: "#F8FAFC", label: { en: "In review",    nl: "In controle" } },
-  approved:     { icon: FileCheck,     color: "#3EB1C8", bg: "#F0FAFB", label: { en: "Approved",     nl: "Goedgekeurd" } },
-  distributed:  { icon: Send,          color: "#3EB1C8", bg: "#F0FAFB", label: { en: "Distributed",  nl: "Afgerekend" } },
-};
-
-function SettlementBadge({ status, lang }) {
-  const cfg = settlementConfig[status] || settlementConfig.not_started;
-  const Icon = cfg.icon;
-  return (
-    <span
-      className="inline-flex items-center gap-2 px-2 py-1 rounded-full text-[11px] font-medium whitespace-nowrap"
-      style={{ background: cfg.bg, color: cfg.color }}
-    >
-      <Icon size={11} />
-      {cfg.label[lang] || cfg.label.en}
-    </span>
-  );
-}
-
-/* ── Net result display ── */
-function NetResult({ value, lang }) {
-  if (value == null) return <span className="text-slate-300">—</span>;
-  const isPositive = value >= 0;
-  const fmt = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(Math.abs(value));
-  return (
-    <span
-      className="text-xs font-medium tabular-nums"
-      style={{ color: isPositive ? brand.blue : brand.red }}
-    >
-      {isPositive ? `+${fmt}` : `-${fmt}`}
-      <span className="text-[11px] font-normal ml-1 opacity-70">
-        {isPositive
-          ? (lang === "nl" ? "teruggave" : "refund")
-          : (lang === "nl" ? "naheffing" : "surcharge")}
-      </span>
-    </span>
-  );
-}
-
 /* ── Data quality filter options ── */
 const qualityFilters = [
   { value: "all",     label: { en: "All",     nl: "Alle" } },
@@ -148,6 +98,14 @@ const utilityFilterOptions = [
   { value: "electricity", label: { en: "Electricity",nl: "Elektriciteit"},icon: Zap,        color: "#F59E0B" },
 ];
 
+/* ── Sortable column options ── */
+const sortOptions = [
+  { value: "",             label: { en: "Default",    nl: "Standaard" } },
+  { value: "vhe",          label: { en: "VHE",        nl: "VHE" } },
+  { value: "components",   label: { en: "Components", nl: "Componenten" } },
+  { value: "utilityCount", label: { en: "Utilities",  nl: "Nutsvoorzieningen" } },
+];
+
 /* ── Column definitions ── */
 const allColumns = {
   complex:          { align: "left",   sortable: false },
@@ -157,58 +115,102 @@ const allColumns = {
   components:       { align: "right",  sortable: true },
   utilities:        { align: "left",   sortable: true, sortKey: "utilityCount" },
   budgetProgress:   { align: "left",   sortable: false },
-  settlementStatus: { align: "center", sortable: false, label: { en: "Settlement", nl: "Afrekening" } },
-  netResult:        { align: "right",  sortable: false, label: { en: "Net Result", nl: "Netto Resultaat" } },
   dataQuality:      { align: "center", sortable: false },
 };
 
-/* ── Default columns for Complexes (no view) — core object attributes only ── */
+/* ── Default columns ── */
 const defaultComplexColumns = [
   "complex", "complexId", "location", "vhe", "components", "utilities", "dataQuality",
 ];
+
+/* ── Saved filters persistence ── */
+const STORAGE_KEY = "homii-building-filters";
+
+function loadSavedFilters(orgId) {
+  try {
+    const raw = localStorage.getItem(`${STORAGE_KEY}-${orgId}`);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function persistSavedFilters(orgId, filters) {
+  localStorage.setItem(`${STORAGE_KEY}-${orgId}`, JSON.stringify(filters));
+}
+
+/* ── Dropdown component ── */
+function Dropdown({ trigger, children, align = "left" }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    }
+    if (open) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  return (
+    <div className="relative" ref={ref}>
+      <div onClick={() => setOpen(!open)}>{trigger}</div>
+      {open && (
+        <div
+          className={`absolute top-full mt-1 ${align === "right" ? "right-0" : "left-0"} z-50 min-w-[180px] rounded-lg border border-slate-200 bg-white shadow-lg py-1`}
+          onClick={() => setOpen(false)}
+        >
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
 
 /* ── Main component ── */
 export default function BuildingListPage() {
   const lang = useLang();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const [qualityFilter, setQualityFilter] = useState("all");
   const [utilityFilters, setUtilityFilters] = useState([]);
-  const [settlementFilter, setSettlementFilter] = useState("all");
-  const [sortCol, setSortCol] = useState(null); // null | "vhe" | "components" | "utilityCount"
-  const [sortDir, setSortDir] = useState("desc"); // "asc" | "desc"
+  const [locationFilter, setLocationFilter] = useState("all");
+  const [sortCol, setSortCol] = useState(null);
+  const [sortDir, setSortDir] = useState("desc");
   const { data, orgId } = useOrg();
 
-  // Resolve active view from URL
-  const viewId = searchParams.get("view");
-  const activeView = viewId ? getView(viewId) : null;
+  // Saved filters
+  const [savedFilters, setSavedFilters] = useState(() => loadSavedFilters(orgId));
+  const [showSaveInput, setShowSaveInput] = useState(false);
+  const [filterName, setFilterName] = useState("");
+  const saveInputRef = useRef(null);
 
-  // Views can lock a year (settlement views)
-  const isViewWithYear = activeView?.year != null;
-  const year = activeView?.year ?? null;
-  const currentYear = new Date().getFullYear();
-  const isPastYear = year != null && year < currentYear;
+  // Sync saved filters when org changes
+  useEffect(() => {
+    setSavedFilters(loadSavedFilters(orgId));
+  }, [orgId]);
 
-  const settlements = useMemo(() => {
-    if (year == null) return [];
-    return getSettlementsByYear(year);
-  }, [year]);
+  // Focus save input when shown
+  useEffect(() => {
+    if (showSaveInput && saveInputRef.current) saveInputRef.current.focus();
+  }, [showSaveInput]);
 
-  // Resolve which columns to show
-  const visibleColumns = useMemo(() => {
-    if (activeView?.columns?.length) return activeView.columns;
-    return defaultComplexColumns;
-  }, [activeView]);
+  // Extract unique locations from building data
+  const locations = useMemo(() => {
+    const locs = [...new Set(data.buildings.map((b) => b.location))].sort();
+    return locs;
+  }, [data.buildings]);
 
-  // Build enriched list: building + settlement for selected year
+  // Columns — always default for now (settlement views handled separately)
+  const visibleColumns = defaultComplexColumns;
+
+  // Enrich buildings
   const enriched = useMemo(() => {
-    return data.buildings.map((b) => {
-      const stl = year != null ? settlements.find((s) => s.buildingId === b.id) : null;
-      return { ...b, settlement: stl, utilityCount: b.utilities.length };
-    });
-  }, [settlements, year]);
+    return data.buildings.map((b) => ({
+      ...b,
+      utilityCount: b.utilities.length,
+    }));
+  }, [data.buildings]);
 
+  // Filter
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     return enriched.filter((b) => {
@@ -222,21 +224,18 @@ export default function BuildingListPage() {
       const matchUtility =
         utilityFilters.length === 0 ||
         utilityFilters.every((u) => b.utilities.includes(u));
-      const matchSettlement =
-        !isPastYear ||
-        settlementFilter === "all" ||
-        b.settlement?.status === settlementFilter;
-      return matchSearch && matchQuality && matchUtility && matchSettlement;
+      const matchLocation =
+        locationFilter === "all" || b.location === locationFilter;
+      return matchSearch && matchQuality && matchUtility && matchLocation;
     });
-  }, [search, qualityFilter, utilityFilters, enriched, isPastYear, settlementFilter]);
+  }, [search, qualityFilter, utilityFilters, locationFilter, enriched]);
 
   // Sort
   const sorted = useMemo(() => {
     if (!sortCol) return filtered;
-    const key = sortCol;
     return [...filtered].sort((a, b) => {
-      const av = a[key] ?? 0;
-      const bv = b[key] ?? 0;
+      const av = a[sortCol] ?? 0;
+      const bv = b[sortCol] ?? 0;
       return sortDir === "asc" ? av - bv : bv - av;
     });
   }, [filtered, sortCol, sortDir]);
@@ -249,25 +248,71 @@ export default function BuildingListPage() {
     const start = page * PAGE_SIZE;
     return sorted.slice(start, start + PAGE_SIZE);
   }, [sorted, page]);
+
   // Reset page when filters change
-  useMemo(() => setPage(0), [search, qualityFilter, utilityFilters, settlementFilter]);
+  useMemo(() => setPage(0), [search, qualityFilter, utilityFilters, locationFilter]);
 
-  // Settlement summary counts for past year
-  const settlementSummary = useMemo(() => {
-    if (!isPastYear) return null;
-    const counts = { not_started: 0, monitoring: 0, in_review: 0, approved: 0, distributed: 0 };
-    settlements.forEach((s) => {
-      if (counts[s.status] !== undefined) counts[s.status]++;
-    });
-    return counts;
-  }, [settlements, isPastYear]);
+  // Check if any filters are active
+  const hasActiveFilters =
+    qualityFilter !== "all" ||
+    utilityFilters.length > 0 ||
+    locationFilter !== "all" ||
+    sortCol !== null ||
+    search !== "";
 
-  const showSettlement = visibleColumns.includes("settlementStatus");
+  // Current filter state snapshot
+  function getCurrentFilterState() {
+    return {
+      qualityFilter,
+      utilityFilters: [...utilityFilters],
+      locationFilter,
+      sortCol,
+      sortDir,
+      search,
+    };
+  }
 
-  // Page title: view name or default
-  const pageTitle = activeView
-    ? (activeView.name[lang] || activeView.name.en)
-    : t("buildingsTitle", lang);
+  // Apply a saved filter
+  function applyFilter(f) {
+    setQualityFilter(f.qualityFilter || "all");
+    setUtilityFilters(f.utilityFilters || []);
+    setLocationFilter(f.locationFilter || "all");
+    setSortCol(f.sortCol || null);
+    setSortDir(f.sortDir || "desc");
+    setSearch(f.search || "");
+  }
+
+  // Save current filter
+  function handleSaveFilter() {
+    if (!filterName.trim()) return;
+    const newFilter = {
+      id: `filter-${Date.now()}`,
+      name: filterName.trim(),
+      ...getCurrentFilterState(),
+    };
+    const updated = [...savedFilters, newFilter];
+    setSavedFilters(updated);
+    persistSavedFilters(orgId, updated);
+    setFilterName("");
+    setShowSaveInput(false);
+  }
+
+  // Delete a saved filter
+  function handleDeleteFilter(id) {
+    const updated = savedFilters.filter((f) => f.id !== id);
+    setSavedFilters(updated);
+    persistSavedFilters(orgId, updated);
+  }
+
+  // Clear all filters
+  function clearFilters() {
+    setQualityFilter("all");
+    setUtilityFilters([]);
+    setLocationFilter("all");
+    setSortCol(null);
+    setSortDir("desc");
+    setSearch("");
+  }
 
   // Toggle sort on a column
   function handleSort(colKey) {
@@ -341,18 +386,6 @@ export default function BuildingListPage() {
             <BudgetBar spent={b.budgetSpent} total={b.budgetTotal} />
           </td>
         );
-      case "settlementStatus":
-        return (
-          <td key={col} className="px-3 sm:px-4 py-3 text-center">
-            {b.settlement && <SettlementBadge status={b.settlement.status} lang={lang} />}
-          </td>
-        );
-      case "netResult":
-        return (
-          <td key={col} className="px-3 sm:px-4 py-3 text-right">
-            <NetResult value={b.settlement?.netResult} lang={lang} />
-          </td>
-        );
       case "dataQuality":
         return (
           <td key={col} className="px-3 sm:px-4 py-3 text-center">
@@ -380,180 +413,282 @@ export default function BuildingListPage() {
     <div className="flex-1 overflow-y-auto">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
 
-        {/* Title + view badge + count */}
+        {/* Title + count */}
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-baseline gap-3">
             <h1 className="text-xl font-semibold" style={{ color: brand.navy }}>
-              {pageTitle}
+              {t("buildingsTitle", lang)}
             </h1>
-            {activeView && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-100 text-[11px] font-medium text-slate-500">
-                <LayoutGrid size={14} />
-                {lang === "nl" ? "Weergave" : "View"}
-              </span>
-            )}
             <span className="text-sm text-slate-400">
               {sorted.length > PAGE_SIZE
                 ? `${page * PAGE_SIZE + 1}–${Math.min((page + 1) * PAGE_SIZE, sorted.length)} / ${sorted.length}`
                 : sorted.length}
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            {/* Year badge for settlement views */}
-            {isViewWithYear && (
-              <span className="inline-flex items-center px-3 py-1 rounded-lg bg-slate-100 text-sm font-semibold tabular-nums text-slate-600">
-                {year}
-              </span>
-            )}
-          </div>
         </div>
 
-        {/* ── Saved Views bar ── */}
+        {/* ── Filter & Sort toolbar ── */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider mr-1">
-            <Eye size={14} className="inline -mt-0.5 mr-1" />
-            {lang === "nl" ? "Weergaven" : "Views"}
+            <SlidersHorizontal size={14} className="inline -mt-0.5 mr-1" />
+            {lang === "nl" ? "Filters" : "Filters"}
           </span>
-          {/* Default / no view */}
-          <button
-            onClick={() => setSearchParams({})}
-            className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
-              !activeView
-                ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200"
-                : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
-            }`}
-          >
-            <LayoutGrid size={14} />
-            {lang === "nl" ? "Alle complexen" : "All complexes"}
-          </button>
-          {/* Saved views */}
-          {data.savedViews
-            .filter((v) => v.objectType === "buildings")
-            .map((v) => {
-              const isActive = viewId === v.id;
-              return (
-                <button
-                  key={v.id}
-                  onClick={() => setSearchParams({ view: v.id })}
-                  className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
-                    isActive
-                      ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200"
-                      : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
-                  }`}
-                >
-                  <Bookmark size={14} className={isActive ? "fill-current" : ""} />
-                  {v.name[lang] || v.name.en}
-                </button>
-              );
-            })}
-        </div>
 
-        {/* Settlement summary bar (past year view only) */}
-        {isPastYear && settlementSummary && showSettlement && (
-          <div className="flex flex-wrap items-center gap-2 mb-4 p-3 rounded-lg bg-slate-50 border border-slate-200">
-            <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider mr-2">
-              {lang === "nl" ? "Afrekening" : "Settlement"} {year}
-            </span>
-            {Object.entries(settlementSummary).map(([status, count]) => {
-              const cfg = settlementConfig[status];
-              if (!cfg) return null;
-              const Icon = cfg.icon;
-              const isActive = settlementFilter === status;
-              return (
-                <button
-                  key={status}
-                  onClick={() =>
-                    setSettlementFilter(isActive ? "all" : status)
-                  }
-                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                    isActive
-                      ? "ring-2 ring-offset-1 shadow-sm"
-                      : "hover:bg-white"
-                  }`}
-                  style={{
-                    background: isActive ? cfg.bg : "transparent",
-                    color: cfg.color,
-                    ringColor: isActive ? cfg.color : undefined,
-                  }}
-                >
-                  <Icon size={12} />
-                  <span className="tabular-nums font-semibold">{count}</span>
-                  <span className="hidden sm:inline">{cfg.label[lang] || cfg.label.en}</span>
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Search & filter bar */}
-        <div className="flex flex-wrap items-center gap-3 mb-4">
           {/* Search input */}
-          <div className="relative flex-1 min-w-[200px] max-w-[320px]">
+          <div className="relative min-w-[180px] max-w-[260px]">
             <Search
               size={14}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
             />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={`${t("search", lang)}...`}
-              className="w-full h-8 pl-8 pr-3 text-sm rounded-lg border border-slate-200 bg-white text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#3EB1C8]/30 focus:border-[#3EB1C8] transition-colors"
+              className="w-full h-8 pl-8 pr-3 text-xs rounded-lg border border-slate-200 bg-white text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#3EB1C8]/30 focus:border-[#3EB1C8] transition-colors"
             />
           </div>
 
-          {/* Quality filter */}
-          <div className="inline-flex items-center rounded-lg bg-slate-100 p-0.5">
+          {/* Location filter */}
+          {locations.length > 1 && (
+            <Dropdown
+              trigger={
+                <button
+                  className={`inline-flex items-center gap-1.5 px-3 h-8 rounded-lg text-xs font-medium transition-colors border ${
+                    locationFilter !== "all"
+                      ? "border-[#3EB1C8] bg-[#3EB1C8]/5 text-[#3EB1C8]"
+                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  <MapPin size={13} />
+                  {locationFilter === "all"
+                    ? (lang === "nl" ? "Locatie" : "Location")
+                    : locationFilter}
+                  <ChevronDown size={12} />
+                </button>
+              }
+            >
+              <button
+                onClick={() => setLocationFilter("all")}
+                className={`w-full text-left px-3 py-2 text-xs hover:bg-slate-50 ${
+                  locationFilter === "all" ? "font-semibold text-slate-900" : "text-slate-600"
+                }`}
+              >
+                {lang === "nl" ? "Alle locaties" : "All locations"}
+              </button>
+              {locations.map((loc) => (
+                <button
+                  key={loc}
+                  onClick={() => setLocationFilter(loc)}
+                  className={`w-full text-left px-3 py-2 text-xs hover:bg-slate-50 ${
+                    locationFilter === loc ? "font-semibold text-slate-900" : "text-slate-600"
+                  }`}
+                >
+                  {loc}
+                </button>
+              ))}
+            </Dropdown>
+          )}
+
+          {/* Quality filter dropdown */}
+          <Dropdown
+            trigger={
+              <button
+                className={`inline-flex items-center gap-1.5 px-3 h-8 rounded-lg text-xs font-medium transition-colors border ${
+                  qualityFilter !== "all"
+                    ? "border-[#3EB1C8] bg-[#3EB1C8]/5 text-[#3EB1C8]"
+                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                {qualityFilter === "all"
+                  ? (lang === "nl" ? "Datakwaliteit" : "Data quality")
+                  : qualityFilters.find((f) => f.value === qualityFilter)?.label[lang] ||
+                    qualityFilters.find((f) => f.value === qualityFilter)?.label.en}
+                <ChevronDown size={12} />
+              </button>
+            }
+          >
             {qualityFilters.map((f) => (
               <button
                 key={f.value}
                 onClick={() => setQualityFilter(f.value)}
-                className={`px-3 h-7 rounded-lg text-xs font-medium transition-colors ${
-                  qualityFilter === f.value
-                    ? "bg-white text-slate-900 shadow-sm"
-                    : "text-slate-500 hover:text-slate-700"
+                className={`w-full text-left px-3 py-2 text-xs hover:bg-slate-50 ${
+                  qualityFilter === f.value ? "font-semibold text-slate-900" : "text-slate-600"
                 }`}
               >
                 {f.label[lang] || f.label.en}
               </button>
             ))}
+          </Dropdown>
+
+          {/* Utility filter icons */}
+          <div className="flex items-center gap-1">
+            {utilityFilterOptions.map((u) => {
+              const Icon = u.icon;
+              const isActive = utilityFilters.includes(u.value);
+              return (
+                <button
+                  key={u.value}
+                  onClick={() => toggleUtility(u.value)}
+                  className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
+                    isActive
+                      ? "ring-2 ring-offset-1 shadow-sm"
+                      : "hover:bg-slate-100"
+                  }`}
+                  style={{
+                    background: isActive ? u.color + "15" : "transparent",
+                    ringColor: isActive ? u.color : undefined,
+                  }}
+                  title={u.label[lang] || u.label.en}
+                >
+                  <Icon size={14} style={{ color: isActive ? u.color : "#94A3B8" }} />
+                </button>
+              );
+            })}
           </div>
 
-          {/* Utility filter (only on default complexes view, not settlement views) */}
-          {!isViewWithYear && (
-            <div className="flex items-center gap-1">
-              {utilityFilterOptions.map((u) => {
-                const Icon = u.icon;
-                const isActive = utilityFilters.includes(u.value);
-                return (
-                  <button
-                    key={u.value}
-                    onClick={() => toggleUtility(u.value)}
-                    className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
-                      isActive
-                        ? "ring-2 ring-offset-1 shadow-sm"
-                        : "hover:bg-slate-100"
-                    }`}
-                    style={{
-                      background: isActive ? u.color + "15" : "transparent",
-                      ringColor: isActive ? u.color : undefined,
+          {/* Divider */}
+          <div className="w-px h-5 bg-slate-200 mx-1" />
+
+          {/* Sort dropdown */}
+          <Dropdown
+            trigger={
+              <button
+                className={`inline-flex items-center gap-1.5 px-3 h-8 rounded-lg text-xs font-medium transition-colors border ${
+                  sortCol
+                    ? "border-[#3EB1C8] bg-[#3EB1C8]/5 text-[#3EB1C8]"
+                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                <ArrowUpDown size={13} />
+                {sortCol
+                  ? `${sortOptions.find((s) => s.value === sortCol)?.label[lang] || sortCol} ${sortDir === "asc" ? "↑" : "↓"}`
+                  : (lang === "nl" ? "Sorteren" : "Sort")}
+                <ChevronDown size={12} />
+              </button>
+            }
+          >
+            {sortOptions.map((s) => (
+              <button
+                key={s.value}
+                onClick={() => {
+                  if (!s.value) {
+                    setSortCol(null);
+                    setSortDir("desc");
+                  } else if (sortCol === s.value) {
+                    setSortDir(sortDir === "asc" ? "desc" : "asc");
+                  } else {
+                    setSortCol(s.value);
+                    setSortDir("desc");
+                  }
+                }}
+                className={`w-full text-left px-3 py-2 text-xs hover:bg-slate-50 flex items-center justify-between ${
+                  sortCol === s.value || (!sortCol && !s.value)
+                    ? "font-semibold text-slate-900"
+                    : "text-slate-600"
+                }`}
+              >
+                {s.label[lang] || s.label.en}
+                {sortCol === s.value && (
+                  <span className="text-slate-400">{sortDir === "asc" ? "↑" : "↓"}</span>
+                )}
+              </button>
+            ))}
+          </Dropdown>
+
+          {/* Clear all filters */}
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="inline-flex items-center gap-1 px-2 h-7 rounded-lg text-[11px] font-medium text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+            >
+              <X size={12} />
+              {lang === "nl" ? "Wissen" : "Clear"}
+            </button>
+          )}
+
+          {/* Save filter button */}
+          {hasActiveFilters && (
+            <>
+              <div className="w-px h-5 bg-slate-200 mx-1" />
+              {!showSaveInput ? (
+                <button
+                  onClick={() => setShowSaveInput(true)}
+                  className="inline-flex items-center gap-1.5 px-3 h-8 rounded-lg text-xs font-medium text-slate-500 border border-dashed border-slate-300 hover:border-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  <Save size={13} />
+                  {lang === "nl" ? "Opslaan" : "Save"}
+                </button>
+              ) : (
+                <div className="inline-flex items-center gap-1.5">
+                  <input
+                    ref={saveInputRef}
+                    type="text"
+                    value={filterName}
+                    onChange={(e) => setFilterName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleSaveFilter();
+                      if (e.key === "Escape") { setShowSaveInput(false); setFilterName(""); }
                     }}
-                    title={u.label[lang] || u.label.en}
+                    placeholder={lang === "nl" ? "Naam..." : "Name..."}
+                    className="h-8 w-32 px-2.5 text-xs rounded-lg border border-slate-300 bg-white text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#3EB1C8]/30 focus:border-[#3EB1C8]"
+                  />
+                  <button
+                    onClick={handleSaveFilter}
+                    disabled={!filterName.trim()}
+                    className="h-8 px-3 rounded-lg text-xs font-medium text-white transition-colors disabled:opacity-40"
+                    style={{ background: brand.teal }}
                   >
-                    <Icon size={14} style={{ color: isActive ? u.color : "#94A3B8" }} />
+                    {lang === "nl" ? "Opslaan" : "Save"}
                   </button>
-                );
-              })}
-            </div>
+                  <button
+                    onClick={() => { setShowSaveInput(false); setFilterName(""); }}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
+
+        {/* ── Saved filters bar ── */}
+        {savedFilters.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider mr-1">
+              <Save size={13} className="inline -mt-0.5 mr-1" />
+              {lang === "nl" ? "Opgeslagen" : "Saved"}
+            </span>
+            {savedFilters.map((f) => (
+              <div
+                key={f.id}
+                className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white hover:border-slate-300 transition-colors group"
+              >
+                <button
+                  onClick={() => applyFilter(f)}
+                  className="px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900"
+                >
+                  {f.name}
+                </button>
+                <button
+                  onClick={() => handleDeleteFilter(f.id)}
+                  className="pr-2 py-1.5 text-slate-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                  title={lang === "nl" ? "Verwijderen" : "Delete"}
+                >
+                  <Trash2 size={12} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* ── Mobile card view ── */}
         <div className="block md:hidden space-y-3">
           {paged.map((b) => (
             <button
               key={b.id}
-              onClick={() => navigate(`/${orgId}/buildings/${b.id}${isViewWithYear ? `?year=${year}` : ""}`)}
+              onClick={() => navigate(`/${orgId}/buildings/${b.id}`)}
               className="w-full text-left rounded-lg border border-slate-200 bg-white p-4 hover:border-[#3EB1C8] hover:shadow-md transition-colors"
             >
               <div className="flex items-start justify-between mb-2">
@@ -581,14 +716,7 @@ export default function BuildingListPage() {
                 </span>
               </div>
 
-              {showSettlement && b.settlement ? (
-                <div className="flex items-center justify-between gap-3">
-                  <SettlementBadge status={b.settlement.status} lang={lang} />
-                  <NetResult value={b.settlement.netResult} lang={lang} />
-                </div>
-              ) : (
-                <UtilityIcons utilities={b.utilities} lang={lang} />
-              )}
+              <UtilityIcons utilities={b.utilities} lang={lang} />
             </button>
           ))}
           {sorted.length === 0 && (
@@ -628,7 +756,7 @@ export default function BuildingListPage() {
                 <tr
                   key={b.id}
                   className="hover:bg-slate-50/80 transition-colors cursor-pointer"
-                  onClick={() => navigate(`/${orgId}/buildings/${b.id}${isViewWithYear ? `?year=${year}` : ""}`)}
+                  onClick={() => navigate(`/${orgId}/buildings/${b.id}`)}
                 >
                   {visibleColumns.map((colKey) => renderCell(colKey, b))}
                 </tr>
