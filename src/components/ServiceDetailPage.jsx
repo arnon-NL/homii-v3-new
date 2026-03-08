@@ -23,6 +23,11 @@ import {
   getServiceCategories,
   getLedgerByService,
   getLedgerSummaryByService,
+  getBuildingServicesByService,
+  getMetersByBuilding,
+  getAvailableYears,
+  isFeatureEnabled,
+  getHeatingSeasonsByBuilding,
 } from "@/lib/mockData";
 import { useOrg } from "@/lib/OrgContext";
 
@@ -103,6 +108,15 @@ function MonthlyBarChart({ entries, budgetPerMonth }) {
   );
 }
 
+/* ── Utility config for energy view ── */
+const utilityConfig = {
+  heat: { label: { en: "Heat", nl: "Warmte" }, unit: "GJ", color: "#EF4444" },
+  gas: { label: { en: "Gas", nl: "Gas" }, unit: "m³", color: "#F59E0B" },
+  water: { label: { en: "Water", nl: "Water" }, unit: "m³", color: "#3B82F6" },
+  warmWater: { label: { en: "Warm Water", nl: "Warm Water" }, unit: "m³", color: "#8B5CF6" },
+  electricity: { label: { en: "Electricity", nl: "Elektriciteit" }, unit: "kWh", color: "#10B981" },
+};
+
 /* ── Main component ── */
 export default function ServiceDetailPage() {
   const { serviceId } = useParams();
@@ -113,17 +127,70 @@ export default function ServiceDetailPage() {
   const service = orgData.services.find((s) => s.id === serviceId);
   const category = orgData.serviceCategories.find((c) => c.id === service?.category);
 
-  const [year] = useState(2025);
+  const hasLedger = isFeatureEnabled("ledger");
+  const availableYears = useMemo(() => getAvailableYears(), []);
+  const [year, setYear] = useState(() => {
+    const yrs = getAvailableYears();
+    const currentYear = new Date().getFullYear();
+    if (yrs.includes(currentYear)) return currentYear;
+    return yrs.length > 0 ? yrs[yrs.length - 1] : 2025;
+  });
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [expandedBuilding, setExpandedBuilding] = useState(null);
 
-  // Ledger data
-  const allEntries = useMemo(() => getLedgerByService(serviceId, year), [serviceId, year]);
-  const summary = useMemo(() => getLedgerSummaryByService(serviceId, year), [serviceId, year]);
+  // ── Energy mode: building-service rows from buildingServices ──
+  const energyBuildingRows = useMemo(() => {
+    if (hasLedger) return [];
+    const bsList = getBuildingServicesByService(serviceId, year);
+    return bsList
+      .map((bs) => {
+        const bld = orgData.buildings.find((b) => b.id === bs.buildingId);
+        if (!bld) return null;
+        // Get meters for this building matching this service's utility
+        const util = service?.utility;
+        const allBuildingMeters = getMetersByBuilding(bs.buildingId);
+        const serviceMeters = util
+          ? allBuildingMeters.filter((m) => m.utility === util && !m.dismounted)
+          : allBuildingMeters.filter((m) => !m.dismounted);
+        const mainMeters = serviceMeters.filter((m) => m.type === "main");
+        const subMeters = serviceMeters.filter((m) => m.type === "sub");
+        // Heating season info
+        const seasons = getHeatingSeasonsByBuilding(bs.buildingId);
+        const currentSeason = seasons.find((s) => s.yearKey === year);
+        return {
+          bs,
+          building: bld,
+          mainMeters,
+          subMeters,
+          meterCount: serviceMeters.length,
+          budget: bs.budget || 0,
+          actual: bs.actual || 0,
+          variance: (bs.actual || 0) - (bs.budget || 0),
+          variancePct: bs.budget > 0 ? (((bs.actual || 0) - (bs.budget || 0)) / bs.budget) * 100 : 0,
+          season: currentSeason,
+          yearLabel: bs.yearLabel,
+        };
+      })
+      .filter(Boolean)
+      .filter((row) => {
+        if (!search) return true;
+        const q = search.toLowerCase();
+        return (
+          row.building.complex.toLowerCase().includes(q) ||
+          row.building.complexId?.toLowerCase().includes(q) ||
+          row.building.location?.toLowerCase().includes(q)
+        );
+      })
+      .sort((a, b) => b.meterCount - a.meterCount);
+  }, [serviceId, year, search, hasLedger, orgData, service]);
 
-  // Building rows with aggregated data
+  // ── Ledger mode: original data ──
+  const allEntries = useMemo(() => hasLedger ? getLedgerByService(serviceId, year) : [], [serviceId, year, hasLedger]);
+  const summary = useMemo(() => hasLedger ? getLedgerSummaryByService(serviceId, year) : {}, [serviceId, year, hasLedger]);
+
   const buildingRows = useMemo(() => {
+    if (!hasLedger) return [];
     return Object.entries(summary)
       .map(([bldId, data]) => {
         const bld = orgData.buildings.find((b) => b.id === bldId);
@@ -156,15 +223,14 @@ export default function ServiceDetailPage() {
         );
       })
       .sort((a, b) => {
-        // Issues first
         const aIssues = a.flagged + a.pending;
         const bIssues = b.flagged + b.pending;
         if (aIssues !== bIssues) return bIssues - aIssues;
         return b.total - a.total;
       });
-  }, [summary, statusFilter, search, service, orgData]);
+  }, [summary, statusFilter, search, service, orgData, hasLedger]);
 
-  // Totals
+  // Totals (ledger mode)
   const totalBooked = allEntries.reduce((s, e) => s + e.amount, 0);
   const totalBudget = buildingRows.reduce((s, r) => s + r.budgetForService, 0);
   const totalFlagged = allEntries.filter((e) => e.status === "flagged").length;
@@ -172,6 +238,12 @@ export default function ServiceDetailPage() {
   const completeness = allEntries.length > 0 ? Math.round(
     (allEntries.filter((e) => e.status === "booked").length / allEntries.length) * 100
   ) : 0;
+
+  // Totals (energy mode)
+  const energyTotalBudget = energyBuildingRows.reduce((s, r) => s + r.budget, 0);
+  const energyTotalActual = energyBuildingRows.reduce((s, r) => s + r.actual, 0);
+  const energyTotalMeters = energyBuildingRows.reduce((s, r) => s + r.meterCount, 0);
+  const energyMainMeters = energyBuildingRows.reduce((s, r) => s + r.mainMeters.length, 0);
 
   if (!service) {
     return (
@@ -208,13 +280,215 @@ export default function ServiceDetailPage() {
               {service.name[lang] || service.name.en}
             </h1>
           </div>
-          <div
-            className="px-3 py-1 rounded-full text-xs font-semibold"
-            style={{ background: "#F8FAFC", color: brand.navy }}
-          >
-            {year}
+          {/* Year selector */}
+          <div className="inline-flex items-center rounded-lg bg-slate-100 p-0.5">
+            {availableYears.map((y) => (
+              <button
+                key={y}
+                onClick={() => setYear(y)}
+                className={`px-3 h-7 rounded-lg text-xs font-medium tabular-nums transition-colors ${
+                  year === y
+                    ? "bg-white text-slate-900 shadow-sm"
+                    : "text-slate-400 hover:text-slate-600"
+                }`}
+              >
+                {y}
+              </button>
+            ))}
           </div>
         </div>
+
+        {/* ═══════════════════════════════════════════════════ */}
+        {/* ENERGY MODE — building-service overview with meters */}
+        {/* ═══════════════════════════════════════════════════ */}
+        {!hasLedger ? (
+          <>
+            {/* Energy summary cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+              {[
+                {
+                  label: { en: "Buildings", nl: "Complexen" },
+                  value: energyBuildingRows.length,
+                  sub: lang === "nl" ? "Actieve complexen" : "Active complexes",
+                  color: brand.navy,
+                },
+                {
+                  label: { en: "Total Budget", nl: "Totaal budget" },
+                  value: fmtEur(energyTotalBudget),
+                  sub: `${lang === "nl" ? "Werkelijk" : "Actual"}: ${fmtEur(energyTotalActual)}`,
+                  color: brand.navy,
+                },
+                {
+                  label: { en: "Variance", nl: "Afwijking" },
+                  value: fmtEur(energyTotalActual - energyTotalBudget),
+                  sub: energyTotalBudget > 0 ? `${(((energyTotalActual - energyTotalBudget) / energyTotalBudget) * 100).toFixed(1)}%` : "—",
+                  color: energyTotalActual > energyTotalBudget ? brand.red : brand.blue,
+                },
+                {
+                  label: { en: "Meters", nl: "Meters" },
+                  value: energyTotalMeters,
+                  sub: `${energyMainMeters} ${lang === "nl" ? "hoofdmeters" : "main meters"}`,
+                  color: brand.blue,
+                },
+              ].map((card, i) => (
+                <div key={i} className="rounded-lg border border-slate-200 bg-white p-3">
+                  <div className="text-[11px] text-slate-500 font-medium mb-1">{card.label[lang]}</div>
+                  <div className="text-base font-semibold tabular-nums" style={{ color: card.color }}>{card.value}</div>
+                  <div className="text-[11px] text-slate-400 mt-0.5">{card.sub}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Search */}
+            <div className="flex items-center gap-3 mb-4">
+              <div className="relative flex-1 min-w-[200px] max-w-[300px]">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder={`${t("search", lang)} ${lang === "nl" ? "complexen" : "complexes"}...`}
+                  className="w-full h-8 pl-8 pr-3 text-sm rounded-lg border border-slate-200 bg-white text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#3EB1C8]/30 focus:border-[#3EB1C8] transition-colors"
+                />
+              </div>
+              <span className="text-xs text-slate-400 ml-auto">
+                {energyBuildingRows.length} {lang === "nl" ? "complexen" : "complexes"}
+              </span>
+            </div>
+
+            {/* Energy building rows */}
+            <div className="space-y-2">
+              {energyBuildingRows.map((row) => {
+                const isExpanded = expandedBuilding === row.building.id;
+                const utilCfg = utilityConfig[service.utility] || { label: { en: service.utility, nl: service.utility }, unit: "", color: "#64748B" };
+
+                return (
+                  <div
+                    key={row.building.id}
+                    className="rounded-lg border border-slate-200 bg-white overflow-hidden"
+                  >
+                    <button
+                      onClick={() => setExpandedBuilding(isExpanded ? null : row.building.id)}
+                      className="w-full text-left flex items-center gap-3 px-4 py-3 hover:bg-slate-50/60 transition-colors"
+                    >
+                      <div className="flex items-center justify-center w-5">
+                        {isExpanded ? <ChevronDown size={14} className="text-slate-400" /> : <ChevronRight size={14} className="text-slate-400" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <Building2 size={12} className="text-slate-400 shrink-0" />
+                          <span className="text-sm font-medium truncate" style={{ color: brand.navy }}>{row.building.complex}</span>
+                          <span className="text-[11px] text-slate-400 shrink-0">{row.building.complexId}</span>
+                        </div>
+                        <div className="text-[11px] text-slate-400 mt-0.5 pl-5">
+                          {row.building.location} · {row.building.vhe} VHE · {row.meterCount} {lang === "nl" ? "meters" : "meters"}
+                          {row.yearLabel && row.yearLabel !== String(year) ? ` · ${lang === "nl" ? "Seizoen" : "Season"} ${row.yearLabel}` : ""}
+                        </div>
+                      </div>
+                      {/* Meter counts */}
+                      <div className="hidden sm:flex items-center gap-3 shrink-0 text-[11px]">
+                        {row.mainMeters.length > 0 && (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full font-medium" style={{ background: `${utilCfg.color}10`, color: utilCfg.color }}>
+                            {row.mainMeters.length} {lang === "nl" ? "hoofd" : "main"}
+                          </span>
+                        )}
+                        <span className="text-slate-400">{row.subMeters.length} sub</span>
+                      </div>
+                      {/* Budget */}
+                      <div className="text-right shrink-0">
+                        <div className="text-sm font-semibold tabular-nums" style={{ color: brand.navy }}>
+                          {fmtEur(row.actual)}
+                        </div>
+                        {row.budget > 0 && (
+                          <div
+                            className="text-[11px] tabular-nums flex items-center justify-end gap-1"
+                            style={{ color: row.variance > 0 ? brand.red : brand.blue }}
+                          >
+                            {row.variance > 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
+                            {row.variancePct > 0 ? "+" : ""}{row.variancePct.toFixed(1)}%
+                          </div>
+                        )}
+                      </div>
+                    </button>
+
+                    {/* Expanded: meter details */}
+                    {isExpanded && (
+                      <div className="border-t border-slate-100">
+                        {/* Main meters */}
+                        {row.mainMeters.length > 0 && (
+                          <div className="px-4 py-3 border-b border-slate-50">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                              {lang === "nl" ? "Hoofdmeters" : "Main Meters"}
+                            </p>
+                            <div className="space-y-1.5">
+                              {row.mainMeters.map((m) => (
+                                <div key={m.id} className="flex items-center gap-3 text-xs">
+                                  <span className="w-2 h-2 rounded-full shrink-0" style={{ background: utilCfg.color }} />
+                                  <span className="font-mono text-slate-500 min-w-[120px]">{m.meterNumber}</span>
+                                  <span className="text-slate-400">{m.meterType}</span>
+                                  <span className="ml-auto font-medium text-slate-600">{m.unit}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {/* Sub meter summary */}
+                        {row.subMeters.length > 0 && (
+                          <div className="px-4 py-3 border-b border-slate-50">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">
+                              {lang === "nl" ? "Submeters" : "Sub Meters"}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {row.subMeters.length} {lang === "nl" ? "actieve submeters" : "active sub meters"}
+                              {(() => {
+                                const types = {};
+                                for (const m of row.subMeters) { types[m.meterType] = (types[m.meterType] || 0) + 1; }
+                                return ` (${Object.entries(types).map(([k, v]) => `${v}× ${k}`).join(", ")})`;
+                              })()}
+                            </p>
+                          </div>
+                        )}
+                        {/* Season info */}
+                        {row.season && (
+                          <div className="px-4 py-3 border-b border-slate-50">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">
+                              {lang === "nl" ? "Stookseizoen" : "Heating Season"}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {new Date(row.season.seasonStart).toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" })}
+                              {" – "}
+                              {new Date(row.season.seasonEnd).toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" })}
+                            </p>
+                          </div>
+                        )}
+                        {/* View building */}
+                        <div className="px-4 py-3 bg-slate-50/30">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); navigate(`/buildings/${row.building.id}`); }}
+                            className="text-xs font-medium hover:underline transition-colors"
+                            style={{ color: brand.blue }}
+                          >
+                            {lang === "nl" ? `Bekijk ${row.building.complex} →` : `View ${row.building.complex} →`}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              {energyBuildingRows.length === 0 && (
+                <div className="rounded-lg border border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-400">
+                  {t("noResults", lang)}
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+        <>
+        {/* ═══════════════════════════════════════════════════ */}
+        {/* LEDGER MODE — original summary + ledger entries    */}
+        {/* ═══════════════════════════════════════════════════ */}
 
         {/* ── Summary cards ── */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
@@ -537,6 +811,8 @@ export default function ServiceDetailPage() {
             </div>
           )}
         </div>
+        </>
+        )}
       </div>
     </div>
   );
