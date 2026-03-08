@@ -1438,7 +1438,7 @@ export default function BuildingDetailPage() {
                                               {season.avgAdvance > 0 && (
                                                 <div className="mt-2 text-[11px] text-slate-400 flex items-center gap-2">
                                                   <span>{lang === "nl" ? "Gem. voorschot" : "Avg. advance"}:</span>
-                                                  <span className="font-medium text-slate-600">{fmt2(season.avgAdvance)}/{lang === "nl" ? "mnd" : "mo"}</span>
+                                                  <span className="font-medium text-slate-600">{fmtEur2(season.avgAdvance)}/{lang === "nl" ? "mnd" : "mo"}</span>
                                                   {season.endDebtorRisk > 0 && (
                                                     <>
                                                       <span className="text-slate-300">·</span>
