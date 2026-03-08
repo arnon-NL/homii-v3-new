@@ -121,6 +121,14 @@ export {
   setActiveOrg,
   getActiveOrgId,
 
+  // --- Meter links ---
+  costCategoryMeterLinks,
+  getMeterLink,
+  getMeterLinksByBuilding,
+  getMeterLinksByService,
+  addMeterLink,
+  removeMeterLink,
+
   // --- Field sources ---
   FIELD_SOURCES,
   getFieldSource,

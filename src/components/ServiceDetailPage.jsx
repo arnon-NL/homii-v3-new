@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -16,6 +16,10 @@ import {
   BarChart3,
   Gauge,
   Info,
+  Link2,
+  Unlink,
+  X,
+  Zap,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import { t, useLang } from "@/lib/i18n";
@@ -31,6 +35,11 @@ import {
   getSettlementsByYear,
   isFeatureEnabled,
   getHeatingSeasonsByBuilding,
+  getCostCategoriesByService,
+  getLedgerGroupedByCostCategory,
+  getMeterLink,
+  addMeterLink,
+  removeMeterLink,
 } from "@/lib/mockData";
 import { useOrg } from "@/lib/OrgContext";
 
@@ -107,6 +116,383 @@ function MonthlyBarChart({ entries, budgetPerMonth }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+/* ── Comparison bar chart: ledger vs consumption per month ── */
+function ComparisonBarChart({ ledgerEntries, meterReadings, unitPrice, year }) {
+  const monthLabels = ["J","F","M","A","M","J","J","A","S","O","N","D"];
+
+  // Ledger totals per month
+  const ledgerByMonth = Array.from({ length: 12 }, (_, i) => {
+    const month = i + 1;
+    return ledgerEntries
+      .filter((e) => e.month === month && e.year === year)
+      .reduce((sum, e) => sum + e.amount, 0);
+  });
+
+  // Consumption costs per month (distributed evenly across year for now)
+  const totalConsumption = meterReadings?.consumption || 0;
+  const totalConsumptionCost = totalConsumption * (unitPrice || 0);
+  const monthlyConsumptionCost = totalConsumptionCost / 12;
+  const consumptionByMonth = Array.from({ length: 12 }, () => monthlyConsumptionCost);
+
+  const maxVal = Math.max(...ledgerByMonth, ...consumptionByMonth, 1);
+
+  return (
+    <div className="flex items-end gap-1 h-[56px]">
+      {ledgerByMonth.map((ledgerVal, i) => {
+        const consVal = consumptionByMonth[i];
+        const lH = maxVal > 0 ? (ledgerVal / maxVal) * 48 : 0;
+        const cH = maxVal > 0 ? (consVal / maxVal) * 48 : 0;
+        return (
+          <div key={i} className="flex flex-col items-center gap-1" style={{ width: 28 }}>
+            <div className="flex items-end gap-[2px]">
+              <div
+                className="w-[5px] rounded-lg"
+                style={{
+                  height: Math.max(2, lH),
+                  background: brand.navy,
+                  opacity: 0.7,
+                }}
+                title={`Ledger: €${Math.round(ledgerVal)}`}
+              />
+              <div
+                className="w-[5px] rounded-lg"
+                style={{
+                  height: Math.max(2, cH),
+                  background: brand.blue,
+                  opacity: 0.5,
+                }}
+                title={`Consumption: €${Math.round(consVal)}`}
+              />
+            </div>
+            <span className="text-[10px] text-slate-400">{monthLabels[i]}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ── Cost Category Meter Section: connect + reconciliation ── */
+function CostCategoryMeterSection({ serviceId, buildingId, year, lang }) {
+  const costCategories = useMemo(() => getCostCategoriesByService(serviceId), [serviceId]);
+  const allBuildingMeters = useMemo(() => getMetersByBuilding(buildingId), [buildingId]);
+  const mainMeters = useMemo(() => allBuildingMeters.filter((m) => m.type === "main"), [allBuildingMeters]);
+  const { grouped, unassigned } = useMemo(
+    () => getLedgerGroupedByCostCategory(serviceId, buildingId, year),
+    [serviceId, buildingId, year]
+  );
+
+  const [connectingCatId, setConnectingCatId] = useState(null);
+  const [expandedCatId, setExpandedCatId] = useState(null);
+  const [, forceUpdate] = useState(0);
+
+  const handleConnect = useCallback((costCategoryId, meterId) => {
+    addMeterLink({ costCategoryId, meterId, buildingId: String(buildingId), serviceId });
+    setConnectingCatId(null);
+    forceUpdate((n) => n + 1);
+  }, [buildingId, serviceId]);
+
+  const handleDisconnect = useCallback((costCategoryId) => {
+    removeMeterLink(costCategoryId, buildingId);
+    forceUpdate((n) => n + 1);
+  }, [buildingId]);
+
+  if (costCategories.length === 0) return null;
+
+  // Utility mapping: cost category unit → meter utility filter
+  const unitToUtility = { "m³": ["water", "gas"], "kWh": ["electricity"], "GJ": ["heat"] };
+
+  return (
+    <div className="border-t border-slate-100">
+      <div className="px-4 py-2 bg-slate-50/40 border-b border-slate-100">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+          {lang === "nl" ? "Kostensoorten" : "Cost Categories"}
+        </span>
+      </div>
+
+      {costCategories.map((cc) => {
+        const link = getMeterLink(cc.id, buildingId);
+        const isMeterable = cc.unit && cc.unitPrice;
+        const isConnecting = connectingCatId === cc.id;
+        const isExpanded = expandedCatId === cc.id;
+        const catEntries = grouped[cc.id] || [];
+        const catTotal = catEntries.reduce((s, e) => s + e.amount, 0);
+
+        // Find the linked meter object
+        const linkedMeter = link ? mainMeters.find((m) => m.id === link.meterId) || allBuildingMeters.find((m) => m.id === link.meterId) : null;
+        const meterReadings = linkedMeter?.readings?.[year] || linkedMeter?.readings?.[String(year)] || null;
+
+        // Calculate consumption-based cost
+        const consumption = meterReadings?.consumption || 0;
+        const consumptionCostYTD = consumption * (cc.unitPrice || 0);
+
+        // Calculate year-end expected
+        const now = new Date();
+        const dayOfYear = Math.floor((now - new Date(year, 0, 1)) / 86400000);
+        const yearProgress = Math.max(0.01, Math.min(1, dayOfYear / 365));
+        const isCurrentYear = year === now.getFullYear();
+        const yearEndExpected = isCurrentYear ? consumptionCostYTD / yearProgress : consumptionCostYTD;
+
+        // Variance
+        const variance = catTotal > 0 && consumptionCostYTD > 0
+          ? ((catTotal - consumptionCostYTD) / consumptionCostYTD) * 100
+          : 0;
+        const absVariance = Math.abs(variance);
+        const varianceColor = absVariance > 20 ? brand.red : absVariance > 10 ? brand.amber : brand.subtle;
+
+        // Available meters to connect (filtered by matching utility)
+        const matchingMeters = isMeterable
+          ? mainMeters.filter((m) => {
+              const utilities = unitToUtility[cc.unit] || [];
+              return utilities.includes(m.utility);
+            })
+          : [];
+
+        return (
+          <div key={cc.id} className="border-b border-slate-50 last:border-b-0">
+            {/* Cost category row */}
+            <div className="px-4 py-3">
+              <div className="flex items-center gap-3">
+                {/* Expand toggle for connected categories */}
+                {link && linkedMeter ? (
+                  <button
+                    onClick={() => setExpandedCatId(isExpanded ? null : cc.id)}
+                    className="flex items-center justify-center w-4 shrink-0"
+                  >
+                    {isExpanded
+                      ? <ChevronDown size={14} className="text-slate-400" />
+                      : <ChevronRight size={14} className="text-slate-400" />
+                    }
+                  </button>
+                ) : (
+                  <div className="w-4 shrink-0" />
+                )}
+
+                {/* Category info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-slate-700 truncate">{cc.name[lang] || cc.name.en}</span>
+                    <span className="text-[11px] text-slate-400">{cc.supplier}</span>
+                  </div>
+                  <div className="text-[11px] text-slate-400 mt-0.5 flex items-center gap-2">
+                    <span>{Math.round(cc.budgetShare * 100)}%</span>
+                    {cc.unit && cc.unitPrice && (
+                      <>
+                        <span className="text-slate-200">·</span>
+                        <span>€{cc.unitPrice.toFixed(2)}/{cc.unit}</span>
+                      </>
+                    )}
+                    <span className="text-slate-200">·</span>
+                    <span>{cc.invoiceFrequency}</span>
+                  </div>
+                </div>
+
+                {/* Meter connection state */}
+                <div className="flex items-center gap-2 shrink-0">
+                  {link && linkedMeter ? (
+                    /* Connected state: show meter badge */
+                    <div className="group relative flex items-center gap-1.5">
+                      <span
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium"
+                        style={{ background: `${brand.blue}10`, color: brand.blue }}
+                      >
+                        <Zap size={12} />
+                        {linkedMeter.meterNumber}
+                      </span>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleDisconnect(cc.id); }}
+                        className="opacity-0 group-hover:opacity-100 w-5 h-5 rounded flex items-center justify-center hover:bg-red-50 transition-all"
+                        title={lang === "nl" ? "Ontkoppelen" : "Disconnect"}
+                      >
+                        <Unlink size={12} className="text-red-400" />
+                      </button>
+                    </div>
+                  ) : isMeterable && !isConnecting ? (
+                    /* Unconnected + connectable: show connect button */
+                    <button
+                      onClick={() => setConnectingCatId(cc.id)}
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                    >
+                      <Link2 size={12} />
+                      {lang === "nl" ? "Koppel meter" : "Connect meter"}
+                    </button>
+                  ) : null}
+                </div>
+
+                {/* Ledger total for this category */}
+                <div className="text-right shrink-0 min-w-[80px]">
+                  <div className="text-xs font-medium tabular-nums" style={{ color: brand.navy }}>
+                    {fmtEur(catTotal)}
+                  </div>
+                  <div className="text-[11px] text-slate-400">
+                    {catEntries.length} {lang === "nl" ? "boekingen" : "entries"}
+                  </div>
+                </div>
+              </div>
+
+              {/* Inline meter selector */}
+              {isConnecting && (
+                <div className="mt-3 ml-7 p-3 rounded-lg border border-slate-200 bg-slate-50/50">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-medium text-slate-500">
+                      {lang === "nl" ? "Selecteer hoofdmeter" : "Select main meter"}
+                    </span>
+                    <button
+                      onClick={() => setConnectingCatId(null)}
+                      className="w-5 h-5 rounded flex items-center justify-center hover:bg-slate-200 transition-colors"
+                    >
+                      <X size={12} className="text-slate-400" />
+                    </button>
+                  </div>
+                  {matchingMeters.length > 0 ? (
+                    <div className="space-y-1">
+                      {matchingMeters.map((m) => {
+                        const mReading = m.readings?.[year] || m.readings?.[String(year)];
+                        return (
+                          <button
+                            key={m.id}
+                            onClick={() => handleConnect(cc.id, m.id)}
+                            className="w-full text-left flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white border border-transparent hover:border-slate-200 transition-colors"
+                          >
+                            <Zap size={14} style={{ color: brand.blue }} />
+                            <div className="flex-1 min-w-0">
+                              <div className="text-xs font-medium text-slate-700">{m.meterNumber}</div>
+                              <div className="text-[11px] text-slate-400">{m.utility} · {m.unit}</div>
+                            </div>
+                            {mReading && (
+                              <div className="text-right text-[11px] text-slate-400 tabular-nums">
+                                {Math.round(mReading.consumption).toLocaleString("nl-NL")} {m.unit}
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-[11px] text-slate-400 py-2">
+                      {lang === "nl"
+                        ? "Geen overeenkomende hoofdmeters gevonden voor dit complex"
+                        : "No matching main meters found for this building"}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Comparison strip: only when connected and has data */}
+              {link && linkedMeter && consumptionCostYTD > 0 && (
+                <div className="mt-3 ml-7 grid grid-cols-4 gap-3">
+                  <div>
+                    <div className="text-[11px] text-slate-400 mb-0.5">
+                      {lang === "nl" ? "Grootboek (YTD)" : "Ledger (YTD)"}
+                    </div>
+                    <div className="text-xs font-medium tabular-nums" style={{ color: brand.navy }}>
+                      {fmtEur(catTotal)}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[11px] text-slate-400 mb-0.5">
+                      {lang === "nl" ? "Verbruik (YTD)" : "Consumption (YTD)"}
+                    </div>
+                    <div className="text-xs font-medium tabular-nums" style={{ color: brand.blue }}>
+                      {fmtEur(consumptionCostYTD)}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[11px] text-slate-400 mb-0.5">
+                      {lang === "nl" ? "Verwacht jaareinde" : "Year-End Expected"}
+                    </div>
+                    <div className="text-xs font-medium tabular-nums text-slate-600">
+                      {fmtEur(yearEndExpected)}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[11px] text-slate-400 mb-0.5">
+                      {lang === "nl" ? "Afwijking" : "Variance"}
+                    </div>
+                    <div
+                      className="text-xs font-medium tabular-nums"
+                      style={{ color: varianceColor }}
+                    >
+                      {variance > 0 ? "+" : ""}{variance.toFixed(1)}%
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Connected but no consumption data */}
+              {link && linkedMeter && consumptionCostYTD === 0 && (
+                <div className="mt-2 ml-7 text-[11px] text-slate-400">
+                  {lang === "nl"
+                    ? `Geen verbruiksdata voor ${year}`
+                    : `No consumption data for ${year}`}
+                </div>
+              )}
+            </div>
+
+            {/* Expanded: monthly comparison chart */}
+            {isExpanded && link && linkedMeter && (
+              <div className="mx-4 mb-3 ml-11 p-3 rounded-lg border border-slate-100 bg-slate-50/30">
+                <div className="flex items-center gap-2 mb-2">
+                  <BarChart3 size={12} className="text-slate-400" />
+                  <span className="text-[11px] font-medium text-slate-500">
+                    {lang === "nl" ? "Maandvergelijking" : "Monthly Comparison"}
+                  </span>
+                  <span className="text-[10px] text-slate-300 ml-auto flex items-center gap-2">
+                    <span className="inline-block w-2 h-2 rounded-full" style={{ background: brand.navy, opacity: 0.7 }} />
+                    {lang === "nl" ? "Grootboek" : "Ledger"}
+                    <span className="inline-block w-2 h-2 rounded-full" style={{ background: brand.blue, opacity: 0.5 }} />
+                    {lang === "nl" ? "Verbruik" : "Consumption"}
+                  </span>
+                </div>
+                <ComparisonBarChart
+                  ledgerEntries={catEntries}
+                  meterReadings={meterReadings}
+                  unitPrice={cc.unitPrice}
+                  year={year}
+                />
+                {/* Consumption detail */}
+                {meterReadings && (
+                  <div className="mt-3 pt-2 border-t border-slate-100 flex items-center gap-4 text-[11px] text-slate-400">
+                    <span>
+                      {lang === "nl" ? "Verbruik" : "Consumption"}: <span className="font-medium text-slate-600 tabular-nums">{Math.round(consumption).toLocaleString("nl-NL")} {linkedMeter.unit}</span>
+                    </span>
+                    <span className="text-slate-200">·</span>
+                    <span>
+                      {lang === "nl" ? "Tarief" : "Rate"}: <span className="font-medium text-slate-600 tabular-nums">€{cc.unitPrice.toFixed(2)}/{cc.unit}</span>
+                    </span>
+                    <span className="text-slate-200">·</span>
+                    <span>
+                      {lang === "nl" ? "Verwachte kosten" : "Expected cost"}: <span className="font-medium text-slate-600 tabular-nums">{fmtEur(consumptionCostYTD)}</span>
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      {/* Unassigned entries */}
+      {unassigned.length > 0 && (
+        <div className="px-4 py-2 border-t border-slate-100">
+          <div className="flex items-center gap-3 ml-4">
+            <div className="flex-1">
+              <span className="text-xs text-slate-400 italic">
+                {lang === "nl" ? "Niet toegewezen" : "Unassigned"}
+              </span>
+            </div>
+            <div className="text-right">
+              <span className="text-xs font-medium tabular-nums text-slate-500">
+                {fmtEur(unassigned.reduce((s, e) => s + e.amount, 0))}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -874,6 +1260,16 @@ export default function ServiceDetailPage() {
                         budgetPerMonth={row.budgetForService / 12}
                       />
                     </div>
+
+                    {/* Cost Categories with Meter Connection */}
+                    {isFeatureEnabled("consumption") && (
+                      <CostCategoryMeterSection
+                        serviceId={serviceId}
+                        buildingId={row.building.id}
+                        year={year}
+                        lang={lang}
+                      />
+                    )}
 
                     {/* Entry table */}
                     <div className="overflow-x-auto">

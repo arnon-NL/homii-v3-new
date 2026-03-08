@@ -1,0 +1,29 @@
+[
+  {
+    "id": "CCML-001",
+    "costCategoryId": "CC-105-01",
+    "meterId": "MTR-S900002",
+    "buildingId": "10263",
+    "serviceId": "SVC-105",
+    "linkedAt": "2025-11-15",
+    "linkedBy": "user-admin"
+  },
+  {
+    "id": "CCML-002",
+    "costCategoryId": "CC-105-01",
+    "meterId": "MTR-S900786",
+    "buildingId": "10007",
+    "serviceId": "SVC-105",
+    "linkedAt": "2025-11-20",
+    "linkedBy": "user-admin"
+  },
+  {
+    "id": "CCML-003",
+    "costCategoryId": "CC-105-01",
+    "meterId": "MTR-S900061",
+    "buildingId": "10193",
+    "serviceId": "SVC-105",
+    "linkedAt": "2025-12-01",
+    "linkedBy": "user-admin"
+  }
+]

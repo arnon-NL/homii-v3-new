@@ -340,6 +340,16 @@ export function isFeatureEnabled(feature) {
   return featureMap[feature] ?? false;
 }
 
+// --- Meter Links ---
+export {
+  costCategoryMeterLinks,
+  getMeterLink,
+  getMeterLinksByBuilding,
+  getMeterLinksByService,
+  addMeterLink,
+  removeMeterLink,
+} from "./meterLinks.js";
+
 // --- Field Sources (shared across orgs) ---
 export { FIELD_SOURCES, getFieldSource, getEntitySource } from "./fieldSources.js";
 
