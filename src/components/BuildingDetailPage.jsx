@@ -1259,242 +1259,210 @@ export default function BuildingDetailPage() {
                                     {/* Expanded detail — progressive disclosure */}
                                     {isExpanded && (
                                       <div className="border-t border-slate-100 px-4 py-4 space-y-5 bg-slate-50/30">
-                                        {/* Cost basis indicator */}
-                                        <div
-                                          className="flex items-center gap-2 px-3 py-2 rounded-lg text-[11px]"
-                                          style={{ background: isFeatureEnabled("ledger") ? "#F0FAFB" : "#FFFBEB" }}
-                                        >
-                                          {isFeatureEnabled("ledger") ? (
-                                            <>
-                                              <FileText size={14} style={{ color: brand.blue }} />
-                                              <span className="font-medium" style={{ color: brand.blue }}>
-                                                {lang === "nl" ? "Kosten uit grootboek" : "Costs from ledger"}
-                                              </span>
-                                            </>
-                                          ) : (
-                                            <>
-                                              <Gauge size={14} style={{ color: brand.amber }} />
-                                              <span className="font-medium" style={{ color: brand.amber }}>
-                                                {lang === "nl" ? "Kosten uit verbruiksdata" : "Costs from consumption data"}
-                                              </span>
-                                              <span className="text-slate-400">·</span>
-                                              <span className="text-slate-500">
-                                                {lang === "nl" ? "prognose" : "forecast"}
-                                              </span>
-                                            </>
-                                          )}
-                                        </div>
-
-                                        {/* Section A: Budget Progress for this service */}
+                                        {/* ── Dual-track progress: Financial + Consumption ── */}
                                         {(() => {
-                                          const pct = bs.budget > 0 ? Math.round((bs.actual / bs.budget) * 100) : 0;
-                                          const barCol = overBudget ? brand.red : svcAheadOfPace ? brand.amber : brand.blue;
-                                          return (
-                                            <div>
-                                              <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider mb-2">
-                                                {lang === "nl" ? "Budget voortgang" : "Budget Progress"}
-                                              </p>
-                                              <div className="flex items-center gap-3">
-                                                <div className="flex-1 h-[6px] rounded-full bg-slate-100 overflow-hidden relative">
-                                                  <div
-                                                    className="h-full rounded-full transition-colors"
-                                                    style={{ width: `${Math.min(pct, 100)}%`, background: barCol }}
-                                                  />
-                                                  {/* Year pace marker */}
-                                                  {yearPct > 0 && yearPct < 100 && (
-                                                    <div
-                                                      className="absolute top-[-2px] w-[2px] h-[10px] bg-slate-300 rounded-full"
-                                                      style={{ left: `${yearPct}%` }}
-                                                      title={`${lang === "nl" ? "Jaar" : "Year"}: ${yearPct}%`}
-                                                    />
-                                                  )}
-                                                </div>
-                                                <span className="text-[11px] text-slate-500 tabular-nums shrink-0">
-                                                  {pct}% {lang === "nl" ? "van budget" : "of budget"}
-                                                </span>
-                                              </div>
-                                              <div className="flex items-center justify-between mt-1.5 text-[11px] text-slate-400">
-                                                <span>{fmt(bs.actual)} / {fmt(bs.budget)}</span>
-                                                <span>
-                                                  {lang === "nl" ? "Jaar" : "Year"} {yearPct}% {lang === "nl" ? "verstreken" : "elapsed"}
-                                                  {pct > yearPct + 10 && (
-                                                    <span className="ml-1 text-amber-500 font-medium">
-                                                      · {lang === "nl" ? "voor op schema" : "ahead of pace"}
-                                                    </span>
-                                                  )}
-                                                </span>
-                                              </div>
-                                            </div>
-                                          );
-                                        })()}
+                                          const hasLedger = isFeatureEnabled("ledger");
+                                          const cons = bs.consumption;
+                                          const hasConsumption = cons && cons.ytdConsumption != null && cons.unitPrice > 0;
 
-                                        {/* Section A2: Consumption Progress (from heating season data) */}
-                                        {(() => {
-                                          if (!isFeatureEnabled("consumptionControl")) return null;
-                                          const season = heatingSeasons.find(h => h.yearKey === year);
-                                          if (!season || season.ytdTotalCost == null) return null;
+                                          // Financial track data
+                                          const budgetPct = bs.budget > 0 ? Math.round((bs.actual / bs.budget) * 100) : 0;
+                                          const finBarCol = overBudget ? brand.red : svcAheadOfPace ? brand.amber : brand.blue;
+                                          const finStatus = overBudget
+                                            ? { label: { nl: "Over budget", en: "Over budget" }, color: brand.red }
+                                            : svcAheadOfPace
+                                            ? { label: { nl: "Voor op schema", en: "Ahead of pace" }, color: brand.amber }
+                                            : { label: { nl: "Op schema", en: "On pace" }, color: brand.blue };
 
-                                          const utilType = bs.service?.utility;
-                                          const utilCfg = {
-                                            heat: { unit: "GJ", color: "#EF4444" },
-                                            gas: { unit: "m³", color: "#F59E0B" },
-                                            water: { unit: "m³", color: "#3B82F6" },
-                                            warmWater: { unit: "m³", color: "#8B5CF6" },
-                                            electricity: { unit: "kWh", color: "#F59E0B" },
-                                          }[utilType] || { unit: "GJ", color: "#64748B" };
-
-                                          const unitPrice = season.m3Price || season.gjPrice || 0;
-                                          const vheCount = building.vhe || 1;
-
-                                          const now = new Date();
-                                          const start = new Date(season.seasonStart);
-                                          const end = new Date(season.seasonEnd);
-                                          const totalDays = Math.max(1, (end - start) / 86400000);
-                                          const elapsedDays = Math.max(0, Math.min(totalDays, (now - start) / 86400000));
-                                          const seasonPct = Math.round((elapsedDays / totalDays) * 100);
-
-                                          const ytdCost = season.ytdTotalCost || 0;
-                                          const endCost = (season.endCostPerApartment || 0) * vheCount;
-                                          const costPct = endCost > 0 ? Math.round((ytdCost / endCost) * 100) : 0;
-
-                                          const ytdConsumption = unitPrice > 0 ? ytdCost / unitPrice : 0;
-                                          const endConsumption = unitPrice > 0 ? endCost / unitPrice : 0;
+                                          // Consumption track data
+                                          let consPct = 0, consStatus = null, consBarCol = brand.blue;
+                                          if (hasConsumption) {
+                                            consPct = cons.endConsumption > 0 ? Math.round((cons.ytdConsumption / cons.endConsumption) * 100) : 0;
+                                            const consAhead = consPct > yearPct + 10;
+                                            const consOver = consPct > 100;
+                                            consBarCol = consOver ? brand.red : consAhead ? brand.amber : brand.blue;
+                                            consStatus = consOver
+                                              ? { label: { nl: "Boven verwachting", en: "Above expected" }, color: brand.red }
+                                              : consAhead
+                                              ? { label: { nl: "Voor op schema", en: "Ahead of pace" }, color: brand.amber }
+                                              : { label: { nl: "Op schema", en: "On pace" }, color: brand.blue };
+                                          }
 
                                           const fmtNum = (n) => Math.round(n).toLocaleString("nl-NL");
+                                          const showDual = hasLedger && hasConsumption;
 
                                           return (
-                                            <div>
-                                              <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider mb-3">
-                                                {lang === "nl" ? "Verbruiksvoortgang" : "Consumption Progress"}
-                                                <span className="ml-2 font-normal normal-case">
-                                                  ({lang === "nl" ? "seizoen" : "season"} {seasonPct}% {lang === "nl" ? "verstreken" : "elapsed"})
-                                                </span>
-                                              </p>
-                                              <div className="grid grid-cols-2 gap-3">
-                                                {/* Consumption */}
-                                                <div className="rounded-lg border border-slate-100 bg-white p-3">
-                                                  <div className="flex items-center gap-1.5 mb-2">
-                                                    <Gauge size={14} style={{ color: utilCfg.color }} />
-                                                    <span className="text-[11px] font-medium text-slate-500">
-                                                      {lang === "nl" ? "Verbruik" : "Consumption"} ({utilCfg.unit})
-                                                    </span>
+                                            <>
+                                              {/* Temporal anchor */}
+                                              <div className="flex items-center justify-between text-[11px] text-slate-400">
+                                                <div className="flex items-center gap-2 flex-1">
+                                                  <div className="flex-1 h-[3px] rounded-full bg-slate-100 overflow-hidden max-w-[140px]">
+                                                    <div className="h-full rounded-full bg-slate-300" style={{ width: `${yearPct}%` }} />
                                                   </div>
-                                                  <div className="flex items-baseline gap-2 mb-1">
-                                                    <span className="text-sm font-semibold tabular-nums" style={{ color: brand.navy }}>
-                                                      {fmtNum(ytdConsumption)}
-                                                    </span>
-                                                    <span className="text-[11px] text-slate-400">
-                                                      {lang === "nl" ? "tot heden" : "to date"}
-                                                    </span>
-                                                  </div>
-                                                  <div className="flex items-center gap-2 mb-2">
-                                                    <div className="flex-1 h-[4px] rounded-full bg-slate-100 overflow-hidden">
-                                                      <div
-                                                        className="h-full rounded-full"
-                                                        style={{ width: `${Math.min(costPct, 100)}%`, background: utilCfg.color }}
-                                                      />
-                                                    </div>
-                                                    <span className="text-[11px] text-slate-400 tabular-nums">{costPct}%</span>
-                                                  </div>
-                                                  <div className="text-[11px] text-slate-400">
-                                                    {lang === "nl" ? "Verwacht einde seizoen" : "Expected end of season"}: <span className="font-medium text-slate-600">{fmtNum(endConsumption)} {utilCfg.unit}</span>
-                                                  </div>
+                                                  <span className="tabular-nums">{lang === "nl" ? "Jaar" : "Year"} {yearPct}% {lang === "nl" ? "verstreken" : "elapsed"}</span>
                                                 </div>
-                                                {/* Costs */}
-                                                <div className="rounded-lg border border-slate-100 bg-white p-3">
-                                                  <div className="flex items-center gap-1.5 mb-2">
-                                                    <FileText size={14} style={{ color: brand.blue }} />
-                                                    <span className="text-[11px] font-medium text-slate-500">
-                                                      {lang === "nl" ? "Kosten" : "Costs"} (€)
+                                                {showDual && (() => {
+                                                  const gap = budgetPct - consPct;
+                                                  if (Math.abs(gap) < 10) return (
+                                                    <span className="text-[11px] font-medium" style={{ color: brand.blue }}>
+                                                      {lang === "nl" ? "Facturatie en verbruik lopen gelijk" : "Invoicing and consumption aligned"}
                                                     </span>
-                                                  </div>
-                                                  <div className="flex items-baseline gap-2 mb-1">
-                                                    <span className="text-sm font-semibold tabular-nums" style={{ color: brand.navy }}>
-                                                      {fmt(ytdCost)}
+                                                  );
+                                                  return gap > 0 ? (
+                                                    <span className="text-[11px] font-medium" style={{ color: brand.amber }}>
+                                                      {lang === "nl" ? "Facturatie loopt voor op verbruik" : "Invoicing ahead of consumption"}
                                                     </span>
-                                                    <span className="text-[11px] text-slate-400">
-                                                      {lang === "nl" ? "tot heden" : "to date"}
+                                                  ) : (
+                                                    <span className="text-[11px] font-medium" style={{ color: brand.red }}>
+                                                      {lang === "nl" ? "Verbruik loopt voor op facturatie" : "Consumption ahead of invoicing"}
                                                     </span>
-                                                  </div>
-                                                  <div className="flex items-center gap-2 mb-2">
-                                                    <div className="flex-1 h-[4px] rounded-full bg-slate-100 overflow-hidden">
-                                                      <div
-                                                        className="h-full rounded-full"
-                                                        style={{ width: `${Math.min(costPct, 100)}%`, background: brand.blue }}
-                                                      />
-                                                    </div>
-                                                    <span className="text-[11px] text-slate-400 tabular-nums">{costPct}%</span>
-                                                  </div>
-                                                  <div className="text-[11px] text-slate-400">
-                                                    {lang === "nl" ? "Verwacht einde seizoen" : "Expected end of season"}: <span className="font-medium text-slate-600">{fmt(endCost)}</span>
-                                                  </div>
-                                                  {unitPrice > 0 && (
-                                                    <div className="text-[11px] text-slate-400 mt-1">
-                                                      {lang === "nl" ? "Tarief" : "Rate"}: €{unitPrice.toFixed(2)}/{utilCfg.unit}
-                                                    </div>
-                                                  )}
-                                                </div>
+                                                  );
+                                                })()}
                                               </div>
-                                              {season.avgAdvance > 0 && (
-                                                <div className="mt-2 text-[11px] text-slate-400 flex items-center gap-2">
-                                                  <span>{lang === "nl" ? "Gem. voorschot" : "Avg. advance"}:</span>
-                                                  <span className="font-medium text-slate-600">{fmtEur2(season.avgAdvance)}/{lang === "nl" ? "mnd" : "mo"}</span>
-                                                  {season.endDebtorRisk > 0 && (
+
+                                              {/* Dual-track cards */}
+                                              <div className={showDual ? "grid grid-cols-2 gap-3" : ""}>
+                                                {/* Financial track */}
+                                                {hasLedger && (
+                                                  <div className="rounded-lg border border-slate-100 bg-white p-3">
+                                                    <div className="flex items-center justify-between mb-2.5">
+                                                      <div className="flex items-center gap-1.5">
+                                                        <FileText size={13} style={{ color: brand.blue }} />
+                                                        <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: brand.blue }}>
+                                                          {lang === "nl" ? "Financieel" : "Financial"}
+                                                        </span>
+                                                      </div>
+                                                      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full" style={{ color: finStatus.color, background: finStatus.color + "12" }}>
+                                                        {finStatus.label[lang]}
+                                                      </span>
+                                                    </div>
+                                                    <div className="text-[11px] text-slate-400 mb-1">
+                                                      {lang === "nl" ? "Geboekt" : "Booked"}
+                                                    </div>
+                                                    <div className="flex items-baseline gap-2 mb-2">
+                                                      <span className="text-base font-semibold tabular-nums" style={{ color: brand.navy }}>
+                                                        {fmt(bs.actual)}
+                                                      </span>
+                                                      <span className="text-[11px] text-slate-400 tabular-nums">
+                                                        / {fmt(bs.budget)}
+                                                      </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                      <div className="flex-1 h-[5px] rounded-full bg-slate-100 overflow-hidden relative">
+                                                        <div className="h-full rounded-full" style={{ width: `${Math.min(budgetPct, 100)}%`, background: finBarCol }} />
+                                                        {yearPct > 0 && yearPct < 100 && (
+                                                          <div className="absolute top-[-2px] w-[2px] h-[9px] rounded-full" style={{ left: `${yearPct}%`, background: "#94A3B8" }} />
+                                                        )}
+                                                      </div>
+                                                      <span className="text-[11px] text-slate-500 tabular-nums shrink-0 font-medium">{budgetPct}%</span>
+                                                    </div>
+                                                    <div className="text-[11px] text-slate-400">
+                                                      {bs.ledgerEntries || 0} / {bs.expectedEntries || 12} {lang === "nl" ? "facturen ontvangen" : "invoices received"}
+                                                    </div>
+                                                  </div>
+                                                )}
+
+                                                {/* Consumption track */}
+                                                {hasConsumption && (
+                                                  <div className="rounded-lg border border-slate-100 bg-white p-3">
+                                                    <div className="flex items-center justify-between mb-2.5">
+                                                      <div className="flex items-center gap-1.5">
+                                                        <Gauge size={13} style={{ color: brand.amber }} />
+                                                        <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: brand.amber }}>
+                                                          {lang === "nl" ? "Verbruik" : "Consumption"}
+                                                        </span>
+                                                      </div>
+                                                      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full" style={{ color: consStatus.color, background: consStatus.color + "12" }}>
+                                                        {consStatus.label[lang]}
+                                                      </span>
+                                                    </div>
+                                                    <div className="text-[11px] text-slate-400 mb-1">
+                                                      {lang === "nl" ? "Gemeten" : "Metered"} · {cons.mainMeterNumber || cons.unit}
+                                                      {cons.allocationShare < 1 && (
+                                                        <span className="ml-1 text-slate-300">({Math.round(cons.allocationShare * 100)}%)</span>
+                                                      )}
+                                                    </div>
+                                                    <div className="flex items-baseline gap-2 mb-2">
+                                                      <span className="text-base font-semibold tabular-nums" style={{ color: brand.navy }}>
+                                                        {fmtNum(cons.ytdConsumption)} {cons.unit}
+                                                      </span>
+                                                      <span className="text-[11px] text-slate-400 tabular-nums">
+                                                        → {fmtEur2(cons.ytdCost)}
+                                                      </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                      <div className="flex-1 h-[5px] rounded-full bg-slate-100 overflow-hidden relative">
+                                                        <div className="h-full rounded-full" style={{ width: `${Math.min(consPct, 100)}%`, background: consBarCol }} />
+                                                        {yearPct > 0 && yearPct < 100 && (
+                                                          <div className="absolute top-[-2px] w-[2px] h-[9px] rounded-full" style={{ left: `${yearPct}%`, background: "#94A3B8" }} />
+                                                        )}
+                                                      </div>
+                                                      <span className="text-[11px] text-slate-500 tabular-nums shrink-0 font-medium">{consPct}%</span>
+                                                    </div>
+                                                    <div className="text-[11px] text-slate-400">
+                                                      {lang === "nl" ? "Verwacht einde jaar" : "Expected year-end"}: <span className="font-medium text-slate-600">{fmtNum(cons.endConsumption)} {cons.unit}</span>
+                                                      <span className="text-slate-300 mx-1">→</span>
+                                                      <span className="font-medium text-slate-600">{fmtEur2(cons.endCost)}</span>
+                                                    </div>
+                                                    {cons.unitPrice > 0 && (
+                                                      <div className="text-[11px] text-slate-400 mt-1">
+                                                        {lang === "nl" ? "Tarief" : "Rate"}: €{cons.unitPrice.toFixed(2)}/{cons.unit}
+                                                      </div>
+                                                    )}
+                                                  </div>
+                                                )}
+
+                                                {/* Energy-only fallback: single financial card using consumption data as financial source */}
+                                                {!hasLedger && !hasConsumption && (
+                                                  <div className="rounded-lg border border-slate-100 bg-white p-3">
+                                                    <div className="flex items-center gap-1.5 mb-2">
+                                                      <Gauge size={13} style={{ color: brand.amber }} />
+                                                      <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: brand.amber }}>
+                                                        {lang === "nl" ? "Kosten uit verbruiksdata" : "Costs from consumption data"}
+                                                      </span>
+                                                    </div>
+                                                    <div className="flex items-baseline gap-2 mb-2">
+                                                      <span className="text-base font-semibold tabular-nums" style={{ color: brand.navy }}>
+                                                        {fmt(bs.actual)}
+                                                      </span>
+                                                      <span className="text-[11px] text-slate-400 tabular-nums">/ {fmt(bs.budget)}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                      <div className="flex-1 h-[5px] rounded-full bg-slate-100 overflow-hidden relative">
+                                                        <div className="h-full rounded-full" style={{ width: `${Math.min(budgetPct, 100)}%`, background: finBarCol }} />
+                                                        {yearPct > 0 && yearPct < 100 && (
+                                                          <div className="absolute top-[-2px] w-[2px] h-[9px] rounded-full" style={{ left: `${yearPct}%`, background: "#94A3B8" }} />
+                                                        )}
+                                                      </div>
+                                                      <span className="text-[11px] text-slate-500 tabular-nums shrink-0">{budgetPct}%</span>
+                                                    </div>
+                                                  </div>
+                                                )}
+                                              </div>
+
+                                              {/* Tenant impact — shown when consumption data provides it */}
+                                              {hasConsumption && cons.avgAdvance > 0 && (
+                                                <div className="flex items-center gap-3 text-[11px] text-slate-400 flex-wrap">
+                                                  <span>{lang === "nl" ? "Gem. voorschot" : "Avg. advance"}: <span className="font-medium text-slate-600">{fmtEur2(cons.avgAdvance)}/{lang === "nl" ? "mnd" : "mo"}</span></span>
+                                                  {cons.endDebtorRisk > 0 && (
                                                     <>
                                                       <span className="text-slate-300">·</span>
                                                       <span style={{ color: brand.amber }}>
-                                                        {lang === "nl" ? "Debiteurrisico" : "Debtor risk"}: {fmt(season.endDebtorRisk)}
+                                                        {lang === "nl" ? "Debiteurrisico" : "Debtor risk"}: {fmt(cons.endDebtorRisk)}
+                                                      </span>
+                                                    </>
+                                                  )}
+                                                  {cons.tenantExceedingBudget > 0 && (
+                                                    <>
+                                                      <span className="text-slate-300">·</span>
+                                                      <span style={{ color: brand.red }}>
+                                                        {cons.tenantExceedingBudget} {lang === "nl" ? "huurders boven budget" : "tenants over budget"}
                                                       </span>
                                                     </>
                                                   )}
                                                 </div>
                                               )}
-                                            </div>
-                                          );
-                                        })()}
-
-                                        {/* Section B: Consumption insight (metered services — cross-cutting, stays at service level) */}
-                                        {isFeatureEnabled("consumptionControl") && bs.service?.metered && (() => {
-                                          const utilityMap = {
-                                            "SVC-108": "heat", "SVC-107": "heat",
-                                            "SVC-102": "water", "SVC-104": "water",
-                                            "SVC-105": "electricity", "SVC-106": "electricity",
-                                            "SVC-110": "electricity", "SVC-133": "electricity",
-                                          };
-                                          const utilType = utilityMap[bs.serviceId];
-                                          const svcMeters = meterList.filter((m) => m.utility === utilType && m.type === "main");
-                                          const totalConsumption = svcMeters.reduce((s, m) => s + (m.consumption || 0), 0);
-                                          const meteredCats = costCats.filter((cc) => cc.unit && cc.unitPrice);
-                                          const avgUnitPrice = meteredCats.length > 0
-                                            ? meteredCats.reduce((s, cc) => s + Math.abs(cc.unitPrice) * cc.budgetShare, 0) / meteredCats.reduce((s, cc) => s + cc.budgetShare, 0)
-                                            : 0;
-                                          const expectedCost = totalConsumption * avgUnitPrice;
-                                          const variancePct = expectedCost > 0 ? Math.round(((bs.actual - expectedCost) / expectedCost) * 100) : 0;
-                                          const unit = meteredCats[0]?.unit || "—";
-                                          if (totalConsumption === 0 || avgUnitPrice === 0) return null;
-                                          return (
-                                            <div className="px-3 py-3 rounded-lg bg-white border border-slate-100">
-                                              <div className="grid grid-cols-3 gap-4 text-[11px]">
-                                                <div>
-                                                  <p className="text-slate-400 mb-1">{lang === "nl" ? "Verbruik" : "Consumption"}</p>
-                                                  <p className="font-medium text-slate-700 tabular-nums">{totalConsumption.toLocaleString("nl-NL")} {unit}</p>
-                                                </div>
-                                                <div>
-                                                  <p className="text-slate-400 mb-1">{lang === "nl" ? "Verwachte kosten" : "Expected cost"}</p>
-                                                  <p className="font-medium text-slate-700 tabular-nums">{fmtEur2(expectedCost)}</p>
-                                                  <p className="text-[11px] text-slate-400 mt-0.5">{totalConsumption.toLocaleString("nl-NL")} × €{avgUnitPrice.toFixed(2)}/{unit}</p>
-                                                </div>
-                                                <div>
-                                                  <p className="text-slate-400 mb-1">{lang === "nl" ? "Geboekt" : "Booked"}</p>
-                                                  <p className="font-medium tabular-nums" style={{ color: brand.navy }}>{fmtEur2(bs.actual)}</p>
-                                                  {Math.abs(variancePct) > 15 && (
-                                                    <p className="text-[11px] font-medium mt-0.5" style={{ color: variancePct > 0 ? brand.red : brand.amber }}>
-                                                      {variancePct > 0 ? "+" : ""}{variancePct}% {lang === "nl" ? "afwijking" : "variance"}
-                                                    </p>
-                                                  )}
-                                                </div>
-                                              </div>
-                                            </div>
+                                            </>
                                           );
                                         })()}
 
