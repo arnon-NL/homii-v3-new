@@ -695,37 +695,6 @@ export default function BuildingDetailPage() {
 
                   return (
                 <div className="mt-4 space-y-4">
-                  {/* ── Cost basis indicator ── */}
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg mb-3 text-[11px] bg-slate-50">
-                    {isFeatureEnabled("ledger") ? (
-                      <>
-                        <FileText size={13} className="text-slate-400 shrink-0" />
-                        <span className="font-medium text-slate-600">
-                          {lang === "nl" ? "Kosten uit grootboek" : "Costs from ledger"}
-                        </span>
-                        <span className="text-slate-300">·</span>
-                        <span className="text-slate-400">
-                          {lang === "nl"
-                            ? "Werkelijke kosten op basis van facturen en boekingen per kostensoort"
-                            : "Actual costs from invoices and bookings per cost category"}
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <Gauge size={13} className="text-slate-400 shrink-0" />
-                        <span className="font-medium text-slate-600">
-                          {lang === "nl" ? "Kosten uit verbruiksdata" : "Costs from consumption data"}
-                        </span>
-                        <span className="text-slate-300">·</span>
-                        <span className="text-slate-400">
-                          {lang === "nl"
-                            ? "Verwachte kosten berekend op meterdata — geen kostensoorten beschikbaar"
-                            : "Expected costs calculated from metering data — no cost categories available"}
-                        </span>
-                      </>
-                    )}
-                  </div>
-
                   {/* ── Layer 1: Mode-aware Verdict Card ── */}
                   {isFeatureEnabled("ledger") && isPastYear && settlement ? (
                     /* ═══ SETTLEMENT MODE — Readiness cockpit ═══ */
