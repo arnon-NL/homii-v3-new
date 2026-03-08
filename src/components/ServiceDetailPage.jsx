@@ -54,9 +54,9 @@ const fmtDate = (d) => {
 
 /* ── Status config ── */
 const statusConfig = {
-  booked:  { color: brand.blue, bg: "#F0FAFB", label: { en: "Booked", nl: "Geboekt" }, icon: CheckCircle2 },
-  pending: { color: brand.amber, bg: "#FFFBEB", label: { en: "Pending", nl: "In afwachting" }, icon: Clock },
-  flagged: { color: brand.red, bg: "#FEF2F2", label: { en: "Flagged", nl: "Gemarkeerd" }, icon: AlertTriangle },
+  booked:  { color: brand.muted, bg: "#F8FAFC", label: { en: "Booked", nl: "Geboekt" }, icon: CheckCircle2 },
+  pending: { color: brand.amber, bg: "#F8FAFC", label: { en: "Pending", nl: "In afwachting" }, icon: Clock },
+  flagged: { color: brand.red, bg: "#F8FAFC", label: { en: "Flagged", nl: "Gemarkeerd" }, icon: AlertTriangle },
 };
 
 function LedgerStatusBadge({ status }) {
@@ -69,7 +69,7 @@ function LedgerStatusBadge({ status }) {
       className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium"
       style={{ background: cfg.bg, color: cfg.color }}
     >
-      <Icon size={10} />
+      <Icon size={14} />
       {cfg.label[lang]}
     </span>
   );
@@ -110,11 +110,11 @@ function MonthlyBarChart({ entries, budgetPerMonth }) {
 
 /* ── Utility config for energy view ── */
 const utilityConfig = {
-  heat: { label: { en: "Heat", nl: "Warmte" }, unit: "GJ", color: "#EF4444" },
-  gas: { label: { en: "Gas", nl: "Gas" }, unit: "m³", color: "#F59E0B" },
-  water: { label: { en: "Water", nl: "Water" }, unit: "m³", color: "#3B82F6" },
-  warmWater: { label: { en: "Warm Water", nl: "Warm Water" }, unit: "m³", color: "#8B5CF6" },
-  electricity: { label: { en: "Electricity", nl: "Elektriciteit" }, unit: "kWh", color: "#10B981" },
+  heat: { label: { en: "Heat", nl: "Warmte" }, unit: "GJ", color: "#64748B" },
+  gas: { label: { en: "Gas", nl: "Gas" }, unit: "m³", color: "#64748B" },
+  water: { label: { en: "Water", nl: "Water" }, unit: "m³", color: "#64748B" },
+  warmWater: { label: { en: "Warm Water", nl: "Warm Water" }, unit: "m³", color: "#64748B" },
+  electricity: { label: { en: "Electricity", nl: "Elektriciteit" }, unit: "kWh", color: "#64748B" },
 };
 
 /* ── Main component ── */
@@ -322,13 +322,13 @@ export default function ServiceDetailPage() {
                   label: { en: "Variance", nl: "Afwijking" },
                   value: fmtEur(energyTotalActual - energyTotalBudget),
                   sub: energyTotalBudget > 0 ? `${(((energyTotalActual - energyTotalBudget) / energyTotalBudget) * 100).toFixed(1)}%` : "—",
-                  color: energyTotalActual > energyTotalBudget ? brand.red : brand.blue,
+                  color: energyTotalActual > energyTotalBudget ? brand.red : brand.subtle,
                 },
                 {
                   label: { en: "Meters", nl: "Meters" },
                   value: energyTotalMeters,
                   sub: `${energyMainMeters} ${lang === "nl" ? "hoofdmeters" : "main meters"}`,
-                  color: brand.blue,
+                  color: brand.subtle,
                 },
               ].map((card, i) => (
                 <div key={i} className="rounded-lg border border-slate-200 bg-white p-3">
@@ -376,7 +376,7 @@ export default function ServiceDetailPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <Building2 size={12} className="text-slate-400 shrink-0" />
+                          <Building2 size={14} className="text-slate-400 shrink-0" />
                           <span className="text-sm font-medium truncate" style={{ color: brand.navy }}>{row.building.complex}</span>
                           <span className="text-[11px] text-slate-400 shrink-0">{row.building.complexId}</span>
                         </div>
@@ -402,9 +402,9 @@ export default function ServiceDetailPage() {
                         {row.budget > 0 && (
                           <div
                             className="text-[11px] tabular-nums flex items-center justify-end gap-1"
-                            style={{ color: row.variance > 0 ? brand.red : brand.blue }}
+                            style={{ color: row.variance > 0 ? brand.red : brand.subtle }}
                           >
-                            {row.variance > 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
+                            {row.variance > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                             {row.variancePct > 0 ? "+" : ""}{row.variancePct.toFixed(1)}%
                           </div>
                         )}
@@ -417,10 +417,10 @@ export default function ServiceDetailPage() {
                         {/* Main meters */}
                         {row.mainMeters.length > 0 && (
                           <div className="px-4 py-3 border-b border-slate-50">
-                            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
                               {lang === "nl" ? "Hoofdmeters" : "Main Meters"}
                             </p>
-                            <div className="space-y-1.5">
+                            <div className="space-y-2">
                               {row.mainMeters.map((m) => (
                                 <div key={m.id} className="flex items-center gap-3 text-xs">
                                   <span className="w-2 h-2 rounded-full shrink-0" style={{ background: utilCfg.color }} />
@@ -435,7 +435,7 @@ export default function ServiceDetailPage() {
                         {/* Sub meter summary */}
                         {row.subMeters.length > 0 && (
                           <div className="px-4 py-3 border-b border-slate-50">
-                            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">
+                            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">
                               {lang === "nl" ? "Submeters" : "Sub Meters"}
                             </p>
                             <p className="text-xs text-slate-500">
@@ -451,7 +451,7 @@ export default function ServiceDetailPage() {
                         {/* Season info */}
                         {row.season && (
                           <div className="px-4 py-3 border-b border-slate-50">
-                            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1">
+                            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">
                               {lang === "nl" ? "Stookseizoen" : "Heating Season"}
                             </p>
                             <p className="text-xs text-slate-500">
@@ -503,25 +503,25 @@ export default function ServiceDetailPage() {
               label: { en: "Variance", nl: "Afwijking" },
               value: fmtEur(totalBooked - totalBudget),
               sub: `${totalBudget > 0 ? (((totalBooked - totalBudget) / totalBudget) * 100).toFixed(1) : 0}%`,
-              color: totalBooked > totalBudget ? brand.red : brand.blue,
+              color: totalBooked > totalBudget ? brand.red : brand.subtle,
             },
             {
               label: { en: "Completeness", nl: "Volledigheid" },
               value: `${completeness}%`,
               sub: `${allEntries.length} ${lang === "nl" ? "boekingen" : "entries"}`,
-              color: completeness >= 90 ? brand.blue : completeness >= 70 ? brand.amber : brand.red,
+              color: completeness >= 90 ? brand.subtle : completeness >= 70 ? brand.amber : brand.red,
             },
             {
               label: { en: "Flagged", nl: "Gemarkeerd" },
               value: totalFlagged,
               sub: lang === "nl" ? "Vereist actie" : "Needs action",
-              color: totalFlagged > 0 ? brand.red : brand.blue,
+              color: totalFlagged > 0 ? brand.red : brand.subtle,
             },
             {
               label: { en: "Pending", nl: "In afwachting" },
               value: totalPending,
               sub: lang === "nl" ? "Nog te boeken" : "Awaiting booking",
-              color: totalPending > 0 ? brand.amber : brand.blue,
+              color: totalPending > 0 ? brand.amber : brand.subtle,
             },
           ].map((card, i) => (
             <div
@@ -632,7 +632,7 @@ export default function ServiceDetailPage() {
                   {/* Building info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <Building2 size={12} className="text-slate-400 shrink-0" />
+                      <Building2 size={14} className="text-slate-400 shrink-0" />
                       <span
                         className="text-sm font-medium truncate"
                         style={{ color: brand.navy }}
@@ -653,13 +653,13 @@ export default function ServiceDetailPage() {
                   <div className="hidden sm:flex items-center gap-3 shrink-0">
                     {row.flagged > 0 && (
                       <span className="inline-flex items-center gap-1 text-[11px] font-medium" style={{ color: brand.red }}>
-                        <AlertTriangle size={11} />
+                        <AlertTriangle size={14} />
                         {row.flagged}
                       </span>
                     )}
                     {row.pending > 0 && (
                       <span className="inline-flex items-center gap-1 text-[11px] font-medium" style={{ color: brand.amber }}>
-                        <Clock size={11} />
+                        <Clock size={14} />
                         {row.pending}
                       </span>
                     )}
@@ -672,12 +672,12 @@ export default function ServiceDetailPage() {
                     </div>
                     <div
                       className="text-[11px] tabular-nums flex items-center justify-end gap-1"
-                      style={{ color: row.variance > 0 ? brand.red : brand.blue }}
+                      style={{ color: row.variance > 0 ? brand.red : brand.subtle }}
                     >
                       {row.variance > 0 ? (
-                        <TrendingUp size={10} />
+                        <TrendingUp size={14} />
                       ) : (
-                        <TrendingDown size={10} />
+                        <TrendingDown size={14} />
                       )}
                       {row.variancePct > 0 ? "+" : ""}
                       {row.variancePct.toFixed(1)}%
@@ -743,7 +743,7 @@ export default function ServiceDetailPage() {
                                 </div>
                                 {entry.flag && (
                                   <div className="text-[11px] mt-0.5 flex items-center gap-1" style={{ color: brand.red }}>
-                                    <AlertTriangle size={9} />
+                                    <AlertTriangle size={14} />
                                     {entry.flag[lang] || entry.flag.en}
                                   </div>
                                 )}

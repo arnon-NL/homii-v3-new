@@ -97,7 +97,7 @@ const fmt = (v) =>
 
 /* ── Ledger status config ── */
 const ledgerStatusCfg = {
-  booked:  { color: brand.blue, bg: "#F0FAFB", label: { en: "Booked", nl: "Geboekt" }, icon: CheckCircle2 },
+  booked:  { color: brand.muted, bg: "#F8FAFC", label: { en: "Booked", nl: "Geboekt" }, icon: CheckCircle2 },
   pending: { color: brand.amber, bg: "#FFFBEB", label: { en: "Pending", nl: "In afwachting" }, icon: Clock },
   flagged: { color: brand.red,   bg: "#FEF2F2", label: { en: "Flagged", nl: "Gemarkeerd" }, icon: AlertTriangle },
 };
@@ -119,17 +119,17 @@ function LedgerStatusBadge({ status, lang }) {
 
 /* ── Utility icon ── */
 const utilityIcon = {
-  heat: { icon: Flame, color: "#EF4444" },
+  heat: { icon: Flame, color: "#64748B" },
   water: { icon: Droplets, color: "#64748B" },
   electricity: { icon: Zap, color: "#64748B" },
 };
 
 /* ── Activity icon ── */
 const activityIcons = {
-  meter_reading: { icon: Gauge, color: brand.blue },
-  ledger_entry: { icon: FileText, color: brand.blue },
+  meter_reading: { icon: Gauge, color: brand.muted },
+  ledger_entry: { icon: FileText, color: brand.muted },
   distribution: { icon: Activity, color: brand.amber },
-  contract_change: { icon: Users, color: brand.blue },
+  contract_change: { icon: Users, color: brand.muted },
   alert: { icon: AlertTriangle, color: brand.red },
 };
 
@@ -137,8 +137,8 @@ const activityIcons = {
 const settlementStatusConfig = {
   not_started:  { icon: Circle,        color: "#94A3B8", bg: "#F8FAFC", label: { en: "Not started",  nl: "Niet gestart" } },
   monitoring:   { icon: Clock,         color: "#94A3B8", bg: "#F8FAFC", label: { en: "Monitoring",   nl: "Monitoring" } },
-  in_review:    { icon: AlertTriangle, color: "#F59E0B", bg: "#FFFBEB", label: { en: "In review",    nl: "In controle" } },
-  approved:     { icon: FileCheck,     color: "#3EB1C8", bg: "#F0FAFB", label: { en: "Approved",     nl: "Goedgekeurd" } },
+  in_review:    { icon: AlertTriangle, color: "#F59E0B", bg: "#F8FAFC", label: { en: "In review",    nl: "In controle" } },
+  approved:     { icon: FileCheck,     color: "#94A3B8", bg: "#F8FAFC", label: { en: "Approved",     nl: "Goedgekeurd" } },
   distributed:  { icon: Send,          color: "#94A3B8", bg: "#F8FAFC", label: { en: "Distributed",  nl: "Afgerekend" } },
 };
 
@@ -147,7 +147,7 @@ function CheckIcon({ passed, label }) {
   return (
     <div className="flex items-center gap-2" title={label}>
       {passed ? (
-        <CheckCircle2 size={14} className="text-green-500" />
+        <CheckCircle2 size={14} className="text-slate-400" />
       ) : passed === false ? (
         <AlertTriangle size={14} className="text-amber-500" />
       ) : (
@@ -162,7 +162,7 @@ function CheckIcon({ passed, label }) {
 
 /* ── Settlement check status badge ── */
 const checkStatusConfig = {
-  approved: { icon: CheckCircle2, color: "#3EB1C8", bg: "#F0FAFB", label: { en: "Approved",  nl: "Goedgekeurd" } },
+  approved: { icon: CheckCircle2, color: "#94A3B8", bg: "#F8FAFC", label: { en: "Approved",  nl: "Goedgekeurd" } },
   verified: { icon: ShieldCheck,  color: "#94A3B8", bg: "#F8FAFC", label: { en: "Verified",  nl: "Geverifieerd" } },
   flagged:  { icon: Flag,         color: "#EF4444", bg: "#FEF2F2", label: { en: "Flagged",   nl: "Gemarkeerd" } },
   pending:  { icon: Clock,        color: "#94A3B8", bg: "#F8FAFC", label: { en: "Pending",   nl: "In afwachting" } },
@@ -223,7 +223,7 @@ function YearSelector({ year, setYear, availableYears, heatingSeasons }) {
         const endDate = new Date(activeSeason.seasonEnd);
         const fmtMonth = (d) => d.toLocaleDateString("nl-NL", { month: "short", year: "numeric" });
         return (
-          <span className="text-[10px] text-slate-400 ml-1">
+          <span className="text-[11px] text-slate-400 ml-1">
             {fmtMonth(startDate)} – {fmtMonth(endDate)}
           </span>
         );
@@ -775,7 +775,7 @@ export default function BuildingDetailPage() {
                                 {item.action && (
                                   <button
                                     onClick={item.action}
-                                    className="text-[11px] font-medium shrink-0 px-2 py-0.5 rounded hover:bg-slate-100 transition-colors"
+                                    className="text-[11px] font-medium shrink-0 px-2 py-1 rounded hover:bg-slate-100 transition-colors"
                                     style={{ color: brand.blue }}
                                   >
                                     {item.actionLabel[lang] || item.actionLabel.en} →
@@ -816,7 +816,7 @@ export default function BuildingDetailPage() {
                         </div>
                         <div className="divide-y divide-slate-100">
                           {activityList.slice(0, 5).map((act) => (
-                            <div key={act.id} className="flex items-start gap-3 px-4 py-2.5">
+                            <div key={act.id} className="flex items-start gap-3 px-4 py-2">
                               <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 shrink-0" />
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs text-slate-600 truncate">
@@ -866,7 +866,7 @@ export default function BuildingDetailPage() {
                       {/* Back navigation */}
                       <button
                         onClick={() => setDistDrilldown(null)}
-                        className="flex items-center gap-1.5 text-xs font-medium transition-colors hover:underline"
+                        className="flex items-center gap-1 text-xs font-medium transition-colors hover:underline"
                         style={{ color: brand.blue }}
                       >
                         <ArrowLeft size={14} />
@@ -922,7 +922,7 @@ export default function BuildingDetailPage() {
                         <>
                           {/* ── LANE 1: Cost Inputs ── */}
                           <div>
-                            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
                               {lang === "nl" ? "1. Kostenopbouw" : "1. Cost Inputs"}
                             </p>
                             <Card className="border-slate-200 bg-white">
@@ -933,7 +933,7 @@ export default function BuildingDetailPage() {
                                       <p className="text-xs font-medium text-slate-700">
                                         {input.label[lang] || input.label.en}
                                       </p>
-                                      <p className="text-[10px] text-slate-400 mt-0.5 font-mono truncate">
+                                      <p className="text-[11px] text-slate-400 mt-0.5 font-mono truncate">
                                         {input.formula}
                                       </p>
                                     </div>
@@ -958,7 +958,7 @@ export default function BuildingDetailPage() {
                           {/* ── LANE 2: Component Split ── */}
                           {dm.splits.length > 0 && (
                             <div>
-                              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
                                 {lang === "nl" ? "2. Componentensplitsing" : "2. Component Split"}
                               </p>
                               <Card className="border-slate-200 bg-white">
@@ -976,25 +976,25 @@ export default function BuildingDetailPage() {
                                             <p className="text-xs font-medium text-slate-700">
                                               {split.label[lang] || split.label.en}
                                             </p>
-                                            <div className="flex items-center gap-1.5 mt-0.5">
-                                              <span className="text-[10px] text-slate-400">
+                                            <div className="flex items-center gap-1 mt-0.5">
+                                              <span className="text-[11px] text-slate-400">
                                                 {(split.ratio * 100).toFixed(1)}% {lang === "nl" ? "van" : "of"} {sourceLabel[lang] || sourceLabel.en}
                                               </span>
                                               {split.method === "meter_based" && (
-                                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-medium bg-blue-50" style={{ color: brand.blue }}>
+                                                <span className="inline-flex items-center gap-0.5 px-1.5 py-1 rounded text-[9px] font-medium bg-blue-50" style={{ color: brand.blue }}>
                                                   <Gauge size={9} />
                                                   {lang === "nl" ? "meter" : "metered"}
                                                 </span>
                                               )}
                                               {split.method === "meter_ratio" && (
-                                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-medium bg-blue-50" style={{ color: brand.blue }}>
+                                                <span className="inline-flex items-center gap-0.5 px-1.5 py-1 rounded text-[9px] font-medium bg-blue-50" style={{ color: brand.blue }}>
                                                   <Gauge size={9} />
                                                   {lang === "nl" ? "verhouding" : "ratio"}
                                                 </span>
                                               )}
                                             </div>
                                             {split.note && (
-                                              <p className="text-[10px] text-slate-400 mt-0.5 italic">
+                                              <p className="text-[11px] text-slate-400 mt-0.5 italic">
                                                 {split.note[lang] || split.note.en}
                                               </p>
                                             )}
@@ -1023,7 +1023,7 @@ export default function BuildingDetailPage() {
 
                           {/* ── LANE 3: Invoice Lines ── */}
                           <div>
-                            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
                               {dm.splits.length > 0
                                 ? (lang === "nl" ? "3. Verdeelregels" : "3. Invoice Lines")
                                 : (lang === "nl" ? "2. Verdeelregels" : "2. Invoice Lines")}
@@ -1041,15 +1041,15 @@ export default function BuildingDetailPage() {
                                           <p className="text-xs font-medium text-slate-700">
                                             {line.label[lang] || line.label.en}
                                           </p>
-                                          <div className="flex items-center gap-1.5 mt-0.5">
-                                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-medium bg-slate-100 text-slate-500">
+                                          <div className="flex items-center gap-1 mt-0.5">
+                                            <span className="inline-flex items-center gap-0.5 px-1.5 py-1 rounded text-[9px] font-medium bg-slate-100 text-slate-500">
                                               {line.keyLabel[lang] || line.keyLabel.en}
                                             </span>
                                           </div>
                                         </div>
                                         <div className="text-right ml-4">
                                           <span className="text-xs font-semibold text-slate-700 tabular-nums">{fmt(lineAmt)}</span>
-                                          <p className="text-[10px] text-slate-400 tabular-nums">{pct.toFixed(1)}%</p>
+                                          <p className="text-[11px] text-slate-400 tabular-nums">{pct.toFixed(1)}%</p>
                                         </div>
                                       </div>
                                       {/* Proportion bar */}
@@ -1077,14 +1077,14 @@ export default function BuildingDetailPage() {
 
                           {/* ── Distribution key legend ── */}
                           <div className="px-1">
-                            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+                            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
                               {lang === "nl" ? "Verdeelsleutels" : "Distribution Keys"}
                             </p>
                             <div className="flex flex-wrap gap-x-4 gap-y-1">
                               {[...new Set(dm.invoiceLines.map(l => l.distributionKey))].map(key => {
                                 const line = dm.invoiceLines.find(l => l.distributionKey === key);
                                 return (
-                                  <span key={key} className="text-[10px] text-slate-400">
+                                  <span key={key} className="text-[11px] text-slate-400">
                                     <span className="font-mono text-slate-500">{key.replace("cost_key_", "")}</span>
                                     {" = "}{line.keyLabel[lang] || line.keyLabel.en}
                                   </span>
@@ -1343,7 +1343,7 @@ export default function BuildingDetailPage() {
                                                   <div key={cc.id} className="rounded-lg bg-white border border-slate-100 overflow-hidden">
                                                     {/* Cost Category header row — clickable */}
                                                     <div
-                                                      className="flex items-center gap-2.5 px-3 py-2.5 cursor-pointer hover:bg-slate-50/50 transition-colors"
+                                                      className="flex items-center gap-2.5 px-3 py-2 cursor-pointer hover:bg-slate-50/50 transition-colors"
                                                       onClick={() => toggleCostCat(cc.id)}
                                                     >
                                                       {isCcExpanded
@@ -1351,23 +1351,23 @@ export default function BuildingDetailPage() {
                                                         : <ChevronRight size={12} className="text-slate-400 shrink-0" />
                                                       }
                                                       <div className="flex-1 min-w-0">
-                                                        <div className="flex items-center gap-1.5">
+                                                        <div className="flex items-center gap-1">
                                                           <span className="text-[11px] font-medium text-slate-700">{(cc.name || cc.label)?.[lang] || (cc.name || cc.label)?.en || cc.id}</span>
                                                           {cc.supplier && (
                                                             <span className="text-[11px] text-slate-400 truncate hidden sm:inline">· {cc.supplier}</span>
                                                           )}
                                                           {ccFlagged > 0 && (
-                                                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-50 font-medium" style={{ color: brand.red }}>
+                                                            <span className="text-[11px] px-1.5 py-1 rounded bg-red-50 font-medium" style={{ color: brand.red }}>
                                                               {ccFlagged} ⚑
                                                             </span>
                                                           )}
                                                         </div>
                                                         {/* Mini progress bar */}
-                                                        <div className="flex items-center gap-1.5 mt-1 max-w-[120px]">
+                                                        <div className="flex items-center gap-1 mt-1 max-w-[120px]">
                                                           <div className="flex-1 h-[2px] rounded-full bg-slate-100 overflow-hidden">
                                                             <div className="h-full rounded-full" style={{ width: `${Math.min(ccPct, 100)}%`, background: ccBarCol }} />
                                                           </div>
-                                                          <span className="text-[10px] text-slate-400 tabular-nums">{ccPct}%</span>
+                                                          <span className="text-[11px] text-slate-400 tabular-nums">{ccPct}%</span>
                                                         </div>
                                                       </div>
                                                       <div className="flex items-center gap-2.5 shrink-0 text-[11px]">
@@ -1402,7 +1402,7 @@ export default function BuildingDetailPage() {
                                                           </div>
                                                         ))}
                                                         {ccEntries.length > 8 && (
-                                                          <p className="text-[10px] text-slate-400 italic px-3 pl-8 py-1.5">
+                                                          <p className="text-[11px] text-slate-400 italic px-3 pl-8 py-1.5">
                                                             + {ccEntries.length - 8} {lang === "nl" ? "meer" : "more"}
                                                           </p>
                                                         )}
@@ -1410,7 +1410,7 @@ export default function BuildingDetailPage() {
                                                     )}
                                                     {isCcExpanded && ccEntries.length === 0 && (
                                                       <div className="border-t border-slate-100 bg-slate-50/30 px-3 pl-8 py-2">
-                                                        <p className="text-[10px] text-slate-400 italic">
+                                                        <p className="text-[11px] text-slate-400 italic">
                                                           {lang === "nl" ? "Geen boekingen gevonden" : "No entries found"}
                                                         </p>
                                                       </div>
@@ -1425,7 +1425,7 @@ export default function BuildingDetailPage() {
                                         {/* Section D: Unclassified entries — data quality signal */}
                                         {unassignedEntries.length > 0 && (
                                           <div>
-                                            <div className="flex items-center gap-1.5 mb-2">
+                                            <div className="flex items-center gap-1 mb-2">
                                               <HelpCircle size={12} style={{ color: brand.amber }} />
                                               <p className="text-[11px] text-amber-600 font-medium uppercase tracking-wider">
                                                 {lang === "nl" ? "Niet-geclassificeerd" : "Unclassified"} ({unassignedEntries.length})
@@ -1447,7 +1447,7 @@ export default function BuildingDetailPage() {
                                                 </div>
                                               ))}
                                               {unassignedEntries.length > 5 && (
-                                                <p className="text-[10px] text-amber-500 italic px-3 py-1.5">
+                                                <p className="text-[11px] text-amber-500 italic px-3 py-1.5">
                                                   + {unassignedEntries.length - 5} {lang === "nl" ? "meer" : "more"}
                                                 </p>
                                               )}
@@ -1504,7 +1504,7 @@ export default function BuildingDetailPage() {
                     <div className="flex items-center justify-end mb-3">
                       <button
                         onClick={() => setShowDismounted(!showDismounted)}
-                        className="flex items-center gap-1.5 text-[11px] font-medium text-slate-400 hover:text-slate-600 transition-colors"
+                        className="flex items-center gap-1 text-[11px] font-medium text-slate-400 hover:text-slate-600 transition-colors"
                       >
                         <span className={`w-3.5 h-3.5 rounded border transition-colors flex items-center justify-center ${showDismounted ? 'bg-slate-700 border-slate-700' : 'border-slate-300'}`}>
                           {showDismounted && <CheckCircle2 size={10} className="text-white" />}
@@ -1546,7 +1546,7 @@ export default function BuildingDetailPage() {
                                   </div>
                                   <div className="flex items-center gap-2 ml-2">
                                     {m.dismounted && (
-                                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-400">
+                                      <span className="inline-flex items-center gap-1 px-1.5 py-1 rounded text-[11px] font-medium bg-slate-100 text-slate-400">
                                         {lang === "nl" ? "Gedemonteerd" : "Dismounted"}
                                       </span>
                                     )}
@@ -1618,7 +1618,7 @@ export default function BuildingDetailPage() {
                                   </div>
                                   <div className="flex items-center gap-2">
                                     {m.dismounted && (
-                                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-400">
+                                      <span className="inline-flex items-center gap-1 px-1.5 py-1 rounded text-[11px] font-medium bg-slate-100 text-slate-400">
                                         {lang === "nl" ? "Gedemonteerd" : "Dismounted"}
                                       </span>
                                     )}
@@ -1724,7 +1724,7 @@ export default function BuildingDetailPage() {
                                           return (
                                             <div key={item.s} className="flex items-center justify-between px-3 py-2">
                                               <div className="min-w-0">
-                                                <span className="text-[10px] font-mono text-slate-400 mr-1.5">{svc?.code || item.s}</span>
+                                                <span className="text-[11px] font-mono text-slate-400 mr-1.5">{svc?.code || item.s}</span>
                                                 <span className="text-xs text-slate-600">
                                                   {svc?.name?.[lang] || svc?.name?.en || "—"}
                                                 </span>

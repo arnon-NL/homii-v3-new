@@ -118,6 +118,25 @@ export default function SupplierListPage() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [viewMode, setViewMode] = useState("grouped");
 
+  // Guard: if no suppliers data, show empty state
+  if (!data.suppliers || data.suppliers.length === 0) {
+    return (
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
+          <h1 className="text-xl font-semibold mb-6" style={{ color: brand.navy }}>
+            {t("suppliersTitle", lang)}
+          </h1>
+          <div className="flex flex-col items-center justify-center min-h-[400px] text-slate-400">
+            <Truck size={32} className="mb-3 text-slate-300" />
+            <p className="text-sm">
+              {lang === "nl" ? "Geen leveranciers beschikbaar voor deze organisatie" : "No suppliers available for this organization"}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const categoryFilters = useMemo(() => [
     { value: "all", label: { en: "All", nl: "Alle" } },
     ...data.supplierCategories.map((c) => ({ value: c.id, label: c.label })),
@@ -195,7 +214,7 @@ export default function SupplierListPage() {
         {/* Summary bar */}
         <div className="flex flex-wrap items-center gap-4 mb-4 text-xs text-slate-500">
           <div className="flex items-center gap-2">
-            <Truck size={13} className="text-slate-400" />
+            <Truck size={14} className="text-slate-400" />
             <span className="font-medium" style={{ color: brand.navy }}>
               {filtered.length}
             </span>
@@ -203,7 +222,7 @@ export default function SupplierListPage() {
           </div>
           <span className="w-px h-3.5 bg-slate-200" />
           <div className="flex items-center gap-2">
-            <Building2 size={13} className="text-slate-400" />
+            <Building2 size={14} className="text-slate-400" />
             <span className="font-medium" style={{ color: brand.navy }}>
               {fmt(totalAnnualSpend)}
             </span>
@@ -430,7 +449,7 @@ export default function SupplierListPage() {
                               className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
                               style={{ background: cfg?.bg || "#F1F5F9" }}
                             >
-                              <Icon size={13} style={{ color: cfg?.color || brand.muted }} />
+                              <Icon size={14} style={{ color: cfg?.color || brand.muted }} />
                             </div>
                             <div className="min-w-0">
                               <div className="text-sm font-medium truncate" style={{ color: brand.navy }}>

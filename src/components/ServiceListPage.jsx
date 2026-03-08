@@ -244,7 +244,7 @@ export default function ServiceListPage() {
                             {s.buildingCount} {lang === "nl" ? "geb." : "bldg."}
                           </span>
                           <span className="text-xs tabular-nums text-slate-600 font-medium w-[72px] text-right">
-                            {fmt(s.avgCostPerVhe)}/VHE
+                            {s.avgCostPerVhe != null ? `${fmt(s.avgCostPerVhe)}/VHE` : "—"}
                           </span>
                         </div>
 
@@ -371,7 +371,7 @@ export default function ServiceListPage() {
                               className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
                               style={{ background: cfg?.bg || "#F1F5F9" }}
                             >
-                              <Icon size={13} style={{ color: cfg?.color || brand.muted }} />
+                              <Icon size={14} style={{ color: cfg?.color || brand.muted }} />
                             </div>
                             <div className="min-w-0">
                               <div className="text-sm font-medium truncate" style={{ color: brand.navy }}>
@@ -409,7 +409,7 @@ export default function ServiceListPage() {
                         </td>
                         <td className="px-3 sm:px-4 py-3 text-right">
                           <span className="text-sm tabular-nums text-slate-600">
-                            {fmt(s.avgCostPerVhe)}
+                            {s.avgCostPerVhe != null ? fmt(s.avgCostPerVhe) : "—"}
                           </span>
                         </td>
                         <td className="px-3 sm:px-4 py-3 text-center">

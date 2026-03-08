@@ -50,7 +50,7 @@ function NavButton({ item, showCount }) {
     >
       {({ isActive }) => (
         <>
-          <Icon size={15} strokeWidth={isActive ? 2 : 1.5} />
+          <Icon size={16} strokeWidth={isActive ? 2 : 1.5} />
           <span className="flex-1 text-left">{item.label}</span>
           {showCount && item.count != null && (
             <span className="text-[11px] text-slate-400 tabular-nums">
@@ -86,13 +86,13 @@ function ViewButton({ view, lang, orgId }) {
   return (
     <NavLink
       to={viewPath}
-      className={`w-full flex items-center gap-3 h-7 pl-4 pr-2.5 rounded-lg text-xs transition-colors no-underline ${
+      className={`w-full flex items-center gap-3 h-7 pl-4 pr-2 rounded-lg text-xs transition-colors no-underline ${
         isActive
           ? "bg-slate-200/60 text-slate-900 font-medium"
           : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
       }`}
     >
-      <Icon size={13} strokeWidth={isActive ? 2 : 1.5} />
+      <Icon size={14} strokeWidth={isActive ? 2 : 1.5} />
       <span className="flex-1 text-left truncate">
         {view.name[lang] || view.name.en}
       </span>
@@ -135,7 +135,7 @@ function OrgSwitcher() {
       {/* Trigger */}
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center gap-3 px-3 pt-4 pb-2.5 hover:bg-slate-100/60 rounded-lg transition-colors"
+        className="w-full flex items-center gap-3 px-3 pt-4 pb-2 hover:bg-slate-100/60 rounded-lg transition-colors"
       >
         {org.logoUrl ? (
           <img
@@ -170,8 +170,8 @@ function OrgSwitcher() {
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute left-2 right-2 top-[calc(100%+2px)] z-50 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 animate-in fade-in slide-in-from-top-1 duration-150">
-          <div className="px-3 py-1.5 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">
+        <div className="absolute left-2 right-2 top-[calc(100%+2px)] z-50 bg-white rounded-xl shadow-md border border-slate-200 py-1 animate-in fade-in slide-in-from-top-1 duration-150">
+          <div className="px-3 py-1 text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
             Organizations
           </div>
           {organizations.map((o) => {
@@ -194,14 +194,14 @@ function OrgSwitcher() {
                   />
                 ) : (
                   <div
-                    className="w-7 h-7 rounded-md flex items-center justify-center text-white text-[10px] font-semibold"
+                    className="w-7 h-7 rounded-md flex items-center justify-center text-white text-[11px] font-semibold"
                     style={{ background: brand.navy }}
                   >
                     {o.logoText}
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <span className="text-[13px] font-medium text-slate-800 block truncate">
+                  <span className="text-sm font-medium text-slate-800 block truncate">
                     {o.name}
                   </span>
                   <span className="text-[11px] text-slate-400">
@@ -252,7 +252,7 @@ export default function Sidebar({ lang, setLang }) {
       {/* Search */}
       <div className="px-3 pb-2">
         <div className="flex items-center gap-2 h-8 px-3 rounded-lg bg-slate-200/50 border border-slate-200/80 text-slate-400 cursor-pointer hover:bg-slate-200/80 transition-colors">
-          <Search size={13} strokeWidth={2} />
+          <Search size={14} strokeWidth={2} />
           <span className="text-xs">{t("search", lang)}...</span>
           <span className="ml-auto text-[11px] font-mono text-slate-300 bg-white/60 px-2 py-1 rounded border border-slate-200/80">
             ⌘K
@@ -290,7 +290,7 @@ export default function Sidebar({ lang, setLang }) {
             className="w-4 h-4 rounded flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
             title={lang === "nl" ? "Weergave toevoegen" : "Add view"}
           >
-            <Plus size={11} strokeWidth={2.5} />
+            <Plus size={14} strokeWidth={2} />
           </button>
         </div>
         <div className="space-y-0.5">

@@ -29,7 +29,9 @@ export function AttrRow({ label, value, onClick, color, source }) {
       <span className="text-[11px] text-slate-400 shrink-0">{label}</span>
       <span className="flex items-center gap-1.5">
         <Val
-          className={`text-xs font-medium text-right truncate max-w-[180px] xl:max-w-[140px] ${onClick ? "hover:text-[#3EB1C8] cursor-pointer transition-colors" : ""}`}
+          className={`text-xs font-medium text-right truncate max-w-[180px] xl:max-w-[140px] ${onClick ? "cursor-pointer transition-colors" : ""}`}
+          onMouseEnter={onClick ? (e) => e.currentTarget.style.color = brand.blue : undefined}
+          onMouseLeave={onClick ? (e) => e.currentTarget.style.color = color || brand.navy : undefined}
           style={{ color: color || brand.navy }}
           onClick={onClick}
           title={typeof value === "string" ? value : undefined}>
@@ -49,7 +51,8 @@ export function AttrLink({ title, label, items, onItemClick }) {
         {items.map((item, i) => (
           <button key={i}
             onClick={() => item.onClick ? item.onClick() : onItemClick?.(item)}
-            className="group flex items-center gap-1 text-xs font-medium text-left transition-colors text-[#3B8EA5] hover:text-[#3EB1C8] hover:underline max-w-full"
+            className="group flex items-center gap-1 text-xs font-medium text-left transition-colors hover:underline max-w-full"
+            style={{ color: brand.blue }}
             title={item.label}>
             <span className="truncate">{item.label}</span>
             <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />

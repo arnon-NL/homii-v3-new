@@ -33,9 +33,9 @@ import { StatusBadge } from "./ui/status-badge";
 
 /* ── Utility icon map ── */
 const utilityConfig = {
-  heat:        { icon: Flame,      color: "#EF4444", label: { en: "Heat",       nl: "Warmte" } },
+  heat:        { icon: Flame,      color: "#64748B", label: { en: "Heat",       nl: "Warmte" } },
   water:       { icon: Droplets,   color: "#64748B", label: { en: "Water",      nl: "Water" } },
-  warmWater:   { icon: ShowerHead, color: "#F59E0B", label: { en: "Warm water", nl: "Warm water" } },
+  warmWater:   { icon: ShowerHead, color: "#64748B", label: { en: "Warm water", nl: "Warm water" } },
   electricity: { icon: Zap,        color: "#64748B", label: { en: "Electricity",nl: "Elektriciteit" } },
 };
 
@@ -93,8 +93,8 @@ function BudgetBar({ spent, total }) {
 const settlementConfig = {
   not_started:  { icon: Circle,        color: "#94A3B8", bg: "#F8FAFC", label: { en: "Not started",  nl: "Niet gestart" } },
   monitoring:   { icon: Clock,         color: "#94A3B8", bg: "#F8FAFC", label: { en: "Monitoring",   nl: "Monitoring" } },
-  in_review:    { icon: AlertTriangle, color: "#F59E0B", bg: "#FFFBEB", label: { en: "In review",    nl: "In controle" } },
-  approved:     { icon: FileCheck,     color: "#3EB1C8", bg: "#F0FAFB", label: { en: "Approved",     nl: "Goedgekeurd" } },
+  in_review:    { icon: AlertTriangle, color: "#F59E0B", bg: "#F8FAFC", label: { en: "In review",    nl: "In controle" } },
+  approved:     { icon: FileCheck,     color: "#94A3B8", bg: "#F8FAFC", label: { en: "Approved",     nl: "Goedgekeurd" } },
   distributed:  { icon: Send,          color: "#94A3B8", bg: "#F8FAFC", label: { en: "Distributed",  nl: "Afgerekend" } },
 };
 
@@ -120,7 +120,7 @@ function NetResult({ value, lang }) {
   return (
     <span
       className="text-xs font-medium tabular-nums"
-      style={{ color: isPositive ? brand.blue : brand.red }}
+      style={{ color: isPositive ? brand.subtle : brand.red }}
     >
       {isPositive ? `+${fmt}` : `-${fmt}`}
       <span className="text-[11px] font-normal ml-1 opacity-70">
@@ -142,9 +142,9 @@ const qualityFilters = [
 
 /* ── Utility filter options ── */
 const utilityFilterOptions = [
-  { value: "heat",        label: { en: "Heat",       nl: "Warmte" },     icon: Flame,      color: "#EF4444" },
+  { value: "heat",        label: { en: "Heat",       nl: "Warmte" },     icon: Flame,      color: "#64748B" },
   { value: "water",       label: { en: "Water",      nl: "Water" },      icon: Droplets,   color: "#64748B" },
-  { value: "warmWater",   label: { en: "Warm water", nl: "Warm water" }, icon: ShowerHead,  color: "#F59E0B" },
+  { value: "warmWater",   label: { en: "Warm water", nl: "Warm water" }, icon: ShowerHead,  color: "#64748B" },
   { value: "electricity", label: { en: "Electricity",nl: "Elektriciteit"},icon: Zap,        color: "#64748B" },
 ];
 
@@ -388,7 +388,7 @@ export default function BuildingListPage() {
             </h1>
             {activeView && (
               <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-100 text-[11px] font-medium text-slate-500">
-                <LayoutGrid size={10} />
+                <LayoutGrid size={14} />
                 {lang === "nl" ? "Weergave" : "View"}
               </span>
             )}
@@ -411,19 +411,19 @@ export default function BuildingListPage() {
         {/* ── Saved Views bar ── */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider mr-1">
-            <Eye size={11} className="inline -mt-0.5 mr-1" />
+            <Eye size={14} className="inline -mt-0.5 mr-1" />
             {lang === "nl" ? "Weergaven" : "Views"}
           </span>
           {/* Default / no view */}
           <button
             onClick={() => setSearchParams({})}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+            className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
               !activeView
                 ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200"
                 : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
             }`}
           >
-            <LayoutGrid size={11} />
+            <LayoutGrid size={14} />
             {lang === "nl" ? "Alle complexen" : "All complexes"}
           </button>
           {/* Saved views */}
@@ -435,13 +435,13 @@ export default function BuildingListPage() {
                 <button
                   key={v.id}
                   onClick={() => setSearchParams({ view: v.id })}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
                     isActive
                       ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200"
                       : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
                   }`}
                 >
-                  <Bookmark size={11} className={isActive ? "fill-current" : ""} />
+                  <Bookmark size={14} className={isActive ? "fill-current" : ""} />
                   {v.name[lang] || v.name.en}
                 </button>
               );
