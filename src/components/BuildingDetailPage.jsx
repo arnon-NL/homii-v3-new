@@ -345,6 +345,20 @@ export default function BuildingDetailPage() {
   const mainMeters = meterList.filter((m) => m.type === "main");
   const subMeters = meterList.filter((m) => m.type === "sub");
 
+  // Kostenverdeler map: serviceId (e.g. "SVC-108") → supplier name(s)
+  const kostenverdelerMap = useMemo(() => {
+    const map = {};
+    (data.suppliers || []).forEach((s) => {
+      if (s.kostenverdeler && s.serviceIds) {
+        s.serviceIds.forEach((sid) => {
+          if (!map[sid]) map[sid] = [];
+          map[sid].push(s.name);
+        });
+      }
+    });
+    return map;
+  }, [data.suppliers]);
+
   if (!building)
     return (
       <div className="flex-1 flex items-center justify-center text-slate-400 text-sm">
@@ -422,7 +436,6 @@ export default function BuildingDetailPage() {
                 >
                   {building.complex}
                 </h1>
-                <StatusBadge status={building.status} />
                 <StatusBadge status={building.dataQuality} size="xs" />
               </div>
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-slate-500">
@@ -1335,6 +1348,11 @@ export default function BuildingDetailPage() {
                                           {bs.service?.metered && (
                                             <span className="text-[11px] px-2 py-1 rounded-full font-medium text-slate-500 bg-slate-100">
                                               {lang === "nl" ? "Gemeten" : "Metered"}
+                                            </span>
+                                          )}
+                                          {kostenverdelerMap[bs.serviceId] && (
+                                            <span className="text-[11px] px-2 py-1 rounded-full font-medium text-slate-500 bg-slate-100">
+                                              ⇄ {kostenverdelerMap[bs.serviceId].join(", ")}
                                             </span>
                                           )}
                                         </div>
