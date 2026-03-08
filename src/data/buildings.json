@@ -9437,17 +9437,16 @@
   },
   {
     "id": "8320",
-    "complex": "Rode Kruislaan",
-    "complexId": "2212001",
+    "complex": "Florijn Zuid",
+    "complexId": "21042-02",
     "location": "Amsterdam",
-    "vhe": 423,
-    "components": 12,
+    "vhe": 94,
+    "components": 14,
     "utilities": [
-      "electricity",
       "heat"
     ],
-    "budgetTotal": 714888.44,
-    "budgetSpent": 680846.13,
+    "budgetTotal": 220000,
+    "budgetSpent": 11673,
     "dataQuality": "warning",
     "status": "pending"
   },
