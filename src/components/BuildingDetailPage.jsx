@@ -995,7 +995,7 @@ export default function BuildingDetailPage() {
                                 ? (lang === "nl" ? "Op koers" : "On track")
                                 : verdictStatus === "review"
                                   ? (lang === "nl" ? "Aandacht nodig" : "Needs review")
-                                  : (lang === "nl" ? "Actie vereist" : "Action required")}
+                                  : (lang === "nl" ? "Boven budget" : "Over budget")}
                             </p>
                             <p className="text-[11px] text-slate-500 tabular-nums">
                               {fmt(totalActual)} / {fmt(totalBudget)} ({budgetPct}%)
