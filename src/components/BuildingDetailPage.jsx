@@ -1402,6 +1402,61 @@ export default function BuildingDetailPage() {
                                           );
                                         })()}
 
+                                        {/* Section B: Consumption / Meter link (metered services only) */}
+                                        {bs.consumption?.mainMeterId && (() => {
+                                          const c = bs.consumption;
+                                          const linkedMeter = allMeters.find((m) => m.id === c.mainMeterId);
+                                          const fmtNum = (n) => Math.round(n).toLocaleString("nl-NL");
+                                          return (
+                                            <div className="rounded-lg border border-slate-100 bg-white p-3">
+                                              <div className="flex items-center justify-between mb-2">
+                                                <div className="flex items-center gap-1.5">
+                                                  <Gauge size={12} className="text-slate-400" />
+                                                  <span className="text-[11px] text-slate-500 font-medium uppercase tracking-wider">
+                                                    {lang === "nl" ? "Verbruik" : "Consumption"}
+                                                  </span>
+                                                </div>
+                                                <button
+                                                  className="text-[11px] font-medium flex items-center gap-1 hover:underline"
+                                                  style={{ color: brand.blue }}
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setActiveTab("consumption");
+                                                  }}
+                                                >
+                                                  <Flame size={11} />
+                                                  {linkedMeter?.meterNumber || c.mainMeterNumber || c.mainMeterId}
+                                                  <ArrowUpRight size={11} />
+                                                </button>
+                                              </div>
+                                              <div className="grid grid-cols-3 gap-3 text-[11px]">
+                                                <div>
+                                                  <p className="text-slate-400 mb-0.5">{lang === "nl" ? "YTD verbruik" : "YTD consumption"}</p>
+                                                  <p className="font-medium text-slate-700 tabular-nums">{fmtNum(c.ytdConsumption)} {c.unit}</p>
+                                                </div>
+                                                <div>
+                                                  <p className="text-slate-400 mb-0.5">{lang === "nl" ? "Verwacht" : "Expected"}</p>
+                                                  <p className="font-medium text-slate-700 tabular-nums">{fmtNum(c.endConsumption)} {c.unit}</p>
+                                                </div>
+                                                <div>
+                                                  <p className="text-slate-400 mb-0.5">{lang === "nl" ? "Eenheidsprijs" : "Unit price"}</p>
+                                                  <p className="font-medium text-slate-700 tabular-nums">€{c.unitPrice?.toFixed(2)}/{c.unit}</p>
+                                                </div>
+                                              </div>
+                                              {c.meterCount > 0 && (
+                                                <p className="text-[11px] text-slate-400 mt-2">
+                                                  {c.meterCount} {lang === "nl" ? "submeters" : "sub-meters"}
+                                                  {c.tenantExceedingBudget > 0 && (
+                                                    <span className="text-amber-600 ml-1">
+                                                      · {c.tenantExceedingBudget} {lang === "nl" ? "boven voorschot" : "over advance"}
+                                                    </span>
+                                                  )}
+                                                </p>
+                                              )}
+                                            </div>
+                                          );
+                                        })()}
+
                                         {/* Section C: Cost Categories with nested Ledger Entries */}
                                         <div>
                                           <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider mb-2">
