@@ -608,6 +608,8 @@ def extract_meters(buildings, apt_id_remap, heating_seasons):
     meter with serial '00003446693MGNLD01' will appear 3-4 times (once per
     season). We deduplicate to one record per physical meter, keeping the
     latest season's data, matching how Portaal structures its meters.
+
+    Also populates `readings` dict from costAttribution data, keyed by year.
     """
     print("Extracting meters...")
 
@@ -625,8 +627,42 @@ def extract_meters(buildings, apt_id_remap, heating_seasons):
         ORDER BY ms.serial_number, hs.season_start DESC
     """)
 
-    # Deduplicate: keep the latest season's row per serial_number
-    seen_serials = {}  # serial_number → best row
+    # ── Pre-load cost attribution per (apartment_id, heating_season_id) ──
+    ca_rows = query("""
+        SELECT apartment_id, heating_season_id,
+               ytd_variable_cost, ytd_total_cost, end_total_cost
+        FROM usage_monitor_costattributionperiod
+    """)
+    ca_lookup = {}  # (apt_id, hs_id) → cost record
+    for cr in ca_rows:
+        ca_lookup[(cr["apartment_id"], cr["heating_season_id"])] = cr
+
+    # ── Pre-load unit prices per heating_season_id ──
+    hs_prices = {}  # hs_id → (price, unit)
+    for hs in heating_seasons:
+        # Find the first non-null price in the heatingseason
+        for price_field, unit in [
+            ("gjPrice", "GJ"), ("m3Price", "m³"),
+            ("coldWaterM3Price", "m³"), ("warmWaterM3Price", "m³"),
+            ("electricityPrice", "kWh"),
+        ]:
+            val = hs.get(price_field)
+            if val and val > 0:
+                hs_prices[hs["id"]] = (val, unit)
+                break
+
+    # ── Pre-load meter counts per (apartment_id, heating_season_id, meter_type) ──
+    mc_rows = query("""
+        SELECT apartment_id, heating_season_id, meter_type, COUNT(*) as cnt
+        FROM usage_monitor_meterstatus
+        GROUP BY apartment_id, heating_season_id, meter_type
+    """)
+    meter_counts = {}  # (apt_id, hs_id, meter_type) → count
+    for mc in mc_rows:
+        meter_counts[(mc["apartment_id"], mc["heating_season_id"], mc["meter_type"])] = mc["cnt"]
+
+    # ── Collect ALL season rows per serial, keep latest as primary ──
+    serial_rows = defaultdict(list)  # serial → [(row, bld_id), ...]
     skipped_orphan = 0
     skipped_unmatched = 0
 
@@ -642,15 +678,17 @@ def extract_meters(buildings, apt_id_remap, heating_seasons):
             continue
 
         serial = r.get("serial_number") or f"M-{r['id']}"
+        serial_rows[serial].append((r, bld_id))
 
-        # Keep the row with the latest season_start (rows are ordered DESC)
-        if serial in seen_serials:
-            continue  # already have a newer season for this meter
-        seen_serials[serial] = (r, bld_id)
-
-    # Build meter records from deduplicated rows
+    # ── Build meter records with readings ──
     meters = []
-    for serial, (r, bld_id) in seen_serials.items():
+    meters_with_readings = 0
+    readings_populated = 0
+
+    for serial, row_list in serial_rows.items():
+        # First entry is latest season (rows ordered by season_start DESC)
+        r, bld_id = row_list[0]
+
         meter_type = r.get("meter_type", "O")
         utility = METER_TYPE_MAP.get(meter_type, "other")
 
@@ -665,12 +703,72 @@ def extract_meters(buildings, apt_id_remap, heating_seasons):
         if not dismounted and r.get("data_integrity_status", 1) >= 3:
             status = "error"
 
-        # Season enrichment
+        # Season enrichment (from latest season)
         hs_id = r.get("heating_season_id")
         hs = hs_by_id.get(hs_id)
         season_id = hs_id if hs else None
         year_key = hs.get("yearKey") if hs else None
         year_label = hs.get("yearLabel") if hs else None
+
+        # ── Build readings from ALL seasons ──
+        readings = {}
+        for (sr, _) in row_list:
+            sr_hs_id = sr.get("heating_season_id")
+            sr_apt_id = sr.get("apartment_db_id")
+            sr_season_start = sr.get("season_start")
+            sr_mtype = sr.get("meter_type", "O")
+
+            if not sr_hs_id or not sr_apt_id or not sr_season_start:
+                continue
+
+            yr = int(sr_season_start[:4])
+
+            # Get cost attribution for this VHE + season
+            ca = ca_lookup.get((sr_apt_id, sr_hs_id))
+            if not ca:
+                continue
+
+            var_cost = ca.get("ytd_variable_cost")
+            total_cost = ca.get("ytd_total_cost")
+            end_cost = ca.get("end_total_cost")
+
+            # Use the best available cost figure
+            cost = var_cost if var_cost is not None else total_cost
+            if cost is None or cost == 0:
+                # Try end_total_cost as fallback
+                cost = end_cost
+            if cost is None:
+                continue
+
+            # Divide cost among meters of same type for this VHE in this season
+            n_meters = meter_counts.get((sr_apt_id, sr_hs_id, sr_mtype), 1)
+            per_meter_cost = cost / max(n_meters, 1)
+
+            # Try to derive consumption from unit price
+            price_info = hs_prices.get(sr_hs_id)
+            consumption = None
+            if price_info:
+                unit_price, _ = price_info
+                if unit_price > 0:
+                    consumption = round(per_meter_cost / unit_price, 2)
+
+            # If no unit price available, use cost as a proxy for consumption display
+            if consumption is None:
+                consumption = round(per_meter_cost, 2)
+
+            reading_date = sr.get("latest_date") or sr_season_start
+
+            readings[yr] = {
+                "start": 0,
+                "end": consumption,
+                "consumption": consumption,
+                "cost": round(per_meter_cost, 2),
+                "readingDate": reading_date,
+            }
+            readings_populated += 1
+
+        if readings:
+            meters_with_readings += 1
 
         meters.append({
             "id": f"MTR-{r['id']}",
@@ -682,6 +780,7 @@ def extract_meters(buildings, apt_id_remap, heating_seasons):
             "meterNumber": serial,
             "ean": None,
             "unit": {"heat": "GJ", "water": "m³", "warmWater": "m³", "electricity": "kWh", "gas": "m³"}.get(utility, ""),
+            "readings": readings,
             "status": status,
             "dismounted": dismounted,
             "dismountedDate": r.get("dismounted_date"),
@@ -695,6 +794,7 @@ def extract_meters(buildings, apt_id_remap, heating_seasons):
         })
 
     print(f"  → {len(meters)} unique physical meters (from {len(rows)} meterstatus rows)")
+    print(f"  → {meters_with_readings} meters have readings, {readings_populated} total reading entries")
     if skipped_orphan:
         print(f"    Skipped {skipped_orphan} orphaned rows (no apartment)")
     if skipped_unmatched:
