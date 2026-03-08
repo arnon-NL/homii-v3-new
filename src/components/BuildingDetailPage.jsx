@@ -1328,9 +1328,9 @@ export default function BuildingDetailPage() {
                                           );
                                         })()}
 
-                                        {/* Section A2: Consumption Progress (energy-only mode — from heating season data) */}
+                                        {/* Section A2: Consumption Progress (from heating season data) */}
                                         {(() => {
-                                          if (isFeatureEnabled("ledger")) return null;
+                                          if (!isFeatureEnabled("consumptionControl")) return null;
                                           const season = heatingSeasons.find(h => h.yearKey === year);
                                           if (!season || season.ytdTotalCost == null) return null;
 
