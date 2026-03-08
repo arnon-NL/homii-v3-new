@@ -540,13 +540,13 @@ export default function BuildingDetailPage() {
               <TabsList className="bg-transparent h-10 gap-0 p-0 border-b border-slate-200 w-full justify-start rounded-none overflow-x-auto">
                 {[
                   { value: "overview", label: t("overview", lang) },
-                  {
-                    value: "services",
-                    label: `${t("services", lang)} (${bsRelations.length})`,
-                  },
                   isFeatureEnabled("consumptionControl") && {
                     value: "consumption",
                     label: lang === "nl" ? "Verbruik" : "Consumption",
+                  },
+                  {
+                    value: "services",
+                    label: `${t("services", lang)} (${bsRelations.length})`,
                   },
                   isFeatureEnabled("consumption") && {
                     value: "meters",
