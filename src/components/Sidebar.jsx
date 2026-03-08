@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { NavLink, useLocation, useSearchParams } from "react-router-dom";
 import {
   Home,
@@ -18,10 +18,12 @@ import {
   List,
   AlertTriangle,
   Plus,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import { t, useLang } from "@/lib/i18n";
-import { savedViews } from "@/lib/mockData";
+import { useOrg } from "@/lib/OrgContext";
 
 /* ── Icon lookup for view icons ── */
 const viewIconMap = {
@@ -100,7 +102,118 @@ function ViewButton({ view, lang }) {
   );
 }
 
+/* ── Org Switcher (Notion-style) ── */
+function OrgSwitcher() {
+  const { org, organizations, switchOrg } = useOrg();
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    }
+    if (open) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  return (
+    <div className="relative" ref={ref}>
+      {/* Trigger */}
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center gap-3 px-3 pt-4 pb-2.5 hover:bg-slate-100/60 rounded-lg transition-colors"
+      >
+        {org.logoUrl ? (
+          <img
+            src={org.logoUrl}
+            alt={org.name}
+            className="w-8 h-8 rounded-lg object-contain bg-white border border-slate-200"
+          />
+        ) : (
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-[11px] font-semibold tracking-wide"
+            style={{ background: brand.navy }}
+          >
+            {org.logoText}
+          </div>
+        )}
+        <div className="flex-1 min-w-0 text-left">
+          <span
+            className="text-sm font-semibold block truncate"
+            style={{ color: brand.navy }}
+          >
+            {org.name}
+          </span>
+          <span className="text-[11px] text-slate-400 font-medium">
+            Powered by homii
+          </span>
+        </div>
+        <ChevronDown
+          size={14}
+          className={`text-slate-400 transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {/* Dropdown */}
+      {open && (
+        <div className="absolute left-2 right-2 top-[calc(100%+2px)] z-50 bg-white rounded-xl shadow-lg border border-slate-200 py-1.5 animate-in fade-in slide-in-from-top-1 duration-150">
+          <div className="px-3 py-1.5 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">
+            Organizations
+          </div>
+          {organizations.map((o) => {
+            const isActive = o.id === org.id;
+            return (
+              <button
+                key={o.id}
+                onClick={() => {
+                  switchOrg(o.id);
+                  setOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-3 py-2 text-left transition-colors ${
+                  isActive
+                    ? "bg-slate-50"
+                    : "hover:bg-slate-50"
+                }`}
+              >
+                {o.logoUrl ? (
+                  <img
+                    src={o.logoUrl}
+                    alt={o.name}
+                    className="w-7 h-7 rounded-md object-contain bg-white border border-slate-200"
+                  />
+                ) : (
+                  <div
+                    className="w-7 h-7 rounded-md flex items-center justify-center text-white text-[10px] font-semibold"
+                    style={{ background: brand.navy }}
+                  >
+                    {o.logoText}
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <span className="text-[13px] font-medium text-slate-800 block truncate">
+                    {o.name}
+                  </span>
+                  <span className="text-[11px] text-slate-400">
+                    {o.modules.includes("serviceCharges")
+                      ? "Energy + Service Charges"
+                      : "Energy Module"}
+                  </span>
+                </div>
+                {isActive && (
+                  <Check size={14} className="text-slate-500 shrink-0" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Sidebar({ lang, setLang }) {
+  const { data, hasModule } = useOrg();
+
   const navItems = [
     { label: t("home", lang), icon: Home, path: "/" },
     { label: t("inbox", lang), icon: Inbox, path: "/inbox" },
@@ -113,37 +226,17 @@ export default function Sidebar({ lang, setLang }) {
     { label: t("buildings", lang), icon: Building2, path: "/buildings" },
     { label: t("vheTitle", lang), icon: DoorOpen, path: "/vhe" },
     { label: t("services", lang), icon: Wrench, path: "/services" },
-    { label: t("suppliers", lang), icon: Truck, path: "/suppliers" },
+    hasModule("serviceCharges") && { label: t("suppliers", lang), icon: Truck, path: "/suppliers" },
     { label: t("meters", lang), icon: Gauge, path: "/meters" },
-  ];
+  ].filter(Boolean);
 
   // Filter out default views — those are just the object list pages themselves
-  const viewItems = savedViews.filter((v) => !v.isDefault);
+  const viewItems = (data.savedViews || []).filter((v) => !v.isDefault);
 
   return (
     <aside className="w-60 shrink-0 border-r border-slate-200 bg-slate-50 flex flex-col h-full select-none">
-      {/* Client logo header */}
-      <div className="px-3 pt-4 pb-2.5">
-        <div className="flex items-center gap-3">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-[11px] font-semibold tracking-wide"
-            style={{ background: brand.navy }}
-          >
-            CLI
-          </div>
-          <div className="flex-1 min-w-0">
-            <span
-              className="text-sm font-semibold block truncate"
-              style={{ color: brand.navy }}
-            >
-              Client Name
-            </span>
-            <span className="text-[11px] text-slate-400 font-medium">
-              Powered by homii
-            </span>
-          </div>
-        </div>
-      </div>
+      {/* Org switcher header */}
+      <OrgSwitcher />
 
       {/* Search */}
       <div className="px-3 pb-2">

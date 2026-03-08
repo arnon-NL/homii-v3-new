@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { brand } from "@/lib/brand";
 import { LangCtx, t } from "@/lib/i18n";
+import { OrgProvider, useOrg } from "@/lib/OrgContext";
 import Sidebar from "./Sidebar";
 import PlaceholderPage from "./PlaceholderPage";
 import BuildingListPage from "./BuildingListPage";
@@ -11,15 +12,29 @@ import BuildingDetailPage from "./BuildingDetailPage";
 import SupplierListPage from "./SupplierListPage";
 import ServiceDetailPage from "./ServiceDetailPage";
 
-export default function App() {
+function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [lang, setLang] = useState("en");
   const location = useLocation();
+  const navigate = useNavigate();
+  const { orgId } = useOrg();
 
   // Close mobile sidebar on navigation
   React.useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);
+
+  // On org switch: navigate to /buildings to avoid stale building IDs
+  const prevOrgRef = React.useRef(orgId);
+  React.useEffect(() => {
+    if (prevOrgRef.current !== orgId) {
+      prevOrgRef.current = orgId;
+      // If on a detail page, go back to list
+      if (location.pathname.match(/^\/(buildings|services|suppliers|vhe|meters)\/[^/]+/)) {
+        navigate("/buildings", { replace: true });
+      }
+    }
+  }, [orgId, location.pathname, navigate]);
 
   return (
     <LangCtx.Provider value={lang}>
@@ -71,8 +86,8 @@ export default function App() {
           <Sidebar lang={lang} setLang={setLang} />
         </div>
 
-        {/* Main content */}
-        <div className="flex-1 flex flex-col overflow-hidden pt-12 lg:pt-0">
+        {/* Main content — key on orgId to force remount on org switch */}
+        <div className="flex-1 flex flex-col overflow-hidden pt-12 lg:pt-0" key={orgId}>
           <Routes>
             <Route
               path="/"
@@ -122,5 +137,13 @@ export default function App() {
         </div>
       </div>
     </LangCtx.Provider>
+  );
+}
+
+export default function App() {
+  return (
+    <OrgProvider>
+      <AppContent />
+    </OrgProvider>
   );
 }

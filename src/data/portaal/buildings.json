@@ -1,0 +1,454 @@
+[
+  {
+    "id": "17989",
+    "complex": "Malderburchtstr 380-656 (Hatert 12)",
+    "complexId": "SV213IS-1149002",
+    "location": "Nijmegen",
+    "vhe": 142,
+    "components": 3,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 163228.97,
+    "budgetSpent": 56397.44,
+    "dataQuality": "medium",
+    "status": "active"
+  },
+  {
+    "id": "033000445",
+    "complex": "Muiderkring 21-223",
+    "complexId": "SV213IS-3131002",
+    "location": "Leiden",
+    "vhe": 0,
+    "components": 1,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 0,
+    "budgetSpent": 0,
+    "dataQuality": "medium",
+    "status": "pending"
+  },
+  {
+    "id": "12078",
+    "complex": "De Vijverhorst",
+    "complexId": "SV213IS-1161002",
+    "location": "Nijmegen",
+    "vhe": 109,
+    "components": 3,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 140644.21,
+    "budgetSpent": 40722.41,
+    "dataQuality": "good",
+    "status": "active"
+  },
+  {
+    "id": "12486",
+    "complex": "Dalweg, Veldeplein en meer",
+    "complexId": "SV213IS-2172005",
+    "location": "Soest",
+    "vhe": 242,
+    "components": 2,
+    "utilities": [
+      "heat",
+      "gas"
+    ],
+    "budgetTotal": 198501.67,
+    "budgetSpent": 174492.52,
+    "dataQuality": "good",
+    "status": "active"
+  },
+  {
+    "id": "11493",
+    "complex": "Voorstenkamp (De Stroeten)",
+    "complexId": "SV213IS-1173002",
+    "location": "Nijmegen",
+    "vhe": 120,
+    "components": 3,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 145708.26,
+    "budgetSpent": 41350.45,
+    "dataQuality": "medium",
+    "status": "active"
+  },
+  {
+    "id": "71574",
+    "complex": "Dorbeendreef 1- 174 - noord",
+    "complexId": "SV213IS-4044002",
+    "location": "Utrecht",
+    "vhe": 174,
+    "components": 3,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 169614.89,
+    "budgetSpent": 134335.23,
+    "dataQuality": "low",
+    "status": "active"
+  },
+  {
+    "id": "52050",
+    "complex": "Nigerdreef 1-347",
+    "complexId": "SV213IS-4207002",
+    "location": "Utrecht",
+    "vhe": 174,
+    "components": 3,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 125445.85,
+    "budgetSpent": 97917.41,
+    "dataQuality": "good",
+    "status": "active"
+  },
+  {
+    "id": "033004024",
+    "complex": "Stedumhof 90-352",
+    "complexId": "SV213IS-1308002",
+    "location": "Arnhem",
+    "vhe": 0,
+    "components": 1,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 0,
+    "budgetSpent": 0,
+    "dataQuality": "good",
+    "status": "active"
+  },
+  {
+    "id": "52565",
+    "complex": "Ibisdreef 2/232",
+    "complexId": "SV213IS-4203003",
+    "location": "Utrecht",
+    "vhe": 116,
+    "components": 3,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 85983.94,
+    "budgetSpent": 60058.19,
+    "dataQuality": "good",
+    "status": "active"
+  },
+  {
+    "id": "51935",
+    "complex": "Scharlakendreef - noord",
+    "complexId": "SV213IS-4040002",
+    "location": "Utrecht",
+    "vhe": 98,
+    "components": 3,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 54804.21,
+    "budgetSpent": 47393.87,
+    "dataQuality": "good",
+    "status": "active"
+  },
+  {
+    "id": "71584",
+    "complex": "St. Maartendreef - noord",
+    "complexId": "SV213IS-4024002",
+    "location": "Utrecht",
+    "vhe": 116,
+    "components": 3,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 70829.88,
+    "budgetSpent": 55156.86,
+    "dataQuality": "good",
+    "status": "active"
+  },
+  {
+    "id": "033000453",
+    "complex": "Agaatlaan 5-547",
+    "complexId": "SV213IS-3129002",
+    "location": "Leiden",
+    "vhe": 0,
+    "components": 1,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 0,
+    "budgetSpent": 0,
+    "dataQuality": "low",
+    "status": "pending"
+  },
+  {
+    "id": "71560",
+    "complex": "Bangkokdreef - noord",
+    "complexId": "SV213IS-4030002",
+    "location": "Utrecht",
+    "vhe": 116,
+    "components": 3,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 80757.91,
+    "budgetSpent": 62695.01,
+    "dataQuality": "good",
+    "status": "active"
+  },
+  {
+    "id": "15198",
+    "complex": "Oude Dukenburgseweg (Leuvensehof)",
+    "complexId": "SV213IS-1167002",
+    "location": "Nijmegen",
+    "vhe": 198,
+    "components": 2,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 168724.91,
+    "budgetSpent": 52161.46,
+    "dataQuality": "medium",
+    "status": "active"
+  },
+  {
+    "id": "33673",
+    "complex": "Zwanenveld 5601-5696 (De Zwaan)",
+    "complexId": "SV213IS-1170002",
+    "location": "Nijmegen",
+    "vhe": 82,
+    "components": 3,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 0,
+    "budgetSpent": 0,
+    "dataQuality": "medium",
+    "status": "pending"
+  },
+  {
+    "id": "9318",
+    "complex": "Boekweitland 1-101",
+    "complexId": "SV213IS-2166004",
+    "location": "Soest",
+    "vhe": 51,
+    "components": 3,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 48169.57,
+    "budgetSpent": 0,
+    "dataQuality": "good",
+    "status": "active"
+  },
+  {
+    "id": "12489",
+    "complex": "A. Cuyplaan 4-98",
+    "complexId": "SV213IS-2168004",
+    "location": "Soest",
+    "vhe": 49,
+    "components": 3,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 65385.29,
+    "budgetSpent": 0,
+    "dataQuality": "good",
+    "status": "active"
+  },
+  {
+    "id": "51596",
+    "complex": "St. Ludgerusstraat   Willibrordusstraat",
+    "complexId": "SV213IS-4199002",
+    "location": "Utrecht",
+    "vhe": 99,
+    "components": 3,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 62765.23,
+    "budgetSpent": 0,
+    "dataQuality": "low",
+    "status": "active"
+  },
+  {
+    "id": "12487",
+    "complex": "P. Lorentzlaann, S.Stevinlaan",
+    "complexId": "SV213IS-2222002",
+    "location": "Soesterberg",
+    "vhe": 56,
+    "components": 3,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 39451.71,
+    "budgetSpent": 0,
+    "dataQuality": "good",
+    "status": "active"
+  },
+  {
+    "id": "033002004",
+    "complex": "Turkooislaan 2-104",
+    "complexId": "SV213IS-3127002",
+    "location": "Leiden",
+    "vhe": 0,
+    "components": 1,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 0,
+    "budgetSpent": 0,
+    "dataQuality": "medium",
+    "status": "pending"
+  },
+  {
+    "id": "033001074",
+    "complex": "Langegracht 76-214",
+    "complexId": "SV213IS-3015002",
+    "location": "Leiden",
+    "vhe": 0,
+    "components": 1,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 0,
+    "budgetSpent": 0,
+    "dataQuality": "low",
+    "status": "active"
+  },
+  {
+    "id": "15197",
+    "complex": "Zwanenveld 6501-6550 (De Wetering)",
+    "complexId": "SV213IS-1169002",
+    "location": "Nijmegen",
+    "vhe": 50,
+    "components": 3,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 49806.66,
+    "budgetSpent": 0,
+    "dataQuality": "good",
+    "status": "active"
+  },
+  {
+    "id": "33770",
+    "complex": "Geulstr - Schependomln",
+    "complexId": "SV213IS-1077001",
+    "location": "Nijmegen",
+    "vhe": 62,
+    "components": 3,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 81333.93,
+    "budgetSpent": 0,
+    "dataQuality": "medium",
+    "status": "active"
+  },
+  {
+    "id": "8821",
+    "complex": "W. Beckmanstraat 2-320",
+    "complexId": "SV213IS-2198010",
+    "location": "Soest",
+    "vhe": 164,
+    "components": 1,
+    "utilities": [
+      "heat",
+      "gas"
+    ],
+    "budgetTotal": 0,
+    "budgetSpent": 0,
+    "dataQuality": "low",
+    "status": "pending"
+  },
+  {
+    "id": "52051",
+    "complex": "Haarlemmerhoutdreef 6-63",
+    "complexId": "SV213IS-4210002",
+    "location": "Utrecht",
+    "vhe": 58,
+    "components": 3,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 47113.87,
+    "budgetSpent": 34499.07,
+    "dataQuality": "good",
+    "status": "active"
+  },
+  {
+    "id": "033001052",
+    "complex": "Maria Gijzenplein",
+    "complexId": "SV213IS-3016004",
+    "location": "Leiden",
+    "vhe": 0,
+    "components": 1,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 0,
+    "budgetSpent": 0,
+    "dataQuality": "low",
+    "status": "active"
+  },
+  {
+    "id": "103265",
+    "complex": "Hoog Soestdijk",
+    "complexId": "SV213IS-2258001",
+    "location": "Soest",
+    "vhe": 85,
+    "components": 3,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 78285.88,
+    "budgetSpent": 25803.81,
+    "dataQuality": "good",
+    "status": "active"
+  },
+  {
+    "id": "033005522",
+    "complex": "Smidssteeg 2-58",
+    "complexId": "SV213IS-3180002",
+    "location": "Leiden",
+    "vhe": 0,
+    "components": 1,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 0,
+    "budgetSpent": 0,
+    "dataQuality": "good",
+    "status": "active"
+  },
+  {
+    "id": "71579",
+    "complex": "Lichtenberchdreef 12-178 - noord",
+    "complexId": "SV213IS-4041006",
+    "location": "Utrecht",
+    "vhe": 70,
+    "components": 2,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 79980.2,
+    "budgetSpent": 62894.17,
+    "dataQuality": "good",
+    "status": "active"
+  },
+  {
+    "id": "71578",
+    "complex": "Theemsdreef 16-178 - noord",
+    "complexId": "SV213IS-4041007",
+    "location": "Utrecht",
+    "vhe": 70,
+    "components": 2,
+    "utilities": [
+      "heat"
+    ],
+    "budgetTotal": 0,
+    "budgetSpent": 0,
+    "dataQuality": "good",
+    "status": "active"
+  }
+]

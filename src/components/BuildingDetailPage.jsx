@@ -611,14 +611,6 @@ export default function BuildingDetailPage() {
 
                   {/* ── Layer 1: Verdict Card ── */}
                   <Card className="border-slate-200 bg-white overflow-hidden">
-                    <div
-                      className="h-1"
-                      style={{
-                        background: verdictStatus === "on_track" ? brand.blue
-                          : verdictStatus === "review" ? brand.amber
-                          : brand.red,
-                      }}
-                    />
                     <CardContent className="px-5 py-4">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
@@ -1097,10 +1089,6 @@ export default function BuildingDetailPage() {
                                         setExpandedService(isExpanded ? null : bs.serviceId)
                                       }
                                     >
-                                      <div
-                                        className="w-1.5 h-8 rounded-full shrink-0"
-                                        style={{ background: rowStatusColor }}
-                                      />
                                       <ChevronRight
                                         size={14}
                                         className={`text-slate-400 transition-transform duration-150 shrink-0 ${isExpanded ? "rotate-90" : ""}`}

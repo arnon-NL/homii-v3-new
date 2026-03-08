@@ -26,7 +26,8 @@ import {
   Eye,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
-import { buildings, getSettlementsByYear, getView, savedViews } from "@/lib/mockData";
+import { getSettlementsByYear, getView } from "@/lib/mockData";
+import { useOrg } from "@/lib/OrgContext";
 import { t, useLang } from "@/lib/i18n";
 import { StatusBadge } from "./ui/status-badge";
 

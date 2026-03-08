@@ -1,0 +1,32 @@
+[
+  {
+    "id": "rochdale",
+    "name": "Rochdale",
+    "slug": "rochdale",
+    "logoText": "RCH",
+    "logoUrl": null,
+    "modules": ["energy", "serviceCharges"],
+    "dataDir": "",
+    "moduleConfig": {
+      "mode": "full",
+      "hasLedgerData": true,
+      "hasConsumptionData": true,
+      "hasNonUtilityServices": true
+    }
+  },
+  {
+    "id": "portaal",
+    "name": "Portaal",
+    "slug": "portaal",
+    "logoText": "PRT",
+    "logoUrl": "https://homiilogos.s3.eu-central-1.amazonaws.com/portaal-logo.png",
+    "modules": ["energy"],
+    "dataDir": "portaal",
+    "moduleConfig": {
+      "mode": "energyOnly",
+      "hasLedgerData": false,
+      "hasConsumptionData": true,
+      "hasNonUtilityServices": false
+    }
+  }
+]

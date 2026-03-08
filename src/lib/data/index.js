@@ -1,111 +1,342 @@
 // ═══════════════════════════════════════════════════════════════
-// src/lib/data/index.js — Main data layer exports
-// Drop-in replacement for mockData.js — all component imports
-// should work without changes via the mockData.js wrapper.
+// src/lib/data/index.js — Org-aware data layer
+//
+// Uses a module-level active org so all existing component imports
+// continue to work. OrgContext calls setActiveOrg() when switching.
+//
+// Pattern: all getter functions delegate to the active org's dataset.
+// ═══════════════════════════════════════════════════════════════
+import { getDataset, getAvailableYears as _getAvailableYears } from "./orgData.js";
+
+// --- Active org state (set by OrgContext) ---
+let _activeOrgId = "rochdale";
+
+export function setActiveOrg(orgId) {
+  _activeOrgId = orgId;
+}
+
+export function getActiveOrgId() {
+  return _activeOrgId;
+}
+
+function ds() {
+  return getDataset(_activeOrgId);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Array exports — these are getters so they always return current org data
+// ═══════════════════════════════════════════════════════════════
+export function getBuildings() { return ds().buildings; }
+export function getServices() { return ds().services; }
+export function getServiceCategories() { return ds().serviceCategories; }
+export function getAllBuildingServices() { return ds().buildingServices; }
+export function getVhes() { return ds().vhes; }
+export function getMeters() { return ds().meters; }
+export function getAllLedgerEntries() { return ds().ledgerEntries; }
+export function getSuppliers() { return ds().suppliers; }
+export function getSupplierCategories() { return ds().supplierCategories; }
+export function getAllSettlements() { return ds().settlements; }
+export function getAllSettlementChecks() { return ds().settlementChecks; }
+export function getDistributionMethods() { return ds().distributionMethods; }
+export function getDistributionModels() { return ds().distributionModels; }
+export function getMonthlyCloseStatuses() { return ds().monthlyCloseStatuses; }
+export function getSavedViews() { return ds().savedViews; }
+export function getActivities() { return ds().activities; }
+export function getCostAttribution() { return ds().costAttribution; }
+export function getCostCategories() { return ds().costCategories; }
+export function getModuleConfig() { return ds().moduleConfig; }
+
+// ── Backward-compatible property-style exports ─────────────
+// These use Object.defineProperty with getters so they dynamically
+// resolve to current org's data when accessed.
+// ── NOTE: This is a prototype pattern. In production, use hooks. ─
+const _proxy = {};
+Object.defineProperty(_proxy, "buildings", { get: () => ds().buildings, enumerable: true });
+Object.defineProperty(_proxy, "services", { get: () => ds().services, enumerable: true });
+Object.defineProperty(_proxy, "serviceCategories", { get: () => ds().serviceCategories, enumerable: true });
+Object.defineProperty(_proxy, "buildingServices", { get: () => ds().buildingServices, enumerable: true });
+Object.defineProperty(_proxy, "costAttribution", { get: () => ds().costAttribution, enumerable: true });
+Object.defineProperty(_proxy, "costCategories", { get: () => ds().costCategories, enumerable: true });
+Object.defineProperty(_proxy, "vhes", { get: () => ds().vhes, enumerable: true });
+Object.defineProperty(_proxy, "meters", { get: () => ds().meters, enumerable: true });
+Object.defineProperty(_proxy, "ledgerEntries", { get: () => ds().ledgerEntries, enumerable: true });
+Object.defineProperty(_proxy, "settlements", { get: () => ds().settlements, enumerable: true });
+Object.defineProperty(_proxy, "settlementChecks", { get: () => ds().settlementChecks, enumerable: true });
+Object.defineProperty(_proxy, "suppliers", { get: () => ds().suppliers, enumerable: true });
+Object.defineProperty(_proxy, "supplierCategories", { get: () => ds().supplierCategories, enumerable: true });
+Object.defineProperty(_proxy, "distributionMethods", { get: () => ds().distributionMethods, enumerable: true });
+Object.defineProperty(_proxy, "distributionModels", { get: () => ds().distributionModels, enumerable: true });
+Object.defineProperty(_proxy, "monthlyCloseStatuses", { get: () => ds().monthlyCloseStatuses, enumerable: true });
+Object.defineProperty(_proxy, "savedViews", { get: () => ds().savedViews, enumerable: true });
+Object.defineProperty(_proxy, "activities", { get: () => ds().activities, enumerable: true });
+Object.defineProperty(_proxy, "moduleConfig", { get: () => ds().moduleConfig, enumerable: true });
+
+// Re-export as named constants (these reference the proxy getters)
+export const buildings = _proxy.buildings;
+export const services = _proxy.services;
+export const serviceCategories = _proxy.serviceCategories;
+export const buildingServices = _proxy.buildingServices;
+export const costAttribution = _proxy.costAttribution;
+export const costCategories = _proxy.costCategories;
+export const vhes = _proxy.vhes;
+export const meters = _proxy.meters;
+export const ledgerEntries = _proxy.ledgerEntries;
+export const suppliers = _proxy.suppliers;
+export const supplierCategories = _proxy.supplierCategories;
+export const distributionMethods = _proxy.distributionMethods;
+export const distributionModels = _proxy.distributionModels;
+export const monthlyCloseStatuses = _proxy.monthlyCloseStatuses;
+export const savedViews = _proxy.savedViews;
+export const activities = _proxy.activities;
+export const moduleConfig = _proxy.moduleConfig;
+export const buildingSettlements = _proxy.settlements;
+export const settlementChecks = _proxy.settlementChecks;
+
+// ═══════════════════════════════════════════════════════════════
+// Getter functions — all delegate to active org's indexed dataset
 // ═══════════════════════════════════════════════════════════════
 
 // --- Buildings ---
-export { buildings, getBuilding, getBuildingByComplexId } from "./buildings.js";
+export function getBuilding(id) {
+  return ds()._buildingMap.get(String(id)) || null;
+}
+
+export function getBuildingByComplexId(complexId) {
+  return ds().buildings.find((b) => b.complexId === complexId) || null;
+}
 
 // --- Services ---
-export {
-  services,
-  serviceCategories,
-  getService,
-  getServiceByCode,
-  getServicesByCategory as getServicesByCategoryId,
-} from "./services.js";
+export function getService(id) {
+  return ds()._serviceMap.get(id) || null;
+}
 
-// --- Finance (buildingServices, costAttribution, costCategories) ---
-export {
-  buildingServices,
-  costAttribution,
-  costCategories,
-  getBuildingServices,
-  getBuildingServicesByService,
-  getBuildingService,
-  getCostAttributionByVhe,
-  getCostCategoriesByService,
-} from "./finance.js";
+export function getServiceByCode(code) {
+  return ds()._serviceByCode.get(code) || null;
+}
+
+export function getServicesByCategoryId(categoryId) {
+  return ds().services.filter((s) => s.category === categoryId);
+}
+
+// --- Finance ---
+export function getBuildingServices(buildingId, year) {
+  const all = ds()._bsByBuilding.get(String(buildingId)) || [];
+  if (year) return all.filter((bs) => bs.year === year);
+  return all;
+}
+
+export function getBuildingServicesByService(serviceId, year) {
+  const all = ds()._bsByService.get(serviceId) || [];
+  if (year) return all.filter((bs) => bs.year === year);
+  return all;
+}
+
+export function getBuildingService(buildingId, serviceId, year) {
+  return ds()._bsLookup.get(`${buildingId}|${serviceId}|${year}`) || null;
+}
+
+export function getCostAttributionByVhe(vheId, year) {
+  const all = ds()._caByVhe.get(vheId) || [];
+  if (year) return all.filter((ca) => ca.year === year);
+  return all;
+}
+
+export function getCostCategoriesByService(serviceId) {
+  return ds().costCategories.filter((cc) => cc.serviceId === serviceId);
+}
 
 // --- VHEs ---
-export { vhes, getVhe, getVhesByBuilding } from "./vhes.js";
+export function getVhe(id) {
+  return ds()._vheMap.get(id) || null;
+}
+
+export function getVhesByBuilding(buildingId) {
+  return ds()._vhesByBuilding.get(String(buildingId)) || [];
+}
 
 // --- Meters ---
-export { meters, getMetersByBuilding, getMetersByVhe } from "./meters.js";
+export function getMetersByBuilding(buildingId) {
+  return ds()._metersByBuilding.get(String(buildingId)) || [];
+}
+
+export function getMetersByVhe(vheId) {
+  return ds()._metersByVhe.get(vheId) || [];
+}
 
 // --- Ledger ---
-export {
-  ledgerEntries,
-  getLedgerByService,
-  getLedgerByBuilding,
-  getLedgerByServiceAndBuilding,
-  getLedgerGroupedByCostCategory,
-  getLedgerSummaryByService,
-  getLedgerSummaryByBuilding,
-  getLedgerMonthlySummaryByService,
-} from "./ledger.js";
+export function getLedgerByService(serviceId, year) {
+  const entries = ds()._ledgerByService.get(serviceId) || [];
+  if (year != null) return entries.filter((e) => e.year === year);
+  return entries;
+}
+
+export function getLedgerByBuilding(buildingId) {
+  return ds()._ledgerByBuilding.get(String(buildingId)) || [];
+}
+
+export function getLedgerByServiceAndBuilding(serviceId, buildingId) {
+  return ds()._ledgerByServiceBuilding.get(`${serviceId}|${String(buildingId)}`) || [];
+}
+
+export function getLedgerGroupedByCostCategory(serviceId, buildingId, year) {
+  let entries = buildingId
+    ? getLedgerByServiceAndBuilding(serviceId, buildingId)
+    : getLedgerByService(serviceId);
+  if (year != null) entries = entries.filter((e) => e.year === year);
+  const grouped = {};
+  const unassigned = [];
+  for (const e of entries) {
+    const cat = e.costCategoryId;
+    if (!cat) { unassigned.push(e); continue; }
+    if (!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push(e);
+  }
+  return { grouped, unassigned };
+}
+
+export function getLedgerSummaryByService(serviceId, year) {
+  const entries = getLedgerByService(serviceId, year);
+  const byBuilding = {};
+  for (const e of entries) {
+    if (!byBuilding[e.buildingId])
+      byBuilding[e.buildingId] = { total: 0, count: 0, flagged: 0, pending: 0 };
+    const b = byBuilding[e.buildingId];
+    b.total += e.amount || 0;
+    b.count += 1;
+    if (e.status === "flagged") b.flagged += 1;
+    if (e.status === "pending") b.pending += 1;
+  }
+  return byBuilding;
+}
+
+export function getLedgerSummaryByBuilding(buildingId) {
+  const entries = getLedgerByBuilding(buildingId);
+  const byService = {};
+  for (const e of entries) {
+    if (!byService[e.serviceId])
+      byService[e.serviceId] = { total: 0, count: 0 };
+    byService[e.serviceId].total += e.amount || 0;
+    byService[e.serviceId].count += 1;
+  }
+  return byService;
+}
+
+export function getLedgerMonthlySummaryByService(serviceId) {
+  const entries = getLedgerByService(serviceId);
+  const byMonth = {};
+  for (const e of entries) {
+    const key = `${e.year}-${String(e.month).padStart(2, "0")}`;
+    if (!byMonth[key]) byMonth[key] = { total: 0, count: 0 };
+    byMonth[key].total += e.amount || 0;
+    byMonth[key].count += 1;
+  }
+  return byMonth;
+}
 
 // --- Suppliers ---
-export {
-  suppliers,
-  supplierCategories,
-  getSupplier,
-  getSuppliersByService,
-} from "./suppliers.js";
+export function getSupplier(id) {
+  return ds()._supplierMap.get(id) || null;
+}
+
+export function getSuppliersByService(serviceId) {
+  return ds().suppliers.filter((s) => s.serviceIds && s.serviceIds.includes(serviceId));
+}
 
 // --- Settlements ---
-export {
-  buildingSettlements,
-  settlementChecks,
-  getSettlement,
-  getSettlementsByYear,
-  getSettlementChecks,
-} from "./settlements.js";
+export function getSettlement(buildingId, year) {
+  const all = ds()._settlementsByBuilding.get(String(buildingId)) || [];
+  if (year) return all.find((s) => s.year === year) || null;
+  return all[0] || null;
+}
+
+export function getSettlementsByYear(year) {
+  return ds().settlements.filter((s) => s.year === year);
+}
+
+export function getSettlementChecks(buildingId, year) {
+  return ds()._checksByBldYear.get(`${String(buildingId)}|${year}`) || [];
+}
 
 // --- Distribution ---
-export {
-  distributionMethods,
-  distributionModels,
-  getDistributionMethod,
-  getDistributionModel,
-} from "./distribution.js";
+export function getDistributionMethod(id) {
+  return ds().distributionMethods.find((m) => m.id === id) || null;
+}
+
+export function getDistributionModel(buildingId, serviceId) {
+  // Try indexed lookup from distribution models
+  for (const m of ds().distributionModels) {
+    if (String(m.buildingId) === String(buildingId) && m.serviceId === serviceId) return m;
+  }
+  return null;
+}
 
 // --- Monthly Close ---
-export {
-  monthlyCloseStatuses,
-  getMonthlyCloseForBuilding,
-  getMonthlyCloseForBuildingService,
-  getMonthlyCloseGridForBuilding,
-} from "./monthlyClose.js";
+export function getMonthlyCloseForBuilding(buildingId, year) {
+  const all = ds().monthlyCloseStatuses.filter(
+    (s) => String(s.buildingId) === String(buildingId),
+  );
+  if (year) return all.filter((s) => s.year === year);
+  return all;
+}
+
+export function getMonthlyCloseForBuildingService(buildingId, serviceId, year) {
+  const all = ds().monthlyCloseStatuses.filter(
+    (s) => String(s.buildingId) === String(buildingId) && s.serviceId === serviceId,
+  );
+  if (year) return all.filter((s) => s.year === year);
+  return all;
+}
+
+export function getMonthlyCloseGridForBuilding(buildingId, year) {
+  const entries = getMonthlyCloseForBuilding(buildingId, year);
+  const grid = {};
+  for (const e of entries) {
+    if (!grid[e.serviceId]) {
+      grid[e.serviceId] = Array(12).fill(null).map(() => ({ status: "pending" }));
+    }
+    const idx = (e.month || 1) - 1;
+    grid[e.serviceId][idx] = {
+      status: e.status,
+      closedAt: e.closedAt,
+      closedBy: e.closedBy,
+    };
+  }
+  return grid;
+}
 
 // --- Views ---
-export { savedViews, getView } from "./views.js";
+export function getView(id) {
+  return ds().savedViews.find((v) => v.id === id) || null;
+}
 
 // --- Config ---
-export { moduleConfig, isFeatureEnabled } from "./config.js";
+export function isFeatureEnabled(feature) {
+  const cfg = ds().moduleConfig;
+  if (cfg.mode === "full") return true;
+  const featureMap = {
+    ledger: cfg.hasLedgerData,
+    consumption: cfg.hasConsumptionData,
+    nonUtility: cfg.hasNonUtilityServices,
+    consumptionControl: cfg.hasConsumptionData,
+  };
+  return featureMap[feature] ?? false;
+}
 
-// --- Field Sources ---
+// --- Field Sources (shared across orgs) ---
 export { FIELD_SOURCES, getFieldSource, getEntitySource } from "./fieldSources.js";
 
-// --- Activities (static mock) ---
-import rawActivities from "../../data/activities.json";
-export const activities = rawActivities;
+// --- Available years (derived from data) ---
+export function getAvailableYears() {
+  return _getAvailableYears(_activeOrgId);
+}
 
 // ═══════════════════════════════════════════════════════════════
 // Compatibility aliases — match original mockData.js signatures
 // ═══════════════════════════════════════════════════════════════
 
-import { buildings as _buildings } from "./buildings.js";
-import { services as _services, serviceCategories as _cats } from "./services.js";
-import { getBuildingServices as _getBs } from "./finance.js";
-import { getMetersByVhe as _getMetersByVhe } from "./meters.js";
-import { suppliers as _suppliers } from "./suppliers.js";
-import { savedViews as _views } from "./views.js";
-
-/** getBuildingServicesByYear: returns { 2024: [...], 2025: [...], 2026: [...] } */
+/** getBuildingServicesByYear: returns { year: [...], ... } */
 export function getBuildingServicesByYear(buildingId) {
-  const all = _getBs(buildingId);
+  const all = getBuildingServices(buildingId);
   const byYear = {};
   for (const bs of all) {
     if (!byYear[bs.year]) byYear[bs.year] = [];
@@ -116,12 +347,12 @@ export function getBuildingServicesByYear(buildingId) {
 
 /** getSubmetersByVhe: alias for getMetersByVhe, filtered to type=sub */
 export function getSubmetersByVhe(vheId) {
-  return _getMetersByVhe(vheId).filter((m) => m.type === "sub");
+  return getMetersByVhe(vheId).filter((m) => m.type === "sub");
 }
 
 /** getVheMeterReadings: returns meter readings for a VHE+year */
 export function getVheMeterReadings(vheId, year) {
-  const submeters = _getMetersByVhe(vheId);
+  const submeters = getMetersByVhe(vheId);
   return submeters
     .filter((m) => m.readings && m.readings[year])
     .map((m) => ({ ...m.readings[year], meterId: m.id, utility: m.utility }));
@@ -129,24 +360,24 @@ export function getVheMeterReadings(vheId, year) {
 
 /** getActivitiesByBuilding */
 export function getActivitiesByBuilding(buildingId) {
-  return rawActivities.filter((a) => a.buildingId === String(buildingId));
+  return ds().activities.filter((a) => a.buildingId === String(buildingId));
 }
 
 /** getSuppliersByCategory */
 export function getSuppliersByCategory(categoryId) {
-  return _suppliers.filter(
+  return ds().suppliers.filter(
     (s) => s.categories && s.categories.includes(categoryId),
   );
 }
 
 /** getViewsForObject: filter saved views by objectType */
 export function getViewsForObject(objectType) {
-  return _views.filter((v) => v.objectType === objectType);
+  return ds().savedViews.filter((v) => v.objectType === objectType);
 }
 
 /** getCategory: get a service category by id */
 export function getCategory(categoryId) {
-  return _cats.find((c) => c.id === categoryId) || null;
+  return ds().serviceCategories.find((c) => c.id === categoryId) || null;
 }
 
 /**
@@ -154,9 +385,11 @@ export function getCategory(categoryId) {
  * Matches original mockData.js behavior (returns grouped object, not array)
  */
 export function getServicesByCategory() {
+  const cats = ds().serviceCategories;
+  const svcs = ds().services;
   const grouped = {};
-  for (const cat of _cats) {
-    grouped[cat.id] = _services.filter((s) => s.category === cat.id);
+  for (const cat of cats) {
+    grouped[cat.id] = svcs.filter((s) => s.category === cat.id);
   }
   return grouped;
 }

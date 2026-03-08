@@ -1,0 +1,52 @@
+[
+  {
+    "id": "CC-heat",
+    "serviceId": "SVC-EM-heat",
+    "code": "HEAT",
+    "name": {
+      "en": "Heating",
+      "nl": "Verwarming"
+    },
+    "type": "variable"
+  },
+  {
+    "id": "CC-gas",
+    "serviceId": "SVC-EM-gas",
+    "code": "GAS",
+    "name": {
+      "en": "Gas",
+      "nl": "Gas"
+    },
+    "type": "variable"
+  },
+  {
+    "id": "CC-water",
+    "serviceId": "SVC-EM-water",
+    "code": "WATER",
+    "name": {
+      "en": "Water",
+      "nl": "Water"
+    },
+    "type": "variable"
+  },
+  {
+    "id": "CC-warmwater",
+    "serviceId": "SVC-EM-warmwater",
+    "code": "WARMWATER",
+    "name": {
+      "en": "Warm Water",
+      "nl": "Warm Water"
+    },
+    "type": "variable"
+  },
+  {
+    "id": "CC-contracts",
+    "serviceId": "SVC-EM-contracts",
+    "code": "CONTRACTS",
+    "name": {
+      "en": "Service Contracts",
+      "nl": "Servicecontracten"
+    },
+    "type": "fixed"
+  }
+]
