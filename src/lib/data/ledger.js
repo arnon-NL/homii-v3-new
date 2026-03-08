@@ -38,20 +38,25 @@ export function getLedgerByServiceAndBuilding(serviceId, buildingId) {
   return byServiceBuilding.get(`${serviceId}|${String(buildingId)}`) || [];
 }
 
-export function getLedgerGroupedByCostCategory(serviceId, buildingId) {
-  const entries = buildingId
+export function getLedgerGroupedByCostCategory(serviceId, buildingId, year) {
+  let entries = buildingId
     ? getLedgerByServiceAndBuilding(serviceId, buildingId)
     : getLedgerByService(serviceId);
 
+  if (year != null) entries = entries.filter((e) => e.year === year);
+
   const grouped = {};
+  const unassigned = [];
   for (const e of entries) {
-    const cat = e.costCategoryId || "uncategorized";
-    if (!grouped[cat]) grouped[cat] = { total: 0, count: 0, entries: [] };
-    grouped[cat].total += e.amount || 0;
-    grouped[cat].count += 1;
-    grouped[cat].entries.push(e);
+    const cat = e.costCategoryId;
+    if (!cat) {
+      unassigned.push(e);
+      continue;
+    }
+    if (!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push(e);
   }
-  return grouped;
+  return { grouped, unassigned };
 }
 
 export function getLedgerSummaryByService(serviceId, year) {
