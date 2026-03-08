@@ -1,0 +1,102 @@
+[
+  {
+    "id": "ACT-001",
+    "buildingId": "7955",
+    "type": "meter_reading",
+    "date": "2026-02-20",
+    "description": {
+      "en": "Heat meter reading received",
+      "nl": "Warmtemeterstand ontvangen"
+    }
+  },
+  {
+    "id": "ACT-002",
+    "buildingId": "8727",
+    "type": "ledger_entry",
+    "date": "2026-01-26",
+    "description": {
+      "en": "Ledger entry posted",
+      "nl": "Boekingsregel verwerkt"
+    }
+  },
+  {
+    "id": "ACT-003",
+    "buildingId": "10381",
+    "type": "distribution",
+    "date": "2026-02-22",
+    "description": {
+      "en": "Distribution method updated",
+      "nl": "Verdeelsleutel gewijzigd"
+    }
+  },
+  {
+    "id": "ACT-004",
+    "buildingId": "8402",
+    "type": "alert",
+    "date": "2026-01-04",
+    "description": {
+      "en": "Meter reading overdue",
+      "nl": "Meterstand te laat"
+    }
+  },
+  {
+    "id": "ACT-005",
+    "buildingId": "8523",
+    "type": "meter_reading",
+    "date": "2026-01-09",
+    "description": {
+      "en": "Heat meter reading received",
+      "nl": "Warmtemeterstand ontvangen"
+    }
+  },
+  {
+    "id": "ACT-006",
+    "buildingId": "8818",
+    "type": "ledger_entry",
+    "date": "2026-02-24",
+    "description": {
+      "en": "Ledger entry posted",
+      "nl": "Boekingsregel verwerkt"
+    }
+  },
+  {
+    "id": "ACT-007",
+    "buildingId": "7963",
+    "type": "distribution",
+    "date": "2026-03-01",
+    "description": {
+      "en": "Distribution method updated",
+      "nl": "Verdeelsleutel gewijzigd"
+    }
+  },
+  {
+    "id": "ACT-008",
+    "buildingId": "8171",
+    "type": "alert",
+    "date": "2026-02-19",
+    "description": {
+      "en": "Meter reading overdue",
+      "nl": "Meterstand te laat"
+    }
+  },
+  {
+    "id": "ACT-009",
+    "buildingId": "8584",
+    "type": "meter_reading",
+    "date": "2026-02-08",
+    "description": {
+      "en": "Heat meter reading received",
+      "nl": "Warmtemeterstand ontvangen"
+    }
+  },
+  {
+    "id": "ACT-010",
+    "buildingId": "8459",
+    "type": "ledger_entry",
+    "date": "2026-01-17",
+    "description": {
+      "en": "Ledger entry posted",
+      "nl": "Boekingsregel verwerkt"
+    }
+  }
+]

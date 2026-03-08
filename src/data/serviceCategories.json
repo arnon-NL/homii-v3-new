@@ -1,0 +1,42 @@
+[
+  {
+    "id": "energy",
+    "icon": "Zap",
+    "label": {
+      "en": "Energy & Water",
+      "nl": "Energie & Water"
+    }
+  },
+  {
+    "id": "installations",
+    "icon": "Wrench",
+    "label": {
+      "en": "Installations & Maintenance",
+      "nl": "Installaties & Technisch Beheer"
+    }
+  },
+  {
+    "id": "cleaning",
+    "icon": "Sparkles",
+    "label": {
+      "en": "Cleaning & Exterior",
+      "nl": "Schoonmaak & Buitenruimte"
+    }
+  },
+  {
+    "id": "management",
+    "icon": "HardHat",
+    "label": {
+      "en": "Management & Services",
+      "nl": "Beheer & Woonservices"
+    }
+  },
+  {
+    "id": "other",
+    "icon": "FolderOpen",
+    "label": {
+      "en": "Other & Insurance",
+      "nl": "Overig & Verzekeringen"
+    }
+  }
+]

@@ -1,6 +1,7 @@
 import React from "react";
 import { ArrowUpRight } from "lucide-react";
 import { brand } from "@/lib/brand";
+import { DataSourceTag } from "@/components/ui/data-source-tag";
 
 export function AttributePanel({ children }) {
   return (
@@ -21,18 +22,21 @@ export function AttrSection({ title, children }) {
   );
 }
 
-export function AttrRow({ label, value, onClick, color }) {
+export function AttrRow({ label, value, onClick, color, source }) {
   const Val = onClick ? "button" : "span";
   return (
     <div className="flex items-baseline justify-between gap-2 min-h-[22px]">
       <span className="text-[11px] text-slate-400 shrink-0">{label}</span>
-      <Val
-        className={`text-xs font-medium text-right truncate max-w-[200px] xl:max-w-[160px] ${onClick ? "hover:text-[#3EB1C8] cursor-pointer transition-colors" : ""}`}
-        style={{ color: color || brand.navy }}
-        onClick={onClick}
-        title={typeof value === "string" ? value : undefined}>
-        {value}
-      </Val>
+      <span className="flex items-center gap-1.5">
+        <Val
+          className={`text-xs font-medium text-right truncate max-w-[180px] xl:max-w-[140px] ${onClick ? "hover:text-[#3EB1C8] cursor-pointer transition-colors" : ""}`}
+          style={{ color: color || brand.navy }}
+          onClick={onClick}
+          title={typeof value === "string" ? value : undefined}>
+          {value}
+        </Val>
+        {source && <DataSourceTag source={source} />}
+      </span>
     </div>
   );
 }

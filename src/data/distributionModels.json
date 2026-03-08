@@ -1,0 +1,2402 @@
+[
+  {
+    "id": "DM-8047-108",
+    "buildingId": "8047",
+    "serviceId": "SVC-108",
+    "provider": "Techem Energy Services BV",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 88999.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 9652.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.36598,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.64285,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8077-108",
+    "buildingId": "8077",
+    "serviceId": "SVC-108",
+    "provider": "Techem Energy Services BV",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 122990.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 14314.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.28322,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.62689,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8088-108",
+    "buildingId": "8088",
+    "serviceId": "SVC-108",
+    "provider": "ista Nederland B.V.",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 131950.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 2708.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.28309,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.67487,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8091-108",
+    "buildingId": "8091",
+    "serviceId": "SVC-108",
+    "provider": "ista Nederland B.V.",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 112637.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 14583.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.37345,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.62929,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8092-108",
+    "buildingId": "8092",
+    "serviceId": "SVC-108",
+    "provider": "ista Nederland B.V.",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 81670.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 8119.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.36306,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.66596,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8101-108",
+    "buildingId": "8101",
+    "serviceId": "SVC-108",
+    "provider": "Techem Energy Services BV",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 95043.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 6376.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.3244,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.69164,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8109-108",
+    "buildingId": "8109",
+    "serviceId": "SVC-108",
+    "provider": "Techem Energy Services BV",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 34734.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 6612.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.2869,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.65356,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8135-108",
+    "buildingId": "8135",
+    "serviceId": "SVC-108",
+    "provider": "ista Nederland B.V.",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 48993.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 5923.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.35732,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.64037,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8145-108",
+    "buildingId": "8145",
+    "serviceId": "SVC-108",
+    "provider": "Techem Energy Services BV",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 122908.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 14923.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.35166,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.69052,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8180-108",
+    "buildingId": "8180",
+    "serviceId": "SVC-108",
+    "provider": "ista Nederland B.V.",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 26949.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 5691.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.29158,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.67601,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8181-108",
+    "buildingId": "8181",
+    "serviceId": "SVC-108",
+    "provider": "ista Nederland B.V.",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 113014.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 10607.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.34375,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.70323,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8188-108",
+    "buildingId": "8188",
+    "serviceId": "SVC-108",
+    "provider": "Techem Energy Services BV",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 27176.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 3309.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.36583,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.63742,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8191-108",
+    "buildingId": "8191",
+    "serviceId": "SVC-108",
+    "provider": "Techem Energy Services BV",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 139516.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 13536.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.36672,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.66042,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8193-108",
+    "buildingId": "8193",
+    "serviceId": "SVC-108",
+    "provider": "Techem Energy Services BV",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 110651.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 11474.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.29976,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.64346,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8198-108",
+    "buildingId": "8198",
+    "serviceId": "SVC-108",
+    "provider": "Techem Energy Services BV",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 29016.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 7729.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.29779,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.69603,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8199-108",
+    "buildingId": "8199",
+    "serviceId": "SVC-108",
+    "provider": "ista Nederland B.V.",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 149653.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 8123.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.35049,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.6349,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8215-108",
+    "buildingId": "8215",
+    "serviceId": "SVC-108",
+    "provider": "ista Nederland B.V.",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 136744.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 6937.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.31806,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.63089,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8216-108",
+    "buildingId": "8216",
+    "serviceId": "SVC-108",
+    "provider": "Techem Energy Services BV",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 195528.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 6909.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.31193,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.68562,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8223-108",
+    "buildingId": "8223",
+    "serviceId": "SVC-108",
+    "provider": "ista Nederland B.V.",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 25546.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 5215.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.31892,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.65063,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  },
+  {
+    "id": "DM-8224-108",
+    "buildingId": "8224",
+    "serviceId": "SVC-108",
+    "provider": "Techem Energy Services BV",
+    "formulaVersion": "2024-v2",
+    "lastUpdated": "2024-09-01",
+    "inputs": [
+      {
+        "id": "gas_cost",
+        "label": {
+          "en": "Gas cost",
+          "nl": "Gaskosten"
+        },
+        "formula": "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')",
+        "resolvedValue": 59634.0
+      },
+      {
+        "id": "contracts",
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "formula": "other_costs('Vaste Lasten') + other_costs('Meetdiensten')",
+        "resolvedValue": 13685.0
+      }
+    ],
+    "splits": [
+      {
+        "source": "gas_cost",
+        "ratio": 0.31283,
+        "method": "fixed_pct",
+        "output": "warm_water_cost",
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        }
+      },
+      {
+        "source": "gas_cost",
+        "ratio": 0.70939,
+        "method": "fixed_pct",
+        "output": "heating_cost",
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.15,
+        "method": "fixed_pct",
+        "output": "heating_fixed",
+        "label": {
+          "en": "Pipe delivery (fixed)",
+          "nl": "Leidingafgifte (vast)"
+        }
+      },
+      {
+        "source": "heating_cost",
+        "ratio": 0.85,
+        "method": "fixed_pct",
+        "output": "heating_variable",
+        "label": {
+          "en": "Heating (variable)",
+          "nl": "Verwarming (variabel)"
+        }
+      }
+    ],
+    "invoiceLines": [
+      {
+        "label": {
+          "en": "Heating",
+          "nl": "Verwarming"
+        },
+        "source": "heating_variable",
+        "distributionKey": "cost_key_nl_eenheden",
+        "keyLabel": {
+          "en": "By consumption units",
+          "nl": "Op basis van eenheden"
+        }
+      },
+      {
+        "label": {
+          "en": "Pipe delivery",
+          "nl": "Leidingafgifte"
+        },
+        "source": "heating_fixed",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Warm water",
+          "nl": "Warm water"
+        },
+        "source": "warm_water_cost",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      },
+      {
+        "label": {
+          "en": "Contracts",
+          "nl": "Contractkosten"
+        },
+        "source": "contracts",
+        "distributionKey": "cost_key_ista_label_hasFixed",
+        "keyLabel": {
+          "en": "Per VHE (ista fixed)",
+          "nl": "Per VHE (ista vast)"
+        }
+      }
+    ]
+  }
+]

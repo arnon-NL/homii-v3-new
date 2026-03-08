@@ -1,0 +1,742 @@
+[
+  {
+    "id": "SVC-036",
+    "code": "GDG036",
+    "name": {
+      "en": "Glass Insurance",
+      "nl": "Glasverzekering"
+    },
+    "description": {
+      "en": "Collective glass breakage insurance",
+      "nl": "Collectieve glasbrakverzekering"
+    },
+    "category": "other",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 596,
+    "suppliers": [],
+    "avgCostPerVhe": 25.46,
+    "status": "active"
+  },
+  {
+    "id": "SVC-099",
+    "code": "GDG099",
+    "name": {
+      "en": "Miscellaneous",
+      "nl": "Diversen"
+    },
+    "description": {
+      "en": "Uncategorised service charges",
+      "nl": "Niet-gecategoriseerde servicekosten"
+    },
+    "category": "other",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 1,
+    "suppliers": [],
+    "avgCostPerVhe": 23.13,
+    "status": "active"
+  },
+  {
+    "id": "SVC-102",
+    "code": "GDG102",
+    "name": {
+      "en": "Cold Water (residential)",
+      "nl": "Koud water woonruimte"
+    },
+    "description": {
+      "en": "Cold water supply for residential units",
+      "nl": "Koud waterlevering voor woonruimten"
+    },
+    "category": "energy",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": true,
+    "metered": true,
+    "buildingCount": 50,
+    "suppliers": [],
+    "avgCostPerVhe": 71.92,
+    "status": "active"
+  },
+  {
+    "id": "SVC-104",
+    "code": "GDG104",
+    "name": {
+      "en": "Hot Water (residential)",
+      "nl": "Warm water woonruimte"
+    },
+    "description": {
+      "en": "Hot water supply for residential units",
+      "nl": "Warm waterlevering voor woonruimten"
+    },
+    "category": "energy",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": true,
+    "metered": true,
+    "buildingCount": 1,
+    "suppliers": [],
+    "avgCostPerVhe": 0.38,
+    "status": "active"
+  },
+  {
+    "id": "SVC-105",
+    "code": "GDG105",
+    "name": {
+      "en": "Communal Electricity",
+      "nl": "Elektrakosten algemeen"
+    },
+    "description": {
+      "en": "Electricity for shared spaces",
+      "nl": "Elektriciteit voor gemeenschappelijke ruimten"
+    },
+    "category": "energy",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": true,
+    "buildingCount": 443,
+    "suppliers": [],
+    "avgCostPerVhe": 62.76,
+    "status": "active"
+  },
+  {
+    "id": "SVC-106",
+    "code": "GDG106",
+    "name": {
+      "en": "Electricity (residential)",
+      "nl": "Elektra woonruimte"
+    },
+    "description": {
+      "en": "Individual electricity for residential units",
+      "nl": "Individueel elektriciteitsverbruik voor woonruimten"
+    },
+    "category": "energy",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": true,
+    "metered": true,
+    "buildingCount": 8,
+    "suppliers": [],
+    "avgCostPerVhe": 8.21,
+    "status": "active"
+  },
+  {
+    "id": "SVC-107",
+    "code": "GDG107",
+    "name": {
+      "en": "Gas (communal facilities)",
+      "nl": "Lev gas gem voorz"
+    },
+    "description": {
+      "en": "Gas delivery for communal facilities",
+      "nl": "Gaslevering voor gemeenschappelijke voorzieningen"
+    },
+    "category": "energy",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": true,
+    "metered": true,
+    "buildingCount": 1,
+    "suppliers": [],
+    "avgCostPerVhe": 30.42,
+    "status": "active"
+  },
+  {
+    "id": "SVC-108",
+    "code": "GDG108",
+    "name": {
+      "en": "Heating Costs",
+      "nl": "Warmtekosten"
+    },
+    "description": {
+      "en": "Central heating supply and distribution",
+      "nl": "Centrale verwarming en warmtedistributie"
+    },
+    "category": "energy",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": true,
+    "metered": true,
+    "buildingCount": 50,
+    "suppliers": [],
+    "avgCostPerVhe": 383.2,
+    "status": "active"
+  },
+  {
+    "id": "SVC-109",
+    "code": "GDG109",
+    "name": {
+      "en": "Elektra Woonruimte",
+      "nl": "Elektra Woonruimte"
+    },
+    "description": {
+      "en": "",
+      "nl": ""
+    },
+    "category": "energy",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 2,
+    "suppliers": [],
+    "avgCostPerVhe": 276.12,
+    "status": "active"
+  },
+  {
+    "id": "SVC-110",
+    "code": "GDG110",
+    "name": {
+      "en": "Electricity (commercial)",
+      "nl": "Elektra BOG"
+    },
+    "description": {
+      "en": "Electricity for commercial spaces",
+      "nl": "Elektriciteit voor bedrijfsmatig onroerend goed"
+    },
+    "category": "energy",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": true,
+    "metered": true,
+    "buildingCount": 3,
+    "suppliers": [],
+    "avgCostPerVhe": 274.32,
+    "status": "active"
+  },
+  {
+    "id": "SVC-111",
+    "code": "GDG111",
+    "name": {
+      "en": "Consumption Meters",
+      "nl": "Verbruiksmeters"
+    },
+    "description": {
+      "en": "Maintenance and calibration of meters",
+      "nl": "Onderhoud en ijking van verbruiksmeters"
+    },
+    "category": "energy",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 9,
+    "suppliers": [],
+    "avgCostPerVhe": 4.32,
+    "status": "active"
+  },
+  {
+    "id": "SVC-115",
+    "code": "GDG115",
+    "name": {
+      "en": "24h Emergency Service (heating)",
+      "nl": "24 uur storingsdienst CV"
+    },
+    "description": {
+      "en": "Emergency repair service for heating",
+      "nl": "24-uurs storingsdienst CV"
+    },
+    "category": "installations",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 823,
+    "suppliers": [],
+    "avgCostPerVhe": 24.8,
+    "status": "active"
+  },
+  {
+    "id": "SVC-116",
+    "code": "GDG116",
+    "name": {
+      "en": "Lamp Replacement",
+      "nl": "Vervangen lampen"
+    },
+    "description": {
+      "en": "Replacement of communal lighting",
+      "nl": "Vervanging verlichting gemeenschappelijke ruimten"
+    },
+    "category": "installations",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 23,
+    "suppliers": [],
+    "avgCostPerVhe": 34.16,
+    "status": "active"
+  },
+  {
+    "id": "SVC-118",
+    "code": "GDG118",
+    "name": {
+      "en": "Cleaning Common Areas",
+      "nl": "Schoonmaken algemene ruimte"
+    },
+    "description": {
+      "en": "Regular cleaning of shared spaces",
+      "nl": "Schoonmaak gemeenschappelijke ruimten"
+    },
+    "category": "cleaning",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 337,
+    "suppliers": [],
+    "avgCostPerVhe": 85.3,
+    "status": "active"
+  },
+  {
+    "id": "SVC-120",
+    "code": "GDG120",
+    "name": {
+      "en": "24h Emergency Service (hydrophore)",
+      "nl": "24 uur storingsdienst hydrof."
+    },
+    "description": {
+      "en": "Emergency service for water pressure systems",
+      "nl": "Storingsdienst hydrofoor"
+    },
+    "category": "installations",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 115,
+    "suppliers": [],
+    "avgCostPerVhe": 1.91,
+    "status": "active"
+  },
+  {
+    "id": "SVC-122",
+    "code": "GDG122",
+    "name": {
+      "en": "Drain Cleaning",
+      "nl": "Ontstoppen riool"
+    },
+    "description": {
+      "en": "Drain and sewer cleaning",
+      "nl": "Riool- en afvoerreiniging"
+    },
+    "category": "installations",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 580,
+    "suppliers": [],
+    "avgCostPerVhe": 6.42,
+    "status": "active"
+  },
+  {
+    "id": "SVC-123",
+    "code": "GDG123",
+    "name": {
+      "en": "Landscaping",
+      "nl": "Tuinonderhoud"
+    },
+    "description": {
+      "en": "Garden and green area maintenance",
+      "nl": "Tuin- en groenonderhoud"
+    },
+    "category": "cleaning",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 1,
+    "suppliers": [],
+    "avgCostPerVhe": 4.16,
+    "status": "active"
+  },
+  {
+    "id": "SVC-124",
+    "code": "GDG124",
+    "name": {
+      "en": "Gutter Cleaning",
+      "nl": "Reinigen dakgoten ed."
+    },
+    "description": {
+      "en": "Periodic cleaning of gutters and drainage",
+      "nl": "Periodiek reinigen dakgoten en afwatering"
+    },
+    "category": "installations",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 49,
+    "suppliers": [],
+    "avgCostPerVhe": 23.34,
+    "status": "active"
+  },
+  {
+    "id": "SVC-126",
+    "code": "GDG126",
+    "name": {
+      "en": "Geyser Cleaning",
+      "nl": "Reinigen geisers ed."
+    },
+    "description": {
+      "en": "Cleaning of gas water heaters",
+      "nl": "Reinigen gasboilers en geisers"
+    },
+    "category": "installations",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 31,
+    "suppliers": [],
+    "avgCostPerVhe": 4.09,
+    "status": "active"
+  },
+  {
+    "id": "SVC-127",
+    "code": "GDG127",
+    "name": {
+      "en": "Mechanical Ventilation",
+      "nl": "Mechanische vent. collectief"
+    },
+    "description": {
+      "en": "Communal ventilation maintenance",
+      "nl": "Onderhoud collectieve ventilatie"
+    },
+    "category": "installations",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 81,
+    "suppliers": [],
+    "avgCostPerVhe": 23.6,
+    "status": "active"
+  },
+  {
+    "id": "SVC-128",
+    "code": "GDG128",
+    "name": {
+      "en": "Mechanische Ventilatie",
+      "nl": "Mechanische Ventilatie"
+    },
+    "description": {
+      "en": "",
+      "nl": ""
+    },
+    "category": "installations",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 519,
+    "suppliers": [],
+    "avgCostPerVhe": 12.36,
+    "status": "active"
+  },
+  {
+    "id": "SVC-131",
+    "code": "GDG131",
+    "name": {
+      "en": "District Management / Caretaker",
+      "nl": "Wijkbeheer/Huismeester"
+    },
+    "description": {
+      "en": "On-site caretaker and management",
+      "nl": "Huismeester en wijkbeheer"
+    },
+    "category": "management",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 834,
+    "suppliers": [],
+    "avgCostPerVhe": 50.16,
+    "status": "active"
+  },
+  {
+    "id": "SVC-132",
+    "code": "GDG132",
+    "name": {
+      "en": "24h Emergency Service (elevator)",
+      "nl": "24 uur storingsdienst lift"
+    },
+    "description": {
+      "en": "Emergency service for elevators",
+      "nl": "24-uurs storingsdienst lift"
+    },
+    "category": "installations",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 152,
+    "suppliers": [],
+    "avgCostPerVhe": 24.4,
+    "status": "active"
+  },
+  {
+    "id": "SVC-133",
+    "code": "GDG133",
+    "name": {
+      "en": "Elevator Electricity",
+      "nl": "Elektriciteit lift"
+    },
+    "description": {
+      "en": "Electricity for elevator operation",
+      "nl": "Elektriciteitsverbruik lift"
+    },
+    "category": "installations",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": true,
+    "buildingCount": 10,
+    "suppliers": [],
+    "avgCostPerVhe": 109.32,
+    "status": "active"
+  },
+  {
+    "id": "SVC-137",
+    "code": "GDG137",
+    "name": {
+      "en": "Residential Support Services",
+      "nl": "Woon ondersteunende diensten"
+    },
+    "description": {
+      "en": "Housing support and wellbeing programs",
+      "nl": "Woonondersteunende diensten"
+    },
+    "category": "management",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 3,
+    "suppliers": [],
+    "avgCostPerVhe": 120.07,
+    "status": "active"
+  },
+  {
+    "id": "SVC-140",
+    "code": "GDG140",
+    "name": {
+      "en": "Window Cleaning",
+      "nl": "Glasbewassing"
+    },
+    "description": {
+      "en": "Professional exterior window cleaning",
+      "nl": "Professionele glasbewassing"
+    },
+    "category": "cleaning",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 2,
+    "suppliers": [],
+    "avgCostPerVhe": 11.88,
+    "status": "active"
+  },
+  {
+    "id": "SVC-142",
+    "code": "GDG142",
+    "name": {
+      "en": "Internet Subscription",
+      "nl": "Internetabonnement"
+    },
+    "description": {
+      "en": "Communal internet subscription",
+      "nl": "Collectief internetabonnement"
+    },
+    "category": "other",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 1,
+    "suppliers": [],
+    "avgCostPerVhe": 223.22,
+    "status": "active"
+  },
+  {
+    "id": "SVC-171",
+    "code": "GDG171",
+    "name": {
+      "en": "24h Service Electric Doors",
+      "nl": "24 uur service Elektr. deuren"
+    },
+    "description": {
+      "en": "Maintenance for automatic door systems",
+      "nl": "Service elektrische deursystemen"
+    },
+    "category": "installations",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 77,
+    "suppliers": [],
+    "avgCostPerVhe": 1.52,
+    "status": "active"
+  },
+  {
+    "id": "SVC-GDH091",
+    "code": "GDH091",
+    "name": {
+      "en": "Vergoeding zonnepanelen",
+      "nl": "Vergoeding zonnepanelen"
+    },
+    "description": {
+      "en": "",
+      "nl": ""
+    },
+    "category": "energy",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 1,
+    "suppliers": [],
+    "avgCostPerVhe": 75.34,
+    "status": "active"
+  },
+  {
+    "id": "SVC-GDH102",
+    "code": "GDH102",
+    "name": {
+      "en": "Koud water woonruimte",
+      "nl": "Koud water woonruimte"
+    },
+    "description": {
+      "en": "",
+      "nl": ""
+    },
+    "category": "energy",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 1,
+    "suppliers": [],
+    "avgCostPerVhe": 177.33,
+    "status": "active"
+  },
+  {
+    "id": "SVC-GDH105",
+    "code": "GDH105",
+    "name": {
+      "en": "Elektrakosten algemeen",
+      "nl": "Elektrakosten algemeen"
+    },
+    "description": {
+      "en": "",
+      "nl": ""
+    },
+    "category": "energy",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 1,
+    "suppliers": [],
+    "avgCostPerVhe": 588.53,
+    "status": "active"
+  },
+  {
+    "id": "SVC-GDH108",
+    "code": "GDH108",
+    "name": {
+      "en": "Warmtekosten",
+      "nl": "Warmtekosten"
+    },
+    "description": {
+      "en": "",
+      "nl": ""
+    },
+    "category": "energy",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 42,
+    "suppliers": [],
+    "avgCostPerVhe": 343.96,
+    "status": "active"
+  },
+  {
+    "id": "SVC-GDH111",
+    "code": "GDH111",
+    "name": {
+      "en": "Verbruiksmeters",
+      "nl": "Verbruiksmeters"
+    },
+    "description": {
+      "en": "",
+      "nl": ""
+    },
+    "category": "energy",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 1,
+    "suppliers": [],
+    "avgCostPerVhe": 26.49,
+    "status": "active"
+  },
+  {
+    "id": "SVC-GDH115",
+    "code": "GDH115",
+    "name": {
+      "en": "24 uur storingsdienst CV",
+      "nl": "24 uur storingsdienst CV"
+    },
+    "description": {
+      "en": "",
+      "nl": ""
+    },
+    "category": "installations",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 2,
+    "suppliers": [],
+    "avgCostPerVhe": 224.62,
+    "status": "active"
+  },
+  {
+    "id": "SVC-GDH116",
+    "code": "GDH116",
+    "name": {
+      "en": "Vervangen lampen",
+      "nl": "Vervangen lampen"
+    },
+    "description": {
+      "en": "",
+      "nl": ""
+    },
+    "category": "cleaning",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 1,
+    "suppliers": [],
+    "avgCostPerVhe": 95.97,
+    "status": "active"
+  },
+  {
+    "id": "SVC-GDH122",
+    "code": "GDH122",
+    "name": {
+      "en": "Ontstoppen riool",
+      "nl": "Ontstoppen riool"
+    },
+    "description": {
+      "en": "",
+      "nl": ""
+    },
+    "category": "installations",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 170,
+    "suppliers": [],
+    "avgCostPerVhe": 1.0,
+    "status": "active"
+  },
+  {
+    "id": "SVC-GDH132",
+    "code": "GDH132",
+    "name": {
+      "en": "24 uur storingsdienst lift",
+      "nl": "24 uur storingsdienst lift"
+    },
+    "description": {
+      "en": "",
+      "nl": ""
+    },
+    "category": "installations",
+    "regulation": "Servicekosten Besluit Art. 1",
+    "variable": false,
+    "metered": false,
+    "buildingCount": 1,
+    "suppliers": [],
+    "avgCostPerVhe": 270.22,
+    "status": "active"
+  }
+]

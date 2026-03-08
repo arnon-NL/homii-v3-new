@@ -1,0 +1,135 @@
+[
+  {
+    "id": "view-all-buildings",
+    "objectType": "buildings",
+    "name": {
+      "en": "All Buildings",
+      "nl": "Alle Gebouwen"
+    },
+    "icon": "list",
+    "isDefault": true,
+    "columns": [
+      "complex",
+      "complexId",
+      "location",
+      "vhe",
+      "components",
+      "utilities",
+      "dataQuality"
+    ],
+    "filters": {},
+    "year": null
+  },
+  {
+    "id": "view-settlement-2024",
+    "objectType": "buildings",
+    "name": {
+      "en": "Settlement 2024",
+      "nl": "Afrekening 2024"
+    },
+    "icon": "fileCheck",
+    "isDefault": false,
+    "columns": [
+      "complex",
+      "location",
+      "vhe",
+      "components",
+      "settlementStatus",
+      "netResult"
+    ],
+    "filters": {},
+    "year": 2024
+  },
+  {
+    "id": "view-settlement-2025",
+    "objectType": "buildings",
+    "name": {
+      "en": "Settlement 2025",
+      "nl": "Afrekening 2025"
+    },
+    "icon": "fileCheck",
+    "isDefault": false,
+    "columns": [
+      "complex",
+      "location",
+      "vhe",
+      "components",
+      "settlementStatus",
+      "netResult"
+    ],
+    "filters": {},
+    "year": 2025
+  },
+  {
+    "id": "view-settlement-2026",
+    "objectType": "buildings",
+    "name": {
+      "en": "Settlement 2026",
+      "nl": "Afrekening 2026"
+    },
+    "icon": "fileCheck",
+    "isDefault": false,
+    "columns": [
+      "complex",
+      "location",
+      "vhe",
+      "components",
+      "settlementStatus",
+      "netResult"
+    ],
+    "filters": {},
+    "year": 2026
+  },
+  {
+    "id": "view-all-units",
+    "objectType": "vhe",
+    "name": {
+      "en": "All Units",
+      "nl": "Alle Eenheden"
+    },
+    "icon": "list",
+    "isDefault": true,
+    "columns": [],
+    "filters": {},
+    "year": null
+  },
+  {
+    "id": "view-all-services",
+    "objectType": "services",
+    "name": {
+      "en": "All Services",
+      "nl": "Alle Diensten"
+    },
+    "icon": "list",
+    "isDefault": true,
+    "columns": [],
+    "filters": {},
+    "year": null
+  },
+  {
+    "id": "view-all-suppliers",
+    "objectType": "suppliers",
+    "name": {
+      "en": "All Suppliers",
+      "nl": "Alle Leveranciers"
+    },
+    "icon": "list",
+    "isDefault": true,
+    "columns": [],
+    "filters": {},
+    "year": null
+  },
+  {
+    "id": "view-all-meters",
+    "objectType": "meters",
+    "name": {
+      "en": "All Meters",
+      "nl": "Alle Meters"
+    },
+    "icon": "list",
+    "isDefault": true,
+    "columns": [],
+    "filters": {},
+    "year": null
+  }
+]

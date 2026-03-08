@@ -48,6 +48,7 @@ import {
   getCostCategoriesByService,
   getDistributionModel,
   isFeatureEnabled,
+  getFieldSource,
 } from "@/lib/mockData";
 import { t, useLang } from "@/lib/i18n";
 import Breadcrumbs from "./Breadcrumbs";
@@ -1651,12 +1652,13 @@ export default function BuildingDetailPage() {
           <div className="w-full xl:w-80 shrink-0">
             <AttributePanel>
               <AttrSection title={lang === "nl" ? "Informatie" : "Information"}>
-                <AttrRow label={lang === "nl" ? "Complex ID" : "Complex ID"} value={building.complexId} />
-                <AttrRow label={lang === "nl" ? "Locatie" : "Location"} value={building.location} />
-                <AttrRow label={lang === "nl" ? "VHE" : "VHE"} value={building.vhe} />
+                <AttrRow label={lang === "nl" ? "Complex ID" : "Complex ID"} value={building.complexId} source={getFieldSource("building", "complexId")} />
+                <AttrRow label={lang === "nl" ? "Locatie" : "Location"} value={building.location} source={getFieldSource("building", "location")} />
+                <AttrRow label={lang === "nl" ? "VHE" : "VHE"} value={building.vhe} source={getFieldSource("building", "vhe")} />
                 <AttrRow
                   label={lang === "nl" ? "Datakwaliteit" : "Data Quality"}
                   value={building.dataQuality}
+                  source={getFieldSource("building", "dataQuality")}
                 />
                 <AttrRow
                   label={lang === "nl" ? "Staat" : "Status"}

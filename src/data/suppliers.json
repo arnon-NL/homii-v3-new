@@ -1,0 +1,179 @@
+[
+  {
+    "id": "SUP-001",
+    "name": "ENGIE Energie Nederland",
+    "category": "energy",
+    "kvk": "34108453",
+    "city": "Zwolle",
+    "contactPerson": "R. van Dijk",
+    "email": "corporaties@engie.nl",
+    "phone": "+31 88 895 0000",
+    "website": "engie.nl",
+    "contractStart": "2022-01-01",
+    "contractEnd": "2025-12-31",
+    "serviceIds": [
+      "SVC-104",
+      "SVC-105",
+      "SVC-106",
+      "SVC-107",
+      "SVC-108",
+      "SVC-110"
+    ],
+    "buildingCount": 21,
+    "annualSpend": 285000,
+    "status": "active",
+    "rating": 4,
+    "notes": {
+      "en": "Main energy supplier.",
+      "nl": "Hoofdleverancier energie."
+    }
+  },
+  {
+    "id": "SUP-002",
+    "name": "Oasen",
+    "category": "energy",
+    "kvk": "24289054",
+    "city": "Gouda",
+    "contactPerson": "M. Bakker",
+    "email": "zakelijk@oasen.nl",
+    "phone": "+31 182 59 36 36",
+    "website": "oasen.nl",
+    "contractStart": "2020-01-01",
+    "contractEnd": null,
+    "serviceIds": [
+      "SVC-102"
+    ],
+    "buildingCount": 16,
+    "annualSpend": 42000,
+    "status": "active",
+    "rating": 4,
+    "notes": {
+      "en": "Regional water supplier.",
+      "nl": "Regionaal waterbedrijf."
+    }
+  },
+  {
+    "id": "SUP-003",
+    "name": "Techem Energy Services BV",
+    "category": "metering",
+    "kvk": "30141780",
+    "city": "Arnhem",
+    "contactPerson": "J. Hendriks",
+    "email": "service@techem.nl",
+    "phone": "+31 26 355 1355",
+    "website": "techem.nl",
+    "contractStart": "2023-07-01",
+    "contractEnd": "2026-06-30",
+    "serviceIds": [
+      "SVC-108",
+      "SVC-111"
+    ],
+    "buildingCount": 14,
+    "annualSpend": 38500,
+    "status": "active",
+    "rating": 3,
+    "notes": {
+      "en": "Metering services.",
+      "nl": "Meetdiensten."
+    }
+  },
+  {
+    "id": "SUP-004",
+    "name": "Joulz Meetbedrijf B.V.",
+    "category": "metering",
+    "kvk": "27258084",
+    "city": "Rotterdam",
+    "contactPerson": "A. Smits",
+    "email": "meetdiensten@joulz.nl",
+    "phone": "+31 88 454 5000",
+    "website": "joulz.nl",
+    "contractStart": "2021-04-01",
+    "contractEnd": "2025-03-31",
+    "serviceIds": [
+      "SVC-108",
+      "SVC-111"
+    ],
+    "buildingCount": 8,
+    "annualSpend": 22400,
+    "status": "active",
+    "rating": 4,
+    "notes": {
+      "en": "Independent metering company.",
+      "nl": "Onafhankelijk meetbedrijf."
+    }
+  },
+  {
+    "id": "SUP-005",
+    "name": "Stedin Netbeheer BV",
+    "category": "energy",
+    "kvk": "24306940",
+    "city": "Rotterdam",
+    "contactPerson": "Klantenservice Zakelijk",
+    "email": "zakelijk@stedin.net",
+    "phone": "+31 88 896 3096",
+    "website": "stedin.net",
+    "contractStart": "2019-01-01",
+    "contractEnd": null,
+    "serviceIds": [
+      "SVC-108"
+    ],
+    "buildingCount": 12,
+    "annualSpend": 18600,
+    "status": "active",
+    "rating": 4,
+    "notes": {
+      "en": "Grid operator.",
+      "nl": "Netbeheerder."
+    }
+  },
+  {
+    "id": "SUP-006",
+    "name": "Schindler Liften B.V.",
+    "category": "installations",
+    "kvk": "33148680",
+    "city": "'s-Gravenhage",
+    "contactPerson": "P. de Groot",
+    "email": "service.nl@schindler.com",
+    "phone": "+31 70 399 2666",
+    "website": "schindler.nl",
+    "contractStart": "2023-01-01",
+    "contractEnd": "2027-12-31",
+    "serviceIds": [
+      "SVC-132",
+      "SVC-133"
+    ],
+    "buildingCount": 6,
+    "annualSpend": 31200,
+    "status": "active",
+    "rating": 5,
+    "notes": {
+      "en": "Elevator maintenance.",
+      "nl": "Liftonderhoud."
+    }
+  },
+  {
+    "id": "SUP-007",
+    "name": "CSU Cleaning Services",
+    "category": "cleaning",
+    "kvk": "17098383",
+    "city": "Eindhoven",
+    "contactPerson": "K. Meijer",
+    "email": "corporaties@csu.nl",
+    "phone": "+31 40 290 4040",
+    "website": "csu.nl",
+    "contractStart": "2024-01-01",
+    "contractEnd": "2026-12-31",
+    "serviceIds": [
+      "SVC-118",
+      "SVC-140"
+    ],
+    "buildingCount": 19,
+    "annualSpend": 89000,
+    "status": "active",
+    "rating": 3,
+    "notes": {
+      "en": "Cleaning services.",
+      "nl": "Schoonmaakdiensten."
+    }
+  }
+]

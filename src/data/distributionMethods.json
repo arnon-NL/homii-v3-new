@@ -1,0 +1,34 @@
+[
+  {
+    "id": "DM-EQ",
+    "code": "equal",
+    "name": {
+      "en": "Equal per VHE",
+      "nl": "Gelijk per VHE"
+    }
+  },
+  {
+    "id": "DM-M2",
+    "code": "m2",
+    "name": {
+      "en": "Based on m² floor area",
+      "nl": "Op basis van m² vloeroppervlak"
+    }
+  },
+  {
+    "id": "DM-MTR",
+    "code": "metered",
+    "name": {
+      "en": "Metered consumption",
+      "nl": "Op basis van meterverbruik"
+    }
+  },
+  {
+    "id": "DM-PRO",
+    "code": "proportional",
+    "name": {
+      "en": "Proportional to voorschot",
+      "nl": "Naar rato van voorschot"
+    }
+  }
+]

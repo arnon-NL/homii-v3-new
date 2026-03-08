@@ -1,0 +1,6 @@
+{
+  "mode": "full",
+  "hasLedgerData": true,
+  "hasConsumptionData": true,
+  "hasNonUtilityServices": true
+}

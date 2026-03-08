@@ -1,0 +1,37 @@
+[
+  {
+    "id": "energy",
+    "name": {
+      "en": "Energy",
+      "nl": "Energie"
+    }
+  },
+  {
+    "id": "water",
+    "name": {
+      "en": "Water",
+      "nl": "Water"
+    }
+  },
+  {
+    "id": "facilities",
+    "name": {
+      "en": "Facilities",
+      "nl": "Facilitaire diensten"
+    }
+  },
+  {
+    "id": "security",
+    "name": {
+      "en": "Security & Safety",
+      "nl": "Beveiging & Veiligheid"
+    }
+  },
+  {
+    "id": "other",
+    "name": {
+      "en": "Other",
+      "nl": "Overig"
+    }
+  }
+]

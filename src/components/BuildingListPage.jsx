@@ -8,6 +8,8 @@ import {
   ShowerHead,
   Zap,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   CheckCircle2,
   Clock,
   AlertTriangle,
@@ -233,6 +235,17 @@ export default function BuildingListPage() {
     });
   }, [filtered, sortCol, sortDir]);
 
+  // Pagination
+  const PAGE_SIZE = 50;
+  const [page, setPage] = useState(0);
+  const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
+  const paged = useMemo(() => {
+    const start = page * PAGE_SIZE;
+    return sorted.slice(start, start + PAGE_SIZE);
+  }, [sorted, page]);
+  // Reset page when filters change
+  useMemo(() => setPage(0), [search, qualityFilter, utilityFilters, settlementFilter]);
+
   // Settlement summary counts for past year
   const settlementSummary = useMemo(() => {
     if (!isPastYear) return null;
@@ -373,7 +386,11 @@ export default function BuildingListPage() {
                 {lang === "nl" ? "Weergave" : "View"}
               </span>
             )}
-            <span className="text-sm text-slate-400">{sorted.length}</span>
+            <span className="text-sm text-slate-400">
+              {sorted.length > PAGE_SIZE
+                ? `${page * PAGE_SIZE + 1}–${Math.min((page + 1) * PAGE_SIZE, sorted.length)} / ${sorted.length}`
+                : sorted.length}
+            </span>
           </div>
           {/* Year badge for settlement views */}
           {isViewWithYear && (
@@ -485,7 +502,7 @@ export default function BuildingListPage() {
 
         {/* ── Mobile card view ── */}
         <div className="block md:hidden space-y-3">
-          {sorted.map((b) => (
+          {paged.map((b) => (
             <button
               key={b.id}
               onClick={() => navigate(`/buildings/${b.id}${isViewWithYear ? `?year=${year}` : ""}`)}
@@ -559,7 +576,7 @@ export default function BuildingListPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {sorted.map((b) => (
+              {paged.map((b) => (
                 <tr
                   key={b.id}
                   className="hover:bg-slate-50/80 transition-colors cursor-pointer"
@@ -581,6 +598,56 @@ export default function BuildingListPage() {
             </tbody>
           </table>
         </div>
+
+        {/* ── Pagination ── */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between mt-4 px-1">
+            <span className="text-xs text-slate-400">
+              {lang === "nl" ? "Pagina" : "Page"} {page + 1} / {totalPages}
+            </span>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setPage(Math.max(0, page - 1))}
+                disabled={page === 0}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                let p;
+                if (totalPages <= 7) {
+                  p = i;
+                } else if (page < 4) {
+                  p = i;
+                } else if (page > totalPages - 5) {
+                  p = totalPages - 7 + i;
+                } else {
+                  p = page - 3 + i;
+                }
+                return (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${
+                      p === page
+                        ? "bg-white shadow-sm border border-slate-200 text-slate-900"
+                        : "text-slate-500 hover:bg-slate-100"
+                    }`}
+                  >
+                    {p + 1}
+                  </button>
+                );
+              })}
+              <button
+                onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
+                disabled={page >= totalPages - 1}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

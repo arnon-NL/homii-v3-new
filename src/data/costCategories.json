@@ -1,0 +1,171 @@
+[
+  {
+    "id": "CC-108-01",
+    "serviceId": "SVC-108",
+    "name": {
+      "en": "Gas delivery",
+      "nl": "Gaslevering"
+    },
+    "supplier": "ENGIE Energie Nederland",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 0.55,
+    "unit": "m³",
+    "unitPrice": 1.45
+  },
+  {
+    "id": "CC-108-02",
+    "serviceId": "SVC-108",
+    "name": {
+      "en": "Grid operator costs",
+      "nl": "Netbeheerkosten"
+    },
+    "supplier": "Stedin Netbeheer BV",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 0.15,
+    "unit": null,
+    "unitPrice": null
+  },
+  {
+    "id": "CC-108-03",
+    "serviceId": "SVC-108",
+    "name": {
+      "en": "Metering services",
+      "nl": "Meetdiensten"
+    },
+    "supplier": "Techem Energy Services BV",
+    "invoiceFrequency": "quarterly",
+    "budgetShare": 0.15,
+    "unit": null,
+    "unitPrice": null
+  },
+  {
+    "id": "CC-108-04",
+    "serviceId": "SVC-108",
+    "name": {
+      "en": "Heat transport",
+      "nl": "Transportkosten warmtenet"
+    },
+    "supplier": "ENGIE Energie Nederland",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 0.15,
+    "unit": null,
+    "unitPrice": null
+  },
+  {
+    "id": "CC-102-01",
+    "serviceId": "SVC-102",
+    "name": {
+      "en": "Water supply",
+      "nl": "Waterlevering"
+    },
+    "supplier": "Oasen",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 0.7,
+    "unit": "m³",
+    "unitPrice": 1.85
+  },
+  {
+    "id": "CC-102-02",
+    "serviceId": "SVC-102",
+    "name": {
+      "en": "Standing charge",
+      "nl": "Vastrecht"
+    },
+    "supplier": "Oasen",
+    "invoiceFrequency": "quarterly",
+    "budgetShare": 0.2,
+    "unit": null,
+    "unitPrice": null
+  },
+  {
+    "id": "CC-105-01",
+    "serviceId": "SVC-105",
+    "name": {
+      "en": "Electricity supply",
+      "nl": "Elektralevering"
+    },
+    "supplier": "ENGIE Energie Nederland",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 0.65,
+    "unit": "kWh",
+    "unitPrice": 0.38
+  },
+  {
+    "id": "CC-105-02",
+    "serviceId": "SVC-105",
+    "name": {
+      "en": "Standing charge",
+      "nl": "Vastrecht elektra"
+    },
+    "supplier": "ENGIE Energie Nederland",
+    "invoiceFrequency": "quarterly",
+    "budgetShare": 0.2,
+    "unit": null,
+    "unitPrice": null
+  },
+  {
+    "id": "CC-118-01",
+    "serviceId": "SVC-118",
+    "name": {
+      "en": "Cleaning service",
+      "nl": "Schoonmaakdienst"
+    },
+    "supplier": "CSU Cleaning Services",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 1.0,
+    "unit": null,
+    "unitPrice": null
+  },
+  {
+    "id": "CC-131-01",
+    "serviceId": "SVC-131",
+    "name": {
+      "en": "Caretaker services",
+      "nl": "Huismeesterdiensten"
+    },
+    "supplier": "SWB Wijkbeheer",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 1.0,
+    "unit": null,
+    "unitPrice": null
+  },
+  {
+    "id": "CC-111-01",
+    "serviceId": "SVC-111",
+    "name": {
+      "en": "Meter maintenance",
+      "nl": "Onderhoud meters"
+    },
+    "supplier": "Techem Energy Services BV",
+    "invoiceFrequency": "quarterly",
+    "budgetShare": 1.0,
+    "unit": null,
+    "unitPrice": null
+  },
+  {
+    "id": "CC-132-01",
+    "serviceId": "SVC-132",
+    "name": {
+      "en": "Elevator maintenance",
+      "nl": "Liftonderhoud"
+    },
+    "supplier": "Schindler Liften B.V.",
+    "invoiceFrequency": "quarterly",
+    "budgetShare": 0.7,
+    "unit": null,
+    "unitPrice": null
+  },
+  {
+    "id": "CC-123-01",
+    "serviceId": "SVC-123",
+    "name": {
+      "en": "Landscaping",
+      "nl": "Tuinonderhoud"
+    },
+    "supplier": "Van Ginkel Groep B.V.",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 0.8,
+    "unit": null,
+    "unitPrice": null
+  }
+]
