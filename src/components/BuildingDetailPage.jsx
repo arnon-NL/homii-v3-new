@@ -349,7 +349,8 @@ export default function BuildingDetailPage() {
                 >
                   {building.complex}
                 </h1>
-                <StatusBadge status={building.dataQuality} />
+                <StatusBadge status={building.status} />
+                <StatusBadge status={building.dataQuality} size="xs" />
               </div>
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-slate-500">
                 <span className="flex items-center gap-1">
@@ -1580,23 +1581,72 @@ export default function BuildingDetailPage() {
                               </div>
 
                               {isExpanded && (
-                                <div className="mt-4 pt-4 border-t border-slate-100 space-y-2">
+                                <div className="mt-4 pt-4 border-t border-slate-100 space-y-3">
                                   <AttributePanel>
                                     <AttrSection title={lang === "nl" ? "Details" : "Details"}>
                                       <AttrRow
                                         label={lang === "nl" ? "VHE ID" : "VHE ID"}
                                         value={vhe.id}
                                       />
-                                      <AttrRow
-                                        label={lang === "nl" ? "Oppervlakte" : "Area"}
-                                        value={`${vhe.m2} m²`}
-                                      />
+                                      {vhe.m2 && (
+                                        <AttrRow
+                                          label={lang === "nl" ? "Oppervlakte" : "Area"}
+                                          value={`${vhe.m2} m²`}
+                                        />
+                                      )}
                                       <AttrRow
                                         label={lang === "nl" ? "Status" : "Status"}
-                                        value={vhe.status}
+                                        value={<StatusBadge status={vhe.status} size="xs" />}
                                       />
+                                      {vhe.contract && (
+                                        <>
+                                          <AttrRow
+                                            label={lang === "nl" ? "Contract" : "Contract"}
+                                            value={<StatusBadge status={vhe.contract.status} size="xs" />}
+                                          />
+                                          <AttrRow
+                                            label={lang === "nl" ? "Ingangsdatum" : "Start date"}
+                                            value={vhe.contract.startDate || "—"}
+                                          />
+                                        </>
+                                      )}
                                     </AttrSection>
                                   </AttributePanel>
+
+                                  {/* Service cost breakdown */}
+                                  {vhe.voorschotBreakdown?.length > 0 && (
+                                    <div>
+                                      <h4 className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2 px-1">
+                                        {lang === "nl" ? "Servicekosten" : "Service Charges"}
+                                      </h4>
+                                      <div className="rounded-lg border border-slate-100 bg-white divide-y divide-slate-50">
+                                        {vhe.voorschotBreakdown.map((item) => {
+                                          const svc = getService(item.s);
+                                          return (
+                                            <div key={item.s} className="flex items-center justify-between px-3 py-2">
+                                              <div className="min-w-0">
+                                                <span className="text-[10px] font-mono text-slate-400 mr-1.5">{svc?.code || item.s}</span>
+                                                <span className="text-xs text-slate-600">
+                                                  {svc?.name?.[lang] || svc?.name?.en || "—"}
+                                                </span>
+                                              </div>
+                                              <span className="text-xs font-medium text-slate-700 tabular-nums shrink-0 ml-2">
+                                                {fmt(item.a)}
+                                              </span>
+                                            </div>
+                                          );
+                                        })}
+                                        <div className="flex items-center justify-between px-3 py-2 bg-slate-50/50">
+                                          <span className="text-xs font-semibold text-slate-600">
+                                            {lang === "nl" ? "Totaal" : "Total"}
+                                          </span>
+                                          <span className="text-xs font-bold tabular-nums" style={{ color: brand.navy }}>
+                                            {fmt(vhe.voorschot)}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </CardContent>

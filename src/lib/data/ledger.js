@@ -24,8 +24,10 @@ for (const e of rawLedger) {
 
 export const ledgerEntries = rawLedger;
 
-export function getLedgerByService(serviceId) {
-  return byService.get(serviceId) || [];
+export function getLedgerByService(serviceId, year) {
+  const entries = byService.get(serviceId) || [];
+  if (year != null) return entries.filter((e) => e.year === year);
+  return entries;
 }
 
 export function getLedgerByBuilding(buildingId) {
@@ -52,7 +54,23 @@ export function getLedgerGroupedByCostCategory(serviceId, buildingId) {
   return grouped;
 }
 
-export function getLedgerSummaryByService(serviceId) {
+export function getLedgerSummaryByService(serviceId, year) {
+  const entries = getLedgerByService(serviceId, year);
+  // Group by building — ServiceDetailPage expects { buildingId: { total, count, flagged, pending } }
+  const byBuilding = {};
+  for (const e of entries) {
+    if (!byBuilding[e.buildingId])
+      byBuilding[e.buildingId] = { total: 0, count: 0, flagged: 0, pending: 0 };
+    const b = byBuilding[e.buildingId];
+    b.total += e.amount || 0;
+    b.count += 1;
+    if (e.status === "flagged") b.flagged += 1;
+    if (e.status === "pending") b.pending += 1;
+  }
+  return byBuilding;
+}
+
+export function getLedgerMonthlySummaryByService(serviceId) {
   const entries = getLedgerByService(serviceId);
   const byMonth = {};
   for (const e of entries) {

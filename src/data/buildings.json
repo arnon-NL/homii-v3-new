@@ -9,7 +9,8 @@
     "utilities": [],
     "budgetTotal": 462.01,
     "budgetSpent": 440.01,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8245",
@@ -21,7 +22,8 @@
     "utilities": [],
     "budgetTotal": 50.3,
     "budgetSpent": 47.9,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8244",
@@ -33,7 +35,8 @@
     "utilities": [],
     "budgetTotal": 3596.48,
     "budgetSpent": 3425.22,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8723",
@@ -47,7 +50,8 @@
     ],
     "budgetTotal": 735.39,
     "budgetSpent": 700.37,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8727",
@@ -59,7 +63,8 @@
     "utilities": [],
     "budgetTotal": 208.31,
     "budgetSpent": 198.39,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "10263",
@@ -73,7 +78,8 @@
     ],
     "budgetTotal": 12264.01,
     "budgetSpent": 11680.01,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "inactive"
   },
   {
     "id": "8564",
@@ -85,7 +91,8 @@
     "utilities": [],
     "budgetTotal": 176.9,
     "budgetSpent": 168.48,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8242",
@@ -99,7 +106,8 @@
     ],
     "budgetTotal": 24237.72,
     "budgetSpent": 23083.54,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8708",
@@ -113,7 +121,8 @@
     ],
     "budgetTotal": 9767.67,
     "budgetSpent": 9302.54,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8084",
@@ -127,7 +136,8 @@
     ],
     "budgetTotal": 17410.21,
     "budgetSpent": 16581.15,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8321",
@@ -142,7 +152,8 @@
     ],
     "budgetTotal": 209076.06,
     "budgetSpent": 199120.06,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8777",
@@ -154,7 +165,8 @@
     "utilities": [],
     "budgetTotal": 284.03,
     "budgetSpent": 270.5,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8808",
@@ -166,7 +178,8 @@
     "utilities": [],
     "budgetTotal": 1915.58,
     "budgetSpent": 1824.36,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8414",
@@ -178,7 +191,8 @@
     "utilities": [],
     "budgetTotal": 708.1,
     "budgetSpent": 674.38,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "9798",
@@ -190,7 +204,8 @@
     "utilities": [],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "8172",
@@ -205,7 +220,8 @@
     ],
     "budgetTotal": 19601.45,
     "budgetSpent": 18668.05,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8171",
@@ -220,7 +236,8 @@
     ],
     "budgetTotal": 22948.01,
     "budgetSpent": 21855.25,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8173",
@@ -235,7 +252,8 @@
     ],
     "budgetTotal": 21637.8,
     "budgetSpent": 20607.43,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8040",
@@ -249,7 +267,8 @@
     ],
     "budgetTotal": 1705.15,
     "budgetSpent": 1623.95,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7962",
@@ -261,7 +280,8 @@
     "utilities": [],
     "budgetTotal": 39.29,
     "budgetSpent": 37.42,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "7959",
@@ -273,7 +293,8 @@
     "utilities": [],
     "budgetTotal": 452.34,
     "budgetSpent": 430.8,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7963",
@@ -285,7 +306,8 @@
     "utilities": [],
     "budgetTotal": 103.8,
     "budgetSpent": 98.86,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "7955",
@@ -297,7 +319,8 @@
     "utilities": [],
     "budgetTotal": 668.68,
     "budgetSpent": 636.84,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8785",
@@ -311,7 +334,8 @@
     ],
     "budgetTotal": 3194.12,
     "budgetSpent": 3042.02,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8459",
@@ -326,7 +350,8 @@
     ],
     "budgetTotal": 4961.58,
     "budgetSpent": 4725.31,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8461",
@@ -342,7 +367,8 @@
     ],
     "budgetTotal": 16476.93,
     "budgetSpent": 15692.31,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8525",
@@ -354,7 +380,8 @@
     "utilities": [],
     "budgetTotal": 393.37,
     "budgetSpent": 374.64,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "10381",
@@ -368,7 +395,8 @@
     ],
     "budgetTotal": 607.87,
     "budgetSpent": 578.92,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "8524",
@@ -380,7 +408,8 @@
     "utilities": [],
     "budgetTotal": 196.69,
     "budgetSpent": 187.32,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8523",
@@ -392,7 +421,8 @@
     "utilities": [],
     "budgetTotal": 58.97,
     "budgetSpent": 56.16,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8522",
@@ -406,7 +436,8 @@
     ],
     "budgetTotal": 687.33,
     "budgetSpent": 654.6,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8587",
@@ -418,7 +449,8 @@
     "utilities": [],
     "budgetTotal": 314.75,
     "budgetSpent": 299.76,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8584",
@@ -432,7 +464,8 @@
     ],
     "budgetTotal": 3236.4,
     "budgetSpent": 3082.29,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8348",
@@ -444,7 +477,8 @@
     "utilities": [],
     "budgetTotal": 152.65,
     "budgetSpent": 145.38,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8349",
@@ -458,7 +492,8 @@
     ],
     "budgetTotal": 2502.99,
     "budgetSpent": 2383.8,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8402",
@@ -472,7 +507,8 @@
     ],
     "budgetTotal": 6250.77,
     "budgetSpent": 5953.11,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8818",
@@ -484,7 +520,8 @@
     "utilities": [],
     "budgetTotal": 476.33,
     "budgetSpent": 453.65,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8693",
@@ -496,7 +533,8 @@
     "utilities": [],
     "budgetTotal": 3323.75,
     "budgetSpent": 3165.48,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8694",
@@ -508,7 +546,8 @@
     "utilities": [],
     "budgetTotal": 1317.71,
     "budgetSpent": 1254.96,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8737",
@@ -522,7 +561,8 @@
     ],
     "budgetTotal": 2797.27,
     "budgetSpent": 2664.07,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8738",
@@ -536,7 +576,8 @@
     ],
     "budgetTotal": 2381.65,
     "budgetSpent": 2268.24,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7996",
@@ -548,7 +589,8 @@
     "utilities": [],
     "budgetTotal": 766.06,
     "budgetSpent": 729.58,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7997",
@@ -560,7 +602,8 @@
     "utilities": [],
     "budgetTotal": 1064.79,
     "budgetSpent": 1014.09,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8570",
@@ -572,7 +615,8 @@
     "utilities": [],
     "budgetTotal": 1632.46,
     "budgetSpent": 1554.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "10193",
@@ -586,7 +630,8 @@
     ],
     "budgetTotal": 8245.34,
     "budgetSpent": 7852.7,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "10194",
@@ -600,7 +645,8 @@
     ],
     "budgetTotal": 4734.02,
     "budgetSpent": 4508.59,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "inactive"
   },
   {
     "id": "8718",
@@ -614,7 +660,8 @@
     ],
     "budgetTotal": 27088.23,
     "budgetSpent": 25798.31,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8390",
@@ -628,7 +675,8 @@
     ],
     "budgetTotal": 43652.31,
     "budgetSpent": 41573.63,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8786",
@@ -642,7 +690,8 @@
     ],
     "budgetTotal": 2331.5,
     "budgetSpent": 2220.48,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8053",
@@ -657,7 +706,8 @@
     ],
     "budgetTotal": 17857.01,
     "budgetSpent": 17006.68,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8410",
@@ -671,7 +721,8 @@
     ],
     "budgetTotal": 5056.54,
     "budgetSpent": 4815.75,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8179",
@@ -685,7 +736,8 @@
     ],
     "budgetTotal": 6781.91,
     "budgetSpent": 6458.96,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8067",
@@ -697,7 +749,8 @@
     "utilities": [],
     "budgetTotal": 1074.56,
     "budgetSpent": 1023.39,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8685",
@@ -712,7 +765,8 @@
     ],
     "budgetTotal": 46883.16,
     "budgetSpent": 44650.63,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8581",
@@ -724,7 +778,8 @@
     "utilities": [],
     "budgetTotal": 491.65,
     "budgetSpent": 468.24,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8755",
@@ -736,7 +791,8 @@
     "utilities": [],
     "budgetTotal": 1593.06,
     "budgetSpent": 1517.2,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8068",
@@ -748,7 +804,8 @@
     "utilities": [],
     "budgetTotal": 4503.78,
     "budgetSpent": 4289.31,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8752",
@@ -762,7 +819,8 @@
     ],
     "budgetTotal": 4223.41,
     "budgetSpent": 4022.3,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8568",
@@ -774,7 +832,8 @@
     "utilities": [],
     "budgetTotal": 431.49,
     "budgetSpent": 410.94,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "9891",
@@ -788,7 +847,8 @@
     ],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "8789",
@@ -802,7 +862,8 @@
     ],
     "budgetTotal": 2013.54,
     "budgetSpent": 1917.66,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7974",
@@ -816,7 +877,8 @@
     ],
     "budgetTotal": 5726.02,
     "budgetSpent": 5453.35,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7977",
@@ -828,7 +890,8 @@
     "utilities": [],
     "budgetTotal": 354.06,
     "budgetSpent": 337.2,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8020",
@@ -842,7 +905,8 @@
     ],
     "budgetTotal": 5757.42,
     "budgetSpent": 5483.26,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8022",
@@ -856,7 +920,8 @@
     ],
     "budgetTotal": 6456.61,
     "budgetSpent": 6149.15,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8018",
@@ -870,7 +935,8 @@
     ],
     "budgetTotal": 9647.69,
     "budgetSpent": 9188.28,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8017",
@@ -884,7 +950,8 @@
     ],
     "budgetTotal": 6299.42,
     "budgetSpent": 5999.45,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8204",
@@ -898,7 +965,8 @@
     ],
     "budgetTotal": 7071.17,
     "budgetSpent": 6734.45,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8508",
@@ -910,7 +978,8 @@
     "utilities": [],
     "budgetTotal": 629.57,
     "budgetSpent": 599.59,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8416",
@@ -924,7 +993,8 @@
     ],
     "budgetTotal": 1009.2,
     "budgetSpent": 961.14,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7998",
@@ -936,7 +1006,8 @@
     "utilities": [],
     "budgetTotal": 294.97,
     "budgetSpent": 280.92,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7999",
@@ -948,7 +1019,8 @@
     "utilities": [],
     "budgetTotal": 373.59,
     "budgetSpent": 355.8,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7991",
@@ -960,7 +1032,8 @@
     "utilities": [],
     "budgetTotal": 5504.59,
     "budgetSpent": 5242.47,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8563",
@@ -972,7 +1045,8 @@
     "utilities": [],
     "budgetTotal": 2175.8,
     "budgetSpent": 2072.19,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8442",
@@ -984,7 +1058,8 @@
     "utilities": [],
     "budgetTotal": 523.81,
     "budgetSpent": 498.87,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8441",
@@ -998,7 +1073,8 @@
     ],
     "budgetTotal": 753.14,
     "budgetSpent": 717.28,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8506",
@@ -1012,7 +1088,8 @@
     ],
     "budgetTotal": 5455.82,
     "budgetSpent": 5196.02,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8645",
@@ -1026,7 +1103,8 @@
     ],
     "budgetTotal": 2485.63,
     "budgetSpent": 2367.27,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8652",
@@ -1038,7 +1116,8 @@
     "utilities": [],
     "budgetTotal": 507.49,
     "budgetSpent": 483.32,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8653",
@@ -1050,7 +1129,8 @@
     "utilities": [],
     "budgetTotal": 19.66,
     "budgetSpent": 18.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8654",
@@ -1062,7 +1142,8 @@
     "utilities": [],
     "budgetTotal": 118.31,
     "budgetSpent": 112.68,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8661",
@@ -1074,7 +1155,8 @@
     "utilities": [],
     "budgetTotal": 98.28,
     "budgetSpent": 93.6,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8656",
@@ -1086,7 +1168,8 @@
     "utilities": [],
     "budgetTotal": 474.51,
     "budgetSpent": 451.91,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8660",
@@ -1098,7 +1181,8 @@
     "utilities": [],
     "budgetTotal": 200.91,
     "budgetSpent": 191.34,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8646",
@@ -1112,7 +1196,8 @@
     ],
     "budgetTotal": 696.02,
     "budgetSpent": 662.88,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8356",
@@ -1126,7 +1211,8 @@
     ],
     "budgetTotal": 31934.67,
     "budgetSpent": 30413.97,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8024",
@@ -1140,7 +1226,8 @@
     ],
     "budgetTotal": 20976.89,
     "budgetSpent": 19977.99,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8015",
@@ -1154,7 +1241,8 @@
     ],
     "budgetTotal": 9010.39,
     "budgetSpent": 8581.32,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8016",
@@ -1168,7 +1256,8 @@
     ],
     "budgetTotal": 8004.22,
     "budgetSpent": 7623.07,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8019",
@@ -1182,7 +1271,8 @@
     ],
     "budgetTotal": 7788.76,
     "budgetSpent": 7417.87,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8229",
@@ -1194,7 +1284,8 @@
     "utilities": [],
     "budgetTotal": 610.02,
     "budgetSpent": 580.97,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8200",
@@ -1208,7 +1299,8 @@
     ],
     "budgetTotal": 191.76,
     "budgetSpent": 182.63,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8218",
@@ -1220,7 +1312,8 @@
     "utilities": [],
     "budgetTotal": 1221.8,
     "budgetSpent": 1163.62,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8202",
@@ -1234,7 +1327,8 @@
     ],
     "budgetTotal": 4774.16,
     "budgetSpent": 4546.82,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8057",
@@ -1246,7 +1340,8 @@
     "utilities": [],
     "budgetTotal": 2433.91,
     "budgetSpent": 2318.01,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8773",
@@ -1258,7 +1353,8 @@
     "utilities": [],
     "budgetTotal": 130.63,
     "budgetSpent": 124.41,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8750",
@@ -1270,7 +1366,8 @@
     "utilities": [],
     "budgetTotal": 81.52,
     "budgetSpent": 77.64,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8751",
@@ -1284,7 +1381,8 @@
     ],
     "budgetTotal": 5111.65,
     "budgetSpent": 4868.24,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8771",
@@ -1298,7 +1396,8 @@
     ],
     "budgetTotal": 11132.35,
     "budgetSpent": 10602.24,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8115",
@@ -1310,7 +1409,8 @@
     "utilities": [],
     "budgetTotal": 6655.69,
     "budgetSpent": 6338.75,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8114",
@@ -1324,7 +1424,8 @@
     ],
     "budgetTotal": 34280.22,
     "budgetSpent": 32647.83,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8313",
@@ -1336,7 +1437,8 @@
     "utilities": [],
     "budgetTotal": 491.65,
     "budgetSpent": 468.24,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8166",
@@ -1348,7 +1450,8 @@
     "utilities": [],
     "budgetTotal": 1921.51,
     "budgetSpent": 1830.01,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8310",
@@ -1360,7 +1463,8 @@
     "utilities": [],
     "budgetTotal": 314.75,
     "budgetSpent": 299.76,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8394",
@@ -1374,7 +1478,8 @@
     ],
     "budgetTotal": 14203.75,
     "budgetSpent": 13527.38,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8495",
@@ -1386,7 +1491,8 @@
     "utilities": [],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8458",
@@ -1400,7 +1506,8 @@
     ],
     "budgetTotal": 4847.97,
     "budgetSpent": 4617.11,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8500",
@@ -1412,7 +1519,8 @@
     "utilities": [],
     "budgetTotal": 7394.17,
     "budgetSpent": 7042.07,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "10312",
@@ -1424,7 +1532,8 @@
     "utilities": [],
     "budgetTotal": 2469.22,
     "budgetSpent": 2351.64,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "8767",
@@ -1439,7 +1548,8 @@
     ],
     "budgetTotal": 56936.28,
     "budgetSpent": 54225.03,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8686",
@@ -1451,7 +1561,8 @@
     "utilities": [],
     "budgetTotal": 1363.78,
     "budgetSpent": 1298.84,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8089",
@@ -1465,7 +1576,8 @@
     ],
     "budgetTotal": 582.27,
     "budgetSpent": 554.54,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8088",
@@ -1481,7 +1593,8 @@
     ],
     "budgetTotal": 801552.5,
     "budgetSpent": 763383.33,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8425",
@@ -1493,7 +1606,8 @@
     "utilities": [],
     "budgetTotal": 611.52,
     "budgetSpent": 582.4,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8426",
@@ -1505,7 +1619,8 @@
     "utilities": [],
     "budgetTotal": 608.62,
     "budgetSpent": 579.64,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8322",
@@ -1517,7 +1632,8 @@
     "utilities": [],
     "budgetTotal": 11039.66,
     "budgetSpent": 10513.96,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8142",
@@ -1529,7 +1645,8 @@
     "utilities": [],
     "budgetTotal": 6013.11,
     "budgetSpent": 5726.77,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8331",
@@ -1543,7 +1660,8 @@
     ],
     "budgetTotal": 4630.2,
     "budgetSpent": 4409.71,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8812",
@@ -1557,7 +1675,8 @@
     ],
     "budgetTotal": 10498.92,
     "budgetSpent": 9998.97,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8747",
@@ -1569,7 +1688,8 @@
     "utilities": [],
     "budgetTotal": 415.81,
     "budgetSpent": 396.01,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8820",
@@ -1583,7 +1703,8 @@
     ],
     "budgetTotal": 4675.46,
     "budgetSpent": 4452.82,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8819",
@@ -1597,7 +1718,8 @@
     ],
     "budgetTotal": 5769.89,
     "budgetSpent": 5495.13,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8748",
@@ -1609,7 +1731,8 @@
     "utilities": [],
     "budgetTotal": 995.99,
     "budgetSpent": 948.56,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8780",
@@ -1623,7 +1746,8 @@
     ],
     "budgetTotal": 5797.56,
     "budgetSpent": 5521.49,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8779",
@@ -1637,7 +1761,8 @@
     ],
     "budgetTotal": 4694.41,
     "budgetSpent": 4470.87,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8045",
@@ -1649,7 +1774,8 @@
     "utilities": [],
     "budgetTotal": 3769.03,
     "budgetSpent": 3589.55,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8504",
@@ -1663,7 +1789,8 @@
     ],
     "budgetTotal": 1261.08,
     "budgetSpent": 1201.03,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8709",
@@ -1675,7 +1802,8 @@
     "utilities": [],
     "budgetTotal": 2784.62,
     "budgetSpent": 2652.02,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8722",
@@ -1687,7 +1815,8 @@
     "utilities": [],
     "budgetTotal": 59.33,
     "budgetSpent": 56.5,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8359",
@@ -1701,7 +1830,8 @@
     ],
     "budgetTotal": 2915.65,
     "budgetSpent": 2776.81,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8351",
@@ -1715,7 +1845,8 @@
     ],
     "budgetTotal": 11048.94,
     "budgetSpent": 10522.8,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8363",
@@ -1727,7 +1858,8 @@
     "utilities": [],
     "budgetTotal": 323.34,
     "budgetSpent": 307.94,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8382",
@@ -1739,7 +1871,8 @@
     "utilities": [],
     "budgetTotal": 1264.05,
     "budgetSpent": 1203.86,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "7979",
@@ -1751,7 +1884,8 @@
     "utilities": [],
     "budgetTotal": 6586.72,
     "budgetSpent": 6273.07,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8637",
@@ -1765,7 +1899,8 @@
     ],
     "budgetTotal": 3202.18,
     "budgetSpent": 3049.7,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8649",
@@ -1779,7 +1914,8 @@
     ],
     "budgetTotal": 915.71,
     "budgetSpent": 872.1,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8647",
@@ -1793,7 +1929,8 @@
     ],
     "budgetTotal": 747.91,
     "budgetSpent": 712.3,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8648",
@@ -1807,7 +1944,8 @@
     ],
     "budgetTotal": 1490.38,
     "budgetSpent": 1419.41,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8639",
@@ -1821,7 +1959,8 @@
     ],
     "budgetTotal": 1085.07,
     "budgetSpent": 1033.4,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8081",
@@ -1835,7 +1974,8 @@
     ],
     "budgetTotal": 21538.79,
     "budgetSpent": 20513.13,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8077",
@@ -1851,7 +1991,8 @@
     ],
     "budgetTotal": 42550.45,
     "budgetSpent": 40524.24,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "10185",
@@ -1863,7 +2004,8 @@
     "utilities": [],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "8796",
@@ -1875,7 +2017,8 @@
     "utilities": [],
     "budgetTotal": 741.94,
     "budgetSpent": 706.61,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8485",
@@ -1889,7 +2032,8 @@
     ],
     "budgetTotal": 1100.65,
     "budgetSpent": 1048.24,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8484",
@@ -1901,7 +2045,8 @@
     "utilities": [],
     "budgetTotal": 137.59,
     "budgetSpent": 131.04,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8066",
@@ -1915,7 +2060,8 @@
     ],
     "budgetTotal": 5509.33,
     "budgetSpent": 5246.98,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8778",
@@ -1929,7 +2075,8 @@
     ],
     "budgetTotal": 4092.49,
     "budgetSpent": 3897.61,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8719",
@@ -1941,7 +2088,8 @@
     "utilities": [],
     "budgetTotal": 4849.37,
     "budgetSpent": 4618.45,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8714",
@@ -1953,7 +2101,8 @@
     "utilities": [],
     "budgetTotal": 4463.61,
     "budgetSpent": 4251.06,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8415",
@@ -1967,7 +2116,8 @@
     ],
     "budgetTotal": 1024.16,
     "budgetSpent": 975.39,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8650",
@@ -1981,7 +2131,8 @@
     ],
     "budgetTotal": 694.34,
     "budgetSpent": 661.28,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8435",
@@ -1995,7 +2146,8 @@
     ],
     "budgetTotal": 3737.42,
     "budgetSpent": 3559.45,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8720",
@@ -2009,7 +2161,8 @@
     ],
     "budgetTotal": 6831.83,
     "budgetSpent": 6506.5,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8724",
@@ -2021,7 +2174,8 @@
     "utilities": [],
     "budgetTotal": 40.76,
     "budgetSpent": 38.82,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8163",
@@ -2035,7 +2189,8 @@
     ],
     "budgetTotal": 434.15,
     "budgetSpent": 413.48,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8161",
@@ -2047,7 +2202,8 @@
     "utilities": [],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "9972",
@@ -2061,7 +2217,8 @@
     ],
     "budgetTotal": 12465.0,
     "budgetSpent": 11871.43,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "inactive"
   },
   {
     "id": "8193",
@@ -2076,7 +2233,8 @@
     ],
     "budgetTotal": 382156.65,
     "budgetSpent": 363958.71,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8306",
@@ -2088,7 +2246,8 @@
     "utilities": [],
     "budgetTotal": 4092.15,
     "budgetSpent": 3897.29,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8515",
@@ -2100,7 +2259,8 @@
     "utilities": [],
     "budgetTotal": 2304.05,
     "budgetSpent": 2194.33,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8692",
@@ -2114,7 +2274,8 @@
     ],
     "budgetTotal": 57086.74,
     "budgetSpent": 54368.32,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8345",
@@ -2126,7 +2287,8 @@
     "utilities": [],
     "budgetTotal": 38.04,
     "budgetSpent": 36.23,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "10168",
@@ -2138,7 +2300,8 @@
     "utilities": [],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "8098",
@@ -2150,7 +2313,8 @@
     "utilities": [],
     "budgetTotal": 12181.67,
     "budgetSpent": 11601.59,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8235",
@@ -2164,7 +2328,8 @@
     ],
     "budgetTotal": 1017.09,
     "budgetSpent": 968.66,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8099",
@@ -2178,7 +2343,8 @@
     ],
     "budgetTotal": 7839.51,
     "budgetSpent": 7466.2,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8756",
@@ -2193,7 +2359,8 @@
     ],
     "budgetTotal": 69322.13,
     "budgetSpent": 66021.08,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8765",
@@ -2208,7 +2375,8 @@
     ],
     "budgetTotal": 9083.41,
     "budgetSpent": 8650.87,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8004",
@@ -2222,7 +2390,8 @@
     ],
     "budgetTotal": 12062.65,
     "budgetSpent": 11488.24,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8124",
@@ -2234,7 +2403,8 @@
     "utilities": [],
     "budgetTotal": 4453.12,
     "budgetSpent": 4241.07,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8125",
@@ -2248,7 +2418,8 @@
     ],
     "budgetTotal": 4766.17,
     "budgetSpent": 4539.21,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8100",
@@ -2260,7 +2431,8 @@
     "utilities": [],
     "budgetTotal": 390.05,
     "budgetSpent": 371.48,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8681",
@@ -2272,7 +2444,8 @@
     "utilities": [],
     "budgetTotal": 354.06,
     "budgetSpent": 337.2,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8673",
@@ -2286,7 +2459,8 @@
     ],
     "budgetTotal": 2449.64,
     "budgetSpent": 2332.99,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8588",
@@ -2298,7 +2472,8 @@
     "utilities": [],
     "budgetTotal": 1692.93,
     "budgetSpent": 1612.31,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8679",
@@ -2310,7 +2485,8 @@
     "utilities": [],
     "budgetTotal": 255.65,
     "budgetSpent": 243.48,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8668",
@@ -2322,7 +2498,8 @@
     "utilities": [],
     "budgetTotal": 223.61,
     "budgetSpent": 212.96,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8669",
@@ -2336,7 +2513,8 @@
     ],
     "budgetTotal": 1234.8,
     "budgetSpent": 1176.0,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8677",
@@ -2350,7 +2528,8 @@
     ],
     "budgetTotal": 11261.18,
     "budgetSpent": 10724.93,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8678",
@@ -2362,7 +2541,8 @@
     "utilities": [],
     "budgetTotal": 342.8,
     "budgetSpent": 326.48,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8667",
@@ -2376,7 +2556,8 @@
     ],
     "budgetTotal": 1712.78,
     "budgetSpent": 1631.22,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8589",
@@ -2390,7 +2571,8 @@
     ],
     "budgetTotal": 7388.9,
     "budgetSpent": 7037.05,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8728",
@@ -2402,7 +2584,8 @@
     "utilities": [],
     "budgetTotal": 5146.77,
     "budgetSpent": 4901.69,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8009",
@@ -2416,7 +2599,8 @@
     ],
     "budgetTotal": 28639.18,
     "budgetSpent": 27275.41,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7994",
@@ -2430,7 +2614,8 @@
     ],
     "budgetTotal": 11180.91,
     "budgetSpent": 10648.49,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7992",
@@ -2444,7 +2629,8 @@
     ],
     "budgetTotal": 5764.77,
     "budgetSpent": 5490.26,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8760",
@@ -2458,7 +2644,8 @@
     ],
     "budgetTotal": 9131.67,
     "budgetSpent": 8696.83,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8058",
@@ -2470,7 +2657,8 @@
     "utilities": [],
     "budgetTotal": 1337.66,
     "budgetSpent": 1273.96,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8707",
@@ -2484,7 +2672,8 @@
     ],
     "budgetTotal": 11275.75,
     "budgetSpent": 10738.81,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8706",
@@ -2498,7 +2687,8 @@
     ],
     "budgetTotal": 7465.89,
     "budgetSpent": 7110.37,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8698",
@@ -2510,7 +2700,8 @@
     "utilities": [],
     "budgetTotal": 565.14,
     "budgetSpent": 538.23,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8795",
@@ -2522,7 +2713,8 @@
     "utilities": [],
     "budgetTotal": 828.72,
     "budgetSpent": 789.26,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8086",
@@ -2536,7 +2728,8 @@
     ],
     "budgetTotal": 20422.05,
     "budgetSpent": 19449.57,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8083",
@@ -2548,7 +2741,8 @@
     "utilities": [],
     "budgetTotal": 7295.47,
     "budgetSpent": 6948.07,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8496",
@@ -2560,7 +2754,8 @@
     "utilities": [],
     "budgetTotal": 9552.24,
     "budgetSpent": 9097.37,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8561",
@@ -2572,7 +2767,8 @@
     "utilities": [],
     "budgetTotal": 693.11,
     "budgetSpent": 660.1,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8160",
@@ -2584,7 +2780,8 @@
     "utilities": [],
     "budgetTotal": 299.11,
     "budgetSpent": 284.87,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8159",
@@ -2596,7 +2793,8 @@
     "utilities": [],
     "budgetTotal": 5017.73,
     "budgetSpent": 4778.79,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8823",
@@ -2608,7 +2806,8 @@
     "utilities": [],
     "budgetTotal": 550.76,
     "budgetSpent": 524.53,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8803",
@@ -2622,7 +2821,8 @@
     ],
     "budgetTotal": 4473.04,
     "budgetSpent": 4260.04,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8804",
@@ -2636,7 +2836,8 @@
     ],
     "budgetTotal": 3054.83,
     "budgetSpent": 2909.36,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8805",
@@ -2650,7 +2851,8 @@
     ],
     "budgetTotal": 4637.69,
     "budgetSpent": 4416.85,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8802",
@@ -2664,7 +2866,8 @@
     ],
     "budgetTotal": 4489.78,
     "budgetSpent": 4275.98,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8704",
@@ -2678,7 +2881,8 @@
     ],
     "budgetTotal": 6074.01,
     "budgetSpent": 5784.77,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8368",
@@ -2692,7 +2896,8 @@
     ],
     "budgetTotal": 21903.31,
     "budgetSpent": 20860.3,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8082",
@@ -2704,7 +2909,8 @@
     "utilities": [],
     "budgetTotal": 7286.46,
     "budgetSpent": 6939.49,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8074",
@@ -2718,7 +2924,8 @@
     ],
     "budgetTotal": 4258.02,
     "budgetSpent": 4055.26,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8216",
@@ -2733,7 +2940,8 @@
     ],
     "budgetTotal": 54611.53,
     "budgetSpent": 52010.98,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8215",
@@ -2750,7 +2958,8 @@
     ],
     "budgetTotal": 219565.69,
     "budgetSpent": 209110.18,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8219",
@@ -2764,7 +2973,8 @@
     ],
     "budgetTotal": 4543.03,
     "budgetSpent": 4326.7,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8212",
@@ -2776,7 +2986,8 @@
     "utilities": [],
     "budgetTotal": 4223.48,
     "budgetSpent": 4022.36,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8222",
@@ -2788,7 +2999,8 @@
     "utilities": [],
     "budgetTotal": 1479.71,
     "budgetSpent": 1409.25,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8374",
@@ -2802,7 +3014,8 @@
     ],
     "budgetTotal": 7477.31,
     "budgetSpent": 7121.25,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8213",
@@ -2814,7 +3027,8 @@
     "utilities": [],
     "budgetTotal": 6603.42,
     "budgetSpent": 6288.97,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8214",
@@ -2826,7 +3040,8 @@
     "utilities": [],
     "budgetTotal": 4378.76,
     "budgetSpent": 4170.25,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8221",
@@ -2838,7 +3053,8 @@
     "utilities": [],
     "budgetTotal": 128.14,
     "budgetSpent": 122.04,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8328",
@@ -2850,7 +3066,8 @@
     "utilities": [],
     "budgetTotal": 406.53,
     "budgetSpent": 387.17,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8211",
@@ -2862,7 +3079,8 @@
     "utilities": [],
     "budgetTotal": 4297.17,
     "budgetSpent": 4092.54,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8753",
@@ -2874,7 +3092,8 @@
     "utilities": [],
     "budgetTotal": 40.75,
     "budgetSpent": 38.81,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "10007",
@@ -2888,7 +3107,8 @@
     ],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "8220",
@@ -2900,7 +3120,8 @@
     "utilities": [],
     "budgetTotal": 10946.19,
     "budgetSpent": 10424.94,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8559",
@@ -2912,7 +3133,8 @@
     "utilities": [],
     "budgetTotal": 1875.75,
     "budgetSpent": 1786.43,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8729",
@@ -2926,7 +3148,8 @@
     ],
     "budgetTotal": 11616.77,
     "budgetSpent": 11063.59,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8195",
@@ -2938,7 +3161,8 @@
     "utilities": [],
     "budgetTotal": 3829.08,
     "budgetSpent": 3646.74,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8596",
@@ -2950,7 +3174,8 @@
     "utilities": [],
     "budgetTotal": 181.38,
     "budgetSpent": 172.74,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8601",
@@ -2962,7 +3187,8 @@
     "utilities": [],
     "budgetTotal": 78.62,
     "budgetSpent": 74.88,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8651",
@@ -2976,7 +3202,8 @@
     ],
     "budgetTotal": 2092.16,
     "budgetSpent": 1992.53,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8378",
@@ -2988,7 +3215,8 @@
     "utilities": [],
     "budgetTotal": 216.34,
     "budgetSpent": 206.04,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8347",
@@ -3002,7 +3230,8 @@
     ],
     "budgetTotal": 5733.21,
     "budgetSpent": 5460.2,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8346",
@@ -3014,7 +3243,8 @@
     "utilities": [],
     "budgetTotal": 1017.31,
     "budgetSpent": 968.87,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8383",
@@ -3026,7 +3256,8 @@
     "utilities": [],
     "budgetTotal": 1040.36,
     "budgetSpent": 990.82,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "7964",
@@ -3038,7 +3269,8 @@
     "utilities": [],
     "budgetTotal": 467.02,
     "budgetSpent": 444.78,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "7965",
@@ -3050,7 +3282,8 @@
     "utilities": [],
     "budgetTotal": 367.68,
     "budgetSpent": 350.17,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "7966",
@@ -3062,7 +3295,8 @@
     "utilities": [],
     "budgetTotal": 286.03,
     "budgetSpent": 272.41,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "7957",
@@ -3074,7 +3308,8 @@
     "utilities": [],
     "budgetTotal": 236.0,
     "budgetSpent": 224.76,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7958",
@@ -3086,7 +3321,8 @@
     "utilities": [],
     "budgetTotal": 413.01,
     "budgetSpent": 393.34,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8542",
@@ -3098,7 +3334,8 @@
     "utilities": [],
     "budgetTotal": 999.14,
     "budgetSpent": 951.56,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8467",
@@ -3110,7 +3347,8 @@
     "utilities": [],
     "budgetTotal": 921.45,
     "budgetSpent": 877.57,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8541",
@@ -3122,7 +3360,8 @@
     "utilities": [],
     "budgetTotal": 39.31,
     "budgetSpent": 37.44,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8540",
@@ -3134,7 +3373,8 @@
     "utilities": [],
     "budgetTotal": 176.9,
     "budgetSpent": 168.48,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8190",
@@ -3146,7 +3386,8 @@
     "utilities": [],
     "budgetTotal": 11098.46,
     "budgetSpent": 10569.96,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8198",
@@ -3162,7 +3403,8 @@
     ],
     "budgetTotal": 509254.92,
     "budgetSpent": 485004.69,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8199",
@@ -3177,7 +3419,8 @@
     ],
     "budgetTotal": 210354.97,
     "budgetSpent": 200338.07,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8126",
@@ -3189,7 +3432,8 @@
     "utilities": [],
     "budgetTotal": 3037.34,
     "budgetSpent": 2892.7,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8815",
@@ -3201,7 +3445,8 @@
     "utilities": [],
     "budgetTotal": 3150.8,
     "budgetSpent": 3000.76,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8031",
@@ -3213,7 +3458,8 @@
     "utilities": [],
     "budgetTotal": 1669.93,
     "budgetSpent": 1590.41,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8194",
@@ -3225,7 +3471,8 @@
     "utilities": [],
     "budgetTotal": 5524.66,
     "budgetSpent": 5261.58,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8408",
@@ -3237,7 +3484,8 @@
     "utilities": [],
     "budgetTotal": 2923.06,
     "budgetSpent": 2783.87,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8405",
@@ -3251,7 +3499,8 @@
     ],
     "budgetTotal": 5381.24,
     "budgetSpent": 5124.99,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8340",
@@ -3265,7 +3514,8 @@
     ],
     "budgetTotal": 26698.16,
     "budgetSpent": 25426.82,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8341",
@@ -3279,7 +3529,8 @@
     ],
     "budgetTotal": 25793.92,
     "budgetSpent": 24565.64,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8296",
@@ -3291,7 +3542,8 @@
     "utilities": [],
     "budgetTotal": 11115.97,
     "budgetSpent": 10586.64,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8617",
@@ -3305,7 +3557,8 @@
     ],
     "budgetTotal": 1252.21,
     "budgetSpent": 1192.58,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8120",
@@ -3319,7 +3572,8 @@
     ],
     "budgetTotal": 9508.13,
     "budgetSpent": 9055.36,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8023",
@@ -3331,7 +3585,8 @@
     "utilities": [],
     "budgetTotal": 640.53,
     "budgetSpent": 610.03,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8090",
@@ -3343,7 +3598,8 @@
     "utilities": [],
     "budgetTotal": 6616.98,
     "budgetSpent": 6301.89,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8384",
@@ -3357,7 +3613,8 @@
     ],
     "budgetTotal": 24013.57,
     "budgetSpent": 22870.07,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8388",
@@ -3369,7 +3626,8 @@
     "utilities": [],
     "budgetTotal": 896.76,
     "budgetSpent": 854.06,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8385",
@@ -3383,7 +3641,8 @@
     ],
     "budgetTotal": 10973.12,
     "budgetSpent": 10450.59,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8386",
@@ -3395,7 +3654,8 @@
     "utilities": [],
     "budgetTotal": 896.76,
     "budgetSpent": 854.06,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8174",
@@ -3409,7 +3669,8 @@
     ],
     "budgetTotal": 1806.01,
     "budgetSpent": 1720.01,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8227",
@@ -3423,7 +3684,8 @@
     ],
     "budgetTotal": 3448.92,
     "budgetSpent": 3284.69,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8121",
@@ -3437,7 +3699,8 @@
     ],
     "budgetTotal": 5268.02,
     "budgetSpent": 5017.16,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8223",
@@ -3453,7 +3716,8 @@
     ],
     "budgetTotal": 966144.07,
     "budgetSpent": 920137.21,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8207",
@@ -3465,7 +3729,8 @@
     "utilities": [],
     "budgetTotal": 1144.2,
     "budgetSpent": 1089.71,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8138",
@@ -3479,7 +3744,8 @@
     ],
     "budgetTotal": 4748.87,
     "budgetSpent": 4522.73,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8460",
@@ -3491,7 +3757,8 @@
     "utilities": [],
     "budgetTotal": 255.65,
     "budgetSpent": 243.48,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7972",
@@ -3503,7 +3770,8 @@
     "utilities": [],
     "budgetTotal": 236.0,
     "budgetSpent": 224.76,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8110",
@@ -3515,7 +3783,8 @@
     "utilities": [],
     "budgetTotal": 58.97,
     "budgetSpent": 56.16,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8087",
@@ -3529,7 +3798,8 @@
     ],
     "budgetTotal": 13592.59,
     "budgetSpent": 12945.32,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8226",
@@ -3545,7 +3815,8 @@
     ],
     "budgetTotal": 740221.76,
     "budgetSpent": 704973.1,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8101",
@@ -3560,7 +3831,8 @@
     ],
     "budgetTotal": 9034.78,
     "budgetSpent": 8604.55,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8136",
@@ -3572,7 +3844,8 @@
     "utilities": [],
     "budgetTotal": 5251.48,
     "budgetSpent": 5001.41,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8640",
@@ -3584,7 +3857,8 @@
     "utilities": [],
     "budgetTotal": 19.66,
     "budgetSpent": 18.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8671",
@@ -3598,7 +3872,8 @@
     ],
     "budgetTotal": 3496.88,
     "budgetSpent": 3330.36,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8690",
@@ -3610,7 +3885,8 @@
     "utilities": [],
     "budgetTotal": 734.0,
     "budgetSpent": 699.05,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8234",
@@ -3622,7 +3898,8 @@
     "utilities": [],
     "budgetTotal": 326.4,
     "budgetSpent": 310.86,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8224",
@@ -3637,7 +3914,8 @@
     ],
     "budgetTotal": 838483.23,
     "budgetSpent": 798555.46,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8544",
@@ -3649,7 +3927,8 @@
     "utilities": [],
     "budgetTotal": 203.83,
     "budgetSpent": 194.12,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8628",
@@ -3661,7 +3940,8 @@
     "utilities": [],
     "budgetTotal": 19.66,
     "budgetSpent": 18.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8228",
@@ -3676,7 +3956,8 @@
     ],
     "budgetTotal": 800041.49,
     "budgetSpent": 761944.28,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8203",
@@ -3690,7 +3971,8 @@
     ],
     "budgetTotal": 6072.63,
     "budgetSpent": 5783.46,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8000",
@@ -3702,7 +3984,8 @@
     "utilities": [],
     "budgetTotal": 196.69,
     "budgetSpent": 187.32,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8001",
@@ -3714,7 +3997,8 @@
     "utilities": [],
     "budgetTotal": 694.79,
     "budgetSpent": 661.7,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8002",
@@ -3726,7 +4010,8 @@
     "utilities": [],
     "budgetTotal": 1416.46,
     "budgetSpent": 1349.01,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8688",
@@ -3738,7 +4023,8 @@
     "utilities": [],
     "budgetTotal": 749.3,
     "budgetSpent": 713.62,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8230",
@@ -3752,7 +4038,8 @@
     ],
     "budgetTotal": 282.17,
     "budgetSpent": 268.73,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8231",
@@ -3764,7 +4051,8 @@
     "utilities": [],
     "budgetTotal": 38.04,
     "budgetSpent": 36.23,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8232",
@@ -3776,7 +4064,8 @@
     "utilities": [],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8355",
@@ -3788,7 +4077,8 @@
     "utilities": [],
     "budgetTotal": 8397.9,
     "budgetSpent": 7998.0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8317",
@@ -3804,7 +4094,8 @@
     ],
     "budgetTotal": 35423.22,
     "budgetSpent": 33736.4,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8318",
@@ -3820,7 +4111,8 @@
     ],
     "budgetTotal": 34040.58,
     "budgetSpent": 32419.6,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8315",
@@ -3836,7 +4128,8 @@
     ],
     "budgetTotal": 38868.27,
     "budgetSpent": 37017.4,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8319",
@@ -3852,7 +4145,8 @@
     ],
     "budgetTotal": 35579.11,
     "budgetSpent": 33884.87,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8316",
@@ -3868,7 +4162,8 @@
     ],
     "budgetTotal": 38171.81,
     "budgetSpent": 36354.1,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8097",
@@ -3882,7 +4177,8 @@
     ],
     "budgetTotal": 3107.98,
     "budgetSpent": 2959.98,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8096",
@@ -3896,7 +4192,8 @@
     ],
     "budgetTotal": 7846.37,
     "budgetSpent": 7472.73,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8187",
@@ -3908,7 +4205,8 @@
     "utilities": [],
     "budgetTotal": 2465.43,
     "budgetSpent": 2348.03,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8185",
@@ -3920,7 +4218,8 @@
     "utilities": [],
     "budgetTotal": 3131.86,
     "budgetSpent": 2982.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8603",
@@ -3932,7 +4231,8 @@
     "utilities": [],
     "budgetTotal": 78.62,
     "budgetSpent": 74.88,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8597",
@@ -3944,7 +4244,8 @@
     "utilities": [],
     "budgetTotal": 58.97,
     "budgetSpent": 56.16,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8593",
@@ -3958,7 +4259,8 @@
     ],
     "budgetTotal": 664.92,
     "budgetSpent": 633.26,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8595",
@@ -3970,7 +4272,8 @@
     "utilities": [],
     "budgetTotal": 78.88,
     "budgetSpent": 75.12,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8616",
@@ -3982,7 +4285,8 @@
     "utilities": [],
     "budgetTotal": 978.57,
     "budgetSpent": 931.97,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8613",
@@ -3994,7 +4298,8 @@
     "utilities": [],
     "budgetTotal": 19.66,
     "budgetSpent": 18.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8614",
@@ -4006,7 +4311,8 @@
     "utilities": [],
     "budgetTotal": 650.89,
     "budgetSpent": 619.9,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8419",
@@ -4018,7 +4324,8 @@
     "utilities": [],
     "budgetTotal": 790.95,
     "budgetSpent": 753.29,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8604",
@@ -4030,7 +4337,8 @@
     "utilities": [],
     "budgetTotal": 766.96,
     "budgetSpent": 730.44,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8599",
@@ -4044,7 +4352,8 @@
     ],
     "budgetTotal": 14425.38,
     "budgetSpent": 13738.46,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "9953",
@@ -4058,7 +4367,8 @@
     ],
     "budgetTotal": 6344.42,
     "budgetSpent": 6042.3,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "8168",
@@ -4070,7 +4380,8 @@
     "utilities": [],
     "budgetTotal": 6405.0,
     "budgetSpent": 6100.0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8181",
@@ -4085,7 +4396,8 @@
     ],
     "budgetTotal": 1116984.78,
     "budgetSpent": 1063795.03,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8298",
@@ -4102,7 +4414,8 @@
     ],
     "budgetTotal": 37202.21,
     "budgetSpent": 35430.68,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8333",
@@ -4116,7 +4429,8 @@
     ],
     "budgetTotal": 2427.77,
     "budgetSpent": 2312.16,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8334",
@@ -4130,7 +4444,8 @@
     ],
     "budgetTotal": 2439.17,
     "budgetSpent": 2323.02,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8206",
@@ -4142,7 +4457,8 @@
     "utilities": [],
     "budgetTotal": 2061.78,
     "budgetSpent": 1963.6,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8305",
@@ -4154,7 +4470,8 @@
     "utilities": [],
     "budgetTotal": 1806.51,
     "budgetSpent": 1720.49,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8330",
@@ -4168,7 +4485,8 @@
     ],
     "budgetTotal": 3959.16,
     "budgetSpent": 3770.63,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8507",
@@ -4182,7 +4500,8 @@
     ],
     "budgetTotal": 2016.14,
     "budgetSpent": 1920.13,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8505",
@@ -4196,7 +4515,8 @@
     ],
     "budgetTotal": 6431.66,
     "budgetSpent": 6125.39,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8395",
@@ -4210,7 +4530,8 @@
     ],
     "budgetTotal": 6275.03,
     "budgetSpent": 5976.22,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8398",
@@ -4224,7 +4545,8 @@
     ],
     "budgetTotal": 5679.11,
     "budgetSpent": 5408.68,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8445",
@@ -4236,7 +4558,8 @@
     "utilities": [],
     "budgetTotal": 1685.54,
     "budgetSpent": 1605.28,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8446",
@@ -4248,7 +4571,8 @@
     "utilities": [],
     "budgetTotal": 2879.17,
     "budgetSpent": 2742.07,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8396",
@@ -4262,7 +4586,8 @@
     ],
     "budgetTotal": 8758.62,
     "budgetSpent": 8341.54,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8444",
@@ -4274,7 +4599,8 @@
     "utilities": [],
     "budgetTotal": 537.5,
     "budgetSpent": 511.9,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8397",
@@ -4288,7 +4614,8 @@
     ],
     "budgetTotal": 13802.59,
     "budgetSpent": 13145.32,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8793",
@@ -4302,7 +4629,8 @@
     ],
     "budgetTotal": 3446.16,
     "budgetSpent": 3282.06,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8132",
@@ -4314,7 +4642,8 @@
     "utilities": [],
     "budgetTotal": 1807.52,
     "budgetSpent": 1721.45,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8705",
@@ -4328,7 +4657,8 @@
     ],
     "budgetTotal": 9518.83,
     "budgetSpent": 9065.55,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8699",
@@ -4340,7 +4670,8 @@
     "utilities": [],
     "budgetTotal": 809.72,
     "budgetSpent": 771.16,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8323",
@@ -4352,7 +4683,8 @@
     "utilities": [],
     "budgetTotal": 550.75,
     "budgetSpent": 524.52,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8325",
@@ -4364,7 +4696,8 @@
     "utilities": [],
     "budgetTotal": 216.34,
     "budgetSpent": 206.04,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8326",
@@ -4376,7 +4709,8 @@
     "utilities": [],
     "budgetTotal": 157.37,
     "budgetSpent": 149.88,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8324",
@@ -4388,7 +4722,8 @@
     "utilities": [],
     "budgetTotal": 550.75,
     "budgetSpent": 524.52,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "9952",
@@ -4402,7 +4737,8 @@
     ],
     "budgetTotal": 1798.29,
     "budgetSpent": 1712.66,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "9951",
@@ -4416,7 +4752,8 @@
     ],
     "budgetTotal": 3725.81,
     "budgetSpent": 3548.39,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "8470",
@@ -4428,7 +4765,8 @@
     "utilities": [],
     "budgetTotal": 814.54,
     "budgetSpent": 775.75,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8153",
@@ -4443,7 +4781,8 @@
     ],
     "budgetTotal": 812.85,
     "budgetSpent": 774.14,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7978",
@@ -4457,7 +4796,8 @@
     ],
     "budgetTotal": 8273.15,
     "budgetSpent": 7879.19,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8128",
@@ -4469,7 +4809,8 @@
     "utilities": [],
     "budgetTotal": 230.29,
     "budgetSpent": 219.32,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8731",
@@ -4483,7 +4824,8 @@
     ],
     "budgetTotal": 3167.66,
     "budgetSpent": 3016.82,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8732",
@@ -4497,7 +4839,8 @@
     ],
     "budgetTotal": 2657.22,
     "budgetSpent": 2530.69,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8119",
@@ -4509,7 +4852,8 @@
     "utilities": [],
     "budgetTotal": 3970.26,
     "budgetSpent": 3781.2,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8473",
@@ -4523,7 +4867,8 @@
     ],
     "budgetTotal": 8913.56,
     "budgetSpent": 8489.1,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8493",
@@ -4537,7 +4882,8 @@
     ],
     "budgetTotal": 40264.44,
     "budgetSpent": 38347.09,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8462",
@@ -4551,7 +4897,8 @@
     ],
     "budgetTotal": 999.23,
     "budgetSpent": 951.65,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8463",
@@ -4565,7 +4912,8 @@
     ],
     "budgetTotal": 996.7,
     "budgetSpent": 949.24,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8464",
@@ -4579,7 +4927,8 @@
     ],
     "budgetTotal": 1010.22,
     "budgetSpent": 962.11,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8457",
@@ -4591,7 +4940,8 @@
     "utilities": [],
     "budgetTotal": 1514.39,
     "budgetSpent": 1442.28,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7990",
@@ -4605,7 +4955,8 @@
     ],
     "budgetTotal": 55241.57,
     "budgetSpent": 52611.02,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8105",
@@ -4617,7 +4968,8 @@
     "utilities": [],
     "budgetTotal": 1418.43,
     "budgetSpent": 1350.89,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8104",
@@ -4631,7 +4983,8 @@
     ],
     "budgetTotal": 4107.33,
     "budgetSpent": 3911.74,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8106",
@@ -4643,7 +4996,8 @@
     "utilities": [],
     "budgetTotal": 4672.68,
     "budgetSpent": 4450.17,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8189",
@@ -4655,7 +5009,8 @@
     "utilities": [],
     "budgetTotal": 59.17,
     "budgetSpent": 56.35,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8188",
@@ -4671,7 +5026,8 @@
     ],
     "budgetTotal": 468826.93,
     "budgetSpent": 446501.84,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8183",
@@ -4683,7 +5039,8 @@
     "utilities": [],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8184",
@@ -4695,7 +5052,8 @@
     "utilities": [],
     "budgetTotal": 57.06,
     "budgetSpent": 54.34,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8182",
@@ -4707,7 +5065,8 @@
     "utilities": [],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "error"
+    "dataQuality": "error",
+    "status": "pending"
   },
   {
     "id": "8547",
@@ -4721,7 +5080,8 @@
     ],
     "budgetTotal": 1048.45,
     "budgetSpent": 998.52,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8060",
@@ -4733,7 +5093,8 @@
     "utilities": [],
     "budgetTotal": 944.26,
     "budgetSpent": 899.3,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8548",
@@ -4747,7 +5108,8 @@
     ],
     "budgetTotal": 759.43,
     "budgetSpent": 723.27,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8545",
@@ -4759,7 +5121,8 @@
     "utilities": [],
     "budgetTotal": 476.34,
     "budgetSpent": 453.66,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8191",
@@ -4774,7 +5137,8 @@
     ],
     "budgetTotal": 303191.89,
     "budgetSpent": 288754.18,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8192",
@@ -4786,7 +5150,8 @@
     "utilities": [],
     "budgetTotal": 191.02,
     "budgetSpent": 181.92,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8387",
@@ -4800,7 +5165,8 @@
     ],
     "budgetTotal": 3060.58,
     "budgetSpent": 2914.84,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8389",
@@ -4812,7 +5178,8 @@
     "utilities": [],
     "budgetTotal": 1601.36,
     "budgetSpent": 1525.1,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8133",
@@ -4824,7 +5191,8 @@
     "utilities": [],
     "budgetTotal": 7199.83,
     "budgetSpent": 6856.98,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8662",
@@ -4838,7 +5206,8 @@
     ],
     "budgetTotal": 7948.48,
     "budgetSpent": 7569.98,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8475",
@@ -4852,7 +5221,8 @@
     ],
     "budgetTotal": 31760.27,
     "budgetSpent": 30247.88,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8517",
@@ -4866,7 +5236,8 @@
     ],
     "budgetTotal": 1143.2,
     "budgetSpent": 1088.76,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8518",
@@ -4878,7 +5249,8 @@
     "utilities": [],
     "budgetTotal": 305.81,
     "budgetSpent": 291.25,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8516",
@@ -4890,7 +5262,8 @@
     "utilities": [],
     "budgetTotal": 371.7,
     "budgetSpent": 354.0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8740",
@@ -4904,7 +5277,8 @@
     ],
     "budgetTotal": 5205.25,
     "budgetSpent": 4957.38,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8741",
@@ -4918,7 +5292,8 @@
     ],
     "budgetTotal": 3117.46,
     "budgetSpent": 2969.01,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8180",
@@ -4933,7 +5308,8 @@
     ],
     "budgetTotal": 1011633.04,
     "budgetSpent": 963460.04,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8092",
@@ -4949,7 +5325,8 @@
     ],
     "budgetTotal": 362434.31,
     "budgetSpent": 345175.53,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "9749",
@@ -4961,7 +5338,8 @@
     "utilities": [],
     "budgetTotal": 39.35,
     "budgetSpent": 37.48,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "8026",
@@ -4975,7 +5353,8 @@
     ],
     "budgetTotal": 31964.33,
     "budgetSpent": 30442.22,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "9754",
@@ -4989,7 +5368,8 @@
     ],
     "budgetTotal": 8457.08,
     "budgetSpent": 8054.36,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "8210",
@@ -5001,7 +5381,8 @@
     "utilities": [],
     "budgetTotal": 4441.97,
     "budgetSpent": 4230.45,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8209",
@@ -5013,7 +5394,8 @@
     "utilities": [],
     "budgetTotal": 6781.2,
     "budgetSpent": 6458.29,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8817",
@@ -5025,7 +5407,8 @@
     "utilities": [],
     "budgetTotal": 806.16,
     "budgetSpent": 767.77,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8422",
@@ -5037,7 +5420,8 @@
     "utilities": [],
     "budgetTotal": 7905.5,
     "budgetSpent": 7529.05,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8555",
@@ -5051,7 +5435,8 @@
     ],
     "budgetTotal": 718.31,
     "budgetSpent": 684.1,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8556",
@@ -5065,7 +5450,8 @@
     ],
     "budgetTotal": 1317.32,
     "budgetSpent": 1254.59,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8065",
@@ -5079,7 +5465,8 @@
     ],
     "budgetTotal": 6897.66,
     "budgetSpent": 6569.2,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8533",
@@ -5091,7 +5478,8 @@
     "utilities": [],
     "budgetTotal": 365.55,
     "budgetSpent": 348.14,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8532",
@@ -5103,7 +5491,8 @@
     "utilities": [],
     "budgetTotal": 451.89,
     "budgetSpent": 430.37,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8531",
@@ -5115,7 +5504,8 @@
     "utilities": [],
     "budgetTotal": 39.31,
     "budgetSpent": 37.44,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8530",
@@ -5129,7 +5519,8 @@
     ],
     "budgetTotal": 737.68,
     "budgetSpent": 702.55,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8063",
@@ -5141,7 +5532,8 @@
     "utilities": [],
     "budgetTotal": 3837.15,
     "budgetSpent": 3654.43,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8420",
@@ -5155,7 +5547,8 @@
     ],
     "budgetTotal": 4287.4,
     "budgetSpent": 4083.24,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8418",
@@ -5169,7 +5562,8 @@
     ],
     "budgetTotal": 3488.13,
     "budgetSpent": 3322.03,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8436",
@@ -5183,7 +5577,8 @@
     ],
     "budgetTotal": 1326.36,
     "budgetSpent": 1263.2,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8710",
@@ -5195,7 +5590,8 @@
     "utilities": [],
     "budgetTotal": 3947.27,
     "budgetSpent": 3759.3,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8197",
@@ -5207,7 +5603,8 @@
     "utilities": [],
     "budgetTotal": 433.83,
     "budgetSpent": 413.17,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8632",
@@ -5221,7 +5618,8 @@
     ],
     "budgetTotal": 15913.44,
     "budgetSpent": 15155.66,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8592",
@@ -5235,7 +5633,8 @@
     ],
     "budgetTotal": 1865.34,
     "budgetSpent": 1776.51,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8631",
@@ -5249,7 +5648,8 @@
     ],
     "budgetTotal": 9845.91,
     "budgetSpent": 9377.06,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8600",
@@ -5263,7 +5663,8 @@
     ],
     "budgetTotal": 4611.74,
     "budgetSpent": 4392.13,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8623",
@@ -5275,7 +5676,8 @@
     "utilities": [],
     "budgetTotal": 39.31,
     "budgetSpent": 37.44,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8591",
@@ -5289,7 +5691,8 @@
     ],
     "budgetTotal": 3877.9,
     "budgetSpent": 3693.24,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8612",
@@ -5303,7 +5706,8 @@
     ],
     "budgetTotal": 1888.94,
     "budgetSpent": 1798.99,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8602",
@@ -5315,7 +5719,8 @@
     "utilities": [],
     "budgetTotal": 58.97,
     "budgetSpent": 56.16,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8624",
@@ -5329,7 +5734,8 @@
     ],
     "budgetTotal": 2350.4,
     "budgetSpent": 2238.48,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8626",
@@ -5343,7 +5749,8 @@
     ],
     "budgetTotal": 1623.79,
     "budgetSpent": 1546.47,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8630",
@@ -5355,7 +5762,8 @@
     "utilities": [],
     "budgetTotal": 98.28,
     "budgetSpent": 93.6,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8598",
@@ -5367,7 +5775,8 @@
     "utilities": [],
     "budgetTotal": 19.66,
     "budgetSpent": 18.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8627",
@@ -5379,7 +5788,8 @@
     "utilities": [],
     "budgetTotal": 487.64,
     "budgetSpent": 464.42,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8622",
@@ -5391,7 +5801,8 @@
     "utilities": [],
     "budgetTotal": 118.06,
     "budgetSpent": 112.44,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8430",
@@ -5403,7 +5814,8 @@
     "utilities": [],
     "budgetTotal": 628.4,
     "budgetSpent": 598.48,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8429",
@@ -5415,7 +5827,8 @@
     "utilities": [],
     "budgetTotal": 930.6,
     "budgetSpent": 886.29,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8428",
@@ -5427,7 +5840,8 @@
     "utilities": [],
     "budgetTotal": 774.55,
     "budgetSpent": 737.67,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8427",
@@ -5439,7 +5853,8 @@
     "utilities": [],
     "budgetTotal": 611.52,
     "budgetSpent": 582.4,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8557",
@@ -5453,7 +5868,8 @@
     ],
     "budgetTotal": 740.06,
     "budgetSpent": 704.82,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8791",
@@ -5467,7 +5883,8 @@
     ],
     "budgetTotal": 2233.03,
     "budgetSpent": 2126.7,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8122",
@@ -5479,7 +5896,8 @@
     "utilities": [],
     "budgetTotal": 4261.4,
     "budgetSpent": 4058.48,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8123",
@@ -5493,7 +5911,8 @@
     ],
     "budgetTotal": 10605.37,
     "budgetSpent": 10100.35,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8491",
@@ -5507,7 +5926,8 @@
     ],
     "budgetTotal": 28311.12,
     "budgetSpent": 26962.97,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8094",
@@ -5519,7 +5939,8 @@
     "utilities": [],
     "budgetTotal": 3378.09,
     "budgetSpent": 3217.23,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8776",
@@ -5531,7 +5952,8 @@
     "utilities": [],
     "budgetTotal": 748.34,
     "budgetSpent": 712.7,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8730",
@@ -5543,7 +5965,8 @@
     "utilities": [],
     "budgetTotal": 3296.21,
     "budgetSpent": 3139.25,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8145",
@@ -5559,7 +5982,8 @@
     ],
     "budgetTotal": 35960.84,
     "budgetSpent": 34248.42,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8143",
@@ -5571,7 +5995,8 @@
     "utilities": [],
     "budgetTotal": 15213.58,
     "budgetSpent": 14489.12,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8062",
@@ -5585,7 +6010,8 @@
     ],
     "budgetTotal": 8764.49,
     "budgetSpent": 8347.13,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8109",
@@ -5601,7 +6027,8 @@
     ],
     "budgetTotal": 71901.02,
     "budgetSpent": 68477.16,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8806",
@@ -5615,7 +6042,8 @@
     ],
     "budgetTotal": 4600.44,
     "budgetSpent": 4381.37,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8807",
@@ -5629,7 +6057,8 @@
     ],
     "budgetTotal": 2193.11,
     "budgetSpent": 2088.68,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8558",
@@ -5643,7 +6072,8 @@
     ],
     "budgetTotal": 698.1,
     "budgetSpent": 664.86,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8162",
@@ -5657,7 +6087,8 @@
     ],
     "budgetTotal": 593.67,
     "budgetSpent": 565.4,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8775",
@@ -5669,7 +6100,8 @@
     "utilities": [],
     "budgetTotal": 6311.18,
     "budgetSpent": 6010.65,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8761",
@@ -5683,7 +6115,8 @@
     ],
     "budgetTotal": 11642.3,
     "budgetSpent": 11087.9,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8762",
@@ -5697,7 +6130,8 @@
     ],
     "budgetTotal": 10650.73,
     "budgetSpent": 10143.55,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8763",
@@ -5711,7 +6145,8 @@
     ],
     "budgetTotal": 9821.27,
     "budgetSpent": 9353.59,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8764",
@@ -5725,7 +6160,8 @@
     ],
     "budgetTotal": 10912.84,
     "budgetSpent": 10393.18,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8735",
@@ -5739,7 +6175,8 @@
     ],
     "budgetTotal": 2155.39,
     "budgetSpent": 2052.75,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8757",
@@ -5753,7 +6190,8 @@
     ],
     "budgetTotal": 9993.9,
     "budgetSpent": 9518.0,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8758",
@@ -5767,7 +6205,8 @@
     ],
     "budgetTotal": 9683.68,
     "budgetSpent": 9222.55,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8759",
@@ -5781,7 +6220,8 @@
     ],
     "budgetTotal": 9711.32,
     "budgetSpent": 9248.88,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8782",
@@ -5795,7 +6235,8 @@
     ],
     "budgetTotal": 3027.57,
     "budgetSpent": 2883.4,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8552",
@@ -5807,7 +6248,8 @@
     "utilities": [],
     "budgetTotal": 444.18,
     "budgetSpent": 423.03,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8443",
@@ -5821,7 +6263,8 @@
     ],
     "budgetTotal": 3163.25,
     "budgetSpent": 3012.62,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8746",
@@ -5835,7 +6278,8 @@
     ],
     "budgetTotal": 2399.21,
     "budgetSpent": 2284.96,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8078",
@@ -5849,7 +6293,8 @@
     ],
     "budgetTotal": 14741.6,
     "budgetSpent": 14039.62,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8409",
@@ -5863,7 +6308,8 @@
     ],
     "budgetTotal": 10435.43,
     "budgetSpent": 9938.5,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8352",
@@ -5877,7 +6323,8 @@
     ],
     "budgetTotal": 7692.13,
     "budgetSpent": 7325.84,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8131",
@@ -5891,7 +6338,8 @@
     ],
     "budgetTotal": 8575.53,
     "budgetSpent": 8167.17,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8129",
@@ -5905,7 +6353,8 @@
     ],
     "budgetTotal": 5058.85,
     "budgetSpent": 4817.95,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8130",
@@ -5917,7 +6366,8 @@
     "utilities": [],
     "budgetTotal": 1661.25,
     "budgetSpent": 1582.14,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8787",
@@ -5931,7 +6381,8 @@
     ],
     "budgetTotal": 9540.56,
     "budgetSpent": 9086.25,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7983",
@@ -5945,7 +6396,8 @@
     ],
     "budgetTotal": 4348.46,
     "budgetSpent": 4141.39,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8329",
@@ -5957,7 +6409,8 @@
     "utilities": [],
     "budgetTotal": 3541.27,
     "budgetSpent": 3372.64,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8783",
@@ -5971,7 +6424,8 @@
     ],
     "budgetTotal": 7550.71,
     "budgetSpent": 7191.15,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8147",
@@ -5985,7 +6439,8 @@
     ],
     "budgetTotal": 2593.27,
     "budgetSpent": 2469.78,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8703",
@@ -5999,7 +6454,8 @@
     ],
     "budgetTotal": 4235.75,
     "budgetSpent": 4034.05,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8687",
@@ -6011,7 +6467,8 @@
     "utilities": [],
     "budgetTotal": 1181.07,
     "budgetSpent": 1124.83,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8574",
@@ -6023,7 +6480,8 @@
     "utilities": [],
     "budgetTotal": 334.28,
     "budgetSpent": 318.36,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8055",
@@ -6035,7 +6493,8 @@
     "utilities": [],
     "budgetTotal": 1731.21,
     "budgetSpent": 1648.77,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8158",
@@ -6047,7 +6506,8 @@
     "utilities": [],
     "budgetTotal": 1118.46,
     "budgetSpent": 1065.2,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8044",
@@ -6059,7 +6519,8 @@
     "utilities": [],
     "budgetTotal": 1725.18,
     "budgetSpent": 1643.03,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8041",
@@ -6071,7 +6532,8 @@
     "utilities": [],
     "budgetTotal": 805.57,
     "budgetSpent": 767.21,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "7975",
@@ -6085,7 +6547,8 @@
     ],
     "budgetTotal": 5676.27,
     "budgetSpent": 5405.97,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8113",
@@ -6097,7 +6560,8 @@
     "utilities": [],
     "budgetTotal": 676.53,
     "budgetSpent": 644.31,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8112",
@@ -6109,7 +6573,8 @@
     "utilities": [],
     "budgetTotal": 1259.1,
     "budgetSpent": 1199.14,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8237",
@@ -6123,7 +6588,8 @@
     ],
     "budgetTotal": 13623.11,
     "budgetSpent": 12974.39,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8238",
@@ -6135,7 +6601,8 @@
     "utilities": [],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8236",
@@ -6149,7 +6616,8 @@
     ],
     "budgetTotal": 19.03,
     "budgetSpent": 18.12,
-    "dataQuality": "error"
+    "dataQuality": "error",
+    "status": "pending"
   },
   {
     "id": "8247",
@@ -6161,7 +6629,8 @@
     "utilities": [],
     "budgetTotal": 1131.49,
     "budgetSpent": 1077.61,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8248",
@@ -6175,7 +6644,8 @@
     ],
     "budgetTotal": 66246.18,
     "budgetSpent": 63091.6,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8431",
@@ -6189,7 +6659,8 @@
     ],
     "budgetTotal": 4704.06,
     "budgetSpent": 4480.06,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8450",
@@ -6201,7 +6672,8 @@
     "utilities": [],
     "budgetTotal": 733.24,
     "budgetSpent": 698.32,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8451",
@@ -6213,7 +6685,8 @@
     "utilities": [],
     "budgetTotal": 220.7,
     "budgetSpent": 210.19,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8452",
@@ -6227,7 +6700,8 @@
     ],
     "budgetTotal": 1083.46,
     "budgetSpent": 1031.87,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8453",
@@ -6241,7 +6715,8 @@
     ],
     "budgetTotal": 949.96,
     "budgetSpent": 904.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8070",
@@ -6253,7 +6728,8 @@
     "utilities": [],
     "budgetTotal": 4664.51,
     "budgetSpent": 4442.39,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8269",
@@ -6267,7 +6743,8 @@
     ],
     "budgetTotal": 11500.18,
     "budgetSpent": 10952.55,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8267",
@@ -6281,7 +6758,8 @@
     ],
     "budgetTotal": 12196.51,
     "budgetSpent": 11615.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8225",
@@ -6293,7 +6771,8 @@
     "utilities": [],
     "budgetTotal": 9874.83,
     "budgetSpent": 9404.6,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8268",
@@ -6307,7 +6786,8 @@
     ],
     "budgetTotal": 10373.4,
     "budgetSpent": 9879.43,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8251",
@@ -6321,7 +6801,8 @@
     ],
     "budgetTotal": 36594.93,
     "budgetSpent": 34852.31,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8252",
@@ -6335,7 +6816,8 @@
     ],
     "budgetTotal": 36495.02,
     "budgetSpent": 34757.16,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8254",
@@ -6352,7 +6834,8 @@
     ],
     "budgetTotal": 32936.89,
     "budgetSpent": 31368.47,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8335",
@@ -6364,7 +6847,8 @@
     "utilities": [],
     "budgetTotal": 4800.33,
     "budgetSpent": 4571.74,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8342",
@@ -6378,7 +6862,8 @@
     ],
     "budgetTotal": 6278.92,
     "budgetSpent": 5979.92,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8809",
@@ -6390,7 +6875,8 @@
     "utilities": [],
     "budgetTotal": 9859.21,
     "budgetSpent": 9389.72,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8810",
@@ -6402,7 +6888,8 @@
     "utilities": [],
     "budgetTotal": 4955.4,
     "budgetSpent": 4719.43,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8250",
@@ -6418,7 +6905,8 @@
     ],
     "budgetTotal": 1066537.78,
     "budgetSpent": 1015750.27,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7969",
@@ -6430,7 +6918,8 @@
     "utilities": [],
     "budgetTotal": 255.65,
     "budgetSpent": 243.48,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7968",
@@ -6442,7 +6931,8 @@
     "utilities": [],
     "budgetTotal": 98.28,
     "budgetSpent": 93.6,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7967",
@@ -6454,7 +6944,8 @@
     "utilities": [],
     "budgetTotal": 157.37,
     "budgetSpent": 149.88,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8253",
@@ -6469,7 +6960,8 @@
     ],
     "budgetTotal": 36966.27,
     "budgetSpent": 35205.97,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8373",
@@ -6481,7 +6973,8 @@
     "utilities": [],
     "budgetTotal": 13977.47,
     "budgetSpent": 13311.88,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8270",
@@ -6493,7 +6986,8 @@
     "utilities": [],
     "budgetTotal": 4675.97,
     "budgetSpent": 4453.3,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "7984",
@@ -6507,7 +7001,8 @@
     ],
     "budgetTotal": 3625.42,
     "budgetSpent": 3452.78,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8575",
@@ -6519,7 +7014,8 @@
     "utilities": [],
     "budgetTotal": 294.97,
     "budgetSpent": 280.92,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8433",
@@ -6534,7 +7030,8 @@
     ],
     "budgetTotal": 8462.73,
     "budgetSpent": 8059.74,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8432",
@@ -6549,7 +7046,8 @@
     ],
     "budgetTotal": 8959.37,
     "budgetSpent": 8532.73,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8241",
@@ -6561,7 +7059,8 @@
     "utilities": [],
     "budgetTotal": 10868.21,
     "budgetSpent": 10350.68,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8366",
@@ -6573,7 +7072,8 @@
     "utilities": [],
     "budgetTotal": 118.06,
     "budgetSpent": 112.44,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8364",
@@ -6587,7 +7087,8 @@
     ],
     "budgetTotal": 3380.34,
     "budgetSpent": 3219.37,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8365",
@@ -6601,7 +7102,8 @@
     ],
     "budgetTotal": 675.55,
     "budgetSpent": 643.38,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8361",
@@ -6615,7 +7117,8 @@
     ],
     "budgetTotal": 4782.57,
     "budgetSpent": 4554.83,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8350",
@@ -6630,7 +7133,8 @@
     ],
     "budgetTotal": 5506.61,
     "budgetSpent": 5244.39,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8360",
@@ -6644,7 +7148,8 @@
     ],
     "budgetTotal": 5702.5,
     "budgetSpent": 5430.95,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8375",
@@ -6656,7 +7161,8 @@
     "utilities": [],
     "budgetTotal": 265.01,
     "budgetSpent": 252.39,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8239",
@@ -6670,7 +7176,8 @@
     ],
     "budgetTotal": 126635.21,
     "budgetSpent": 120604.96,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8240",
@@ -6685,7 +7192,8 @@
     ],
     "budgetTotal": 16905.97,
     "budgetSpent": 16100.92,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8177",
@@ -6699,7 +7207,8 @@
     ],
     "budgetTotal": 5993.72,
     "budgetSpent": 5708.3,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8178",
@@ -6711,7 +7220,8 @@
     "utilities": [],
     "budgetTotal": 8691.74,
     "budgetSpent": 8277.85,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "9944",
@@ -6725,7 +7235,8 @@
     ],
     "budgetTotal": 4507.87,
     "budgetSpent": 4293.21,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "9945",
@@ -6739,7 +7250,8 @@
     ],
     "budgetTotal": 5888.22,
     "budgetSpent": 5607.83,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "8021",
@@ -6753,7 +7265,8 @@
     ],
     "budgetTotal": 70820.18,
     "budgetSpent": 67447.79,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8116",
@@ -6768,7 +7281,8 @@
     ],
     "budgetTotal": 69003.2,
     "budgetSpent": 65717.33,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8469",
@@ -6782,7 +7296,8 @@
     ],
     "budgetTotal": 4497.66,
     "budgetSpent": 4283.49,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8392",
@@ -6794,7 +7309,8 @@
     "utilities": [],
     "budgetTotal": 6955.41,
     "budgetSpent": 6624.2,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8369",
@@ -6806,7 +7322,8 @@
     "utilities": [],
     "budgetTotal": 196.69,
     "budgetSpent": 187.32,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8046",
@@ -6818,7 +7335,8 @@
     "utilities": [],
     "budgetTotal": 3956.2,
     "budgetSpent": 3767.81,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8400",
@@ -6832,7 +7350,8 @@
     ],
     "budgetTotal": 10856.67,
     "budgetSpent": 10339.69,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8494",
@@ -6844,7 +7363,8 @@
     "utilities": [],
     "budgetTotal": 283.99,
     "budgetSpent": 270.47,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "10277",
@@ -6858,7 +7378,8 @@
     ],
     "budgetTotal": 15743.74,
     "budgetSpent": 14994.04,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "inactive"
   },
   {
     "id": "8261",
@@ -6870,7 +7391,8 @@
     "utilities": [],
     "budgetTotal": 1829.14,
     "budgetSpent": 1742.04,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8768",
@@ -6882,7 +7404,8 @@
     "utilities": [],
     "budgetTotal": 418.1,
     "budgetSpent": 398.19,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8772",
@@ -6896,7 +7419,8 @@
     ],
     "budgetTotal": 12413.62,
     "budgetSpent": 11822.5,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8576",
@@ -6908,7 +7432,8 @@
     "utilities": [],
     "budgetTotal": 826.06,
     "budgetSpent": 786.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8262",
@@ -6920,7 +7445,8 @@
     "utilities": [],
     "budgetTotal": 983.43,
     "budgetSpent": 936.6,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8264",
@@ -6932,7 +7458,8 @@
     "utilities": [],
     "budgetTotal": 1199.65,
     "budgetSpent": 1142.52,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8794",
@@ -6946,7 +7473,8 @@
     ],
     "budgetTotal": 2937.19,
     "budgetSpent": 2797.32,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8790",
@@ -6960,7 +7488,8 @@
     ],
     "budgetTotal": 2049.43,
     "budgetSpent": 1951.84,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8406",
@@ -6974,7 +7503,8 @@
     ],
     "budgetTotal": 10610.89,
     "budgetSpent": 10105.61,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8012",
@@ -6988,7 +7518,8 @@
     ],
     "budgetTotal": 16657.37,
     "budgetSpent": 15864.16,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8006",
@@ -7003,7 +7534,8 @@
     ],
     "budgetTotal": 29686.7,
     "budgetSpent": 28273.05,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8379",
@@ -7015,7 +7547,8 @@
     "utilities": [],
     "budgetTotal": 1118.63,
     "budgetSpent": 1065.36,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8380",
@@ -7027,7 +7560,8 @@
     "utilities": [],
     "budgetTotal": 2346.17,
     "budgetSpent": 2234.45,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8381",
@@ -7039,7 +7573,8 @@
     "utilities": [],
     "budgetTotal": 1625.93,
     "budgetSpent": 1548.5,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "9900",
@@ -7055,7 +7590,8 @@
     ],
     "budgetTotal": 1516.32,
     "budgetSpent": 1444.11,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "inactive"
   },
   {
     "id": "8745",
@@ -7067,7 +7603,8 @@
     "utilities": [],
     "budgetTotal": 696.69,
     "budgetSpent": 663.51,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8742",
@@ -7079,7 +7616,8 @@
     "utilities": [],
     "budgetTotal": 595.44,
     "budgetSpent": 567.09,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8739",
@@ -7091,7 +7629,8 @@
     "utilities": [],
     "budgetTotal": 595.4,
     "budgetSpent": 567.05,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8736",
@@ -7103,7 +7642,8 @@
     "utilities": [],
     "budgetTotal": 877.51,
     "budgetSpent": 835.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8733",
@@ -7115,7 +7655,8 @@
     "utilities": [],
     "budgetTotal": 593.34,
     "budgetSpent": 565.09,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8246",
@@ -7127,7 +7668,8 @@
     "utilities": [],
     "budgetTotal": 9041.19,
     "budgetSpent": 8610.66,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8713",
@@ -7141,7 +7683,8 @@
     ],
     "budgetTotal": 7803.38,
     "budgetSpent": 7431.79,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8792",
@@ -7155,7 +7698,8 @@
     ],
     "budgetTotal": 3416.23,
     "budgetSpent": 3253.55,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8117",
@@ -7167,7 +7711,8 @@
     "utilities": [],
     "budgetTotal": 2518.11,
     "budgetSpent": 2398.2,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8801",
@@ -7181,7 +7726,8 @@
     ],
     "budgetTotal": 44498.4,
     "budgetSpent": 42379.43,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8050",
@@ -7193,7 +7739,8 @@
     "utilities": [],
     "budgetTotal": 1142.7,
     "budgetSpent": 1088.29,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8259",
@@ -7205,7 +7752,8 @@
     "utilities": [],
     "budgetTotal": 216.34,
     "budgetSpent": 206.04,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8256",
@@ -7217,7 +7765,8 @@
     "utilities": [],
     "budgetTotal": 3608.25,
     "budgetSpent": 3436.43,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8257",
@@ -7229,7 +7778,8 @@
     "utilities": [],
     "budgetTotal": 275.31,
     "budgetSpent": 262.2,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8258",
@@ -7241,7 +7791,8 @@
     "utilities": [],
     "budgetTotal": 196.69,
     "budgetSpent": 187.32,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8164",
@@ -7253,7 +7804,8 @@
     "utilities": [],
     "budgetTotal": 3245.42,
     "budgetSpent": 3090.88,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8165",
@@ -7267,7 +7819,8 @@
     ],
     "budgetTotal": 2929.15,
     "budgetSpent": 2789.67,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7980",
@@ -7279,7 +7832,8 @@
     "utilities": [],
     "budgetTotal": 329.18,
     "budgetSpent": 313.5,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "7981",
@@ -7291,7 +7845,8 @@
     "utilities": [],
     "budgetTotal": 327.74,
     "budgetSpent": 312.13,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "7982",
@@ -7303,7 +7858,8 @@
     "utilities": [],
     "budgetTotal": 355.39,
     "budgetSpent": 338.47,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8488",
@@ -7315,7 +7871,8 @@
     "utilities": [],
     "budgetTotal": 196.69,
     "budgetSpent": 187.32,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8487",
@@ -7329,7 +7886,8 @@
     ],
     "budgetTotal": 1321.56,
     "budgetSpent": 1258.63,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8486",
@@ -7341,7 +7899,8 @@
     "utilities": [],
     "budgetTotal": 118.06,
     "budgetSpent": 112.44,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8526",
@@ -7355,7 +7914,8 @@
     ],
     "budgetTotal": 625.54,
     "budgetSpent": 595.75,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8367",
@@ -7367,7 +7927,8 @@
     "utilities": [],
     "budgetTotal": 39.31,
     "budgetSpent": 37.44,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8005",
@@ -7381,7 +7942,8 @@
     ],
     "budgetTotal": 41092.09,
     "budgetSpent": 39135.32,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8822",
@@ -7395,7 +7957,8 @@
     ],
     "budgetTotal": 4441.85,
     "budgetSpent": 4230.33,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8205",
@@ -7409,7 +7972,8 @@
     ],
     "budgetTotal": 2016.63,
     "budgetSpent": 1920.6,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8743",
@@ -7423,7 +7987,8 @@
     ],
     "budgetTotal": 3324.85,
     "budgetSpent": 3166.52,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8744",
@@ -7437,7 +8002,8 @@
     ],
     "budgetTotal": 3052.83,
     "budgetSpent": 2907.46,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8056",
@@ -7451,7 +8017,8 @@
     ],
     "budgetTotal": 8807.6,
     "budgetSpent": 8388.19,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8311",
@@ -7463,7 +8030,8 @@
     "utilities": [],
     "budgetTotal": 550.75,
     "budgetSpent": 524.52,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8336",
@@ -7477,7 +8045,8 @@
     ],
     "budgetTotal": 27294.44,
     "budgetSpent": 25994.7,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8337",
@@ -7491,7 +8060,8 @@
     ],
     "budgetTotal": 25848.12,
     "budgetSpent": 24617.26,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "10195",
@@ -7505,7 +8075,8 @@
     ],
     "budgetTotal": 5530.92,
     "budgetSpent": 5267.54,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "8069",
@@ -7517,7 +8088,8 @@
     "utilities": [],
     "budgetTotal": 1006.69,
     "budgetSpent": 958.75,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8734",
@@ -7531,7 +8103,8 @@
     ],
     "budgetTotal": 3059.51,
     "budgetSpent": 2913.82,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8438",
@@ -7545,7 +8118,8 @@
     ],
     "budgetTotal": 12021.38,
     "budgetSpent": 11448.93,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8550",
@@ -7557,7 +8131,8 @@
     "utilities": [],
     "budgetTotal": 160.28,
     "budgetSpent": 152.65,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8549",
@@ -7571,7 +8146,8 @@
     ],
     "budgetTotal": 2353.42,
     "budgetSpent": 2241.35,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8546",
@@ -7585,7 +8161,8 @@
     ],
     "budgetTotal": 944.2,
     "budgetSpent": 899.24,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8551",
@@ -7597,7 +8174,8 @@
     "utilities": [],
     "budgetTotal": 58.97,
     "budgetSpent": 56.16,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7960",
@@ -7609,7 +8187,8 @@
     "utilities": [],
     "budgetTotal": 39.31,
     "budgetSpent": 37.44,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7961",
@@ -7621,7 +8200,8 @@
     "utilities": [],
     "budgetTotal": 2049.23,
     "budgetSpent": 1951.65,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8157",
@@ -7635,7 +8215,8 @@
     ],
     "budgetTotal": 3516.4,
     "budgetSpent": 3348.95,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8233",
@@ -7647,7 +8228,8 @@
     "utilities": [],
     "budgetTotal": 2798.42,
     "budgetSpent": 2665.16,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8093",
@@ -7659,7 +8241,8 @@
     "utilities": [],
     "budgetTotal": 7428.64,
     "budgetSpent": 7074.9,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8372",
@@ -7673,7 +8256,8 @@
     ],
     "budgetTotal": 962.4,
     "budgetSpent": 916.57,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8007",
@@ -7685,7 +8269,8 @@
     "utilities": [],
     "budgetTotal": 7558.47,
     "budgetSpent": 7198.54,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8260",
@@ -7697,7 +8282,8 @@
     "utilities": [],
     "budgetTotal": 501.29,
     "budgetSpent": 477.42,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8272",
@@ -7709,7 +8295,8 @@
     "utilities": [],
     "budgetTotal": 1806.35,
     "budgetSpent": 1720.33,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8271",
@@ -7723,7 +8310,8 @@
     ],
     "budgetTotal": 7255.26,
     "budgetSpent": 6909.77,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7985",
@@ -7737,7 +8325,8 @@
     ],
     "budgetTotal": 3503.17,
     "budgetSpent": 3336.35,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8701",
@@ -7751,7 +8340,8 @@
     ],
     "budgetTotal": 4893.32,
     "budgetSpent": 4660.3,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7976",
@@ -7765,7 +8355,8 @@
     ],
     "budgetTotal": 22033.86,
     "budgetSpent": 20984.63,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8312",
@@ -7779,7 +8370,8 @@
     ],
     "budgetTotal": 18779.66,
     "budgetSpent": 17885.39,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8255",
@@ -7791,7 +8383,8 @@
     "utilities": [],
     "budgetTotal": 1524.09,
     "budgetSpent": 1451.51,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8434",
@@ -7805,7 +8398,8 @@
     ],
     "budgetTotal": 1172.02,
     "budgetSpent": 1116.21,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8726",
@@ -7817,7 +8411,8 @@
     "utilities": [],
     "budgetTotal": 19.66,
     "budgetSpent": 18.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8327",
@@ -7829,7 +8424,8 @@
     "utilities": [],
     "budgetTotal": 97.11,
     "budgetSpent": 92.49,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8196",
@@ -7841,7 +8437,8 @@
     "utilities": [],
     "budgetTotal": 985.28,
     "budgetSpent": 938.36,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7956",
@@ -7853,7 +8450,8 @@
     "utilities": [],
     "budgetTotal": 1563080.1,
     "budgetSpent": 1488647.71,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8565",
@@ -7865,7 +8463,8 @@
     "utilities": [],
     "budgetTotal": 407.93,
     "budgetSpent": 388.5,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8037",
@@ -7879,7 +8478,8 @@
     ],
     "budgetTotal": 725.97,
     "budgetSpent": 691.4,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8697",
@@ -7891,7 +8491,8 @@
     "utilities": [],
     "budgetTotal": 1682.9,
     "budgetSpent": 1602.76,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8567",
@@ -7905,7 +8506,8 @@
     ],
     "budgetTotal": 20507.91,
     "budgetSpent": 19531.34,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8465",
@@ -7921,7 +8523,8 @@
     ],
     "budgetTotal": 23190.05,
     "budgetSpent": 22085.76,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8217",
@@ -7933,7 +8536,8 @@
     "utilities": [],
     "budgetTotal": 8109.95,
     "budgetSpent": 7723.76,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8208",
@@ -7945,7 +8549,8 @@
     "utilities": [],
     "budgetTotal": 3523.0,
     "budgetSpent": 3355.24,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8468",
@@ -7959,7 +8564,8 @@
     ],
     "budgetTotal": 16297.25,
     "budgetSpent": 15521.19,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "10331",
@@ -7973,7 +8579,8 @@
     ],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "error"
+    "dataQuality": "error",
+    "status": "inactive"
   },
   {
     "id": "8417",
@@ -7985,7 +8592,8 @@
     "utilities": [],
     "budgetTotal": 7481.73,
     "budgetSpent": 7125.46,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8091",
@@ -8001,7 +8609,8 @@
     ],
     "budgetTotal": 359607.6,
     "budgetSpent": 342483.43,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8571",
@@ -8013,7 +8622,8 @@
     "utilities": [],
     "budgetTotal": 944.12,
     "budgetSpent": 899.16,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8577",
@@ -8025,7 +8635,8 @@
     "utilities": [],
     "budgetTotal": 1022.74,
     "budgetSpent": 974.04,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8781",
@@ -8039,7 +8650,8 @@
     ],
     "budgetTotal": 3744.12,
     "budgetSpent": 3565.83,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8085",
@@ -8051,7 +8663,8 @@
     "utilities": [],
     "budgetTotal": 1522.44,
     "budgetSpent": 1449.94,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8476",
@@ -8065,7 +8678,8 @@
     ],
     "budgetTotal": 6796.76,
     "budgetSpent": 6473.1,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8521",
@@ -8077,7 +8691,8 @@
     "utilities": [],
     "budgetTotal": 39.31,
     "budgetSpent": 37.44,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8478",
@@ -8089,7 +8704,8 @@
     "utilities": [],
     "budgetTotal": 314.75,
     "budgetSpent": 299.76,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8482",
@@ -8101,7 +8717,8 @@
     "utilities": [],
     "budgetTotal": 157.37,
     "budgetSpent": 149.88,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8477",
@@ -8113,7 +8730,8 @@
     "utilities": [],
     "budgetTotal": 1140.8,
     "budgetSpent": 1086.48,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8492",
@@ -8129,7 +8747,8 @@
     ],
     "budgetTotal": 147483.95,
     "budgetSpent": 140460.9,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "10287",
@@ -8143,7 +8762,8 @@
     ],
     "budgetTotal": 3249.0,
     "budgetSpent": 3094.29,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "8047",
@@ -8159,7 +8779,8 @@
     ],
     "budgetTotal": 20486.35,
     "budgetSpent": 19510.81,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8148",
@@ -8173,7 +8794,8 @@
     ],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8151",
@@ -8187,7 +8809,8 @@
     ],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8149",
@@ -8201,7 +8824,8 @@
     ],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8150",
@@ -8215,7 +8839,8 @@
     ],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8471",
@@ -8229,7 +8854,8 @@
     ],
     "budgetTotal": 7048.18,
     "budgetSpent": 6712.55,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8095",
@@ -8241,7 +8867,8 @@
     "utilities": [],
     "budgetTotal": 1426.95,
     "budgetSpent": 1359.0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8715",
@@ -8253,7 +8880,8 @@
     "utilities": [],
     "budgetTotal": 1718.75,
     "budgetSpent": 1636.9,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8152",
@@ -8265,7 +8893,8 @@
     "utilities": [],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8032",
@@ -8277,7 +8906,8 @@
     "utilities": [],
     "budgetTotal": 1229.98,
     "budgetSpent": 1171.41,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "7989",
@@ -8289,7 +8919,8 @@
     "utilities": [],
     "budgetTotal": 3210.76,
     "budgetSpent": 3057.87,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8404",
@@ -8301,7 +8932,8 @@
     "utilities": [],
     "budgetTotal": 1036.61,
     "budgetSpent": 987.25,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "10306",
@@ -8315,7 +8947,8 @@
     ],
     "budgetTotal": 36257.1,
     "budgetSpent": 34530.57,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "inactive"
   },
   {
     "id": "8498",
@@ -8327,7 +8960,8 @@
     "utilities": [],
     "budgetTotal": 937.71,
     "budgetSpent": 893.06,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8314",
@@ -8339,7 +8973,8 @@
     "utilities": [],
     "budgetTotal": 5908.56,
     "budgetSpent": 5627.2,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8075",
@@ -8353,7 +8988,8 @@
     ],
     "budgetTotal": 4251.07,
     "budgetSpent": 4048.64,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8076",
@@ -8367,7 +9003,8 @@
     ],
     "budgetTotal": 4253.68,
     "budgetSpent": 4051.12,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8072",
@@ -8381,7 +9018,8 @@
     ],
     "budgetTotal": 4274.03,
     "budgetSpent": 4070.5,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8073",
@@ -8395,7 +9033,8 @@
     ],
     "budgetTotal": 4456.61,
     "budgetSpent": 4244.39,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8684",
@@ -8407,7 +9046,8 @@
     "utilities": [],
     "budgetTotal": 14962.42,
     "budgetSpent": 14249.92,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8583",
@@ -8419,7 +9059,8 @@
     "utilities": [],
     "budgetTotal": 668.68,
     "budgetSpent": 636.84,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7988",
@@ -8433,7 +9074,8 @@
     ],
     "budgetTotal": 4512.94,
     "budgetSpent": 4298.04,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8175",
@@ -8447,7 +9089,8 @@
     ],
     "budgetTotal": 23009.93,
     "budgetSpent": 21914.22,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8527",
@@ -8461,7 +9104,8 @@
     ],
     "budgetTotal": 1697.14,
     "budgetSpent": 1616.32,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8528",
@@ -8475,7 +9119,8 @@
     ],
     "budgetTotal": 4077.08,
     "budgetSpent": 3882.93,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8529",
@@ -8489,7 +9134,8 @@
     ],
     "budgetTotal": 9176.86,
     "budgetSpent": 8739.87,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8297",
@@ -8503,7 +9149,8 @@
     ],
     "budgetTotal": 2800.95,
     "budgetSpent": 2667.57,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "active"
   },
   {
     "id": "8301",
@@ -8515,7 +9162,8 @@
     "utilities": [],
     "budgetTotal": 3147.86,
     "budgetSpent": 2997.96,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8107",
@@ -8529,7 +9177,8 @@
     ],
     "budgetTotal": 4265.56,
     "budgetSpent": 4062.44,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8102",
@@ -8543,7 +9192,8 @@
     ],
     "budgetTotal": 4246.71,
     "budgetSpent": 4044.49,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8103",
@@ -8557,7 +9207,8 @@
     ],
     "budgetTotal": 4396.92,
     "budgetSpent": 4187.54,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8543",
@@ -8569,7 +9220,8 @@
     "utilities": [],
     "budgetTotal": 196.81,
     "budgetSpent": 187.44,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8154",
@@ -8581,7 +9233,8 @@
     "utilities": [],
     "budgetTotal": 57.58,
     "budgetSpent": 54.84,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8156",
@@ -8593,7 +9246,8 @@
     "utilities": [],
     "budgetTotal": 126.76,
     "budgetSpent": 120.72,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8155",
@@ -8605,7 +9259,8 @@
     "utilities": [],
     "budgetTotal": 126.76,
     "budgetSpent": 120.72,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "7954",
@@ -8617,7 +9272,8 @@
     "utilities": [],
     "budgetTotal": 260.46,
     "budgetSpent": 248.06,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8725",
@@ -8631,7 +9287,8 @@
     ],
     "budgetTotal": 862.33,
     "budgetSpent": 821.27,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8811",
@@ -8645,7 +9302,8 @@
     ],
     "budgetTotal": 10348.89,
     "budgetSpent": 9856.09,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "10196",
@@ -8659,7 +9317,8 @@
     ],
     "budgetTotal": 5078.16,
     "budgetSpent": 4836.34,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "inactive"
   },
   {
     "id": "8573",
@@ -8671,7 +9330,8 @@
     "utilities": [],
     "budgetTotal": 1632.46,
     "budgetSpent": 1554.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8362",
@@ -8685,7 +9345,8 @@
     ],
     "budgetTotal": 4875.44,
     "budgetSpent": 4643.28,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8353",
@@ -8697,7 +9358,8 @@
     "utilities": [],
     "budgetTotal": 1244.4,
     "budgetSpent": 1185.14,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8566",
@@ -8711,7 +9373,8 @@
     ],
     "budgetTotal": 22063.78,
     "budgetSpent": 21013.12,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8127",
@@ -8723,7 +9386,8 @@
     "utilities": [],
     "budgetTotal": 1057.14,
     "budgetSpent": 1006.8,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8376",
@@ -8737,7 +9401,8 @@
     ],
     "budgetTotal": 4752.98,
     "budgetSpent": 4526.65,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8377",
@@ -8751,7 +9416,8 @@
     ],
     "budgetTotal": 1762.28,
     "budgetSpent": 1678.36,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8320",
@@ -8766,7 +9432,8 @@
     ],
     "budgetTotal": 714888.44,
     "budgetSpent": 680846.13,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8049",
@@ -8780,7 +9447,8 @@
     ],
     "budgetTotal": 2957.1,
     "budgetSpent": 2816.29,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8401",
@@ -8794,7 +9462,8 @@
     ],
     "budgetTotal": 10846.1,
     "budgetSpent": 10329.62,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8167",
@@ -8808,7 +9477,8 @@
     ],
     "budgetTotal": 21084.96,
     "budgetSpent": 20080.91,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8170",
@@ -8823,7 +9493,8 @@
     ],
     "budgetTotal": 41273.0,
     "budgetSpent": 39307.62,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8169",
@@ -8835,7 +9506,8 @@
     "utilities": [],
     "budgetTotal": 1443.34,
     "budgetSpent": 1374.61,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8721",
@@ -8850,7 +9522,8 @@
     ],
     "budgetTotal": -531.42,
     "budgetSpent": -506.11,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8474",
@@ -8865,7 +9538,8 @@
     ],
     "budgetTotal": 90144.75,
     "budgetSpent": 85852.14,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8766",
@@ -8879,7 +9553,8 @@
     ],
     "budgetTotal": 10824.72,
     "budgetSpent": 10309.26,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8411",
@@ -8893,7 +9568,8 @@
     ],
     "budgetTotal": 8452.98,
     "budgetSpent": 8050.46,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8412",
@@ -8907,7 +9583,8 @@
     ],
     "budgetTotal": 4866.24,
     "budgetSpent": 4634.51,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8514",
@@ -8923,7 +9600,8 @@
     ],
     "budgetTotal": 49555.33,
     "budgetSpent": 47195.55,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8578",
@@ -8938,7 +9616,8 @@
     ],
     "budgetTotal": 8928.35,
     "budgetSpent": 8503.19,
-    "dataQuality": "error"
+    "dataQuality": "error",
+    "status": "pending"
   },
   {
     "id": "8403",
@@ -8952,7 +9631,8 @@
     ],
     "budgetTotal": 9074.94,
     "budgetSpent": 8642.8,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8043",
@@ -8964,7 +9644,8 @@
     "utilities": [],
     "budgetTotal": 10204.69,
     "budgetSpent": 9718.75,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "7986",
@@ -8978,7 +9659,8 @@
     ],
     "budgetTotal": 4257.68,
     "budgetSpent": 4054.93,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7987",
@@ -8992,7 +9674,8 @@
     ],
     "budgetTotal": 4204.83,
     "budgetSpent": 4004.6,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8300",
@@ -9004,7 +9687,8 @@
     "utilities": [],
     "budgetTotal": 2990.8,
     "budgetSpent": 2848.38,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8307",
@@ -9018,7 +9702,8 @@
     ],
     "budgetTotal": 1932.56,
     "budgetSpent": 1840.53,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8308",
@@ -9032,7 +9717,8 @@
     ],
     "budgetTotal": 6647.43,
     "budgetSpent": 6330.89,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8039",
@@ -9046,7 +9732,8 @@
     ],
     "budgetTotal": 9090.44,
     "budgetSpent": 8657.56,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8421",
@@ -9060,7 +9747,8 @@
     ],
     "budgetTotal": 1110.53,
     "budgetSpent": 1057.65,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8455",
@@ -9074,7 +9762,8 @@
     ],
     "budgetTotal": 941.5,
     "budgetSpent": 896.67,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8437",
@@ -9088,7 +9777,8 @@
     ],
     "budgetTotal": 2226.64,
     "budgetSpent": 2120.61,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8456",
@@ -9100,7 +9790,8 @@
     "utilities": [],
     "budgetTotal": 406.51,
     "budgetSpent": 387.15,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8717",
@@ -9114,7 +9805,8 @@
     ],
     "budgetTotal": 6721.87,
     "budgetSpent": 6401.78,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8332",
@@ -9128,7 +9820,8 @@
     ],
     "budgetTotal": 2219.75,
     "budgetSpent": 2114.05,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8048",
@@ -9140,7 +9833,8 @@
     "utilities": [],
     "budgetTotal": 2047.49,
     "budgetSpent": 1949.99,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "10169",
@@ -9152,7 +9846,8 @@
     "utilities": [],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "8370",
@@ -9168,7 +9863,8 @@
     ],
     "budgetTotal": 295906.41,
     "budgetSpent": 281815.63,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8371",
@@ -9180,7 +9876,8 @@
     "utilities": [],
     "budgetTotal": 346.25,
     "budgetSpent": 329.76,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8439",
@@ -9194,7 +9891,8 @@
     ],
     "budgetTotal": 15035.0,
     "budgetSpent": 14319.05,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8572",
@@ -9206,7 +9904,8 @@
     "utilities": [],
     "budgetTotal": 703.66,
     "budgetSpent": 670.15,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8108",
@@ -9218,7 +9917,8 @@
     "utilities": [],
     "budgetTotal": 283.51,
     "budgetSpent": 270.01,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8413",
@@ -9230,7 +9930,8 @@
     "utilities": [],
     "budgetTotal": 1868.31,
     "budgetSpent": 1779.34,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8137",
@@ -9244,7 +9945,8 @@
     ],
     "budgetTotal": 6572.56,
     "budgetSpent": 6259.58,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8008",
@@ -9258,7 +9960,8 @@
     ],
     "budgetTotal": 27353.79,
     "budgetSpent": 26051.23,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7971",
@@ -9270,7 +9973,8 @@
     "utilities": [],
     "budgetTotal": 354.06,
     "budgetSpent": 337.2,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7970",
@@ -9282,7 +9986,8 @@
     "utilities": [],
     "budgetTotal": 275.31,
     "budgetSpent": 262.2,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7973",
@@ -9294,7 +9999,8 @@
     "utilities": [],
     "budgetTotal": 57.58,
     "budgetSpent": 54.84,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8393",
@@ -9306,7 +10012,8 @@
     "utilities": [],
     "budgetTotal": 10187.78,
     "budgetSpent": 9702.65,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8139",
@@ -9318,7 +10025,8 @@
     "utilities": [],
     "budgetTotal": 3073.26,
     "budgetSpent": 2926.91,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8501",
@@ -9330,7 +10038,8 @@
     "utilities": [],
     "budgetTotal": 37.92,
     "budgetSpent": 36.11,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8502",
@@ -9342,7 +10051,8 @@
     "utilities": [],
     "budgetTotal": 345.7,
     "budgetSpent": 329.24,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8503",
@@ -9354,7 +10064,8 @@
     "utilities": [],
     "budgetTotal": 57.57,
     "budgetSpent": 54.83,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8682",
@@ -9368,7 +10079,8 @@
     ],
     "budgetTotal": 1063.78,
     "budgetSpent": 1013.12,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8683",
@@ -9383,7 +10095,8 @@
     ],
     "budgetTotal": 38459.8,
     "budgetSpent": 36628.38,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8140",
@@ -9397,7 +10110,8 @@
     ],
     "budgetTotal": 11767.83,
     "budgetSpent": 11207.46,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8299",
@@ -9409,7 +10123,8 @@
     "utilities": [],
     "budgetTotal": 9006.5,
     "budgetSpent": 8577.62,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8711",
@@ -9423,7 +10138,8 @@
     ],
     "budgetTotal": 10756.48,
     "budgetSpent": 10244.27,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8027",
@@ -9437,7 +10153,8 @@
     ],
     "budgetTotal": 61878.3,
     "budgetSpent": 58931.71,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8700",
@@ -9449,7 +10166,8 @@
     "utilities": [],
     "budgetTotal": 491.65,
     "budgetSpent": 468.24,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8749",
@@ -9461,7 +10179,8 @@
     "utilities": [],
     "budgetTotal": 75.6,
     "budgetSpent": 72.0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8712",
@@ -9473,7 +10192,8 @@
     "utilities": [],
     "budgetTotal": 1609.94,
     "budgetSpent": 1533.28,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8079",
@@ -9488,7 +10208,8 @@
     ],
     "budgetTotal": 64590.14,
     "budgetSpent": 61514.42,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8423",
@@ -9500,7 +10221,8 @@
     "utilities": [],
     "budgetTotal": 1101.6,
     "budgetSpent": 1049.14,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8798",
@@ -9514,7 +10236,8 @@
     ],
     "budgetTotal": 10088.67,
     "budgetSpent": 9608.26,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8799",
@@ -9528,7 +10251,8 @@
     ],
     "budgetTotal": 10216.76,
     "budgetSpent": 9730.25,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8814",
@@ -9540,7 +10264,8 @@
     "utilities": [],
     "budgetTotal": 1936.47,
     "budgetSpent": 1844.26,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8813",
@@ -9554,7 +10279,8 @@
     ],
     "budgetTotal": 2070.98,
     "budgetSpent": 1972.36,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8797",
@@ -9568,7 +10294,8 @@
     ],
     "budgetTotal": 10052.75,
     "budgetSpent": 9574.05,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8407",
@@ -9580,7 +10307,8 @@
     "utilities": [],
     "budgetTotal": 202.47,
     "budgetSpent": 192.83,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8309",
@@ -9594,7 +10322,8 @@
     ],
     "budgetTotal": 6263.68,
     "budgetSpent": 5965.41,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8447",
@@ -9606,7 +10335,8 @@
     "utilities": [],
     "budgetTotal": 19.66,
     "budgetSpent": 18.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8449",
@@ -9618,7 +10348,8 @@
     "utilities": [],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8702",
@@ -9632,7 +10363,8 @@
     ],
     "budgetTotal": 5916.44,
     "budgetSpent": 5634.7,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8357",
@@ -9646,7 +10378,8 @@
     ],
     "budgetTotal": 41185.99,
     "budgetSpent": 39224.75,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8472",
@@ -9660,7 +10393,8 @@
     ],
     "budgetTotal": 21578.26,
     "budgetSpent": 20550.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8490",
@@ -9674,7 +10408,8 @@
     ],
     "budgetTotal": 11278.75,
     "budgetSpent": 10741.67,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8489",
@@ -9686,7 +10421,8 @@
     "utilities": [],
     "budgetTotal": 472.17,
     "budgetSpent": 449.69,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8071",
@@ -9700,7 +10436,8 @@
     ],
     "budgetTotal": 4228.98,
     "budgetSpent": 4027.6,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8033",
@@ -9714,7 +10451,8 @@
     ],
     "budgetTotal": 1249.41,
     "budgetSpent": 1189.91,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8036",
@@ -9728,7 +10466,8 @@
     ],
     "budgetTotal": 1608.94,
     "budgetSpent": 1532.32,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8035",
@@ -9742,7 +10481,8 @@
     ],
     "budgetTotal": 679.85,
     "budgetSpent": 647.48,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8034",
@@ -9756,7 +10496,8 @@
     ],
     "budgetTotal": 739.55,
     "budgetSpent": 704.33,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8080",
@@ -9771,7 +10512,8 @@
     ],
     "budgetTotal": 59815.35,
     "budgetSpent": 56967.0,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8343",
@@ -9785,7 +10527,8 @@
     ],
     "budgetTotal": 6595.9,
     "budgetSpent": 6281.81,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8011",
@@ -9799,7 +10542,8 @@
     ],
     "budgetTotal": 13654.31,
     "budgetSpent": 13004.1,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8014",
@@ -9813,7 +10557,8 @@
     ],
     "budgetTotal": 29972.74,
     "budgetSpent": 28545.47,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8010",
@@ -9827,7 +10572,8 @@
     ],
     "budgetTotal": 16186.86,
     "budgetSpent": 15416.06,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8013",
@@ -9841,7 +10587,8 @@
     ],
     "budgetTotal": 14990.82,
     "budgetSpent": 14276.97,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8770",
@@ -9853,7 +10600,8 @@
     "utilities": [],
     "budgetTotal": 855.05,
     "budgetSpent": 814.33,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8689",
@@ -9865,7 +10613,8 @@
     "utilities": [],
     "budgetTotal": 1140.18,
     "budgetSpent": 1085.89,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8784",
@@ -9879,7 +10628,8 @@
     ],
     "budgetTotal": 8139.62,
     "budgetSpent": 7752.02,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8176",
@@ -9891,7 +10641,8 @@
     "utilities": [],
     "budgetTotal": 2339.81,
     "budgetSpent": 2228.39,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8440",
@@ -9905,7 +10656,8 @@
     ],
     "budgetTotal": 10277.04,
     "budgetSpent": 9787.66,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8141",
@@ -9917,7 +10669,8 @@
     "utilities": [],
     "budgetTotal": 1674.18,
     "budgetSpent": 1594.46,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8354",
@@ -9931,7 +10684,8 @@
     ],
     "budgetTotal": 12562.51,
     "budgetSpent": 11964.3,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8344",
@@ -9945,7 +10699,8 @@
     ],
     "budgetTotal": 17587.17,
     "budgetSpent": 16749.69,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8466",
@@ -9959,7 +10714,8 @@
     ],
     "budgetTotal": 40389.07,
     "budgetSpent": 38465.78,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8454",
@@ -9971,7 +10727,8 @@
     "utilities": [],
     "budgetTotal": 408.19,
     "budgetSpent": 388.75,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8038",
@@ -9983,7 +10740,8 @@
     "utilities": [],
     "budgetTotal": 7711.64,
     "budgetSpent": 7344.42,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8663",
@@ -9997,7 +10755,8 @@
     ],
     "budgetTotal": 11068.19,
     "budgetSpent": 10541.13,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8610",
@@ -10009,7 +10768,8 @@
     "utilities": [],
     "budgetTotal": 413.03,
     "budgetSpent": 393.36,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8659",
@@ -10023,7 +10783,8 @@
     ],
     "budgetTotal": 5207.2,
     "budgetSpent": 4959.24,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8611",
@@ -10037,7 +10798,8 @@
     ],
     "budgetTotal": 8593.59,
     "budgetSpent": 8184.37,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8676",
@@ -10053,7 +10815,8 @@
     ],
     "budgetTotal": 213199.15,
     "budgetSpent": 203046.81,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8800",
@@ -10067,7 +10830,8 @@
     ],
     "budgetTotal": 21232.32,
     "budgetSpent": 20221.26,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8621",
@@ -10081,7 +10845,8 @@
     ],
     "budgetTotal": 1586.25,
     "budgetSpent": 1510.71,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8633",
@@ -10095,7 +10860,8 @@
     ],
     "budgetTotal": 7426.44,
     "budgetSpent": 7072.8,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8615",
@@ -10107,7 +10873,8 @@
     "utilities": [],
     "budgetTotal": 699.95,
     "budgetSpent": 666.62,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8672",
@@ -10121,7 +10888,8 @@
     ],
     "budgetTotal": 3933.33,
     "budgetSpent": 3746.03,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8670",
@@ -10135,7 +10903,8 @@
     ],
     "budgetTotal": 4719.96,
     "budgetSpent": 4495.2,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8606",
@@ -10149,7 +10918,8 @@
     ],
     "budgetTotal": 5639.5,
     "budgetSpent": 5370.95,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8680",
@@ -10161,7 +10931,8 @@
     "utilities": [],
     "budgetTotal": 562.23,
     "budgetSpent": 535.46,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8664",
@@ -10175,7 +10946,8 @@
     ],
     "budgetTotal": 3363.64,
     "budgetSpent": 3203.47,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8674",
@@ -10189,7 +10961,8 @@
     ],
     "budgetTotal": 1166.6,
     "budgetSpent": 1111.05,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8590",
@@ -10201,7 +10974,8 @@
     "utilities": [],
     "budgetTotal": 58.97,
     "budgetSpent": 56.16,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8144",
@@ -10215,7 +10989,8 @@
     ],
     "budgetTotal": 2447.57,
     "budgetSpent": 2331.02,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8675",
@@ -10229,7 +11004,8 @@
     ],
     "budgetTotal": 11826.9,
     "budgetSpent": 11263.71,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8618",
@@ -10243,7 +11019,8 @@
     ],
     "budgetTotal": 1457.9,
     "budgetSpent": 1388.48,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8594",
@@ -10255,7 +11032,8 @@
     "utilities": [],
     "budgetTotal": 120.84,
     "budgetSpent": 115.09,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8605",
@@ -10269,7 +11047,8 @@
     ],
     "budgetTotal": 11944.8,
     "budgetSpent": 11376.0,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "10430",
@@ -10283,7 +11062,8 @@
     ],
     "budgetTotal": 478.51,
     "budgetSpent": 455.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "inactive"
   },
   {
     "id": "8608",
@@ -10297,7 +11077,8 @@
     ],
     "budgetTotal": 2329.24,
     "budgetSpent": 2218.32,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8607",
@@ -10311,7 +11092,8 @@
     ],
     "budgetTotal": 1854.73,
     "budgetSpent": 1766.41,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8658",
@@ -10323,7 +11105,8 @@
     "utilities": [],
     "budgetTotal": 118.06,
     "budgetSpent": 112.44,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8665",
@@ -10337,7 +11120,8 @@
     ],
     "budgetTotal": 3740.6,
     "budgetSpent": 3562.48,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8788",
@@ -10351,7 +11135,8 @@
     ],
     "budgetTotal": 6846.42,
     "budgetSpent": 6520.4,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8302",
@@ -10365,7 +11150,8 @@
     ],
     "budgetTotal": 2753.94,
     "budgetSpent": 2622.8,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8303",
@@ -10379,7 +11165,8 @@
     ],
     "budgetTotal": 4994.73,
     "budgetSpent": 4756.89,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8304",
@@ -10393,7 +11180,8 @@
     ],
     "budgetTotal": 2638.38,
     "budgetSpent": 2512.74,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8479",
@@ -10405,7 +11193,8 @@
     "utilities": [],
     "budgetTotal": 39.31,
     "budgetSpent": 37.44,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8821",
@@ -10419,7 +11208,8 @@
     ],
     "budgetTotal": 4608.46,
     "budgetSpent": 4389.01,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8480",
@@ -10431,7 +11221,8 @@
     "utilities": [],
     "budgetTotal": 223.58,
     "budgetSpent": 212.93,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8520",
@@ -10445,7 +11236,8 @@
     ],
     "budgetTotal": 900.26,
     "budgetSpent": 857.39,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8519",
@@ -10457,7 +11249,8 @@
     "utilities": [],
     "budgetTotal": 393.37,
     "budgetSpent": 374.64,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8481",
@@ -10471,7 +11264,8 @@
     ],
     "budgetTotal": 692.64,
     "budgetSpent": 659.66,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8634",
@@ -10485,7 +11279,8 @@
     ],
     "budgetTotal": 1008.67,
     "budgetSpent": 960.64,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8635",
@@ -10499,7 +11294,8 @@
     ],
     "budgetTotal": 1391.2,
     "budgetSpent": 1324.95,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8620",
@@ -10513,7 +11309,8 @@
     ],
     "budgetTotal": 738.03,
     "budgetSpent": 702.89,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8619",
@@ -10527,7 +11324,8 @@
     ],
     "budgetTotal": 1304.41,
     "budgetSpent": 1242.3,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8636",
@@ -10541,7 +11339,8 @@
     ],
     "budgetTotal": 750.67,
     "budgetSpent": 714.92,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8655",
@@ -10553,7 +11352,8 @@
     "utilities": [],
     "budgetTotal": 494.56,
     "budgetSpent": 471.01,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8625",
@@ -10567,7 +11367,8 @@
     ],
     "budgetTotal": 5093.33,
     "budgetSpent": 4850.79,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8644",
@@ -10581,7 +11382,8 @@
     ],
     "budgetTotal": 2505.51,
     "budgetSpent": 2386.2,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8641",
@@ -10593,7 +11395,8 @@
     "utilities": [],
     "budgetTotal": 19.66,
     "budgetSpent": 18.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8642",
@@ -10605,7 +11408,8 @@
     "utilities": [],
     "budgetTotal": 199.59,
     "budgetSpent": 190.09,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8629",
@@ -10617,7 +11421,8 @@
     "utilities": [],
     "budgetTotal": 99.73,
     "budgetSpent": 94.98,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8643",
@@ -10629,7 +11434,8 @@
     "utilities": [],
     "budgetTotal": 19.66,
     "budgetSpent": 18.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8638",
@@ -10641,7 +11447,8 @@
     "utilities": [],
     "budgetTotal": 163.05,
     "budgetSpent": 155.29,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8609",
@@ -10655,7 +11462,8 @@
     ],
     "budgetTotal": 5526.35,
     "budgetSpent": 5263.19,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8483",
@@ -10667,7 +11475,8 @@
     "utilities": [],
     "budgetTotal": 1242.81,
     "budgetSpent": 1183.63,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8696",
@@ -10679,7 +11488,8 @@
     "utilities": [],
     "budgetTotal": 163.05,
     "budgetSpent": 155.29,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8338",
@@ -10693,7 +11503,8 @@
     ],
     "budgetTotal": 37188.63,
     "budgetSpent": 35417.74,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8061",
@@ -10705,7 +11516,8 @@
     "utilities": [],
     "budgetTotal": 1969.15,
     "budgetSpent": 1875.38,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8538",
@@ -10717,7 +11529,8 @@
     "utilities": [],
     "budgetTotal": 595.86,
     "budgetSpent": 567.49,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8539",
@@ -10729,7 +11542,8 @@
     "utilities": [],
     "budgetTotal": 39.31,
     "budgetSpent": 37.44,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8534",
@@ -10741,7 +11555,8 @@
     "utilities": [],
     "budgetTotal": 616.98,
     "budgetSpent": 587.6,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8536",
@@ -10755,7 +11570,8 @@
     ],
     "budgetTotal": 996.54,
     "budgetSpent": 949.09,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8553",
@@ -10769,7 +11585,8 @@
     ],
     "budgetTotal": 1278.45,
     "budgetSpent": 1217.57,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8535",
@@ -10783,7 +11600,8 @@
     ],
     "budgetTotal": 823.1,
     "budgetSpent": 783.9,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8537",
@@ -10795,7 +11613,8 @@
     "utilities": [],
     "budgetTotal": 99.73,
     "budgetSpent": 94.98,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8554",
@@ -10807,7 +11626,8 @@
     "utilities": [],
     "budgetTotal": 39.31,
     "budgetSpent": 37.44,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8273",
@@ -10819,7 +11639,8 @@
     "utilities": [],
     "budgetTotal": 2093.11,
     "budgetSpent": 1993.44,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8146",
@@ -10833,7 +11654,8 @@
     ],
     "budgetTotal": 2508.72,
     "budgetSpent": 2389.26,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8134",
@@ -10845,7 +11667,8 @@
     "utilities": [],
     "budgetTotal": 2412.38,
     "budgetSpent": 2297.5,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8339",
@@ -10859,7 +11682,8 @@
     ],
     "budgetTotal": 4846.89,
     "budgetSpent": 4616.09,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8716",
@@ -10873,7 +11697,8 @@
     ],
     "budgetTotal": 26316.19,
     "budgetSpent": 25063.04,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8201",
@@ -10885,7 +11710,8 @@
     "utilities": [],
     "budgetTotal": 3779.19,
     "budgetSpent": 3599.23,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8052",
@@ -10900,7 +11726,8 @@
     ],
     "budgetTotal": 17197.98,
     "budgetSpent": 16379.03,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8274",
@@ -10912,7 +11739,8 @@
     "utilities": [],
     "budgetTotal": 2239.61,
     "budgetSpent": 2132.96,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8816",
@@ -10924,7 +11752,8 @@
     "utilities": [],
     "budgetTotal": 2921.64,
     "budgetSpent": 2782.51,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8424",
@@ -10936,7 +11765,8 @@
     "utilities": [],
     "budgetTotal": 6688.68,
     "budgetSpent": 6370.17,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8064",
@@ -10948,7 +11778,8 @@
     "utilities": [],
     "budgetTotal": 4337.21,
     "budgetSpent": 4130.68,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "7993",
@@ -10960,7 +11791,8 @@
     "utilities": [],
     "budgetTotal": 1455.3,
     "budgetSpent": 1386.0,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7995",
@@ -10974,7 +11806,8 @@
     ],
     "budgetTotal": 16105.89,
     "budgetSpent": 15338.94,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8509",
@@ -10988,7 +11821,8 @@
     ],
     "budgetTotal": 2456.36,
     "budgetSpent": 2339.39,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8513",
@@ -11003,7 +11837,8 @@
     ],
     "budgetTotal": 6945.46,
     "budgetSpent": 6614.72,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8512",
@@ -11018,7 +11853,8 @@
     ],
     "budgetTotal": 7217.43,
     "budgetSpent": 6873.74,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8511",
@@ -11032,7 +11868,8 @@
     ],
     "budgetTotal": 9636.89,
     "budgetSpent": 9177.99,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8510",
@@ -11046,7 +11883,8 @@
     ],
     "budgetTotal": 8430.96,
     "budgetSpent": 8029.49,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8391",
@@ -11060,7 +11898,8 @@
     ],
     "budgetTotal": 21747.19,
     "budgetSpent": 20711.61,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8003",
@@ -11072,7 +11911,8 @@
     "utilities": [],
     "budgetTotal": 593.67,
     "budgetSpent": 565.4,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8029",
@@ -11086,7 +11926,8 @@
     ],
     "budgetTotal": 8710.32,
     "budgetSpent": 8295.54,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8280",
@@ -11100,7 +11941,8 @@
     ],
     "budgetTotal": 1162.34,
     "budgetSpent": 1106.99,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8281",
@@ -11112,7 +11954,8 @@
     "utilities": [],
     "budgetTotal": 438.49,
     "budgetSpent": 417.61,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8282",
@@ -11126,7 +11969,8 @@
     ],
     "budgetTotal": 3124.85,
     "budgetSpent": 2976.05,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8275",
@@ -11138,7 +11982,8 @@
     "utilities": [],
     "budgetTotal": 355.37,
     "budgetSpent": 338.45,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8276",
@@ -11150,7 +11995,8 @@
     "utilities": [],
     "budgetTotal": 237.45,
     "budgetSpent": 226.14,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8277",
@@ -11162,7 +12008,8 @@
     "utilities": [],
     "budgetTotal": 278.22,
     "budgetSpent": 264.97,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8278",
@@ -11174,7 +12021,8 @@
     "utilities": [],
     "budgetTotal": 297.87,
     "budgetSpent": 283.69,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8279",
@@ -11186,7 +12034,8 @@
     "utilities": [],
     "budgetTotal": 337.19,
     "budgetSpent": 321.13,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8285",
@@ -11198,7 +12047,8 @@
     "utilities": [],
     "budgetTotal": 376.5,
     "budgetSpent": 358.57,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8283",
@@ -11210,7 +12060,8 @@
     "utilities": [],
     "budgetTotal": 1160.71,
     "budgetSpent": 1105.44,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8284",
@@ -11222,7 +12073,8 @@
     "utilities": [],
     "budgetTotal": 278.22,
     "budgetSpent": 264.97,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8286",
@@ -11234,7 +12086,8 @@
     "utilities": [],
     "budgetTotal": 260.0,
     "budgetSpent": 247.62,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8287",
@@ -11246,7 +12099,8 @@
     "utilities": [],
     "budgetTotal": 358.28,
     "budgetSpent": 341.22,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8288",
@@ -11258,7 +12112,8 @@
     "utilities": [],
     "budgetTotal": 236.0,
     "budgetSpent": 224.76,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8289",
@@ -11270,7 +12125,8 @@
     "utilities": [],
     "budgetTotal": 294.97,
     "budgetSpent": 280.92,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8290",
@@ -11282,7 +12138,8 @@
     "utilities": [],
     "budgetTotal": 314.87,
     "budgetSpent": 299.88,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8292",
@@ -11294,7 +12151,8 @@
     "utilities": [],
     "budgetTotal": 236.0,
     "budgetSpent": 224.76,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8293",
@@ -11308,7 +12166,8 @@
     ],
     "budgetTotal": 3108.36,
     "budgetSpent": 2960.34,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8291",
@@ -11320,7 +12179,8 @@
     "utilities": [],
     "budgetTotal": 354.06,
     "budgetSpent": 337.2,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8754",
@@ -11332,7 +12192,8 @@
     "utilities": [],
     "budgetTotal": 203.79,
     "budgetSpent": 194.09,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8294",
@@ -11348,7 +12209,8 @@
     ],
     "budgetTotal": 160823.25,
     "budgetSpent": 153165.0,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8586",
@@ -11360,7 +12222,8 @@
     "utilities": [],
     "budgetTotal": 948.24,
     "budgetSpent": 903.09,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8585",
@@ -11374,7 +12237,8 @@
     ],
     "budgetTotal": 3664.31,
     "budgetSpent": 3489.82,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8695",
@@ -11386,7 +12250,8 @@
     "utilities": [],
     "budgetTotal": 176.9,
     "budgetSpent": 168.48,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8582",
@@ -11398,7 +12263,8 @@
     "utilities": [],
     "budgetTotal": 39.31,
     "budgetSpent": 37.44,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8657",
@@ -11412,7 +12278,8 @@
     ],
     "budgetTotal": 5137.61,
     "budgetSpent": 4892.96,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8118",
@@ -11426,7 +12293,8 @@
     ],
     "budgetTotal": 5771.02,
     "budgetSpent": 5496.21,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8030",
@@ -11438,7 +12306,8 @@
     "utilities": [],
     "budgetTotal": 183.03,
     "budgetSpent": 174.31,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8028",
@@ -11452,7 +12321,8 @@
     ],
     "budgetTotal": 54811.5,
     "budgetSpent": 52201.43,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8042",
@@ -11464,7 +12334,8 @@
     "utilities": [],
     "budgetTotal": 2649.13,
     "budgetSpent": 2522.98,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8051",
@@ -11476,7 +12347,8 @@
     "utilities": [],
     "budgetTotal": 5879.72,
     "budgetSpent": 5599.73,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8135",
@@ -11492,7 +12364,8 @@
     ],
     "budgetTotal": 114888.5,
     "budgetSpent": 109417.62,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7953",
@@ -11504,7 +12377,8 @@
     "utilities": [],
     "budgetTotal": 1752.4,
     "budgetSpent": 1668.95,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "7952",
@@ -11516,7 +12390,8 @@
     "utilities": [],
     "budgetTotal": 1345.44,
     "budgetSpent": 1281.37,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "8054",
@@ -11530,7 +12405,8 @@
     ],
     "budgetTotal": 1659.55,
     "budgetSpent": 1580.52,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   },
   {
     "id": "8059",
@@ -11542,7 +12418,8 @@
     "utilities": [],
     "budgetTotal": 2596.8,
     "budgetSpent": 2473.14,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "pending"
   },
   {
     "id": "9978",
@@ -11554,7 +12431,8 @@
     "utilities": [],
     "budgetTotal": 0.0,
     "budgetSpent": 0,
-    "dataQuality": "good"
+    "dataQuality": "good",
+    "status": "inactive"
   },
   {
     "id": "8249",
@@ -11566,6 +12444,7 @@
     "utilities": [],
     "budgetTotal": 1422.99,
     "budgetSpent": 1355.23,
-    "dataQuality": "warning"
+    "dataQuality": "warning",
+    "status": "pending"
   }
 ]

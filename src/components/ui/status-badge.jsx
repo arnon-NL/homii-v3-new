@@ -1,20 +1,28 @@
 import React from "react";
 
 const variants = {
-  active:  { bg: "bg-emerald-50", text: "text-emerald-600" },
-  success: { bg: "bg-emerald-50", text: "text-emerald-600" },
-  good:    { bg: "bg-emerald-50", text: "text-emerald-600" },
-  warning: { bg: "bg-amber-50",   text: "text-amber-600" },
-  offline: { bg: "bg-amber-50",   text: "text-amber-600" },
-  error:   { bg: "bg-red-50",     text: "text-red-600" },
-  bad:     { bg: "bg-red-50",     text: "text-red-600" },
-  neutral: { bg: "bg-slate-100",  text: "text-slate-500" },
+  active:    { bg: "bg-emerald-50",  text: "text-emerald-600" },
+  success:   { bg: "bg-emerald-50",  text: "text-emerald-600" },
+  good:      { bg: "bg-emerald-50",  text: "text-emerald-600" },
+  onboarded: { bg: "bg-sky-50",      text: "text-sky-600" },
+  warning:   { bg: "bg-amber-50",    text: "text-amber-600" },
+  offline:   { bg: "bg-amber-50",    text: "text-amber-600" },
+  pending:   { bg: "bg-amber-50",    text: "text-amber-600" },
+  error:     { bg: "bg-red-50",      text: "text-red-600" },
+  bad:       { bg: "bg-red-50",      text: "text-red-600" },
+  inactive:  { bg: "bg-slate-100",   text: "text-slate-400" },
+  vacant:    { bg: "bg-slate-100",   text: "text-slate-400" },
+  ended:     { bg: "bg-slate-100",   text: "text-slate-400" },
+  neutral:   { bg: "bg-slate-100",   text: "text-slate-500" },
+  unknown:   { bg: "bg-slate-100",   text: "text-slate-400" },
 };
 
 const statusLabels = {
   active: "Active", success: "Success", good: "Good",
-  warning: "Warning", offline: "Offline",
-  error: "Error", bad: "Bad", neutral: "Neutral",
+  onboarded: "Onboarded", warning: "Warning", offline: "Offline",
+  pending: "Pending", error: "Error", bad: "Bad",
+  inactive: "Inactive", vacant: "Vacant", ended: "Ended",
+  neutral: "Neutral", unknown: "Unknown",
 };
 
 export function StatusBadge({ status, label, size = "sm" }) {
@@ -30,10 +38,10 @@ export function StatusBadge({ status, label, size = "sm" }) {
 
 export function StatusDot({ status, size = 6 }) {
   const colors = {
-    active: "#3EB1C8", success: "#3EB1C8", good: "#3EB1C8",
-    warning: "#F59E0B", offline: "#F59E0B",
+    active: "#3EB1C8", success: "#3EB1C8", good: "#3EB1C8", onboarded: "#0EA5E9",
+    warning: "#F59E0B", offline: "#F59E0B", pending: "#F59E0B",
     error: "#EF4444", bad: "#EF4444",
-    neutral: "#94A3B8",
+    inactive: "#94A3B8", vacant: "#94A3B8", ended: "#94A3B8", neutral: "#94A3B8", unknown: "#94A3B8",
     high: "#3EB1C8", medium: "#F59E0B", low: "#EF4444",
   };
   return <span className="inline-block rounded-full shrink-0" style={{ width: size, height: size, background: colors[status] || colors.neutral }} />;

@@ -232,17 +232,31 @@ def extract_buildings():
         # Budget
         bd = budget_data.get(cid, {})
 
+        # Derive operational status from onboarding + activity
+        vhe_count = c["vhe_count"] or 0
+        onboarded = c.get("onboarded")
+        has_services = svc_counts.get(cid, 0) > 0
+        if onboarded and has_services:
+            status = "active"
+        elif onboarded:
+            status = "onboarded"
+        elif vhe_count > 0:
+            status = "pending"
+        else:
+            status = "inactive"
+
         buildings.append({
             "id": str(cid),
             "complex": name,
             "complexId": c["code"] or f"RDL-{cid}",
             "location": um.get("city") or c["location"] or "Amsterdam",
-            "vhe": c["vhe_count"] or 0,
+            "vhe": vhe_count,
             "components": svc_counts.get(cid, 0),
             "utilities": utilities,
             "budgetTotal": round((bd.get("spent") or 0) * 1.05, 2),  # derived: 5% buffer over actual
             "budgetSpent": bd.get("spent", 0),
             "dataQuality": data_quality,
+            "status": status,
         })
 
     print(f"  → {len(buildings)} buildings")
@@ -593,8 +607,75 @@ def extract_meters(buildings, apt_id_remap):
             "latestDate": r.get("latest_date"),
         })
 
-    print(f"  → {len(meters)} meters")
+    print(f"  → {len(meters)} real meters")
     return meters
+
+
+def generate_synthetic_meters(buildings, real_meters, vhes):
+    """Generate synthetic meters for buildings that have utilities but no real meters."""
+    print("Generating synthetic meters...")
+
+    random.seed(456)
+    blds_with_meters = set(m["buildingId"] for m in real_meters)
+    vhes_by_building = defaultdict(list)
+    for v in vhes:
+        vhes_by_building[v["buildingId"]].append(v)
+
+    synth = []
+    mid = 900000  # start synthetic IDs high to avoid collision
+
+    for b in buildings:
+        if b["id"] in blds_with_meters:
+            continue
+        utilities = b.get("utilities", [])
+        if not utilities:
+            continue
+
+        # 1 main meter per utility
+        for util in utilities:
+            mid += 1
+            unit = {"heat": "GJ", "water": "m³", "warmWater": "m³", "electricity": "kWh", "gas": "m³"}.get(util, "")
+            synth.append({
+                "id": f"MTR-S{mid}",
+                "buildingId": b["id"],
+                "vheId": None,
+                "type": "main",
+                "utility": util,
+                "meterNumber": f"M-{b['id']}-{util[:3].upper()}",
+                "ean": None,
+                "unit": unit,
+                "readings": {},
+                "status": "active",
+                "provider": "",
+                "latestDate": None,
+            })
+
+        # Sub-meters: ~30% of VHEs get a heat/water submeter
+        bld_vhes = vhes_by_building.get(b["id"], [])
+        metered_utils = [u for u in utilities if u in ("heat", "water", "warmWater")]
+        for vhe in bld_vhes:
+            if random.random() > 0.30:
+                continue
+            for util in metered_utils:
+                mid += 1
+                unit = {"heat": "GJ", "water": "m³", "warmWater": "m³"}.get(util, "")
+                synth.append({
+                    "id": f"MTR-S{mid}",
+                    "buildingId": b["id"],
+                    "vheId": vhe["id"],
+                    "type": "sub",
+                    "utility": util,
+                    "meterNumber": f"SM-{vhe['id'][-6:]}-{util[:3].upper()}",
+                    "ean": None,
+                    "unit": unit,
+                    "readings": {},
+                    "status": "active",
+                    "provider": "",
+                    "latestDate": None,
+                })
+
+    print(f"  → {len(synth)} synthetic meters for {len(buildings) - len(blds_with_meters)} buildings")
+    return synth
 
 
 def extract_cost_attribution(apt_id_remap):
@@ -1118,8 +1199,45 @@ def main():
     service_categories = extract_service_categories()
     building_services = extract_building_services(buildings, services)
     vhes, apt_id_remap = extract_vhes(buildings, services)
-    meters = extract_meters(buildings, apt_id_remap)
+    real_meters = extract_meters(buildings, apt_id_remap)
+    synth_meters = generate_synthetic_meters(buildings, real_meters, vhes)
+    meters = real_meters + synth_meters
+    print(f"  → {len(meters)} total meters")
     cost_attribution = extract_cost_attribution(apt_id_remap)
+
+    # Enrich VHEs with voorschotBreakdown from building-services
+    print("Enriching VHEs with voorschot breakdown...")
+    bld_map = {b["id"]: b for b in buildings}
+    bs_by_building = defaultdict(list)
+    for bs in building_services:
+        bs_by_building[bs["buildingId"]].append(bs)
+
+    svc_map = {s["id"]: s for s in services}
+    for vhe in vhes:
+        bld = bld_map.get(vhe["buildingId"])
+        if not bld:
+            continue
+        vhe_count = bld.get("vhe") or 1
+        bld_svcs = bs_by_building.get(vhe["buildingId"], [])
+        # Use the most recent year's services
+        years = set(bs["year"] for bs in bld_svcs)
+        latest_year = max(years) if years else 2025
+        latest_svcs = [bs for bs in bld_svcs if bs["year"] == latest_year]
+
+        breakdown = []
+        total_voorschot = 0
+        for bs in latest_svcs:
+            per_vhe = round((bs.get("actual") or 0) / vhe_count, 2)
+            total_voorschot += per_vhe
+            breakdown.append({
+                "s": bs["serviceId"],   # compact: serviceId
+                "a": per_vhe,           # compact: amount
+            })
+
+        vhe["voorschotBreakdown"] = breakdown
+        vhe["voorschot"] = round(total_voorschot, 2)
+
+    print(f"  → enriched {sum(1 for v in vhes if v['voorschotBreakdown'])} VHEs with cost data")
 
     # Step 1b: Mock data for real buildings
     suppliers = generate_suppliers()

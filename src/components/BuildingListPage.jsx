@@ -20,9 +20,13 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
+  Bookmark,
+  Save,
+  X,
+  Eye,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
-import { buildings, getSettlementsByYear, getView } from "@/lib/mockData";
+import { buildings, getSettlementsByYear, getView, savedViews } from "@/lib/mockData";
 import { t, useLang } from "@/lib/i18n";
 import { StatusBadge } from "./ui/status-badge";
 
@@ -166,7 +170,7 @@ const defaultComplexColumns = [
 export default function BuildingListPage() {
   const lang = useLang();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const [qualityFilter, setQualityFilter] = useState("all");
   const [utilityFilters, setUtilityFilters] = useState([]);
@@ -392,12 +396,54 @@ export default function BuildingListPage() {
                 : sorted.length}
             </span>
           </div>
-          {/* Year badge for settlement views */}
-          {isViewWithYear && (
-            <span className="inline-flex items-center px-3 py-1 rounded-lg bg-slate-100 text-sm font-semibold tabular-nums text-slate-600">
-              {year}
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            {/* Year badge for settlement views */}
+            {isViewWithYear && (
+              <span className="inline-flex items-center px-3 py-1 rounded-lg bg-slate-100 text-sm font-semibold tabular-nums text-slate-600">
+                {year}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* ── Saved Views bar ── */}
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider mr-1">
+            <Eye size={11} className="inline -mt-0.5 mr-1" />
+            {lang === "nl" ? "Weergaven" : "Views"}
+          </span>
+          {/* Default / no view */}
+          <button
+            onClick={() => setSearchParams({})}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              !activeView
+                ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200"
+                : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+            }`}
+          >
+            <LayoutGrid size={11} />
+            {lang === "nl" ? "Alle complexen" : "All complexes"}
+          </button>
+          {/* Saved views */}
+          {savedViews
+            .filter((v) => v.objectType === "buildings")
+            .map((v) => {
+              const isActive = viewId === v.id;
+              return (
+                <button
+                  key={v.id}
+                  onClick={() => setSearchParams({ view: v.id })}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    isActive
+                      ? "bg-white text-slate-900 shadow-sm ring-1 ring-slate-200"
+                      : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+                  }`}
+                >
+                  <Bookmark size={11} className={isActive ? "fill-current" : ""} />
+                  {v.name[lang] || v.name.en}
+                </button>
+              );
+            })}
         </div>
 
         {/* Settlement summary bar (past year view only) */}

@@ -43,6 +43,7 @@ export {
   getLedgerGroupedByCostCategory,
   getLedgerSummaryByService,
   getLedgerSummaryByBuilding,
+  getLedgerMonthlySummaryByService,
 } from "./ledger.js";
 
 // --- Suppliers ---
