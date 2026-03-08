@@ -8,8 +8,10 @@ const variants = {
   warning:   { bg: "bg-amber-50",   text: "text-amber-600" },
   offline:   { bg: "bg-amber-50",   text: "text-amber-600" },
   pending:   { bg: "bg-amber-50",   text: "text-amber-600" },
+  medium:    { bg: "bg-amber-50",   text: "text-amber-600" },
   error:     { bg: "bg-red-50",     text: "text-red-600" },
   bad:       { bg: "bg-red-50",     text: "text-red-600" },
+  low:       { bg: "bg-red-50",     text: "text-red-600" },
   inactive:  { bg: "bg-slate-100",  text: "text-slate-400" },
   vacant:    { bg: "bg-slate-100",  text: "text-slate-400" },
   ended:     { bg: "bg-slate-100",  text: "text-slate-400" },
@@ -20,8 +22,8 @@ const variants = {
 const statusLabels = {
   active: "Active", success: "Success", good: "Good",
   onboarded: "Onboarded", warning: "Warning", offline: "Offline",
-  pending: "Pending", error: "Error", bad: "Bad",
-  inactive: "Inactive", vacant: "Vacant", ended: "Ended",
+  pending: "Pending", medium: "Medium", error: "Error", bad: "Bad",
+  low: "Low", inactive: "Inactive", vacant: "Vacant", ended: "Ended",
   neutral: "Neutral", unknown: "Unknown",
 };
 
