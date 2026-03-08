@@ -178,6 +178,7 @@ export default function BuildingListPage() {
   const [settlementFilter, setSettlementFilter] = useState("all");
   const [sortCol, setSortCol] = useState(null); // null | "vhe" | "components" | "utilityCount"
   const [sortDir, setSortDir] = useState("desc"); // "asc" | "desc"
+  const { data } = useOrg();
 
   // Resolve active view from URL
   const viewId = searchParams.get("view");
@@ -202,7 +203,7 @@ export default function BuildingListPage() {
 
   // Build enriched list: building + settlement for selected year
   const enriched = useMemo(() => {
-    return buildings.map((b) => {
+    return data.buildings.map((b) => {
       const stl = year != null ? settlements.find((s) => s.buildingId === b.id) : null;
       return { ...b, settlement: stl, utilityCount: b.utilities.length };
     });
@@ -426,7 +427,7 @@ export default function BuildingListPage() {
             {lang === "nl" ? "Alle complexen" : "All complexes"}
           </button>
           {/* Saved views */}
-          {savedViews
+          {data.savedViews
             .filter((v) => v.objectType === "buildings")
             .map((v) => {
               const isActive = viewId === v.id;

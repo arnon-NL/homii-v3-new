@@ -12,8 +12,9 @@ import {
   List,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
-import { services, serviceCategories, getServicesByCategory } from "@/lib/mockData";
+import { getServicesByCategory, getServiceCategories } from "@/lib/mockData";
 import { t, useLang } from "@/lib/i18n";
+import { useOrg } from "@/lib/OrgContext";
 import { StatusBadge } from "./ui/status-badge";
 
 /* ── Category icon + color config ── */
@@ -29,7 +30,7 @@ function CategoryBadge({ categoryId, lang }) {
   const cfg = categoryConfig[categoryId];
   if (!cfg) return null;
   const Icon = cfg.icon;
-  const cat = serviceCategories.find((c) => c.id === categoryId);
+  const cat = getServiceCategories().find((c) => c.id === categoryId);
   return (
     <div
       className="inline-flex items-center gap-2 px-2 py-1 rounded-full text-[11px] font-medium"
@@ -52,22 +53,25 @@ function BoolDot({ value }) {
 }
 
 /* ── Category filter tabs ── */
-const categoryFilters = [
-  { value: "all", label: { en: "All", nl: "Alle" } },
-  ...serviceCategories.map((c) => ({ value: c.id, label: c.label })),
-];
+// Moved inside component as useMemo to support org-aware data
 
 /* ── Main component ── */
 export default function ServiceListPage() {
   const lang = useLang();
   const navigate = useNavigate();
+  const { data } = useOrg();
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [viewMode, setViewMode] = useState("grouped"); // "grouped" or "flat"
 
+  const categoryFilters = useMemo(() => [
+    { value: "all", label: { en: "All", nl: "Alle" } },
+    ...data.serviceCategories.map((c) => ({ value: c.id, label: c.label })),
+  ], [data.serviceCategories]);
+
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return services.filter((s) => {
+    return data.services.filter((s) => {
       const matchSearch =
         !q ||
         s.code.toLowerCase().includes(q) ||
@@ -77,17 +81,17 @@ export default function ServiceListPage() {
         categoryFilter === "all" || s.category === categoryFilter;
       return matchSearch && matchCategory;
     });
-  }, [search, categoryFilter, lang]);
+  }, [search, categoryFilter, lang, data.services]);
 
   // Group filtered services by category
   const grouped = useMemo(() => {
-    return serviceCategories
+    return data.serviceCategories
       .map((cat) => ({
         ...cat,
         services: filtered.filter((s) => s.category === cat.id),
       }))
       .filter((g) => g.services.length > 0);
-  }, [filtered]);
+  }, [filtered, data.serviceCategories]);
 
   const fmt = (v) =>
     new Intl.NumberFormat("nl-NL", {

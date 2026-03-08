@@ -32,6 +32,14 @@ export {
   costAttribution,
   moduleConfig,
 
+  // --- Array getter functions (org-aware) ---
+  getBuildings,
+  getServices,
+  getServiceCategories,
+  getSupplierCategories,
+  getMeters,
+  getSavedViews,
+
   // --- Building getters ---
   getBuilding,
   getBuildingByComplexId,
@@ -40,6 +48,7 @@ export {
   getService,
   getServiceByCode,
   getServicesByCategory,
+  getServicesByCategoryId,
   getCategory,
 
   // --- Finance getters ---
@@ -96,6 +105,14 @@ export {
 
   // --- Config ---
   isFeatureEnabled,
+  getModuleConfig,
+
+  // --- Available years ---
+  getAvailableYears,
+
+  // --- Org state ---
+  setActiveOrg,
+  getActiveOrgId,
 
   // --- Field sources ---
   FIELD_SOURCES,

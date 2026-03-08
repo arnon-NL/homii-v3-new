@@ -41,15 +41,17 @@ import {
   getDistributionMethod,
   getSettlement,
   getSettlementChecks,
-  serviceCategories,
+  getServiceCategories,
   getLedgerSummaryByBuilding,
   getLedgerGroupedByCostCategory,
-  meters,
+  getMeters,
   getCostCategoriesByService,
   getDistributionModel,
   isFeatureEnabled,
   getFieldSource,
+  getAvailableYears,
 } from "@/lib/mockData";
+import { useOrg } from "@/lib/OrgContext";
 import { t, useLang } from "@/lib/i18n";
 import Breadcrumbs from "./Breadcrumbs";
 import { Card, CardContent } from "./ui/card";
@@ -179,8 +181,8 @@ function CheckStatusBadge({ status, lang }) {
 }
 
 /* ── Year selector ── */
-function YearSelector({ year, setYear }) {
-  const years = [2024, 2025, 2026];
+function YearSelector({ year, setYear, availableYears }) {
+  const years = availableYears && availableYears.length > 0 ? availableYears : [2024, 2025, 2026];
   return (
     <div className="inline-flex items-center rounded-lg bg-slate-100 p-0.5">
       {years.map((y) => (
@@ -208,7 +210,12 @@ export default function BuildingDetailPage() {
   const { buildingId } = useParams();
   const navigate = useNavigate();
   const lang = useLang();
-  const [year, setYear] = useState(2025);
+  const { data } = useOrg();
+  const availableYears = useMemo(() => getAvailableYears(), []);
+  const [year, setYear] = useState(() => {
+    const yrs = getAvailableYears();
+    return yrs.length > 0 ? yrs[yrs.length - 1] : 2025;
+  });
   const [activeTab, setActiveTab] = useState("overview");
   const [expandedVhe, setExpandedVhe] = useState(null);
   const [expandedService, setExpandedService] = useState(null);
@@ -367,7 +374,7 @@ export default function BuildingDetailPage() {
               </div>
             </div>
           </div>
-          <YearSelector year={year} setYear={setYear} />
+          <YearSelector year={year} setYear={setYear} availableYears={availableYears} />
         </div>
 
         {/* ── Content: tabs + attribute panel ── */}
@@ -427,10 +434,10 @@ export default function BuildingDetailPage() {
                     }
                   });
 
-                  // 2. Flagged ledger entries
+                  // 2. Flagged ledger entries (only for orgs with ledger data)
                   const totalFlaggedEntries = Object.entries(ledgerByService).reduce((sum, [, l]) => sum + (l.flagged || 0), 0);
                   const totalPendingEntries = Object.entries(ledgerByService).reduce((sum, [, l]) => sum + (l.pending || 0), 0);
-                  if (totalFlaggedEntries > 0) {
+                  if (isFeatureEnabled("ledger") && totalFlaggedEntries > 0) {
                     attentionItems.push({
                       id: "flagged-ledger",
                       severity: "error",
@@ -443,7 +450,7 @@ export default function BuildingDetailPage() {
                       actionLabel: { en: "Review", nl: "Bekijk" },
                     });
                   }
-                  if (totalPendingEntries > 0) {
+                  if (isFeatureEnabled("ledger") && totalPendingEntries > 0) {
                     attentionItems.push({
                       id: "pending-ledger",
                       severity: "info",
@@ -509,8 +516,8 @@ export default function BuildingDetailPage() {
                     });
                   }
 
-                  // 5. Settlement check failures (past year)
-                  if (isPastYear && sChecks.length > 0) {
+                  // 5. Settlement check failures (past year — only for orgs with ledger)
+                  if (isFeatureEnabled("ledger") && isPastYear && sChecks.length > 0) {
                     const failedChecks = sChecks.filter((sc) => sc.status === "flagged" || sc.status === "pending");
                     const incompleteChecks = sChecks.filter((sc) => !sc.ledgerComplete);
                     if (failedChecks.length > 0) {
@@ -553,8 +560,8 @@ export default function BuildingDetailPage() {
 
                   return (
                 <div className="mt-4 space-y-4">
-                  {/* Settlement banner (past year only) */}
-                  {isPastYear && settlement && (
+                  {/* Settlement banner (past year only, ledger orgs) */}
+                  {isFeatureEnabled("ledger") && isPastYear && settlement && (
                     <Card className="border-slate-200 bg-white overflow-hidden">
                       <div
                         className="h-1"
@@ -1017,8 +1024,8 @@ export default function BuildingDetailPage() {
                 <div className="mt-4 space-y-4">
                   {(() => {
                     const visibleCategories = isFeatureEnabled("nonUtilityServices")
-                      ? serviceCategories
-                      : serviceCategories.filter((c) => c.id === "energy");
+                      ? data.serviceCategories
+                      : data.serviceCategories.filter((c) => c.id === "energy");
                     const grouped = visibleCategories
                       .map((cat) => ({
                         ...cat,

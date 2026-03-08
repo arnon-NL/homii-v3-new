@@ -19,7 +19,8 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
-import { suppliers, supplierCategories, services } from "@/lib/mockData";
+import { getSupplierCategories, getServices } from "@/lib/mockData";
+import { useOrg } from "@/lib/OrgContext";
 import { t, useLang } from "@/lib/i18n";
 import { StatusBadge } from "./ui/status-badge";
 
@@ -36,7 +37,7 @@ function CategoryBadge({ categoryId, lang }) {
   const cfg = categoryConfig[categoryId];
   if (!cfg) return null;
   const Icon = cfg.icon;
-  const cat = supplierCategories.find((c) => c.id === categoryId);
+  const cat = getSupplierCategories().find((c) => c.id === categoryId);
   return (
     <div
       className="inline-flex items-center gap-2 px-2 py-1 rounded-full text-[11px] font-medium"
@@ -68,7 +69,7 @@ function StarRating({ value, max = 5 }) {
 /* ── Service chip list ── */
 function ServiceChips({ serviceIds, lang, max = 3 }) {
   const matched = serviceIds
-    .map((sid) => services.find((s) => s.id === sid))
+    .map((sid) => getServices().find((s) => s.id === sid))
     .filter(Boolean);
   const shown = matched.slice(0, max);
   const remaining = matched.length - max;
@@ -100,12 +101,6 @@ function supplierStatus(s) {
   return { status: "active", label: { en: "Active", nl: "Actief" } };
 }
 
-/* ── Category filter tabs ── */
-const categoryFilters = [
-  { value: "all", label: { en: "All", nl: "Alle" } },
-  ...supplierCategories.map((c) => ({ value: c.id, label: c.label })),
-];
-
 /* ── Format currency ── */
 const fmt = (v) =>
   new Intl.NumberFormat("nl-NL", {
@@ -118,36 +113,42 @@ const fmt = (v) =>
 export default function SupplierListPage() {
   const lang = useLang();
   const navigate = useNavigate();
+  const { data } = useOrg();
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [viewMode, setViewMode] = useState("grouped");
 
+  const categoryFilters = useMemo(() => [
+    { value: "all", label: { en: "All", nl: "Alle" } },
+    ...data.supplierCategories.map((c) => ({ value: c.id, label: c.label })),
+  ], [data.supplierCategories]);
+
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return suppliers.filter((s) => {
+    return data.suppliers.filter((s) => {
       const matchSearch =
         !q ||
         s.name.toLowerCase().includes(q) ||
         s.city.toLowerCase().includes(q) ||
         s.kvk.includes(q) ||
         s.serviceIds.some((sid) => {
-          const svc = services.find((sv) => sv.id === sid);
+          const svc = getServices().find((sv) => sv.id === sid);
           return svc && ((svc.name[lang] || svc.name.en).toLowerCase().includes(q) || svc.code.toLowerCase().includes(q));
         });
       const matchCategory =
         categoryFilter === "all" || s.category === categoryFilter;
       return matchSearch && matchCategory;
     });
-  }, [search, categoryFilter, lang]);
+  }, [search, categoryFilter, lang, data.suppliers]);
 
   const grouped = useMemo(() => {
-    return supplierCategories
+    return data.supplierCategories
       .map((cat) => ({
         ...cat,
         suppliers: filtered.filter((s) => s.category === cat.id),
       }))
       .filter((g) => g.suppliers.length > 0);
-  }, [filtered]);
+  }, [filtered, data.supplierCategories]);
 
   const totalAnnualSpend = useMemo(
     () => filtered.reduce((sum, s) => sum + s.annualSpend, 0),

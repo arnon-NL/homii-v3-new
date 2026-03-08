@@ -18,12 +18,13 @@ import {
 import { brand } from "@/lib/brand";
 import { t, useLang } from "@/lib/i18n";
 import {
-  services,
-  buildings,
-  serviceCategories,
+  getServices,
+  getBuildings,
+  getServiceCategories,
   getLedgerByService,
   getLedgerSummaryByService,
 } from "@/lib/mockData";
+import { useOrg } from "@/lib/OrgContext";
 
 /* ── Formatters ── */
 const fmtEur = (v) =>
@@ -107,9 +108,10 @@ export default function ServiceDetailPage() {
   const { serviceId } = useParams();
   const navigate = useNavigate();
   const lang = useLang();
+  const { data: orgData } = useOrg();
 
-  const service = services.find((s) => s.id === serviceId);
-  const category = serviceCategories.find((c) => c.id === service?.category);
+  const service = orgData.services.find((s) => s.id === serviceId);
+  const category = orgData.serviceCategories.find((c) => c.id === service?.category);
 
   const [year] = useState(2025);
   const [search, setSearch] = useState("");
@@ -124,7 +126,7 @@ export default function ServiceDetailPage() {
   const buildingRows = useMemo(() => {
     return Object.entries(summary)
       .map(([bldId, data]) => {
-        const bld = buildings.find((b) => b.id === bldId);
+        const bld = orgData.buildings.find((b) => b.id === bldId);
         if (!bld) return null;
         const budgetForService = (service?.avgCostPerVhe || 0) * bld.vhe;
         const variance = data.total - budgetForService;
@@ -160,7 +162,7 @@ export default function ServiceDetailPage() {
         if (aIssues !== bIssues) return bIssues - aIssues;
         return b.total - a.total;
       });
-  }, [summary, statusFilter, search, service]);
+  }, [summary, statusFilter, search, service, orgData]);
 
   // Totals
   const totalBooked = allEntries.reduce((s, e) => s + e.amount, 0);
