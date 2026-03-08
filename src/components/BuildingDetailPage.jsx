@@ -2699,12 +2699,12 @@ export default function BuildingDetailPage() {
           <div className="w-full xl:w-80 shrink-0">
             <AttributePanel>
               <AttrSection title={lang === "nl" ? "Identiteit" : "Identity"}>
-                <AttrRow label="Complex ID" value={building.complexId} source={getFieldSource("building", "complexId")} />
-                <AttrRow label={lang === "nl" ? "Locatie" : "Location"} value={building.location} source={getFieldSource("building", "location")} />
+                <AttrRow label="Complex ID" value={building.complexId} />
+                <AttrRow label={lang === "nl" ? "Locatie" : "Location"} value={building.location} />
               </AttrSection>
               <AttrSection title={lang === "nl" ? "Samenstelling" : "Composition"}>
-                <AttrRow label="VHE" value={building.vhe} source={getFieldSource("building", "vhe")} />
-                <AttrRow label={lang === "nl" ? "Diensten" : "Services"} value={bsRelations.length} source={getFieldSource("building", "components")} />
+                <AttrRow label="VHE" value={building.vhe} />
+                <AttrRow label={lang === "nl" ? "Diensten" : "Services"} value={bsRelations.length} />
                 <AttrRow label={lang === "nl" ? "Meters" : "Meters"} value={`${mainMeters.length} ${lang === "nl" ? "hoofd" : "main"} · ${subMeters.length} sub`} />
                 {building.utilities?.length > 0 && (
                   <AttrRow
@@ -2715,7 +2715,6 @@ export default function BuildingDetailPage() {
                       gas: "Gas",
                       water: "Water",
                     })[u] || u).join(", ")}
-                    source={getFieldSource("building", "utilities")}
                   />
                 )}
               </AttrSection>
