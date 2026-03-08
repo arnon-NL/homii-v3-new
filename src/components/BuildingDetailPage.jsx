@@ -22,6 +22,7 @@ import {
   Users,
   ChevronRight,
   ChevronDown,
+  ArrowLeft,
   Circle,
   HelpCircle,
   FileCheck,
@@ -45,6 +46,7 @@ import {
   getLedgerGroupedByCostCategory,
   meters,
   getCostCategoriesByService,
+  getDistributionModel,
   isFeatureEnabled,
 } from "@/lib/mockData";
 import { t, useLang } from "@/lib/i18n";
@@ -211,6 +213,7 @@ export default function BuildingDetailPage() {
   const [expandedService, setExpandedService] = useState(null);
   const [expandedCostCats, setExpandedCostCats] = useState({});  // { [ccId]: true }
   const toggleCostCat = (ccId) => setExpandedCostCats((prev) => ({ ...prev, [ccId]: !prev[ccId] }));
+  const [distDrilldown, setDistDrilldown] = useState(null); // { serviceId, buildingId } when viewing distribution
 
   const building = getBuilding(buildingId);
 
@@ -781,6 +784,242 @@ export default function BuildingDetailPage() {
 
               {/* ═══ SERVICES TAB — DETAIL & INVESTIGATION ═══ */}
               <TabsContent value="services">
+                {/* ── Distribution drill-down view ── */}
+                {distDrilldown ? (() => {
+                  const dm = getDistributionModel(distDrilldown.buildingId, distDrilldown.serviceId);
+                  const svc = getService(distDrilldown.serviceId);
+                  const svcName = svc ? (svc.name[lang] || svc.name.en) : distDrilldown.serviceId;
+
+                  // Resolve intermediate values from the split tree
+                  const resolveValue = (outputId) => {
+                    // Check inputs first
+                    const input = dm?.inputs?.find(i => i.id === outputId);
+                    if (input) return input.resolvedValue;
+                    // Check splits
+                    const split = dm?.splits?.find(s => s.output === outputId);
+                    if (!split) return 0;
+                    const sourceVal = resolveValue(split.source);
+                    if (split.additionalSources) {
+                      const extra = split.additionalSources.reduce((sum, sid) => sum + resolveValue(sid), 0);
+                      return (sourceVal + extra) * split.ratio;
+                    }
+                    return sourceVal * split.ratio;
+                  };
+
+                  const totalDistributed = dm?.invoiceLines?.reduce((sum, line) => sum + resolveValue(line.source), 0) || 0;
+
+                  return (
+                    <div className="mt-4 space-y-5">
+                      {/* Back navigation */}
+                      <button
+                        onClick={() => setDistDrilldown(null)}
+                        className="flex items-center gap-1.5 text-xs font-medium transition-colors hover:underline"
+                        style={{ color: brand.blue }}
+                      >
+                        <ArrowLeft size={14} />
+                        {lang === "nl" ? "Terug naar diensten" : "Back to services"}
+                      </button>
+
+                      {/* Header */}
+                      <div>
+                        <h3 className="text-sm font-semibold text-slate-800">
+                          {lang === "nl" ? "Verdelingsmodel" : "Distribution Model"}: {svcName}
+                        </h3>
+                        {dm && (
+                          <p className="text-[11px] text-slate-400 mt-1">
+                            {dm.provider || (lang === "nl" ? "Standaard" : "Standard")} · v{dm.formulaVersion} · {lang === "nl" ? "Laatst bijgewerkt" : "Last updated"}: {new Date(dm.lastUpdated).toLocaleDateString("nl-NL", { day: "2-digit", month: "short", year: "numeric" })}
+                          </p>
+                        )}
+                      </div>
+
+                      {!dm ? (
+                        <Card className="border-slate-200 bg-white">
+                          <CardContent className="py-8 text-center">
+                            <HelpCircle size={20} className="mx-auto mb-2 text-slate-300" />
+                            <p className="text-xs text-slate-400">
+                              {lang === "nl" ? "Geen verdelingsmodel beschikbaar voor deze dienst" : "No distribution model available for this service"}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      ) : (
+                        <>
+                          {/* ── LANE 1: Cost Inputs ── */}
+                          <div>
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                              {lang === "nl" ? "1. Kostenopbouw" : "1. Cost Inputs"}
+                            </p>
+                            <Card className="border-slate-200 bg-white">
+                              <CardContent className="py-0">
+                                {dm.inputs.map((input, idx) => (
+                                  <div key={input.id} className={`flex items-center justify-between py-3 ${idx < dm.inputs.length - 1 ? "border-b border-slate-100" : ""}`}>
+                                    <div className="min-w-0 flex-1">
+                                      <p className="text-xs font-medium text-slate-700">
+                                        {input.label[lang] || input.label.en}
+                                      </p>
+                                      <p className="text-[10px] text-slate-400 mt-0.5 font-mono truncate">
+                                        {input.formula}
+                                      </p>
+                                    </div>
+                                    <span className="text-sm font-semibold text-slate-800 tabular-nums ml-4">
+                                      {fmt(input.resolvedValue)}
+                                    </span>
+                                  </div>
+                                ))}
+                                {/* Total inputs */}
+                                <div className="flex items-center justify-between py-2 border-t border-slate-200 bg-slate-50/50">
+                                  <p className="text-[11px] font-medium text-slate-500">
+                                    {lang === "nl" ? "Totaal invoer" : "Total inputs"}
+                                  </p>
+                                  <span className="text-xs font-semibold text-slate-700 tabular-nums">
+                                    {fmt(dm.inputs.reduce((s, i) => s + i.resolvedValue, 0))}
+                                  </span>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </div>
+
+                          {/* ── LANE 2: Component Split ── */}
+                          {dm.splits.length > 0 && (
+                            <div>
+                              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                                {lang === "nl" ? "2. Componentensplitsing" : "2. Component Split"}
+                              </p>
+                              <Card className="border-slate-200 bg-white">
+                                <CardContent className="py-0">
+                                  {dm.splits.map((split, idx) => {
+                                    const sourceLabel = dm.inputs.find(i => i.id === split.source)?.label
+                                      || dm.splits.find(s => s.output === split.source)?.label
+                                      || { en: split.source, nl: split.source };
+                                    const resolvedAmt = resolveValue(split.output);
+
+                                    return (
+                                      <div key={idx} className={`py-3 ${idx < dm.splits.length - 1 ? "border-b border-slate-100" : ""}`}>
+                                        <div className="flex items-center justify-between">
+                                          <div className="min-w-0 flex-1">
+                                            <p className="text-xs font-medium text-slate-700">
+                                              {split.label[lang] || split.label.en}
+                                            </p>
+                                            <div className="flex items-center gap-1.5 mt-0.5">
+                                              <span className="text-[10px] text-slate-400">
+                                                {(split.ratio * 100).toFixed(1)}% {lang === "nl" ? "van" : "of"} {sourceLabel[lang] || sourceLabel.en}
+                                              </span>
+                                              {split.method === "meter_based" && (
+                                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-medium bg-blue-50" style={{ color: brand.blue }}>
+                                                  <Gauge size={9} />
+                                                  {lang === "nl" ? "meter" : "metered"}
+                                                </span>
+                                              )}
+                                              {split.method === "meter_ratio" && (
+                                                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-medium bg-blue-50" style={{ color: brand.blue }}>
+                                                  <Gauge size={9} />
+                                                  {lang === "nl" ? "verhouding" : "ratio"}
+                                                </span>
+                                              )}
+                                            </div>
+                                            {split.note && (
+                                              <p className="text-[10px] text-slate-400 mt-0.5 italic">
+                                                {split.note[lang] || split.note.en}
+                                              </p>
+                                            )}
+                                          </div>
+                                          <span className="text-xs font-semibold text-slate-700 tabular-nums ml-4">
+                                            {fmt(resolvedAmt)}
+                                          </span>
+                                        </div>
+                                        {/* Mini progress bar */}
+                                        <div className="mt-1.5 h-1 rounded-full bg-slate-100 overflow-hidden">
+                                          <div
+                                            className="h-full rounded-full transition-all"
+                                            style={{
+                                              width: `${Math.min(split.ratio * 100, 100)}%`,
+                                              background: split.method === "meter_based" || split.method === "meter_ratio" ? brand.blue : brand.navy,
+                                            }}
+                                          />
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                                </CardContent>
+                              </Card>
+                            </div>
+                          )}
+
+                          {/* ── LANE 3: Invoice Lines ── */}
+                          <div>
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
+                              {dm.splits.length > 0
+                                ? (lang === "nl" ? "3. Verdeelregels" : "3. Invoice Lines")
+                                : (lang === "nl" ? "2. Verdeelregels" : "2. Invoice Lines")}
+                            </p>
+                            <Card className="border-slate-200 bg-white">
+                              <CardContent className="py-0">
+                                {dm.invoiceLines.map((line, idx) => {
+                                  const lineAmt = resolveValue(line.source);
+                                  const pct = totalDistributed > 0 ? (lineAmt / totalDistributed) * 100 : 0;
+
+                                  return (
+                                    <div key={idx} className={`py-3 ${idx < dm.invoiceLines.length - 1 ? "border-b border-slate-100" : ""}`}>
+                                      <div className="flex items-center justify-between">
+                                        <div className="min-w-0 flex-1">
+                                          <p className="text-xs font-medium text-slate-700">
+                                            {line.label[lang] || line.label.en}
+                                          </p>
+                                          <div className="flex items-center gap-1.5 mt-0.5">
+                                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-medium bg-slate-100 text-slate-500">
+                                              {line.keyLabel[lang] || line.keyLabel.en}
+                                            </span>
+                                          </div>
+                                        </div>
+                                        <div className="text-right ml-4">
+                                          <span className="text-xs font-semibold text-slate-700 tabular-nums">{fmt(lineAmt)}</span>
+                                          <p className="text-[10px] text-slate-400 tabular-nums">{pct.toFixed(1)}%</p>
+                                        </div>
+                                      </div>
+                                      {/* Proportion bar */}
+                                      <div className="mt-1.5 h-1 rounded-full bg-slate-100 overflow-hidden">
+                                        <div
+                                          className="h-full rounded-full"
+                                          style={{ width: `${pct}%`, background: brand.navy }}
+                                        />
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                                {/* Total distributed */}
+                                <div className="flex items-center justify-between py-2 border-t border-slate-200 bg-slate-50/50">
+                                  <p className="text-[11px] font-medium text-slate-500">
+                                    {lang === "nl" ? "Totaal verdeeld" : "Total distributed"}
+                                  </p>
+                                  <span className="text-xs font-semibold text-slate-700 tabular-nums">
+                                    {fmt(totalDistributed)}
+                                  </span>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </div>
+
+                          {/* ── Distribution key legend ── */}
+                          <div className="px-1">
+                            <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+                              {lang === "nl" ? "Verdeelsleutels" : "Distribution Keys"}
+                            </p>
+                            <div className="flex flex-wrap gap-x-4 gap-y-1">
+                              {[...new Set(dm.invoiceLines.map(l => l.distributionKey))].map(key => {
+                                const line = dm.invoiceLines.find(l => l.distributionKey === key);
+                                return (
+                                  <span key={key} className="text-[10px] text-slate-400">
+                                    <span className="font-mono text-slate-500">{key.replace("cost_key_", "")}</span>
+                                    {" = "}{line.keyLabel[lang] || line.keyLabel.en}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  );
+                })() : (
                 <div className="mt-4 space-y-4">
                   {(() => {
                     const visibleCategories = isFeatureEnabled("nonUtilityServices")
@@ -1143,12 +1382,20 @@ export default function BuildingDetailPage() {
                                           </div>
                                         )}
 
-                                        {/* Footer: Distribution + cross-navigation */}
+                                        {/* Footer: Distribution model + cross-navigation */}
                                         <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                                          <div className="text-[11px] text-slate-500">
-                                            <span className="font-medium">{lang === "nl" ? "Verdeling" : "Distribution"}:</span>{" "}
-                                            {bs.distMethod?.name[lang] || bs.distMethod?.name.en || "—"}
-                                          </div>
+                                          <button
+                                            className="text-[11px] font-medium flex items-center gap-1 transition-colors hover:underline"
+                                            style={{ color: brand.blue }}
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              setDistDrilldown({ serviceId: bs.serviceId, buildingId });
+                                            }}
+                                          >
+                                            <Activity size={12} />
+                                            {lang === "nl" ? "Bekijk verdelingsmodel" : "View distribution model"}
+                                            <ChevronRight size={12} />
+                                          </button>
                                           <button
                                             className="text-[11px] font-medium flex items-center gap-1 hover:underline"
                                             style={{ color: brand.blue }}
@@ -1157,7 +1404,7 @@ export default function BuildingDetailPage() {
                                               navigate(`/services/${bs.serviceId}`);
                                             }}
                                           >
-                                            {lang === "nl" ? "Bekijk alle complexen" : "View all buildings"}
+                                            {lang === "nl" ? "Alle complexen" : "All buildings"}
                                             <ArrowUpRight size={14} />
                                           </button>
                                         </div>
@@ -1173,6 +1420,7 @@ export default function BuildingDetailPage() {
                     });
                   })()}
                 </div>
+                )}
               </TabsContent>
 
               {/* ═══ METERS TAB (requires consumption feature) ═══ */}

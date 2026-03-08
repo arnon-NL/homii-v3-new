@@ -1711,6 +1711,130 @@ export function getCostCategoriesByService(serviceId) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// DISTRIBUTION MODELS — per building × service
+// Describes how service costs are split into components and
+// distributed to VHEs. Based on ista/Techem formulas.
+// Structure: inputs → splits → invoiceLines (3-phase recipe)
+// ═══════════════════════════════════════════════════════════════════
+
+export const distributionModels = [
+  // ── BLD-001 × SVC-108: Warmtekosten (Techem formula) ──
+  {
+    id: "DM-001-108",
+    buildingId: "BLD-001",
+    serviceId: "SVC-108",
+    provider: "Techem Energy Services BV",
+    formulaVersion: "2024-v2",
+    lastUpdated: "2024-09-01",
+    inputs: [
+      { id: "gas_cost", label: { en: "Gas cost", nl: "Gaskosten" }, formula: "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')", resolvedValue: 28450 },
+      { id: "contracts", label: { en: "Contracts", nl: "Contractkosten" }, formula: "other_costs('Vaste Lasten') + other_costs('Meetdiensten') + other_costs('Dienstverleningskosten')", resolvedValue: 4120 },
+    ],
+    splits: [
+      { source: "gas_cost", ratio: 0.32111, method: "fixed_pct", output: "warm_water_cost", label: { en: "Warm water", nl: "Warm water" } },
+      { source: "gas_cost", ratio: 0.67889, method: "fixed_pct", output: "heating_cost", label: { en: "Heating", nl: "Verwarming" } },
+      { source: "heating_cost", ratio: 0.15, method: "fixed_pct", output: "heating_fixed", label: { en: "Pipe delivery (fixed)", nl: "Leidingafgifte (vast)" } },
+      { source: "heating_cost", ratio: 0.85, method: "fixed_pct", output: "heating_variable", label: { en: "Heating (variable)", nl: "Verwarming (variabel)" } },
+    ],
+    invoiceLines: [
+      { label: { en: "Heating", nl: "Verwarming" }, source: "heating_variable", distributionKey: "cost_key_nl_eenheden", keyLabel: { en: "By consumption units", nl: "Op basis van eenheden" } },
+      { label: { en: "Pipe delivery", nl: "Leidingafgifte" }, source: "heating_fixed", distributionKey: "cost_key_ista_label_hasFixed", keyLabel: { en: "Per VHE (ista fixed)", nl: "Per VHE (ista vast)" } },
+      { label: { en: "Warm water", nl: "Warm water" }, source: "warm_water_cost", distributionKey: "cost_key_ista_label_hasFixed", keyLabel: { en: "Per VHE (ista fixed)", nl: "Per VHE (ista vast)" } },
+      { label: { en: "Contracts", nl: "Contractkosten" }, source: "contracts", distributionKey: "cost_key_ista_label_hasFixed", keyLabel: { en: "Per VHE (ista fixed)", nl: "Per VHE (ista vast)" } },
+    ],
+  },
+  // ── BLD-002 × SVC-108: Warmtekosten (Techem formula with loss share) ──
+  {
+    id: "DM-002-108",
+    buildingId: "BLD-002",
+    serviceId: "SVC-108",
+    provider: "Techem Energy Services BV",
+    formulaVersion: "2024-v3",
+    lastUpdated: "2024-11-15",
+    inputs: [
+      { id: "gas_cost", label: { en: "Gas cost", nl: "Gaskosten" }, formula: "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')", resolvedValue: 94200 },
+      { id: "transport", label: { en: "Transport costs", nl: "Transportkosten" }, formula: "other_costs('Transportkosten')", resolvedValue: 8340 },
+      { id: "techem_svc", label: { en: "Techem service costs", nl: "Techem servicekosten" }, formula: "other_costs('Techem servicekosten')", resolvedValue: 5680 },
+    ],
+    splits: [
+      { source: "gas_cost", ratio: 0.35, method: "fixed_pct", output: "pipe_delivery", label: { en: "Pipe delivery (loss share)", nl: "Leidingafgifte (verliesdeel)" } },
+      { source: "gas_cost", ratio: 0.65, method: "fixed_pct", output: "gas_only", label: { en: "Gas (net of loss)", nl: "Gas (netto)" } },
+      { source: "gas_only", ratio: 0.78, method: "meter_ratio", output: "heating_only", label: { en: "Building heating", nl: "Gebouwverwarming" }, note: { en: "BuildingHeat / (BuildingHeat + CommonHeat)", nl: "Gebouwwarmte / (Gebouw + Gemeenschappelijk)" } },
+      { source: "gas_only", ratio: 0.22, method: "meter_ratio", output: "common_only", label: { en: "Common spaces", nl: "Gemeenschappelijke ruimten" } },
+      { source: "transport", ratio: 1.0, method: "sum", output: "total_contracts", label: { en: "Total contracts", nl: "Totaal contracten" }, additionalSources: ["techem_svc"] },
+    ],
+    invoiceLines: [
+      { label: { en: "Heating", nl: "Verwarming" }, source: "heating_only", distributionKey: "cost_key_nl_eenheden", keyLabel: { en: "By consumption units", nl: "Op basis van eenheden" } },
+      { label: { en: "Pipe delivery", nl: "Leidingafgifte" }, source: "pipe_delivery", distributionKey: "cost_key_nl_hoofdelijk", keyLabel: { en: "Per VHE (equal)", nl: "Per VHE (gelijk)" } },
+      { label: { en: "Contracts", nl: "Contractkosten" }, source: "total_contracts", distributionKey: "cost_key_nl_hoofdelijk", keyLabel: { en: "Per VHE (equal)", nl: "Per VHE (gelijk)" } },
+      { label: { en: "Common spaces heating", nl: "Verwarming gemeensch." }, source: "common_only", distributionKey: "cost_key_ista_label_hasCommonHeating", keyLabel: { en: "Common heating share", nl: "Aandeel gemeensch. verwarming" } },
+    ],
+  },
+  // ── BLD-004 × SVC-108: Warmtekosten (ista formula with boiler meters) ──
+  {
+    id: "DM-004-108",
+    buildingId: "BLD-004",
+    serviceId: "SVC-108",
+    provider: "ista Nederland B.V.",
+    formulaVersion: "2025-v1",
+    lastUpdated: "2025-01-10",
+    inputs: [
+      { id: "gas_cost", label: { en: "Gas cost", nl: "Gaskosten" }, formula: "Gas × UnitPrice + other_costs('Overige kosten in Energiekosten')", resolvedValue: 167800 },
+      { id: "contracts", label: { en: "Contracts", nl: "Contractkosten" }, formula: "other_costs('Vaste Lasten') + other_costs('Meetdiensten') + other_costs('Dienstverleningskosten')", resolvedValue: 12450 },
+    ],
+    splits: [
+      { source: "gas_cost", ratio: 0.283, method: "meter_based", output: "warm_water_cost", label: { en: "Warm water", nl: "Warm water" }, note: { en: "Boiler meter 000053 / total boiler output", nl: "Ketelwarmtemeter 000053 / totale ketelproductie" } },
+      { source: "gas_cost", ratio: 0.717, method: "meter_based", output: "heating_cost", label: { en: "Heating", nl: "Verwarming" } },
+      { source: "heating_cost", ratio: 0.15, method: "fixed_pct", output: "heating_fixed", label: { en: "Pipe delivery (fixed 15%)", nl: "Leidingafgifte (vast 15%)" } },
+      { source: "heating_cost", ratio: 0.85, method: "fixed_pct", output: "heating_variable", label: { en: "Heating (variable 85%)", nl: "Verwarming (variabel 85%)" } },
+    ],
+    invoiceLines: [
+      { label: { en: "Heating", nl: "Verwarming" }, source: "heating_variable", distributionKey: "cost_key_nl_eenheden", keyLabel: { en: "By consumption units", nl: "Op basis van eenheden" } },
+      { label: { en: "Pipe delivery", nl: "Leidingafgifte" }, source: "heating_fixed", distributionKey: "cost_key_nl_hoofdelijk", keyLabel: { en: "Per VHE (equal)", nl: "Per VHE (gelijk)" } },
+      { label: { en: "Warm water", nl: "Warm water" }, source: "warm_water_cost", distributionKey: "cost_key_nl_hoofdelijk", keyLabel: { en: "Per VHE (equal)", nl: "Per VHE (gelijk)" } },
+      { label: { en: "Contracts", nl: "Contractkosten" }, source: "contracts", distributionKey: "cost_key_nl_hoofdelijk", keyLabel: { en: "Per VHE (equal)", nl: "Per VHE (gelijk)" } },
+    ],
+  },
+  // ── Simple distribution models for non-utility services ──
+  // Cold water — straightforward per m³
+  {
+    id: "DM-001-102",
+    buildingId: "BLD-001",
+    serviceId: "SVC-102",
+    provider: null,
+    formulaVersion: "standard",
+    lastUpdated: "2024-01-01",
+    inputs: [
+      { id: "water_cost", label: { en: "Water supply costs", nl: "Waterleveringskosten" }, formula: "total_service_cost", resolvedValue: 8920 },
+    ],
+    splits: [],
+    invoiceLines: [
+      { label: { en: "Water supply", nl: "Waterlevering" }, source: "water_cost", distributionKey: "cost_key_nl_eenheden", keyLabel: { en: "By consumption (m³)", nl: "Op basis van verbruik (m³)" } },
+    ],
+  },
+  // Cleaning — equal per VHE
+  {
+    id: "DM-001-118",
+    buildingId: "BLD-001",
+    serviceId: "SVC-118",
+    provider: null,
+    formulaVersion: "standard",
+    lastUpdated: "2024-01-01",
+    inputs: [
+      { id: "cleaning_cost", label: { en: "Cleaning costs", nl: "Schoonmaakkosten" }, formula: "total_service_cost", resolvedValue: 6500 },
+    ],
+    splits: [],
+    invoiceLines: [
+      { label: { en: "Cleaning", nl: "Schoonmaak" }, source: "cleaning_cost", distributionKey: "cost_key_nl_hoofdelijk", keyLabel: { en: "Equal per VHE", nl: "Gelijk per VHE" } },
+    ],
+  },
+];
+
+export function getDistributionModel(buildingId, serviceId) {
+  return distributionModels.find(dm => dm.buildingId === buildingId && dm.serviceId === serviceId) || null;
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // MONTHLY CLOSE STATUS — per building × service × month
 // Tracks whether each month's costs have been reviewed and closed.
 // Status: closed (green), review (amber), open (red), future (gray)
