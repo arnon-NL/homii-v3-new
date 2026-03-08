@@ -562,78 +562,51 @@ export default function BuildingDetailPage() {
                 ))}
               </TabsList>
 
-              {/* ═══ OVERVIEW TAB — SERVICE CHARGE HEALTH DASHBOARD ═══ */}
+              {/* ═══ OVERVIEW TAB — BUILDING HOME PAGE ═══ */}
               <TabsContent value="overview">
                 {(() => {
-                  // ── Compute attention items (cross-cutting insights) ──
-                  const attentionItems = [];
+                  /* ── Compute warnings (system-generated attention items) ── */
+                  const warnings = [];
 
-                  // 1. Services running ahead of budget pace
+                  // Budget pace warnings
                   enrichedBs.forEach((bs) => {
                     const bsPct = bs.budget > 0 ? (bs.actual / bs.budget) * 100 : 0;
                     if (bsPct > yearPct + 10) {
                       const overBy = Math.round(bsPct - yearPct);
-                      attentionItems.push({
+                      warnings.push({
                         id: `budget-${bs.serviceId}`,
                         severity: bsPct > 100 ? "error" : "warning",
                         icon: AlertTriangle,
                         text: {
-                          en: `${bs.service?.name.en || bs.serviceId} is ${overBy}pp ahead of budget pace (${Math.round(bsPct)}% spent, year ${yearPct}% elapsed)`,
-                          nl: `${bs.service?.name.nl || bs.serviceId} loopt ${overBy}pp voor op budgettempo (${Math.round(bsPct)}% besteed, jaar ${yearPct}% verstreken)`,
+                          en: `${bs.service?.name.en || bs.serviceId} is ${overBy}pp ahead of budget pace`,
+                          nl: `${bs.service?.name.nl || bs.serviceId} loopt ${overBy}pp voor op budgettempo`,
                         },
                         action: () => { setActiveTab("services"); setExpandedService(bs.serviceId); },
-                        actionLabel: { en: "View service", nl: "Bekijk dienst" },
                       });
                     }
                   });
 
-                  // 2. Flagged ledger entries (only for orgs with ledger data)
+                  // Flagged ledger entries
                   const totalFlaggedEntries = Object.entries(ledgerByService).reduce((sum, [, l]) => sum + (l.flagged || 0), 0);
-                  const totalPendingEntries = Object.entries(ledgerByService).reduce((sum, [, l]) => sum + (l.pending || 0), 0);
                   if (isFeatureEnabled("ledger") && totalFlaggedEntries > 0) {
-                    attentionItems.push({
-                      id: "flagged-ledger",
-                      severity: "error",
-                      icon: Flag,
-                      text: {
-                        en: `${totalFlaggedEntries} ledger ${totalFlaggedEntries === 1 ? "entry" : "entries"} flagged for review`,
-                        nl: `${totalFlaggedEntries} ${totalFlaggedEntries === 1 ? "boeking" : "boekingen"} gemarkeerd voor controle`,
-                      },
+                    warnings.push({
+                      id: "flagged-ledger", severity: "error", icon: Flag,
+                      text: { en: `${totalFlaggedEntries} ledger ${totalFlaggedEntries === 1 ? "entry" : "entries"} flagged`, nl: `${totalFlaggedEntries} ${totalFlaggedEntries === 1 ? "boeking" : "boekingen"} gemarkeerd` },
                       action: () => setActiveTab("services"),
-                      actionLabel: { en: "Review", nl: "Bekijk" },
-                    });
-                  }
-                  if (isFeatureEnabled("ledger") && totalPendingEntries > 0) {
-                    attentionItems.push({
-                      id: "pending-ledger",
-                      severity: "info",
-                      icon: Clock,
-                      text: {
-                        en: `${totalPendingEntries} ledger ${totalPendingEntries === 1 ? "entry" : "entries"} pending approval`,
-                        nl: `${totalPendingEntries} ${totalPendingEntries === 1 ? "boeking" : "boekingen"} wachten op goedkeuring`,
-                      },
-                      action: () => setActiveTab("services"),
-                      actionLabel: { en: "Review", nl: "Bekijk" },
                     });
                   }
 
-                  // 3. Overdue meter readings
+                  // Overdue meter readings
                   const overdueMeters = meterList.filter((m) => m.status === "warning");
                   if (overdueMeters.length > 0) {
-                    attentionItems.push({
-                      id: "overdue-meters",
-                      severity: "warning",
-                      icon: Gauge,
-                      text: {
-                        en: `${overdueMeters.length} meter ${overdueMeters.length === 1 ? "reading" : "readings"} overdue (${overdueMeters.map((m) => m.meterNumber).join(", ")})`,
-                        nl: `${overdueMeters.length} meter${overdueMeters.length === 1 ? "stand" : "standen"} achterstallig (${overdueMeters.map((m) => m.meterNumber).join(", ")})`,
-                      },
+                    warnings.push({
+                      id: "overdue-meters", severity: "warning", icon: Gauge,
+                      text: { en: `${overdueMeters.length} meter ${overdueMeters.length === 1 ? "reading" : "readings"} overdue`, nl: `${overdueMeters.length} meter${overdueMeters.length === 1 ? "stand" : "standen"} achterstallig` },
                       action: () => setActiveTab("meters"),
-                      actionLabel: { en: "View meters", nl: "Bekijk meters" },
                     });
                   }
 
-                  // 4. Consumption vs cost variance (metered services)
+                  // Consumption vs cost variance
                   if (isFeatureEnabled("consumptionControl")) {
                     const utilityMap = {
                       "SVC-108": "heat", "SVC-107": "heat",
@@ -654,72 +627,220 @@ export default function BuildingDetailPage() {
                       const expectedCost = totalConsumption * avgUnitPrice;
                       const variancePct = Math.round(((bs.actual - expectedCost) / expectedCost) * 100);
                       if (Math.abs(variancePct) > 20) {
-                        attentionItems.push({
+                        warnings.push({
                           id: `consumption-${bs.serviceId}`,
                           severity: Math.abs(variancePct) > 50 ? "error" : "warning",
                           icon: Activity,
                           text: {
-                            en: `${bs.service?.name.en}: invoiced cost ${variancePct > 0 ? "+" : ""}${variancePct}% vs consumption-based estimate`,
-                            nl: `${bs.service?.name.nl}: geboekte kosten ${variancePct > 0 ? "+" : ""}${variancePct}% t.o.v. verbruiksschatting`,
+                            en: `${bs.service?.name.en}: cost ${variancePct > 0 ? "+" : ""}${variancePct}% vs consumption estimate`,
+                            nl: `${bs.service?.name.nl}: kosten ${variancePct > 0 ? "+" : ""}${variancePct}% t.o.v. verbruiksschatting`,
                           },
                           action: () => { setActiveTab("services"); setExpandedService(bs.serviceId); },
-                          actionLabel: { en: "Investigate", nl: "Onderzoek" },
                         });
                       }
                     });
                   }
 
-                  // 5. Settlement check failures (past year — only for orgs with ledger)
+                  // Settlement check failures
                   if (isFeatureEnabled("ledger") && isPastYear && sChecks.length > 0) {
                     const failedChecks = sChecks.filter((sc) => sc.status === "flagged" || sc.status === "pending");
-                    const incompleteChecks = sChecks.filter((sc) => !sc.ledgerComplete);
                     if (failedChecks.length > 0) {
-                      attentionItems.push({
-                        id: "settlement-checks",
-                        severity: "error",
-                        icon: FileCheck,
-                        text: {
-                          en: `${failedChecks.length} settlement ${failedChecks.length === 1 ? "check" : "checks"} ${failedChecks.some((sc) => sc.status === "flagged") ? "flagged" : "pending"}`,
-                          nl: `${failedChecks.length} afrekening${failedChecks.length === 1 ? "scontrole" : "scontroles"} ${failedChecks.some((sc) => sc.status === "flagged") ? "gemarkeerd" : "in afwachting"}`,
-                        },
+                      warnings.push({
+                        id: "settlement-checks", severity: "error", icon: FileCheck,
+                        text: { en: `${failedChecks.length} settlement ${failedChecks.length === 1 ? "check" : "checks"} need attention`, nl: `${failedChecks.length} afrekening${failedChecks.length === 1 ? "scontrole" : "scontroles"} vragen aandacht` },
                         action: null,
-                        actionLabel: null,
-                      });
-                    }
-                    if (incompleteChecks.length > 0) {
-                      attentionItems.push({
-                        id: "incomplete-ledger",
-                        severity: "warning",
-                        icon: FileText,
-                        text: {
-                          en: `${incompleteChecks.length} ${incompleteChecks.length === 1 ? "service has" : "services have"} incomplete ledger data for settlement`,
-                          nl: `${incompleteChecks.length} ${incompleteChecks.length === 1 ? "dienst heeft" : "diensten hebben"} onvolledige boekingsdata voor afrekening`,
-                        },
-                        action: null,
-                        actionLabel: null,
                       });
                     }
                   }
 
-                  // Sort: errors first, then warnings, then info
-                  const severityOrder = { error: 0, warning: 1, info: 2 };
-                  attentionItems.sort((a, b) => (severityOrder[a.severity] ?? 9) - (severityOrder[b.severity] ?? 9));
+                  // Sort: errors first
+                  const sevOrder = { error: 0, warning: 1, info: 2 };
+                  warnings.sort((a, b) => (sevOrder[a.severity] ?? 9) - (sevOrder[b.severity] ?? 9));
 
-                  const severityStyles = {
-                    error:   { border: "border-red-200",   bg: "bg-red-50/50",   iconColor: brand.red },
-                    warning: { border: "border-amber-200", bg: "bg-amber-50/50", iconColor: brand.amber },
-                    info:    { border: "border-slate-200", bg: "bg-slate-50/50", iconColor: brand.muted },
+                  // Open tasks for this building
+                  const openTasks = buildingTasks.filter((t) => t.status === "open")
+                    .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+                  const overdueTasks = openTasks.filter((t) => new Date(t.dueDate) < new Date());
+
+                  // Merge action queue: overdue tasks first, then warnings, then upcoming tasks
+                  const actionQueue = [];
+                  overdueTasks.forEach((t) => actionQueue.push({ type: "task", severity: "error", item: t }));
+                  warnings.forEach((w) => actionQueue.push({ type: "warning", severity: w.severity, item: w }));
+                  openTasks.filter((t) => !overdueTasks.includes(t)).forEach((t) => actionQueue.push({ type: "task", severity: "info", item: t }));
+
+                  // Notes
+                  const pinnedNotes = buildingNotes.filter((n) => n.pinned).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                  const unpinnedNotes = buildingNotes.filter((n) => !n.pinned).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                  const allNotes = [...pinnedNotes, ...unpinnedNotes];
+
+                  const sevStyles = {
+                    error:   { bg: "bg-red-50/60",   iconColor: brand.red },
+                    warning: { bg: "bg-amber-50/60", iconColor: brand.amber },
+                    info:    { bg: "bg-white",       iconColor: brand.muted },
+                  };
+
+                  const priorityDot = { high: brand.red, medium: brand.amber, low: brand.muted };
+
+                  const fmtRelDate = (d) => {
+                    const dt = new Date(d);
+                    const now = new Date();
+                    const diff = Math.round((dt - now) / 86400000);
+                    if (diff === 0) return lang === "nl" ? "vandaag" : "today";
+                    if (diff === 1) return lang === "nl" ? "morgen" : "tomorrow";
+                    if (diff === -1) return lang === "nl" ? "gisteren" : "yesterday";
+                    if (diff < -1) return `${Math.abs(diff)}d ${lang === "nl" ? "geleden" : "ago"}`;
+                    if (diff > 1 && diff <= 7) return `${diff}d`;
+                    return dt.toLocaleDateString("nl-NL", { day: "numeric", month: "short" });
                   };
 
                   return (
                 <div className="mt-4 space-y-4">
-                  {/* ── Layer 1: Mode-aware Verdict Card ── */}
-                  {isFeatureEnabled("ledger") && isPastYear && settlement ? (
-                    /* ═══ SETTLEMENT MODE — Readiness cockpit ═══ */
+
+                  {/* Layer 0: Pulse Strip */}
+                  <div className="flex flex-wrap items-center gap-x-5 gap-y-1 px-1 text-[13px]">
+                    <span className="tabular-nums" style={{ color: brand.navy }}>
+                      <span className="font-semibold">{fmt(totalBudget)}</span>
+                      <span className="text-slate-400 ml-1">budget</span>
+                    </span>
+                    <span className="w-px h-3.5 bg-slate-200" />
+                    <span className="tabular-nums">
+                      <span
+                        className="font-semibold"
+                        style={{ color: !isOnPace && budgetPct > yearPct + 10 ? brand.amber : brand.navy }}
+                      >
+                        {budgetPct}%
+                      </span>
+                      <span className="text-slate-400 ml-1">{lang === "nl" ? "besteed" : "spent"}</span>
+                    </span>
+                    <span className="w-px h-3.5 bg-slate-200" />
+                    <span className="tabular-nums" style={{ color: brand.navy }}>
+                      <span className="font-semibold">{activeVhe}</span>
+                      <span className="text-slate-400 ml-1">VHE</span>
+                    </span>
+                    {openTasks.length > 0 && (
+                      <>
+                        <span className="w-px h-3.5 bg-slate-200" />
+                        <span className="tabular-nums">
+                          <span
+                            className="font-semibold"
+                            style={{ color: overdueTasks.length > 0 ? brand.red : brand.navy }}
+                          >
+                            {openTasks.length}
+                          </span>
+                          <span className="text-slate-400 ml-1">
+                            {openTasks.length === 1
+                              ? (lang === "nl" ? "open taak" : "open task")
+                              : (lang === "nl" ? "open taken" : "open tasks")}
+                          </span>
+                        </span>
+                      </>
+                    )}
+                    {warnings.length > 0 && (
+                      <>
+                        <span className="w-px h-3.5 bg-slate-200" />
+                        <span className="tabular-nums">
+                          <span className="font-semibold" style={{ color: brand.amber }}>
+                            {warnings.length}
+                          </span>
+                          <span className="text-slate-400 ml-1">
+                            {warnings.length === 1
+                              ? (lang === "nl" ? "waarschuwing" : "warning")
+                              : (lang === "nl" ? "waarschuwingen" : "warnings")}
+                          </span>
+                        </span>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Layer 1: Action Queue */}
+                  {actionQueue.length > 0 ? (
                     <Card className="border-slate-200 bg-white overflow-hidden">
-                      <CardContent className="px-5 py-4">
-                        {/* Settlement progress stepper */}
-                        <div className="flex items-center gap-1 mb-4">
+                      <CardContent className="p-0">
+                        <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2">
+                          <ListChecks size={13} className="text-slate-400" />
+                          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                            {lang === "nl" ? "Acties" : "Actions"}
+                            <span className="ml-1.5 text-slate-300">({actionQueue.length})</span>
+                          </p>
+                        </div>
+                        <div className="divide-y divide-slate-100">
+                          {actionQueue.map((entry) => {
+                            if (entry.type === "task") {
+                              const task = entry.item;
+                              const isOverdue = new Date(task.dueDate) < new Date();
+                              return (
+                                <div key={task.id} className={`flex items-center gap-3 px-4 py-2.5 ${isOverdue ? "bg-red-50/40" : ""}`}>
+                                  <div
+                                    className="w-2 h-2 rounded-full shrink-0"
+                                    style={{ background: priorityDot[task.priority] || brand.muted }}
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs text-slate-700 truncate">
+                                      {task.title[lang] || task.title.en}
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center gap-2 shrink-0">
+                                    <span
+                                      className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-semibold text-white shrink-0"
+                                      style={{ background: brand.navy + "80" }}
+                                      title={task.assignee}
+                                    >
+                                      {task.assigneeInitials}
+                                    </span>
+                                    <span className={`text-[11px] tabular-nums ${isOverdue ? "text-red-600 font-medium" : "text-slate-400"}`}>
+                                      {fmtRelDate(task.dueDate)}
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            } else {
+                              const w = entry.item;
+                              const sty = sevStyles[w.severity] || sevStyles.info;
+                              const WIcon = w.icon;
+                              return (
+                                <div key={w.id} className={`flex items-center gap-3 px-4 py-2.5 ${sty.bg}`}>
+                                  <WIcon size={13} className="shrink-0" style={{ color: sty.iconColor }} />
+                                  <p className="flex-1 min-w-0 text-xs text-slate-700 truncate">
+                                    {w.text[lang] || w.text.en}
+                                  </p>
+                                  {w.action && (
+                                    <button
+                                      onClick={w.action}
+                                      className="text-[11px] font-medium shrink-0 px-2 py-0.5 rounded hover:bg-slate-100 transition-colors"
+                                      style={{ color: brand.blue }}
+                                    >
+                                      {lang === "nl" ? "Bekijk" : "View"} →
+                                    </button>
+                                  )}
+                                </div>
+                              );
+                            }
+                          })}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="flex items-center gap-3 px-4 py-4 rounded-lg border border-slate-200 bg-white">
+                      <CheckCircle2 size={15} style={{ color: brand.blue }} className="shrink-0" />
+                      <p className="text-xs text-slate-500">
+                        {lang === "nl"
+                          ? "Alles op orde — geen openstaande acties."
+                          : "All clear — no open actions."}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Layer 2: Financial Snapshot */}
+                  {isFeatureEnabled("ledger") && isPastYear && settlement ? (
+                    <Card className="border-slate-200 bg-white overflow-hidden">
+                      <CardContent className="px-4 py-3">
+                        <div className="flex items-center gap-2 mb-3">
+                          <CreditCard size={13} className="text-slate-400" />
+                          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                            {lang === "nl" ? "Afrekening" : "Settlement"} {year}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 mb-3">
                           {["monitoring", "in_review", "approved", "distributed"].map((step, i, arr) => {
                             const stepOrder = { monitoring: 0, in_review: 1, approved: 2, distributed: 3 };
                             const currentOrder = stepOrder[settlement.status] ?? -1;
@@ -728,236 +849,196 @@ export default function BuildingDetailPage() {
                             const cfg = settlementStatusConfig[step];
                             return (
                               <React.Fragment key={step}>
-                                <div className="flex items-center gap-1.5">
+                                <div className="flex items-center gap-1">
                                   <div
-                                    className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 transition-colors"
+                                    className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
                                     style={{
                                       background: isCurrent ? cfg?.color : isComplete ? brand.blue : "#F1F5F9",
                                       opacity: isComplete && !isCurrent ? 0.5 : 1,
                                     }}
                                   >
                                     {isComplete ? (
-                                      <CheckCircle2 size={14} className="text-white" />
+                                      <CheckCircle2 size={12} className="text-white" />
                                     ) : (
-                                      <Circle size={14} style={{ color: "#CBD5E1" }} />
+                                      <Circle size={12} style={{ color: "#CBD5E1" }} />
                                     )}
                                   </div>
                                   <span
-                                    className={`text-[11px] ${isCurrent ? "font-semibold" : isComplete ? "font-medium" : ""} hidden sm:inline`}
+                                    className={`text-[10px] ${isCurrent ? "font-semibold" : isComplete ? "font-medium" : ""} hidden sm:inline`}
                                     style={{ color: isCurrent ? cfg?.color : isComplete ? brand.navy : "#94A3B8" }}
                                   >
                                     {cfg?.label[lang]}
                                   </span>
                                 </div>
                                 {i < arr.length - 1 && (
-                                  <div
-                                    className="flex-1 h-px mx-1"
-                                    style={{ background: stepOrder[arr[i + 1]] <= currentOrder ? brand.blue : "#E2E8F0" }}
-                                  />
+                                  <div className="flex-1 h-px mx-0.5" style={{ background: stepOrder[arr[i + 1]] <= currentOrder ? brand.blue : "#E2E8F0" }} />
                                 )}
                               </React.Fragment>
                             );
                           })}
                         </div>
-
-                        {/* Settlement readiness summary */}
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+                          <span className="tabular-nums">{fmt(totalActual)} {lang === "nl" ? "werkelijk" : "actual"}</span>
+                          <span className="text-slate-300">·</span>
+                          <span className="tabular-nums">{fmt(totalBudget)} {lang === "nl" ? "voorschot" : "advance"}</span>
+                          <span className="text-slate-300">·</span>
+                          <span className="font-semibold tabular-nums" style={{ color: variance >= 0 ? brand.blue : brand.red }}>
+                            {variance >= 0 ? "+" : ""}{fmt(variance)} {lang === "nl" ? "netto" : "net"}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <Card className="border-slate-200 bg-white overflow-hidden">
+                      <CardContent className="px-4 py-3">
+                        <div className="flex items-center gap-2 mb-2.5">
+                          <CreditCard size={13} className="text-slate-400" />
+                          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                            Budget {year}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3 mb-2">
+                          <div
+                            className="w-7 h-7 rounded-md flex items-center justify-center shrink-0"
+                            style={{
+                              background: verdictStatus === "on_track" ? "#F0FDFA"
+                                : verdictStatus === "review" ? "#FFFBEB"
+                                : "#FEF2F2",
+                            }}
+                          >
+                            {verdictStatus === "on_track" ? (
+                              <CheckCircle2 size={15} style={{ color: brand.blue }} />
+                            ) : verdictStatus === "review" ? (
+                              <Clock size={15} style={{ color: brand.amber }} />
+                            ) : (
+                              <AlertTriangle size={15} style={{ color: brand.red }} />
+                            )}
+                          </div>
                           <div>
                             <p className="text-sm font-semibold" style={{ color: brand.navy }}>
-                              {(() => {
-                                const passedChecks = sChecks.filter((sc) => sc.status === "approved" || sc.status === "verified").length;
-                                const totalChecks = sChecks.length;
-                                if (settlement.status === "distributed") return lang === "nl" ? "Afrekening afgerond" : "Settlement completed";
-                                if (settlement.status === "approved") return lang === "nl" ? "Goedgekeurd — klaar voor distributie" : "Approved — ready for distribution";
-                                if (totalChecks > 0 && passedChecks === totalChecks) return lang === "nl" ? "Alle controles geslaagd" : "All checks passed";
-                                return lang === "nl" ? "Afrekening in voorbereiding" : "Settlement in preparation";
-                              })()}
+                              {verdictStatus === "on_track"
+                                ? (lang === "nl" ? "Op koers" : "On track")
+                                : verdictStatus === "review"
+                                  ? (lang === "nl" ? "Aandacht nodig" : "Needs review")
+                                  : (lang === "nl" ? "Actie vereist" : "Action required")}
                             </p>
-                            <p className="text-xs text-slate-500 mt-0.5">
-                              {fmt(totalActual)} {lang === "nl" ? "werkelijk" : "actual"}
+                            <p className="text-[11px] text-slate-500 tabular-nums">
+                              {fmt(totalActual)} / {fmt(totalBudget)} ({budgetPct}%)
                               <span className="mx-1.5 text-slate-300">·</span>
-                              {fmt(totalBudget)} {lang === "nl" ? "voorschot" : "advance"}
-                              <span className="mx-1.5 text-slate-300">·</span>
-                              <span style={{ color: totalBudget - totalActual >= 0 ? brand.blue : brand.red }}>
-                                {totalBudget - totalActual >= 0 ? "+" : ""}{fmt(totalBudget - totalActual)} {lang === "nl" ? "netto" : "net"}
-                              </span>
+                              {lang === "nl" ? "jaar" : "year"} {yearPct}%
                             </p>
                           </div>
-                          {sChecks.length > 0 && (
-                            <div className="flex items-center gap-4 text-xs">
-                              <div className="text-center">
-                                <span className="text-lg font-semibold tabular-nums" style={{ color: brand.blue }}>
-                                  {sChecks.filter((sc) => sc.status === "approved" || sc.status === "verified").length}
-                                </span>
-                                <p className="text-[11px] text-slate-400 uppercase tracking-wider">
-                                  {lang === "nl" ? "geslaagd" : "passed"}
+                        </div>
+                        <div className="h-1.5 rounded-full bg-slate-100 overflow-hidden mb-2">
+                          <div
+                            className="h-full rounded-full transition-all"
+                            style={{
+                              width: `${Math.min(budgetPct, 100)}%`,
+                              background: budgetPct > 100 ? brand.red : budgetPct > yearPct + 10 ? brand.amber : brand.blue,
+                            }}
+                          />
+                        </div>
+                        <div className="flex items-center gap-4 text-[11px] text-slate-500">
+                          <span className="flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full" style={{ background: brand.blue }} />
+                            {servicesUnderBudget} {lang === "nl" ? "op koers" : "on track"}
+                          </span>
+                          {servicesOverBudget > 0 && (
+                            <span className="flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full" style={{ background: brand.amber }} />
+                              {servicesOverBudget} {lang === "nl" ? "boven budget" : "over budget"}
+                            </span>
+                          )}
+                          {flaggedCount > 0 && (
+                            <span className="flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full" style={{ background: brand.red }} />
+                              {flaggedCount} {lang === "nl" ? "gemarkeerd" : "flagged"}
+                            </span>
+                          )}
+                          <button
+                            onClick={() => setActiveTab("services")}
+                            className="ml-auto text-[11px] font-medium hover:underline"
+                            style={{ color: brand.blue }}
+                          >
+                            Details →
+                          </button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Layer 3: Notes & Context */}
+                  <Card className="border-slate-200 bg-white overflow-hidden">
+                    <CardContent className="p-0">
+                      <div className="px-4 py-2.5 border-b border-slate-100 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <StickyNote size={13} className="text-slate-400" />
+                          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                            {lang === "nl" ? "Notities" : "Notes"}
+                            {allNotes.length > 0 && <span className="ml-1 text-slate-300">({allNotes.length})</span>}
+                          </p>
+                        </div>
+                        <button
+                          className="flex items-center gap-1 text-[11px] font-medium transition-colors hover:opacity-80"
+                          style={{ color: brand.blue }}
+                        >
+                          <Plus size={12} />
+                          {lang === "nl" ? "Toevoegen" : "Add"}
+                        </button>
+                      </div>
+                      {allNotes.length > 0 ? (
+                        <div className="divide-y divide-slate-100">
+                          {allNotes.slice(0, 4).map((note) => (
+                            <div key={note.id} className="flex items-start gap-3 px-4 py-2.5">
+                              <span
+                                className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-semibold text-white shrink-0 mt-0.5"
+                                style={{ background: brand.navy + "70" }}
+                                title={note.author}
+                              >
+                                {note.authorInitials}
+                              </span>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs text-slate-600 leading-relaxed">
+                                  {note.text[lang] || note.text.en}
+                                </p>
+                                <p className="text-[11px] text-slate-400 mt-0.5">
+                                  {new Date(note.createdAt).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" })}
+                                  {note.pinned && (
+                                    <span className="ml-1.5 text-slate-300">📌</span>
+                                  )}
                                 </p>
                               </div>
-                              {sChecks.filter((sc) => sc.status === "flagged").length > 0 && (
-                                <div className="text-center">
-                                  <span className="text-lg font-semibold tabular-nums" style={{ color: brand.red }}>
-                                    {sChecks.filter((sc) => sc.status === "flagged").length}
-                                  </span>
-                                  <p className="text-[11px] text-slate-400 uppercase tracking-wider">
-                                    {lang === "nl" ? "gemarkeerd" : "flagged"}
-                                  </p>
-                                </div>
-                              )}
-                              {sChecks.filter((sc) => sc.status === "pending").length > 0 && (
-                                <div className="text-center">
-                                  <span className="text-lg font-semibold tabular-nums" style={{ color: brand.amber }}>
-                                    {sChecks.filter((sc) => sc.status === "pending").length}
-                                  </span>
-                                  <p className="text-[11px] text-slate-400 uppercase tracking-wider">
-                                    {lang === "nl" ? "in afwachting" : "pending"}
-                                  </p>
-                                </div>
-                              )}
+                            </div>
+                          ))}
+                          {allNotes.length > 4 && (
+                            <div className="px-4 py-2 text-center">
+                              <button className="text-[11px] font-medium" style={{ color: brand.blue }}>
+                                {lang === "nl" ? `Toon alle ${allNotes.length} notities` : `Show all ${allNotes.length} notes`}
+                              </button>
                             </div>
                           )}
                         </div>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    /* ═══ MONITORING MODE — Budget pace verdict ═══ */
-                    <Card className="border-slate-200 bg-white overflow-hidden">
-                      <CardContent className="px-5 py-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            <div
-                              className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                              style={{
-                                background: verdictStatus === "on_track" ? "#F8FAFC"
-                                  : verdictStatus === "review" ? "#FFFBEB"
-                                  : "#FEF2F2",
-                              }}
-                            >
-                              {verdictStatus === "on_track" ? (
-                                <CheckCircle2 size={20} style={{ color: brand.blue }} />
-                              ) : verdictStatus === "review" ? (
-                                <Clock size={20} style={{ color: brand.amber }} />
-                              ) : (
-                                <AlertTriangle size={20} style={{ color: brand.red }} />
-                              )}
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold" style={{ color: brand.navy }}>
-                                {verdictStatus === "on_track"
-                                  ? (lang === "nl" ? "Complex op koers" : "Building on track")
-                                  : verdictStatus === "review"
-                                    ? (lang === "nl" ? "Aandacht nodig" : "Needs review")
-                                    : (lang === "nl" ? "Actie vereist" : "Action required")}
-                              </p>
-                              <p className="text-xs text-slate-500 mt-0.5">
-                                {fmt(totalActual)} {lang === "nl" ? "van" : "of"} {fmt(totalBudget)} ({budgetPct}%)
-                                <span className="mx-1.5 text-slate-300">·</span>
-                                {lang === "nl" ? "Jaar" : "Year"}: {yearPct}% {lang === "nl" ? "verstreken" : "elapsed"}
-                                {!isOnPace && budgetPct > yearPct + 10 && (
-                                  <span className="ml-1.5 text-amber-600 font-medium">
-                                    — {lang === "nl" ? "loopt voor op budget" : "ahead of budget pace"}
-                                  </span>
-                                )}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-4 text-xs">
-                            <div className="text-center">
-                              <span className="text-lg font-semibold tabular-nums" style={{ color: brand.blue }}>
-                                {servicesUnderBudget}
-                              </span>
-                              <p className="text-[11px] text-slate-400 uppercase tracking-wider">
-                                {lang === "nl" ? "op koers" : "on track"}
-                              </p>
-                            </div>
-                            {servicesOverBudget > 0 && (
-                              <div className="text-center">
-                                <span className="text-lg font-semibold tabular-nums" style={{ color: brand.amber }}>
-                                  {servicesOverBudget}
-                                </span>
-                                <p className="text-[11px] text-slate-400 uppercase tracking-wider">
-                                  {lang === "nl" ? "boven budget" : "over budget"}
-                                </p>
-                              </div>
-                            )}
-                            {flaggedCount > 0 && (
-                              <div className="text-center">
-                                <span className="text-lg font-semibold tabular-nums" style={{ color: brand.red }}>
-                                  {flaggedCount}
-                                </span>
-                                <p className="text-[11px] text-slate-400 uppercase tracking-wider">
-                                  {lang === "nl" ? "gemarkeerd" : "flagged"}
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* ── Layer 2: Attention Items (exception-only insights) ── */}
-                  {attentionItems.length > 0 ? (
-                    <Card className="border-slate-200 bg-white overflow-hidden">
-                      <CardContent className="p-0">
-                        <div className="px-4 py-3 border-b border-slate-100">
-                          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                            {lang === "nl" ? "Aandachtspunten" : "Attention items"}
-                            <span className="ml-1.5 text-slate-300">({attentionItems.length})</span>
+                      ) : (
+                        <div className="px-4 py-6 text-center">
+                          <p className="text-xs text-slate-400">
+                            {lang === "nl" ? "Nog geen notities" : "No notes yet"}
                           </p>
                         </div>
-                        <div className="divide-y divide-slate-100">
-                          {attentionItems.map((item) => {
-                            const sty = severityStyles[item.severity] || severityStyles.info;
-                            const ItemIcon = item.icon;
-                            return (
-                              <div
-                                key={item.id}
-                                className={`flex items-start gap-3 px-4 py-3 ${sty.bg}`}
-                              >
-                                <ItemIcon
-                                  size={14}
-                                  className="mt-0.5 shrink-0"
-                                  style={{ color: sty.iconColor }}
-                                />
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-xs text-slate-700 leading-relaxed">
-                                    {item.text[lang] || item.text.en}
-                                  </p>
-                                </div>
-                                {item.action && (
-                                  <button
-                                    onClick={item.action}
-                                    className="text-[11px] font-medium shrink-0 px-2 py-1 rounded hover:bg-slate-100 transition-colors"
-                                    style={{ color: brand.blue }}
-                                  >
-                                    {item.actionLabel[lang] || item.actionLabel.en} →
-                                  </button>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <div className="flex items-center gap-3 px-4 py-5 rounded-lg border border-slate-200 bg-white">
-                      <CheckCircle2 size={16} style={{ color: brand.blue }} className="shrink-0" />
-                      <p className="text-xs text-slate-500">
-                        {lang === "nl"
-                          ? "Geen aandachtspunten — alle diensten zijn op koers."
-                          : "No attention items — all services are on track."}
-                      </p>
-                    </div>
-                  )}
+                      )}
+                    </CardContent>
+                  </Card>
 
-                  {/* ── Layer 3: Recent Activity ── */}
+                  {/* Layer 4: Recent Activity */}
                   {activityList.length > 0 && (
                     <Card className="border-slate-200 bg-white overflow-hidden">
                       <CardContent className="p-0">
-                        <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-                          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                            {lang === "nl" ? "Recente activiteit" : "Recent activity"}
-                          </p>
+                        <div className="px-4 py-2.5 border-b border-slate-100 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Activity size={13} className="text-slate-400" />
+                            <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                              {lang === "nl" ? "Recente activiteit" : "Recent activity"}
+                            </p>
+                          </div>
                           <button
                             onClick={() => setActiveTab("activity")}
                             className="text-[11px] font-medium hover:underline transition-colors"
@@ -967,15 +1048,15 @@ export default function BuildingDetailPage() {
                           </button>
                         </div>
                         <div className="divide-y divide-slate-100">
-                          {activityList.slice(0, 5).map((act) => (
+                          {activityList.slice(0, 4).map((act) => (
                             <div key={act.id} className="flex items-start gap-3 px-4 py-2">
                               <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 shrink-0" />
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs text-slate-600 truncate">
                                   {act.description[lang] || act.description.en}
                                 </p>
-                                <p className="text-[11px] text-slate-400">{act.date}</p>
                               </div>
+                              <span className="text-[11px] text-slate-400 shrink-0 tabular-nums">{act.date}</span>
                             </div>
                           ))}
                         </div>
