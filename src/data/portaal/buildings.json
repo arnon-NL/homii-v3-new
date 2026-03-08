@@ -34,7 +34,7 @@
       "heat",
       "gas"
     ],
-    "budgetTotal": 62695.0,
+    "budgetTotal": 62695,
     "budgetSpent": 26311.76,
     "dataQuality": "good",
     "status": "active",
@@ -57,8 +57,8 @@
     "utilities": [
       "gas"
     ],
-    "budgetTotal": 0.0,
-    "budgetSpent": 0.0,
+    "budgetTotal": 83933.63,
+    "budgetSpent": 20153.86,
     "dataQuality": "good",
     "status": "active",
     "divider": "ista",
@@ -129,7 +129,7 @@
       "gas"
     ],
     "budgetTotal": 60532.6,
-    "budgetSpent": 24905.0,
+    "budgetSpent": 24905,
     "dataQuality": "medium",
     "status": "active",
     "divider": "ista",
@@ -200,8 +200,8 @@
       "gas",
       "heat"
     ],
-    "budgetTotal": 0.0,
-    "budgetSpent": 0.0,
+    "budgetTotal": 140303.4,
+    "budgetSpent": 23748.72,
     "dataQuality": "medium",
     "status": "active",
     "divider": "Brunata WMS",
@@ -344,8 +344,8 @@
       "heat",
       "gas"
     ],
-    "budgetTotal": 0.0,
-    "budgetSpent": 0.0,
+    "budgetTotal": 33613.08,
+    "budgetSpent": 8117.25,
     "dataQuality": "medium",
     "status": "active",
     "divider": "ista",
@@ -369,8 +369,8 @@
       "water",
       "heat"
     ],
-    "budgetTotal": 0.0,
-    "budgetSpent": 0.0,
+    "budgetTotal": 27267.32,
+    "budgetSpent": 3863.75,
     "dataQuality": "low",
     "status": "active",
     "divider": "Techem",
@@ -465,8 +465,8 @@
       "gas",
       "electricity"
     ],
-    "budgetTotal": 0.0,
-    "budgetSpent": 0.0,
+    "budgetTotal": 86986.94,
+    "budgetSpent": 12914.22,
     "dataQuality": "good",
     "status": "active",
     "divider": "Techem",
@@ -489,8 +489,8 @@
       "heat",
       "gas"
     ],
-    "budgetTotal": 0.0,
-    "budgetSpent": 0.0,
+    "budgetTotal": 50175.92,
+    "budgetSpent": 16514.31,
     "dataQuality": "low",
     "status": "active",
     "divider": "Techem",
@@ -536,8 +536,8 @@
     "utilities": [
       "gas"
     ],
-    "budgetTotal": 0.0,
-    "budgetSpent": 0.0,
+    "budgetTotal": 38729.34,
+    "budgetSpent": 8029.26,
     "dataQuality": "good",
     "status": "active",
     "divider": "ista",
@@ -583,8 +583,8 @@
     "utilities": [
       "gas"
     ],
-    "budgetTotal": 0.0,
-    "budgetSpent": 0.0,
+    "budgetTotal": 86945.71,
+    "budgetSpent": 28715.55,
     "dataQuality": "low",
     "status": "active",
     "divider": "ista",
@@ -655,8 +655,8 @@
       "heat",
       "gas"
     ],
-    "budgetTotal": 0.0,
-    "budgetSpent": 0.0,
+    "budgetTotal": 26723.62,
+    "budgetSpent": 4489.72,
     "dataQuality": "good",
     "status": "active",
     "divider": "ista",
@@ -703,8 +703,8 @@
       "heat",
       "gas"
     ],
-    "budgetTotal": 0.0,
-    "budgetSpent": 0.0,
+    "budgetTotal": 34323.29,
+    "budgetSpent": 7062.38,
     "dataQuality": "good",
     "status": "active",
     "divider": "Techem",

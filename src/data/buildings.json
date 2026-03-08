@@ -202,7 +202,7 @@
     "vhe": 0,
     "components": 1,
     "utilities": [],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "good",
     "status": "inactive"
@@ -845,7 +845,7 @@
     "utilities": [
       "electricity"
     ],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "good",
     "status": "inactive"
@@ -1489,7 +1489,7 @@
     "vhe": 6,
     "components": 1,
     "utilities": [],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "good",
     "status": "pending"
@@ -2002,7 +2002,7 @@
     "vhe": 0,
     "components": 1,
     "utilities": [],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "good",
     "status": "inactive"
@@ -2200,7 +2200,7 @@
     "vhe": 29,
     "components": 6,
     "utilities": [],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "good",
     "status": "pending"
@@ -2215,7 +2215,7 @@
     "utilities": [
       "heat"
     ],
-    "budgetTotal": 12465.0,
+    "budgetTotal": 12465,
     "budgetSpent": 11871.43,
     "dataQuality": "warning",
     "status": "inactive"
@@ -2298,7 +2298,7 @@
     "vhe": 0,
     "components": 1,
     "utilities": [],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "good",
     "status": "inactive"
@@ -2310,7 +2310,9 @@
     "location": "Amsterdam",
     "vhe": 40,
     "components": 6,
-    "utilities": [],
+    "utilities": [
+      "electricity"
+    ],
     "budgetTotal": 12181.67,
     "budgetSpent": 11601.59,
     "dataQuality": "warning",
@@ -2512,7 +2514,7 @@
       "electricity"
     ],
     "budgetTotal": 1234.8,
-    "budgetSpent": 1176.0,
+    "budgetSpent": 1176,
     "dataQuality": "warning",
     "status": "pending"
   },
@@ -2983,7 +2985,9 @@
     "location": "Amsterdam",
     "vhe": 9,
     "components": 9,
-    "utilities": [],
+    "utilities": [
+      "electricity"
+    ],
     "budgetTotal": 4223.48,
     "budgetSpent": 4022.36,
     "dataQuality": "warning",
@@ -3024,7 +3028,9 @@
     "location": "Amsterdam",
     "vhe": 15,
     "components": 9,
-    "utilities": [],
+    "utilities": [
+      "electricity"
+    ],
     "budgetTotal": 6603.42,
     "budgetSpent": 6288.97,
     "dataQuality": "warning",
@@ -3037,7 +3043,9 @@
     "location": "Amsterdam",
     "vhe": 9,
     "components": 9,
-    "utilities": [],
+    "utilities": [
+      "electricity"
+    ],
     "budgetTotal": 4378.76,
     "budgetSpent": 4170.25,
     "dataQuality": "warning",
@@ -3076,7 +3084,9 @@
     "location": "Amsterdam",
     "vhe": 9,
     "components": 9,
-    "utilities": [],
+    "utilities": [
+      "electricity"
+    ],
     "budgetTotal": 4297.17,
     "budgetSpent": 4092.54,
     "dataQuality": "warning",
@@ -3105,7 +3115,7 @@
     "utilities": [
       "electricity"
     ],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "good",
     "status": "inactive"
@@ -3306,7 +3316,7 @@
     "vhe": 14,
     "components": 2,
     "utilities": [],
-    "budgetTotal": 236.0,
+    "budgetTotal": 236,
     "budgetSpent": 224.76,
     "dataQuality": "warning",
     "status": "pending"
@@ -3768,7 +3778,7 @@
     "vhe": 12,
     "components": 2,
     "utilities": [],
-    "budgetTotal": 236.0,
+    "budgetTotal": 236,
     "budgetSpent": 224.76,
     "dataQuality": "warning",
     "status": "pending"
@@ -3883,7 +3893,7 @@
     "vhe": 18,
     "components": 3,
     "utilities": [],
-    "budgetTotal": 734.0,
+    "budgetTotal": 734,
     "budgetSpent": 699.05,
     "dataQuality": "good",
     "status": "pending"
@@ -4062,7 +4072,7 @@
     "vhe": 8,
     "components": 1,
     "utilities": [],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "good",
     "status": "pending"
@@ -4076,7 +4086,7 @@
     "components": 6,
     "utilities": [],
     "budgetTotal": 8397.9,
-    "budgetSpent": 7998.0,
+    "budgetSpent": 7998,
     "dataQuality": "good",
     "status": "pending"
   },
@@ -4378,8 +4388,8 @@
     "vhe": 100,
     "components": 5,
     "utilities": [],
-    "budgetTotal": 6405.0,
-    "budgetSpent": 6100.0,
+    "budgetTotal": 6405,
+    "budgetSpent": 6100,
     "dataQuality": "good",
     "status": "pending"
   },
@@ -5037,7 +5047,7 @@
     "vhe": 294,
     "components": 1,
     "utilities": [],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "good",
     "status": "pending"
@@ -5063,7 +5073,7 @@
     "vhe": 200,
     "components": 1,
     "utilities": [],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "error",
     "status": "pending"
@@ -5261,7 +5271,7 @@
     "components": 3,
     "utilities": [],
     "budgetTotal": 371.7,
-    "budgetSpent": 354.0,
+    "budgetSpent": 354,
     "dataQuality": "good",
     "status": "pending"
   },
@@ -5378,7 +5388,9 @@
     "location": "Amsterdam",
     "vhe": 9,
     "components": 9,
-    "utilities": [],
+    "utilities": [
+      "electricity"
+    ],
     "budgetTotal": 4441.97,
     "budgetSpent": 4230.45,
     "dataQuality": "warning",
@@ -5391,7 +5403,9 @@
     "location": "Amsterdam",
     "vhe": 15,
     "components": 9,
-    "utilities": [],
+    "utilities": [
+      "electricity"
+    ],
     "budgetTotal": 6781.2,
     "budgetSpent": 6458.29,
     "dataQuality": "warning",
@@ -6189,7 +6203,7 @@
       "electricity"
     ],
     "budgetTotal": 9993.9,
-    "budgetSpent": 9518.0,
+    "budgetSpent": 9518,
     "dataQuality": "warning",
     "status": "pending"
   },
@@ -6599,7 +6613,7 @@
     "vhe": 93,
     "components": 2,
     "utilities": [],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "good",
     "status": "pending"
@@ -8533,7 +8547,9 @@
     "location": "Amsterdam",
     "vhe": 65,
     "components": 6,
-    "utilities": [],
+    "utilities": [
+      "electricity"
+    ],
     "budgetTotal": 8109.95,
     "budgetSpent": 7723.76,
     "dataQuality": "warning",
@@ -8547,7 +8563,7 @@
     "vhe": 55,
     "components": 5,
     "utilities": [],
-    "budgetTotal": 3523.0,
+    "budgetTotal": 3523,
     "budgetSpent": 3355.24,
     "dataQuality": "good",
     "status": "pending"
@@ -8577,7 +8593,7 @@
     "utilities": [
       "heat"
     ],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "error",
     "status": "inactive"
@@ -8760,7 +8776,7 @@
     "utilities": [
       "electricity"
     ],
-    "budgetTotal": 3249.0,
+    "budgetTotal": 3249,
     "budgetSpent": 3094.29,
     "dataQuality": "good",
     "status": "inactive"
@@ -8792,7 +8808,7 @@
     "utilities": [
       "electricity"
     ],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "good",
     "status": "pending"
@@ -8807,7 +8823,7 @@
     "utilities": [
       "electricity"
     ],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "good",
     "status": "pending"
@@ -8822,7 +8838,7 @@
     "utilities": [
       "electricity"
     ],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "good",
     "status": "pending"
@@ -8837,7 +8853,7 @@
     "utilities": [
       "electricity"
     ],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "good",
     "status": "pending"
@@ -8866,7 +8882,7 @@
     "components": 3,
     "utilities": [],
     "budgetTotal": 1426.95,
-    "budgetSpent": 1359.0,
+    "budgetSpent": 1359,
     "dataQuality": "good",
     "status": "pending"
   },
@@ -8891,7 +8907,7 @@
     "vhe": 132,
     "components": 5,
     "utilities": [],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "good",
     "status": "pending"
@@ -9491,7 +9507,7 @@
       "electricity",
       "water"
     ],
-    "budgetTotal": 41273.0,
+    "budgetTotal": 41273,
     "budgetSpent": 39307.62,
     "dataQuality": "warning",
     "status": "pending"
@@ -9844,7 +9860,7 @@
     "vhe": 0,
     "components": 1,
     "utilities": [],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "good",
     "status": "inactive"
@@ -9889,7 +9905,7 @@
     "utilities": [
       "electricity"
     ],
-    "budgetTotal": 15035.0,
+    "budgetTotal": 15035,
     "budgetSpent": 14319.05,
     "dataQuality": "warning",
     "status": "pending"
@@ -10178,7 +10194,7 @@
     "components": 1,
     "utilities": [],
     "budgetTotal": 75.6,
-    "budgetSpent": 72.0,
+    "budgetSpent": 72,
     "dataQuality": "good",
     "status": "pending"
   },
@@ -10346,7 +10362,7 @@
     "vhe": 2,
     "components": 1,
     "utilities": [],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "good",
     "status": "pending"
@@ -10511,7 +10527,7 @@
       "water"
     ],
     "budgetTotal": 59815.35,
-    "budgetSpent": 56967.0,
+    "budgetSpent": 56967,
     "dataQuality": "warning",
     "status": "pending"
   },
@@ -11046,7 +11062,7 @@
       "electricity"
     ],
     "budgetTotal": 11944.8,
-    "budgetSpent": 11376.0,
+    "budgetSpent": 11376,
     "dataQuality": "warning",
     "status": "pending"
   },
@@ -11790,7 +11806,7 @@
     "components": 2,
     "utilities": [],
     "budgetTotal": 1455.3,
-    "budgetSpent": 1386.0,
+    "budgetSpent": 1386,
     "dataQuality": "warning",
     "status": "pending"
   },
@@ -12084,7 +12100,7 @@
     "vhe": 10,
     "components": 3,
     "utilities": [],
-    "budgetTotal": 260.0,
+    "budgetTotal": 260,
     "budgetSpent": 247.62,
     "dataQuality": "good",
     "status": "pending"
@@ -12110,7 +12126,7 @@
     "vhe": 12,
     "components": 2,
     "utilities": [],
-    "budgetTotal": 236.0,
+    "budgetTotal": 236,
     "budgetSpent": 224.76,
     "dataQuality": "warning",
     "status": "pending"
@@ -12149,7 +12165,7 @@
     "vhe": 12,
     "components": 2,
     "utilities": [],
-    "budgetTotal": 236.0,
+    "budgetTotal": 236,
     "budgetSpent": 224.76,
     "dataQuality": "warning",
     "status": "pending"
@@ -12208,7 +12224,7 @@
       "water"
     ],
     "budgetTotal": 160823.25,
-    "budgetSpent": 153165.0,
+    "budgetSpent": 153165,
     "dataQuality": "warning",
     "status": "pending"
   },
@@ -12429,7 +12445,7 @@
     "vhe": 0,
     "components": 1,
     "utilities": [],
-    "budgetTotal": 0.0,
+    "budgetTotal": 0,
     "budgetSpent": 0,
     "dataQuality": "good",
     "status": "inactive"

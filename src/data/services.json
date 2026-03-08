@@ -17,7 +17,8 @@
     "buildingCount": 596,
     "suppliers": [],
     "avgCostPerVhe": 25.46,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-099",
@@ -37,7 +38,8 @@
     "buildingCount": 1,
     "suppliers": [],
     "avgCostPerVhe": 23.13,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-102",
@@ -57,7 +59,8 @@
     "buildingCount": 50,
     "suppliers": [],
     "avgCostPerVhe": 71.92,
-    "status": "active"
+    "status": "active",
+    "utility": "water"
   },
   {
     "id": "SVC-104",
@@ -77,7 +80,8 @@
     "buildingCount": 1,
     "suppliers": [],
     "avgCostPerVhe": 0.38,
-    "status": "active"
+    "status": "active",
+    "utility": "water-hot"
   },
   {
     "id": "SVC-105",
@@ -97,7 +101,8 @@
     "buildingCount": 443,
     "suppliers": [],
     "avgCostPerVhe": 62.76,
-    "status": "active"
+    "status": "active",
+    "utility": "electricity"
   },
   {
     "id": "SVC-106",
@@ -117,7 +122,8 @@
     "buildingCount": 8,
     "suppliers": [],
     "avgCostPerVhe": 8.21,
-    "status": "active"
+    "status": "active",
+    "utility": "electricity"
   },
   {
     "id": "SVC-107",
@@ -137,7 +143,8 @@
     "buildingCount": 1,
     "suppliers": [],
     "avgCostPerVhe": 30.42,
-    "status": "active"
+    "status": "active",
+    "utility": "gas"
   },
   {
     "id": "SVC-108",
@@ -157,7 +164,8 @@
     "buildingCount": 50,
     "suppliers": [],
     "avgCostPerVhe": 383.2,
-    "status": "active"
+    "status": "active",
+    "utility": "heat"
   },
   {
     "id": "SVC-109",
@@ -177,7 +185,8 @@
     "buildingCount": 2,
     "suppliers": [],
     "avgCostPerVhe": 276.12,
-    "status": "active"
+    "status": "active",
+    "utility": "electricity"
   },
   {
     "id": "SVC-110",
@@ -197,7 +206,8 @@
     "buildingCount": 3,
     "suppliers": [],
     "avgCostPerVhe": 274.32,
-    "status": "active"
+    "status": "active",
+    "utility": "electricity"
   },
   {
     "id": "SVC-111",
@@ -217,7 +227,8 @@
     "buildingCount": 9,
     "suppliers": [],
     "avgCostPerVhe": 4.32,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-115",
@@ -237,7 +248,8 @@
     "buildingCount": 823,
     "suppliers": [],
     "avgCostPerVhe": 24.8,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-116",
@@ -257,7 +269,8 @@
     "buildingCount": 23,
     "suppliers": [],
     "avgCostPerVhe": 34.16,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-118",
@@ -277,7 +290,8 @@
     "buildingCount": 337,
     "suppliers": [],
     "avgCostPerVhe": 85.3,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-120",
@@ -297,7 +311,8 @@
     "buildingCount": 115,
     "suppliers": [],
     "avgCostPerVhe": 1.91,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-122",
@@ -317,7 +332,8 @@
     "buildingCount": 580,
     "suppliers": [],
     "avgCostPerVhe": 6.42,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-123",
@@ -337,7 +353,8 @@
     "buildingCount": 1,
     "suppliers": [],
     "avgCostPerVhe": 4.16,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-124",
@@ -357,7 +374,8 @@
     "buildingCount": 49,
     "suppliers": [],
     "avgCostPerVhe": 23.34,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-126",
@@ -377,7 +395,8 @@
     "buildingCount": 31,
     "suppliers": [],
     "avgCostPerVhe": 4.09,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-127",
@@ -397,7 +416,8 @@
     "buildingCount": 81,
     "suppliers": [],
     "avgCostPerVhe": 23.6,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-128",
@@ -417,7 +437,8 @@
     "buildingCount": 519,
     "suppliers": [],
     "avgCostPerVhe": 12.36,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-131",
@@ -437,7 +458,8 @@
     "buildingCount": 834,
     "suppliers": [],
     "avgCostPerVhe": 50.16,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-132",
@@ -457,7 +479,8 @@
     "buildingCount": 152,
     "suppliers": [],
     "avgCostPerVhe": 24.4,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-133",
@@ -477,7 +500,8 @@
     "buildingCount": 10,
     "suppliers": [],
     "avgCostPerVhe": 109.32,
-    "status": "active"
+    "status": "active",
+    "utility": "electricity"
   },
   {
     "id": "SVC-137",
@@ -497,7 +521,8 @@
     "buildingCount": 3,
     "suppliers": [],
     "avgCostPerVhe": 120.07,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-140",
@@ -517,7 +542,8 @@
     "buildingCount": 2,
     "suppliers": [],
     "avgCostPerVhe": 11.88,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-142",
@@ -537,7 +563,8 @@
     "buildingCount": 1,
     "suppliers": [],
     "avgCostPerVhe": 223.22,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-171",
@@ -557,7 +584,8 @@
     "buildingCount": 77,
     "suppliers": [],
     "avgCostPerVhe": 1.52,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-GDH091",
@@ -577,7 +605,8 @@
     "buildingCount": 1,
     "suppliers": [],
     "avgCostPerVhe": 75.34,
-    "status": "active"
+    "status": "active",
+    "utility": "electricity"
   },
   {
     "id": "SVC-GDH102",
@@ -597,7 +626,8 @@
     "buildingCount": 1,
     "suppliers": [],
     "avgCostPerVhe": 177.33,
-    "status": "active"
+    "status": "active",
+    "utility": "water"
   },
   {
     "id": "SVC-GDH105",
@@ -617,7 +647,8 @@
     "buildingCount": 1,
     "suppliers": [],
     "avgCostPerVhe": 588.53,
-    "status": "active"
+    "status": "active",
+    "utility": "electricity"
   },
   {
     "id": "SVC-GDH108",
@@ -637,7 +668,8 @@
     "buildingCount": 42,
     "suppliers": [],
     "avgCostPerVhe": 343.96,
-    "status": "active"
+    "status": "active",
+    "utility": "heat"
   },
   {
     "id": "SVC-GDH111",
@@ -657,7 +689,8 @@
     "buildingCount": 1,
     "suppliers": [],
     "avgCostPerVhe": 26.49,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-GDH115",
@@ -677,7 +710,8 @@
     "buildingCount": 2,
     "suppliers": [],
     "avgCostPerVhe": 224.62,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-GDH116",
@@ -697,7 +731,8 @@
     "buildingCount": 1,
     "suppliers": [],
     "avgCostPerVhe": 95.97,
-    "status": "active"
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-GDH122",
@@ -716,8 +751,9 @@
     "metered": false,
     "buildingCount": 170,
     "suppliers": [],
-    "avgCostPerVhe": 1.0,
-    "status": "active"
+    "avgCostPerVhe": 1,
+    "status": "active",
+    "utility": null
   },
   {
     "id": "SVC-GDH132",
@@ -737,6 +773,7 @@
     "buildingCount": 1,
     "suppliers": [],
     "avgCostPerVhe": 270.22,
-    "status": "active"
+    "status": "active",
+    "utility": null
   }
 ]
