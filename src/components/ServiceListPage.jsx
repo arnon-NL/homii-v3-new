@@ -59,7 +59,7 @@ function BoolDot({ value }) {
 export default function ServiceListPage() {
   const lang = useLang();
   const navigate = useNavigate();
-  const { data } = useOrg();
+  const { data, orgId } = useOrg();
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [viewMode, setViewMode] = useState("grouped"); // "grouped" or "flat"
@@ -213,7 +213,7 @@ export default function ServiceListPage() {
                     {group.services.map((s) => (
                       <button
                         key={s.id}
-                        onClick={() => navigate(`/services/${s.id}`)}
+                        onClick={() => navigate(`/${orgId}/services/${s.id}`)}
                         className="w-full text-left flex items-center gap-3 px-4 py-3 hover:bg-slate-50/80 transition-colors group"
                       >
                         <div className="flex-1 min-w-0">
@@ -274,7 +274,7 @@ export default function ServiceListPage() {
               {filtered.map((s) => (
                 <button
                   key={s.id}
-                  onClick={() => navigate(`/services/${s.id}`)}
+                  onClick={() => navigate(`/${orgId}/services/${s.id}`)}
                   className="w-full text-left rounded-lg border border-slate-200 bg-white p-4 hover:border-[#3EB1C8] hover:shadow-md transition-colors"
                 >
                   <div className="flex items-start justify-between mb-2">
@@ -358,7 +358,7 @@ export default function ServiceListPage() {
                       <tr
                         key={s.id}
                         className="hover:bg-slate-50/80 transition-colors cursor-pointer"
-                        onClick={() => navigate(`/services/${s.id}`)}
+                        onClick={() => navigate(`/${orgId}/services/${s.id}`)}
                       >
                         <td className="px-3 sm:px-4 py-3">
                           <span className="text-xs font-mono font-semibold text-slate-600">

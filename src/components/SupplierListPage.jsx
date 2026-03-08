@@ -113,7 +113,7 @@ const fmt = (v) =>
 export default function SupplierListPage() {
   const lang = useLang();
   const navigate = useNavigate();
-  const { data } = useOrg();
+  const { data, orgId } = useOrg();
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [viewMode, setViewMode] = useState("grouped");
@@ -282,7 +282,7 @@ export default function SupplierListPage() {
                       return (
                         <button
                           key={sup.id}
-                          onClick={() => navigate(`/suppliers/${sup.id}`)}
+                          onClick={() => navigate(`/${orgId}/suppliers/${sup.id}`)}
                           className="w-full text-left flex items-center gap-3 px-4 py-3 hover:bg-slate-50/80 transition-colors group"
                         >
                           <div className="flex-1 min-w-0">
@@ -349,7 +349,7 @@ export default function SupplierListPage() {
                 return (
                   <button
                     key={sup.id}
-                    onClick={() => navigate(`/suppliers/${sup.id}`)}
+                    onClick={() => navigate(`/${orgId}/suppliers/${sup.id}`)}
                     className="w-full text-left rounded-lg border border-slate-200 bg-white p-4 hover:border-[#3EB1C8] hover:shadow-md transition-colors"
                   >
                     <div className="flex items-start justify-between mb-2">
@@ -422,7 +422,7 @@ export default function SupplierListPage() {
                       <tr
                         key={sup.id}
                         className="hover:bg-slate-50/80 transition-colors cursor-pointer"
-                        onClick={() => navigate(`/suppliers/${sup.id}`)}
+                        onClick={() => navigate(`/${orgId}/suppliers/${sup.id}`)}
                       >
                         <td className="px-3 sm:px-4 py-3 max-w-[260px]">
                           <div className="flex items-start gap-3">

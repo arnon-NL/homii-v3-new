@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { NavLink, useLocation, useSearchParams } from "react-router-dom";
+import { NavLink, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import {
   Home,
   Inbox,
@@ -33,22 +33,13 @@ const viewIconMap = {
   alertTriangle: AlertTriangle,
 };
 
-/* ── Object type → route prefix mapping ── */
-const objectRouteMap = {
-  buildings: "/buildings",
-  vhe: "/vhe",
-  services: "/services",
-  suppliers: "/suppliers",
-  meters: "/meters",
-};
-
 /* ── Nav button (main nav + objects) ── */
 function NavButton({ item, showCount }) {
   const Icon = item.icon;
   return (
     <NavLink
       to={item.path}
-      end={item.path === "/"}
+      end={item.end}
       className={({ isActive }) =>
         `w-full flex items-center gap-3 h-8 px-3 rounded-lg text-sm transition-colors no-underline ${
           isActive
@@ -73,11 +64,18 @@ function NavButton({ item, showCount }) {
 }
 
 /* ── View button (in Views section) ── */
-function ViewButton({ view, lang }) {
+function ViewButton({ view, lang, orgId }) {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const Icon = viewIconMap[view.icon] || List;
-  const basePath = objectRouteMap[view.objectType] || "/buildings";
+  const objectRouteMap = {
+    buildings: `/${orgId}/buildings`,
+    vhe: `/${orgId}/vhe`,
+    services: `/${orgId}/services`,
+    suppliers: `/${orgId}/suppliers`,
+    meters: `/${orgId}/meters`,
+  };
+  const basePath = objectRouteMap[view.objectType] || `/${orgId}/buildings`;
   const viewPath = `${basePath}?view=${view.id}`;
 
   // Check if this view is currently active
@@ -104,7 +102,9 @@ function ViewButton({ view, lang }) {
 
 /* ── Org Switcher (Notion-style) ── */
 function OrgSwitcher() {
-  const { org, organizations, switchOrg } = useOrg();
+  const { org, organizations } = useOrg();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
@@ -115,6 +115,20 @@ function OrgSwitcher() {
     if (open) document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open]);
+
+  const handleOrgSwitch = (newOrgId) => {
+    // Extract the sub-path after the current orgId
+    const match = location.pathname.match(/^\/[^/]+(\/.*)?$/);
+    let subPath = match?.[1] || "/buildings";
+
+    // If on a detail page, navigate to list to avoid stale IDs
+    if (subPath.match(/^\/(buildings|services|suppliers|vhe|meters)\/[^/]+/)) {
+      subPath = "/buildings";
+    }
+
+    navigate(`/${newOrgId}${subPath}`);
+    setOpen(false);
+  };
 
   return (
     <div className="relative" ref={ref}>
@@ -165,10 +179,7 @@ function OrgSwitcher() {
             return (
               <button
                 key={o.id}
-                onClick={() => {
-                  switchOrg(o.id);
-                  setOpen(false);
-                }}
+                onClick={() => handleOrgSwitch(o.id)}
                 className={`w-full flex items-center gap-3 px-3 py-2 text-left transition-colors ${
                   isActive
                     ? "bg-slate-50"
@@ -212,22 +223,22 @@ function OrgSwitcher() {
 }
 
 export default function Sidebar({ lang, setLang }) {
-  const { data, hasModule } = useOrg();
+  const { orgId, data, hasModule } = useOrg();
 
   const navItems = [
-    { label: t("home", lang), icon: Home, path: "/" },
-    { label: t("inbox", lang), icon: Inbox, path: "/inbox" },
-    { label: t("tasks", lang), icon: CheckSquare, path: "/tasks" },
-    { label: t("workflows", lang), icon: GitBranch, path: "/workflows" },
-    { label: t("onboarding", lang), icon: UserPlus, path: "/onboarding" },
+    { label: t("home", lang), icon: Home, path: `/${orgId}/home`, end: true },
+    { label: t("inbox", lang), icon: Inbox, path: `/${orgId}/inbox` },
+    { label: t("tasks", lang), icon: CheckSquare, path: `/${orgId}/tasks` },
+    { label: t("workflows", lang), icon: GitBranch, path: `/${orgId}/workflows` },
+    { label: t("onboarding", lang), icon: UserPlus, path: `/${orgId}/onboarding` },
   ];
 
   const objectItems = [
-    { label: t("buildings", lang), icon: Building2, path: "/buildings" },
-    { label: t("vheTitle", lang), icon: DoorOpen, path: "/vhe" },
-    { label: t("services", lang), icon: Wrench, path: "/services" },
-    hasModule("serviceCharges") && { label: t("suppliers", lang), icon: Truck, path: "/suppliers" },
-    { label: t("meters", lang), icon: Gauge, path: "/meters" },
+    { label: t("buildings", lang), icon: Building2, path: `/${orgId}/buildings` },
+    { label: t("vheTitle", lang), icon: DoorOpen, path: `/${orgId}/vhe` },
+    { label: t("services", lang), icon: Wrench, path: `/${orgId}/services` },
+    hasModule("serviceCharges") && { label: t("suppliers", lang), icon: Truck, path: `/${orgId}/suppliers` },
+    { label: t("meters", lang), icon: Gauge, path: `/${orgId}/meters` },
   ].filter(Boolean);
 
   // Filter out default views — those are just the object list pages themselves
@@ -284,7 +295,7 @@ export default function Sidebar({ lang, setLang }) {
         </div>
         <div className="space-y-0.5">
           {viewItems.map((view) => (
-            <ViewButton key={view.id} view={view} lang={lang} />
+            <ViewButton key={view.id} view={view} lang={lang} orgId={orgId} />
           ))}
         </div>
       </nav>

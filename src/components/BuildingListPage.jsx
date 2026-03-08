@@ -178,7 +178,7 @@ export default function BuildingListPage() {
   const [settlementFilter, setSettlementFilter] = useState("all");
   const [sortCol, setSortCol] = useState(null); // null | "vhe" | "components" | "utilityCount"
   const [sortDir, setSortDir] = useState("desc"); // "asc" | "desc"
-  const { data } = useOrg();
+  const { data, orgId } = useOrg();
 
   // Resolve active view from URL
   const viewId = searchParams.get("view");
@@ -553,7 +553,7 @@ export default function BuildingListPage() {
           {paged.map((b) => (
             <button
               key={b.id}
-              onClick={() => navigate(`/buildings/${b.id}${isViewWithYear ? `?year=${year}` : ""}`)}
+              onClick={() => navigate(`/${orgId}/buildings/${b.id}${isViewWithYear ? `?year=${year}` : ""}`)}
               className="w-full text-left rounded-lg border border-slate-200 bg-white p-4 hover:border-[#3EB1C8] hover:shadow-md transition-colors"
             >
               <div className="flex items-start justify-between mb-2">
@@ -628,7 +628,7 @@ export default function BuildingListPage() {
                 <tr
                   key={b.id}
                   className="hover:bg-slate-50/80 transition-colors cursor-pointer"
-                  onClick={() => navigate(`/buildings/${b.id}${isViewWithYear ? `?year=${year}` : ""}`)}
+                  onClick={() => navigate(`/${orgId}/buildings/${b.id}${isViewWithYear ? `?year=${year}` : ""}`)}
                 >
                   {visibleColumns.map((colKey) => renderCell(colKey, b))}
                 </tr>

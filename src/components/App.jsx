@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet, useLocation, useParams } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { brand } from "@/lib/brand";
 import { LangCtx, t } from "@/lib/i18n";
@@ -12,29 +12,36 @@ import BuildingDetailPage from "./BuildingDetailPage";
 import SupplierListPage from "./SupplierListPage";
 import ServiceDetailPage from "./ServiceDetailPage";
 
+/* ── Layout that syncs URL :orgId param → OrgContext ── */
+function OrgLayout() {
+  const { orgId: urlOrgId } = useParams();
+  const { orgId: ctxOrgId, switchOrg, organizations } = useOrg();
+
+  const validOrg = organizations.find((o) => o.id === urlOrgId);
+
+  React.useEffect(() => {
+    if (validOrg && urlOrgId !== ctxOrgId) {
+      switchOrg(urlOrgId);
+    }
+  }, [urlOrgId, ctxOrgId, switchOrg, validOrg]);
+
+  if (!validOrg) {
+    return <Navigate to={`/${organizations[0].id}/buildings`} replace />;
+  }
+
+  return <Outlet />;
+}
+
 function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [lang, setLang] = useState("en");
   const location = useLocation();
-  const navigate = useNavigate();
   const { orgId } = useOrg();
 
   // Close mobile sidebar on navigation
   React.useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);
-
-  // On org switch: navigate to /buildings to avoid stale building IDs
-  const prevOrgRef = React.useRef(orgId);
-  React.useEffect(() => {
-    if (prevOrgRef.current !== orgId) {
-      prevOrgRef.current = orgId;
-      // If on a detail page, go back to list
-      if (location.pathname.match(/^\/(buildings|services|suppliers|vhe|meters)\/[^/]+/)) {
-        navigate("/buildings", { replace: true });
-      }
-    }
-  }, [orgId, location.pathname, navigate]);
 
   return (
     <LangCtx.Provider value={lang}>
@@ -89,50 +96,60 @@ function AppContent() {
         {/* Main content — key on orgId to force remount on org switch */}
         <div className="flex-1 flex flex-col overflow-hidden pt-12 lg:pt-0" key={orgId}>
           <Routes>
-            <Route
-              path="/"
-              element={
-                <PlaceholderPage
-                  title={t("homeTitle", lang)}
-                  subtitle={t("homeSubtitle", lang)}
-                />
-              }
-            />
-            <Route
-              path="/inbox"
-              element={<PlaceholderPage title={t("inboxTitle", lang)} />}
-            />
-            <Route
-              path="/tasks"
-              element={<PlaceholderPage title={t("tasksTitle", lang)} />}
-            />
-            <Route
-              path="/workflows"
-              element={<PlaceholderPage title={t("workflowsTitle", lang)} />}
-            />
-            <Route
-              path="/onboarding"
-              element={<PlaceholderPage title={t("onboardingTitle", lang)} />}
-            />
-            <Route path="/buildings" element={<BuildingListPage />} />
-            <Route path="/buildings/:buildingId" element={<BuildingDetailPage />} />
-            <Route
-              path="/vhe"
-              element={<PlaceholderPage title={t("vheTitle", lang)} />}
-            />
-            <Route
-              path="/vhe/:vheId"
-              element={<PlaceholderPage title={t("vheTitle", lang)} />}
-            />
-            <Route path="/services" element={<ServiceListPage />} />
-            <Route path="/services/:serviceId" element={<ServiceDetailPage />} />
-            <Route path="/suppliers" element={<SupplierListPage />} />
-            <Route path="/suppliers/:supplierId" element={<PlaceholderPage title={t("suppliersTitle", lang)} />} />
-            <Route
-              path="/meters"
-              element={<PlaceholderPage title={t("metersTitle", lang)} />}
-            />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Root redirect → current org */}
+            <Route path="/" element={<Navigate to={`/${orgId}/buildings`} replace />} />
+
+            {/* Org-scoped routes */}
+            <Route path="/:orgId" element={<OrgLayout />}>
+              <Route index element={<Navigate to="buildings" replace />} />
+              <Route
+                path="home"
+                element={
+                  <PlaceholderPage
+                    title={t("homeTitle", lang)}
+                    subtitle={t("homeSubtitle", lang)}
+                  />
+                }
+              />
+              <Route
+                path="inbox"
+                element={<PlaceholderPage title={t("inboxTitle", lang)} />}
+              />
+              <Route
+                path="tasks"
+                element={<PlaceholderPage title={t("tasksTitle", lang)} />}
+              />
+              <Route
+                path="workflows"
+                element={<PlaceholderPage title={t("workflowsTitle", lang)} />}
+              />
+              <Route
+                path="onboarding"
+                element={<PlaceholderPage title={t("onboardingTitle", lang)} />}
+              />
+              <Route path="buildings" element={<BuildingListPage />} />
+              <Route path="buildings/:buildingId" element={<BuildingDetailPage />} />
+              <Route
+                path="vhe"
+                element={<PlaceholderPage title={t("vheTitle", lang)} />}
+              />
+              <Route
+                path="vhe/:vheId"
+                element={<PlaceholderPage title={t("vheTitle", lang)} />}
+              />
+              <Route path="services" element={<ServiceListPage />} />
+              <Route path="services/:serviceId" element={<ServiceDetailPage />} />
+              <Route path="suppliers" element={<SupplierListPage />} />
+              <Route path="suppliers/:supplierId" element={<PlaceholderPage title={t("suppliersTitle", lang)} />} />
+              <Route
+                path="meters"
+                element={<PlaceholderPage title={t("metersTitle", lang)} />}
+              />
+              <Route path="*" element={<Navigate to="buildings" replace />} />
+            </Route>
+
+            {/* Fallback for anything else */}
+            <Route path="*" element={<Navigate to={`/${orgId}/buildings`} replace />} />
           </Routes>
         </div>
       </div>

@@ -240,7 +240,7 @@ export default function BuildingDetailPage() {
   const { buildingId } = useParams();
   const navigate = useNavigate();
   const lang = useLang();
-  const { data } = useOrg();
+  const { data, orgId } = useOrg();
   const availableYears = useMemo(() => getAvailableYears(), []);
   const [year, setYear] = useState(() => {
     const yrs = getAvailableYears();
@@ -329,7 +329,7 @@ export default function BuildingDetailPage() {
     );
 
   const crumbs = [
-    { label: t("buildings", lang), to: "/buildings" },
+    { label: t("buildings", lang), to: `/${orgId}/buildings` },
     { label: building.complex },
   ];
 
@@ -1464,7 +1464,7 @@ export default function BuildingDetailPage() {
                                             style={{ color: brand.blue }}
                                             onClick={(e) => {
                                               e.stopPropagation();
-                                              navigate(`/services/${bs.serviceId}`);
+                                              navigate(`/${orgId}/services/${bs.serviceId}`);
                                             }}
                                           >
                                             {lang === "nl" ? "Alle complexen" : "All buildings"}

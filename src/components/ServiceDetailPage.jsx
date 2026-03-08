@@ -122,7 +122,7 @@ export default function ServiceDetailPage() {
   const { serviceId } = useParams();
   const navigate = useNavigate();
   const lang = useLang();
-  const { data: orgData } = useOrg();
+  const { data: orgData, orgId } = useOrg();
 
   const service = orgData.services.find((s) => s.id === serviceId);
   const category = orgData.serviceCategories.find((c) => c.id === service?.category);
@@ -259,7 +259,7 @@ export default function ServiceDetailPage() {
         {/* ── Back + Title ── */}
         <div className="flex items-center gap-3 mb-5">
           <button
-            onClick={() => navigate("/services")}
+            onClick={() => navigate(`/${orgId}/services`)}
             className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100 transition-colors"
           >
             <ArrowLeft size={16} className="text-slate-500" />
@@ -464,7 +464,7 @@ export default function ServiceDetailPage() {
                         {/* View building */}
                         <div className="px-4 py-3 bg-slate-50/30">
                           <button
-                            onClick={(e) => { e.stopPropagation(); navigate(`/buildings/${row.building.id}`); }}
+                            onClick={(e) => { e.stopPropagation(); navigate(`/${orgId}/buildings/${row.building.id}`); }}
                             className="text-xs font-medium hover:underline transition-colors"
                             style={{ color: brand.blue }}
                           >
@@ -789,7 +789,7 @@ export default function ServiceDetailPage() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/buildings/${row.building.id}`);
+                          navigate(`/${orgId}/buildings/${row.building.id}`);
                         }}
                         className="text-xs font-medium hover:underline transition-colors"
                         style={{ color: brand.blue }}
