@@ -1328,6 +1328,131 @@ export default function BuildingDetailPage() {
                                           );
                                         })()}
 
+                                        {/* Section A2: Consumption Progress (energy-only mode — from heating season data) */}
+                                        {(() => {
+                                          if (isFeatureEnabled("ledger")) return null;
+                                          const season = heatingSeasons.find(h => h.yearKey === year);
+                                          if (!season || season.ytdTotalCost == null) return null;
+
+                                          const utilType = bs.service?.utility;
+                                          const utilCfg = {
+                                            heat: { unit: "GJ", color: "#EF4444" },
+                                            gas: { unit: "m³", color: "#F59E0B" },
+                                            water: { unit: "m³", color: "#3B82F6" },
+                                            warmWater: { unit: "m³", color: "#8B5CF6" },
+                                            electricity: { unit: "kWh", color: "#F59E0B" },
+                                          }[utilType] || { unit: "GJ", color: "#64748B" };
+
+                                          const unitPrice = season.m3Price || season.gjPrice || 0;
+                                          const vheCount = building.vhe || 1;
+
+                                          const now = new Date();
+                                          const start = new Date(season.seasonStart);
+                                          const end = new Date(season.seasonEnd);
+                                          const totalDays = Math.max(1, (end - start) / 86400000);
+                                          const elapsedDays = Math.max(0, Math.min(totalDays, (now - start) / 86400000));
+                                          const seasonPct = Math.round((elapsedDays / totalDays) * 100);
+
+                                          const ytdCost = season.ytdTotalCost || 0;
+                                          const endCost = (season.endCostPerApartment || 0) * vheCount;
+                                          const costPct = endCost > 0 ? Math.round((ytdCost / endCost) * 100) : 0;
+
+                                          const ytdConsumption = unitPrice > 0 ? ytdCost / unitPrice : 0;
+                                          const endConsumption = unitPrice > 0 ? endCost / unitPrice : 0;
+
+                                          const fmtNum = (n) => Math.round(n).toLocaleString("nl-NL");
+
+                                          return (
+                                            <div>
+                                              <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider mb-3">
+                                                {lang === "nl" ? "Verbruiksvoortgang" : "Consumption Progress"}
+                                                <span className="ml-2 font-normal normal-case">
+                                                  ({lang === "nl" ? "seizoen" : "season"} {seasonPct}% {lang === "nl" ? "verstreken" : "elapsed"})
+                                                </span>
+                                              </p>
+                                              <div className="grid grid-cols-2 gap-3">
+                                                {/* Consumption */}
+                                                <div className="rounded-lg border border-slate-100 bg-white p-3">
+                                                  <div className="flex items-center gap-1.5 mb-2">
+                                                    <Gauge size={14} style={{ color: utilCfg.color }} />
+                                                    <span className="text-[11px] font-medium text-slate-500">
+                                                      {lang === "nl" ? "Verbruik" : "Consumption"} ({utilCfg.unit})
+                                                    </span>
+                                                  </div>
+                                                  <div className="flex items-baseline gap-2 mb-1">
+                                                    <span className="text-sm font-semibold tabular-nums" style={{ color: brand.navy }}>
+                                                      {fmtNum(ytdConsumption)}
+                                                    </span>
+                                                    <span className="text-[11px] text-slate-400">
+                                                      {lang === "nl" ? "tot heden" : "to date"}
+                                                    </span>
+                                                  </div>
+                                                  <div className="flex items-center gap-2 mb-2">
+                                                    <div className="flex-1 h-[4px] rounded-full bg-slate-100 overflow-hidden">
+                                                      <div
+                                                        className="h-full rounded-full"
+                                                        style={{ width: `${Math.min(costPct, 100)}%`, background: utilCfg.color }}
+                                                      />
+                                                    </div>
+                                                    <span className="text-[11px] text-slate-400 tabular-nums">{costPct}%</span>
+                                                  </div>
+                                                  <div className="text-[11px] text-slate-400">
+                                                    {lang === "nl" ? "Verwacht einde seizoen" : "Expected end of season"}: <span className="font-medium text-slate-600">{fmtNum(endConsumption)} {utilCfg.unit}</span>
+                                                  </div>
+                                                </div>
+                                                {/* Costs */}
+                                                <div className="rounded-lg border border-slate-100 bg-white p-3">
+                                                  <div className="flex items-center gap-1.5 mb-2">
+                                                    <FileText size={14} style={{ color: brand.blue }} />
+                                                    <span className="text-[11px] font-medium text-slate-500">
+                                                      {lang === "nl" ? "Kosten" : "Costs"} (€)
+                                                    </span>
+                                                  </div>
+                                                  <div className="flex items-baseline gap-2 mb-1">
+                                                    <span className="text-sm font-semibold tabular-nums" style={{ color: brand.navy }}>
+                                                      {fmt(ytdCost)}
+                                                    </span>
+                                                    <span className="text-[11px] text-slate-400">
+                                                      {lang === "nl" ? "tot heden" : "to date"}
+                                                    </span>
+                                                  </div>
+                                                  <div className="flex items-center gap-2 mb-2">
+                                                    <div className="flex-1 h-[4px] rounded-full bg-slate-100 overflow-hidden">
+                                                      <div
+                                                        className="h-full rounded-full"
+                                                        style={{ width: `${Math.min(costPct, 100)}%`, background: brand.blue }}
+                                                      />
+                                                    </div>
+                                                    <span className="text-[11px] text-slate-400 tabular-nums">{costPct}%</span>
+                                                  </div>
+                                                  <div className="text-[11px] text-slate-400">
+                                                    {lang === "nl" ? "Verwacht einde seizoen" : "Expected end of season"}: <span className="font-medium text-slate-600">{fmt(endCost)}</span>
+                                                  </div>
+                                                  {unitPrice > 0 && (
+                                                    <div className="text-[11px] text-slate-400 mt-1">
+                                                      {lang === "nl" ? "Tarief" : "Rate"}: €{unitPrice.toFixed(2)}/{utilCfg.unit}
+                                                    </div>
+                                                  )}
+                                                </div>
+                                              </div>
+                                              {season.avgAdvance > 0 && (
+                                                <div className="mt-2 text-[11px] text-slate-400 flex items-center gap-2">
+                                                  <span>{lang === "nl" ? "Gem. voorschot" : "Avg. advance"}:</span>
+                                                  <span className="font-medium text-slate-600">{fmt2(season.avgAdvance)}/{lang === "nl" ? "mnd" : "mo"}</span>
+                                                  {season.endDebtorRisk > 0 && (
+                                                    <>
+                                                      <span className="text-slate-300">·</span>
+                                                      <span style={{ color: brand.amber }}>
+                                                        {lang === "nl" ? "Debiteurrisico" : "Debtor risk"}: {fmt(season.endDebtorRisk)}
+                                                      </span>
+                                                    </>
+                                                  )}
+                                                </div>
+                                              )}
+                                            </div>
+                                          );
+                                        })()}
+
                                         {/* Section B: Consumption insight (metered services — cross-cutting, stays at service level) */}
                                         {isFeatureEnabled("consumptionControl") && bs.service?.metered && (() => {
                                           const utilityMap = {
@@ -1767,39 +1892,119 @@ export default function BuildingDetailPage() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
-                          {vheList.map((vhe) => (
-                            <tr
-                              key={vhe.id}
-                              className="hover:bg-slate-50/50 cursor-pointer transition-colors"
-                              onClick={() => {
-                                setVheViewMode("cards");
-                                setExpandedVhe(vhe.id);
-                              }}
-                            >
-                              <td className="px-3 py-2.5 text-slate-600 font-mono tabular-nums">
-                                {vhe.unit}
-                              </td>
-                              <td className="px-3 py-2.5 text-slate-700 font-medium max-w-[200px] truncate">
-                                {vhe.address}
-                              </td>
-                              <td className="px-3 py-2.5 text-slate-500 tabular-nums hidden sm:table-cell">
-                                {vhe.m2 ? `${vhe.m2}` : "—"}
-                              </td>
-                              <td className="px-3 py-2.5">
-                                <StatusBadge status={vhe.status} size="xs" />
-                              </td>
-                              <td className="px-3 py-2.5 hidden sm:table-cell">
-                                {vhe.contract ? (
-                                  <StatusBadge status={vhe.contract.status} size="xs" />
-                                ) : (
-                                  <span className="text-slate-300">—</span>
+                          {vheList.map((vhe) => {
+                            const isExp = expandedVhe === vhe.id;
+                            return (
+                              <React.Fragment key={vhe.id}>
+                                <tr
+                                  className={`cursor-pointer transition-colors ${isExp ? "bg-slate-50" : "hover:bg-slate-50/50"}`}
+                                  onClick={() => setExpandedVhe(isExp ? null : vhe.id)}
+                                >
+                                  <td className="px-3 py-2.5 text-slate-600 font-mono tabular-nums">
+                                    <div className="flex items-center gap-1.5">
+                                      <ChevronRight
+                                        size={12}
+                                        className={`text-slate-400 transition-transform duration-150 shrink-0 ${isExp ? "rotate-90" : ""}`}
+                                      />
+                                      {vhe.unit}
+                                    </div>
+                                  </td>
+                                  <td className="px-3 py-2.5 text-slate-700 font-medium max-w-[200px] truncate">
+                                    {vhe.address}
+                                  </td>
+                                  <td className="px-3 py-2.5 text-slate-500 tabular-nums hidden sm:table-cell">
+                                    {vhe.m2 ? `${vhe.m2}` : "—"}
+                                  </td>
+                                  <td className="px-3 py-2.5">
+                                    <StatusBadge status={vhe.status} size="xs" />
+                                  </td>
+                                  <td className="px-3 py-2.5 hidden sm:table-cell">
+                                    {vhe.contract ? (
+                                      <StatusBadge status={vhe.contract.status} size="xs" />
+                                    ) : (
+                                      <span className="text-slate-300">—</span>
+                                    )}
+                                  </td>
+                                  <td className="px-3 py-2.5 text-right font-medium tabular-nums" style={{ color: brand.navy }}>
+                                    {fmt(vhe.voorschot)}
+                                  </td>
+                                </tr>
+                                {isExp && (
+                                  <tr>
+                                    <td colSpan={6} className="p-0">
+                                      <div className="px-4 py-4 bg-slate-50/70 border-t border-slate-100 space-y-3">
+                                        <AttributePanel>
+                                          <AttrSection title={lang === "nl" ? "Details" : "Details"}>
+                                            <AttrRow
+                                              label={lang === "nl" ? "VHE ID" : "VHE ID"}
+                                              value={vhe.id}
+                                            />
+                                            {vhe.m2 && (
+                                              <AttrRow
+                                                label={lang === "nl" ? "Oppervlakte" : "Area"}
+                                                value={`${vhe.m2} m²`}
+                                              />
+                                            )}
+                                            <AttrRow
+                                              label={lang === "nl" ? "Status" : "Status"}
+                                              value={<StatusBadge status={vhe.status} size="xs" />}
+                                            />
+                                            {vhe.contract && (
+                                              <>
+                                                <AttrRow
+                                                  label={lang === "nl" ? "Contract" : "Contract"}
+                                                  value={<StatusBadge status={vhe.contract.status} size="xs" />}
+                                                />
+                                                <AttrRow
+                                                  label={lang === "nl" ? "Ingangsdatum" : "Start date"}
+                                                  value={vhe.contract.startDate || "—"}
+                                                />
+                                              </>
+                                            )}
+                                          </AttrSection>
+                                        </AttributePanel>
+
+                                        {/* Service cost breakdown */}
+                                        {vhe.voorschotBreakdown?.length > 0 && (
+                                          <div>
+                                            <h4 className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2 px-1">
+                                              {lang === "nl" ? "Servicekosten" : "Service Charges"}
+                                            </h4>
+                                            <div className="rounded-lg border border-slate-100 bg-white divide-y divide-slate-50">
+                                              {vhe.voorschotBreakdown.map((item) => {
+                                                const svc = getService(item.s);
+                                                return (
+                                                  <div key={item.s} className="flex items-center justify-between px-3 py-2">
+                                                    <div className="min-w-0">
+                                                      <span className="text-[11px] font-mono text-slate-400 mr-1.5">{svc?.code || item.s}</span>
+                                                      <span className="text-xs text-slate-600">
+                                                        {svc?.name?.[lang] || svc?.name?.en || "—"}
+                                                      </span>
+                                                    </div>
+                                                    <span className="text-xs font-medium text-slate-700 tabular-nums shrink-0 ml-2">
+                                                      {fmt(item.a)}
+                                                    </span>
+                                                  </div>
+                                                );
+                                              })}
+                                              <div className="flex items-center justify-between px-3 py-2 bg-slate-50/50">
+                                                <span className="text-xs font-semibold text-slate-600">
+                                                  {lang === "nl" ? "Totaal" : "Total"}
+                                                </span>
+                                                <span className="text-xs font-bold tabular-nums" style={{ color: brand.navy }}>
+                                                  {fmt(vhe.voorschot)}
+                                                </span>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+                                      </div>
+                                    </td>
+                                  </tr>
                                 )}
-                              </td>
-                              <td className="px-3 py-2.5 text-right font-medium tabular-nums" style={{ color: brand.navy }}>
-                                {fmt(vhe.voorschot)}
-                              </td>
-                            </tr>
-                          ))}
+                              </React.Fragment>
+                            );
+                          })}
                         </tbody>
                         <tfoot>
                           <tr className="bg-slate-50/80 border-t border-slate-200">
