@@ -1545,9 +1545,9 @@ export default function BuildingDetailPage() {
                                         {/* Section C: Cost Categories with nested Ledger Entries */}
                                         <div>
                                           <p className="text-[11px] text-slate-500 font-medium uppercase tracking-wider mb-2">
-                                            {lang === "nl" ? "Kostensoorten" : "Cost Categories"} ({costCats.length})
+                                            {lang === "nl" ? "Kostensoorten" : "Cost Categories"} ({costCats.length + (unassignedEntries.length > 0 ? 1 : 0)})
                                           </p>
-                                          {costCats.length === 0 ? (
+                                          {costCats.length === 0 && unassignedEntries.length === 0 ? (
                                             <p className="text-[11px] text-slate-400 italic">
                                               {lang === "nl" ? "Geen kostensoorten geconfigureerd" : "No cost categories configured"}
                                             </p>
@@ -1650,42 +1650,67 @@ export default function BuildingDetailPage() {
                                                   </div>
                                                 );
                                               })}
+                                              {/* Uncategorized entries — same style as cost categories */}
+                                              {unassignedEntries.length > 0 && (() => {
+                                                const ucActual = unassignedEntries.reduce((s, e) => s + e.amount, 0);
+                                                const ucFlagged = unassignedEntries.filter((e) => e.status === "flagged").length;
+                                                const isUcExpanded = expandedCostCats["__uncategorized__"];
+                                                const ucSorted = [...unassignedEntries].sort((a, b) => b.date.localeCompare(a.date));
+                                                return (
+                                                  <div className="rounded-lg bg-white border border-slate-100 overflow-hidden">
+                                                    <div
+                                                      className="flex items-center gap-2.5 px-3 py-2 cursor-pointer hover:bg-slate-50/50 transition-colors"
+                                                      onClick={() => toggleCostCat("__uncategorized__")}
+                                                    >
+                                                      {isUcExpanded
+                                                        ? <ChevronDown size={12} className="text-slate-400 shrink-0" />
+                                                        : <ChevronRight size={12} className="text-slate-400 shrink-0" />
+                                                      }
+                                                      <div className="flex-1 min-w-0">
+                                                        <span className="text-[11px] font-medium text-slate-500">
+                                                          {lang === "nl" ? "Niet gecategoriseerd" : "Uncategorized"}
+                                                        </span>
+                                                      </div>
+                                                      <div className="flex items-center gap-2.5 shrink-0 text-[11px]">
+                                                        {ucFlagged > 0 && (
+                                                          <span className="text-[11px] px-1.5 py-1 rounded bg-red-50 font-medium" style={{ color: brand.red }}>
+                                                            {ucFlagged} ⚑
+                                                          </span>
+                                                        )}
+                                                        <span className="font-medium tabular-nums" style={{ color: brand.navy }}>
+                                                          {fmtEur2(ucActual)}
+                                                        </span>
+                                                      </div>
+                                                    </div>
+                                                    {isUcExpanded && (
+                                                      <div className="border-t border-slate-100 bg-slate-50/30">
+                                                        {ucSorted.slice(0, 8).map((entry) => (
+                                                          <div key={entry.id} className="flex items-center justify-between text-[11px] px-3 py-1.5 pl-8 border-b border-slate-50 last:border-b-0">
+                                                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                                                              <span className="text-slate-400 tabular-nums shrink-0">{fmtDate(entry.date)}</span>
+                                                              <span className="text-slate-600 truncate">
+                                                                {typeof entry.description === "object" ? (entry.description[lang] || entry.description.en) : entry.description}
+                                                              </span>
+                                                            </div>
+                                                            <div className="flex items-center gap-2 shrink-0 ml-2">
+                                                              <span className="text-slate-700 tabular-nums">{fmtEur2(entry.amount)}</span>
+                                                              <LedgerStatusBadge status={entry.status} lang={lang} />
+                                                            </div>
+                                                          </div>
+                                                        ))}
+                                                        {ucSorted.length > 8 && (
+                                                          <p className="text-[11px] text-slate-400 italic px-3 pl-8 py-1.5">
+                                                            + {ucSorted.length - 8} {lang === "nl" ? "meer" : "more"}
+                                                          </p>
+                                                        )}
+                                                      </div>
+                                                    )}
+                                                  </div>
+                                                );
+                                              })()}
                                             </div>
                                           )}
                                         </div>
-
-                                        {/* Section D: Unclassified entries — data quality signal */}
-                                        {unassignedEntries.length > 0 && (
-                                          <div>
-                                            <div className="flex items-center gap-1 mb-2">
-                                              <HelpCircle size={12} style={{ color: brand.amber }} />
-                                              <p className="text-[11px] text-amber-600 font-medium uppercase tracking-wider">
-                                                {lang === "nl" ? "Niet-geclassificeerd" : "Unclassified"} ({unassignedEntries.length})
-                                              </p>
-                                            </div>
-                                            <div className="rounded-lg bg-amber-50/30 border border-amber-100 overflow-hidden">
-                                              {unassignedEntries.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5).map((entry) => (
-                                                <div key={entry.id} className="flex items-center justify-between text-[11px] px-3 py-1.5 border-b border-amber-50 last:border-b-0">
-                                                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                                                    <span className="text-slate-400 tabular-nums shrink-0">{fmtDate(entry.date)}</span>
-                                                    <span className="text-slate-600 truncate">
-                                                      {typeof entry.description === "object" ? (entry.description[lang] || entry.description.en) : entry.description}
-                                                    </span>
-                                                  </div>
-                                                  <div className="flex items-center gap-2 shrink-0 ml-2">
-                                                    <span className="text-slate-700 tabular-nums">{fmtEur2(entry.amount)}</span>
-                                                    <LedgerStatusBadge status={entry.status} lang={lang} />
-                                                  </div>
-                                                </div>
-                                              ))}
-                                              {unassignedEntries.length > 5 && (
-                                                <p className="text-[11px] text-amber-500 italic px-3 py-1.5">
-                                                  + {unassignedEntries.length - 5} {lang === "nl" ? "meer" : "more"}
-                                                </p>
-                                              )}
-                                            </div>
-                                          </div>
-                                        )}
 
                                         {/* Footer: Distribution model + cross-navigation */}
                                         <div className="flex items-center justify-between pt-2 border-t border-slate-100">
