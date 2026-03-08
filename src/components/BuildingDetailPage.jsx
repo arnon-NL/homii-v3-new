@@ -2698,19 +2698,26 @@ export default function BuildingDetailPage() {
           {/* ── Attribute panel (right sidebar) ── */}
           <div className="w-full xl:w-80 shrink-0">
             <AttributePanel>
-              <AttrSection title={lang === "nl" ? "Informatie" : "Information"}>
-                <AttrRow label={lang === "nl" ? "Complex ID" : "Complex ID"} value={building.complexId} source={getFieldSource("building", "complexId")} />
+              <AttrSection title={lang === "nl" ? "Identiteit" : "Identity"}>
+                <AttrRow label="Complex ID" value={building.complexId} source={getFieldSource("building", "complexId")} />
                 <AttrRow label={lang === "nl" ? "Locatie" : "Location"} value={building.location} source={getFieldSource("building", "location")} />
-                <AttrRow label={lang === "nl" ? "VHE" : "VHE"} value={building.vhe} source={getFieldSource("building", "vhe")} />
-                <AttrRow
-                  label={lang === "nl" ? "Datakwaliteit" : "Data Quality"}
-                  value={building.dataQuality}
-                  source={getFieldSource("building", "dataQuality")}
-                />
-                <AttrRow
-                  label={lang === "nl" ? "Staat" : "Status"}
-                  value={building.status}
-                />
+              </AttrSection>
+              <AttrSection title={lang === "nl" ? "Samenstelling" : "Composition"}>
+                <AttrRow label="VHE" value={building.vhe} source={getFieldSource("building", "vhe")} />
+                <AttrRow label={lang === "nl" ? "Diensten" : "Services"} value={bsRelations.length} source={getFieldSource("building", "components")} />
+                <AttrRow label={lang === "nl" ? "Meters" : "Meters"} value={`${mainMeters.length} ${lang === "nl" ? "hoofd" : "main"} · ${subMeters.length} sub`} />
+                {building.utilities?.length > 0 && (
+                  <AttrRow
+                    label={lang === "nl" ? "Nutsbedrijven" : "Utilities"}
+                    value={building.utilities.map(u => ({
+                      electricity: lang === "nl" ? "Elektra" : "Electricity",
+                      heat: lang === "nl" ? "Warmte" : "Heat",
+                      gas: "Gas",
+                      water: "Water",
+                    })[u] || u).join(", ")}
+                    source={getFieldSource("building", "utilities")}
+                  />
+                )}
               </AttrSection>
             </AttributePanel>
           </div>
