@@ -131,6 +131,28 @@ SERVICE_TO_UTILITY = {
     "GDH091": "solar",
 }
 
+# Energy service code → heatingseason price field + unit
+ENERGY_SERVICE_PRICE_MAP = {
+    "GDG108": {"priceField": "gjPrice", "unit": "GJ", "utility": "heat"},
+    "GDH108": {"priceField": "gjPrice", "unit": "GJ", "utility": "heat"},
+    "GDG107": {"priceField": "m3Price", "unit": "m³", "utility": "gas"},
+    "GDG102": {"priceField": "coldWaterM3Price", "unit": "m³", "utility": "water"},
+    "GDH102": {"priceField": "coldWaterM3Price", "unit": "m³", "utility": "water"},
+    "GDG104": {"priceField": "warmWaterM3Price", "unit": "m³", "utility": "warmWater"},
+    "GDG105": {"priceField": "electricityPrice", "unit": "kWh", "utility": "electricity"},
+    "GDH105": {"priceField": "electricityPrice", "unit": "kWh", "utility": "electricity"},
+    "GDG106": {"priceField": "electricityPrice", "unit": "kWh", "utility": "electricity"},
+}
+
+# Utility → meter types that measure it
+UTILITY_METER_TYPES = {
+    "heat": {"WMZ", "EHKV", "H"},
+    "gas": {"GASZ"},
+    "water": {"KWZ", "K"},
+    "warmWater": {"WWZ", "W"},
+    "electricity": {"STRZ"},
+}
+
 
 # ═══════════════════════════════════════════════════════════════════
 # STEP 1a: REAL DATA EXTRACTION
@@ -795,6 +817,150 @@ def extract_heating_seasons(buildings):
     return seasons
 
 
+def enrich_energy_building_services(building_services, heating_seasons, buildings):
+    """Enrich energy buildingServices with consumption data from heatingSeasons.
+
+    For each energy service (GDG108, GDG102, etc.), find the matching
+    heatingseason by building + year overlap and add consumption metrics.
+    """
+    print("Enriching energy building-services with consumption data...")
+
+    # Index heatingSeasons by (buildingId, yearKey)
+    hs_by_bld_year = {}
+    for hs in heating_seasons:
+        key = (hs["buildingId"], hs["yearKey"])
+        hs_by_bld_year[key] = hs
+
+    # Also index by (buildingId, calendar year from seasonStart)
+    for hs in heating_seasons:
+        if hs.get("seasonStart"):
+            cal_year = int(hs["seasonStart"][:4])
+            alt_key = (hs["buildingId"], cal_year)
+            if alt_key not in hs_by_bld_year:
+                hs_by_bld_year[alt_key] = hs
+
+    # Get meter counts per building per season per utility from DB
+    meter_counts = _get_meter_counts_by_season()
+
+    enriched = 0
+    for bs in building_services:
+        svc_code = bs.get("serviceCode", "")
+        price_info = ENERGY_SERVICE_PRICE_MAP.get(svc_code)
+        if not price_info:
+            continue  # not an energy service
+
+        bld_id = bs["buildingId"]
+        year = bs["year"]
+
+        # Find matching heatingseason
+        hs = hs_by_bld_year.get((bld_id, year))
+        if not hs:
+            continue  # no heating season for this building/year
+
+        # Get the price for this specific energy type
+        price_field = price_info["priceField"]
+        unit_price = hs.get(price_field)
+
+        # Get meter count for this utility type in this season
+        utility = price_info["utility"]
+        season_id = hs["id"]
+        m_counts = meter_counts.get(season_id, {})
+        relevant_types = UTILITY_METER_TYPES.get(utility, set())
+        meter_count = sum(m_counts.get(mt, 0) for mt in relevant_types)
+
+        # Add season linkage
+        bs["seasonId"] = season_id
+        bs["seasonStart"] = hs.get("seasonStart")
+        bs["seasonEnd"] = hs.get("seasonEnd")
+        bs["yearLabel"] = hs.get("yearLabel")
+        if utility in ("heat", "gas", "water", "warmWater", "electricity"):
+            bs["distributionMethod"] = "metered"
+
+        # Add consumption data nested on service
+        bs["consumption"] = {
+            "utility": utility,
+            "unitPrice": unit_price,
+            "unit": price_info["unit"],
+            "meterCount": meter_count,
+            "endCostPerVhe": hs.get("endCostPerApartment"),
+            "avgAdvance": hs.get("avgAdvance"),
+            "endDebtorRisk": hs.get("endDebtorRisk"),
+            "ytdTotalCost": hs.get("ytdTotalCost"),
+            "ytdCostPerVhe": hs.get("ytdCostPerApartment"),
+            "tenantExceedingBudget": hs.get("tenantExceedingBudget"),
+            "dataIntegrity": hs.get("dataIntegrity"),
+        }
+
+        enriched += 1
+
+    print(f"  → {enriched} energy building-services enriched with consumption data")
+    return building_services
+
+
+def _get_meter_counts_by_season():
+    """Get meter counts grouped by heating_season_id and meter_type."""
+    rows = query("""
+        SELECT heating_season_id, meter_type, COUNT(*) as cnt
+        FROM usage_monitor_meterstatus
+        GROUP BY heating_season_id, meter_type
+    """)
+    result = defaultdict(dict)
+    for r in rows:
+        result[r["heating_season_id"]][r["meter_type"]] = r["cnt"]
+    return result
+
+
+def enrich_meters_with_season(meters, heating_seasons):
+    """Add meterType and seasonId to Rochdale meters based on heatingseason data."""
+    print("Enriching meters with meterType and seasonId...")
+
+    # Build a lookup of heating_season_id → our season record
+    # We need the original DB heating_season_id, which is hs["id"]
+    hs_by_id = {hs["id"]: hs for hs in heating_seasons}
+
+    # Get meter → heating_season_id mapping from DB
+    rows = query("""
+        SELECT ms.id, ms.heating_season_id, ms.meter_type
+        FROM usage_monitor_meterstatus ms
+    """)
+    db_meter_info = {}
+    for r in rows:
+        db_meter_info[r["id"]] = {
+            "heating_season_id": r["heating_season_id"],
+            "meter_type": r["meter_type"],
+        }
+
+    enriched = 0
+    for m in meters:
+        # Extract original DB ID from "MTR-{id}"
+        mid_str = m["id"]
+        if mid_str.startswith("MTR-S"):
+            continue  # synthetic meter, skip
+        try:
+            db_id = int(mid_str.replace("MTR-", ""))
+        except ValueError:
+            continue
+
+        info = db_meter_info.get(db_id)
+        if not info:
+            continue
+
+        # Add meterType
+        m["meterType"] = info["meter_type"]
+
+        # Add seasonId if we have a matching heating season
+        hs_id = info["heating_season_id"]
+        hs = hs_by_id.get(hs_id)
+        if hs:
+            m["seasonId"] = hs_id
+            m["yearKey"] = hs.get("yearKey")
+            m["yearLabel"] = hs.get("yearLabel")
+            enriched += 1
+
+    print(f"  → {enriched} meters enriched with seasonId and meterType")
+    return meters
+
+
 # ═══════════════════════════════════════════════════════════════════
 # STEP 1b: MOCK DATA GENERATION FOR REAL BUILDINGS
 # ═══════════════════════════════════════════════════════════════════
@@ -1285,6 +1451,12 @@ def main():
     print(f"  → {len(meters)} total meters")
     cost_attribution = extract_cost_attribution(apt_id_remap)
     heating_seasons = extract_heating_seasons(buildings)
+
+    # Enrich energy building-services with consumption data from heatingSeasons
+    building_services = enrich_energy_building_services(building_services, heating_seasons, buildings)
+
+    # Enrich meters with meterType and seasonId
+    meters = enrich_meters_with_season(meters, heating_seasons)
 
     # Enrich VHEs with voorschotBreakdown from building-services
     print("Enriching VHEs with voorschot breakdown...")

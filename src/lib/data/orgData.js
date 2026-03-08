@@ -23,6 +23,7 @@ import rDistributionModels from "../../data/distributionModels.json";
 import rMonthlyClose from "../../data/monthlyCloseStatuses.json";
 import rSavedViews from "../../data/savedViews.json";
 import rActivities from "../../data/activities.json";
+import rHeatingSeasons from "../../data/heatingSeasons.json";
 import rModuleConfig from "../../data/moduleConfig.json";
 
 // --- Portaal ---
@@ -172,7 +173,7 @@ const rochdale = buildIndexes({
   savedViews: rSavedViews,
   activities: rActivities,
   moduleConfig: rModuleConfig,
-  heatingSeasons: [], // Rochdale uses calendar years
+  heatingSeasons: rHeatingSeasons,
 });
 
 const portaal = buildIndexes({
