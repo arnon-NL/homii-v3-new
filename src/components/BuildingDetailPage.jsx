@@ -29,6 +29,8 @@ import {
   Send,
   ShieldCheck,
   Flag,
+  LayoutList,
+  CreditCard,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import {
@@ -261,6 +263,7 @@ export default function BuildingDetailPage() {
   const heatingSeasons = useMemo(() => getHeatingSeasonsByBuilding(buildingId), [buildingId]);
   const [activeTab, setActiveTab] = useState("overview");
   const [expandedVhe, setExpandedVhe] = useState(null);
+  const [vheViewMode, setVheViewMode] = useState("cards"); // "cards" or "table"
   const [expandedService, setExpandedService] = useState(null);
   const [expandedCostCats, setExpandedCostCats] = useState({});  // { [ccId]: true }
   const toggleCostCat = (ccId) => setExpandedCostCats((prev) => ({ ...prev, [ccId]: !prev[ccId] }));
@@ -1699,13 +1702,122 @@ export default function BuildingDetailPage() {
 
               {/* ═══ VHE TAB ═══ */}
               <TabsContent value="vhe">
-                <div className="mt-4 space-y-3">
-                  {vheList.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-sm text-slate-400">
-                      {t("noResults", lang)}
+                {/* View mode toggle */}
+                <div className="mt-4 mb-3 flex items-center justify-between">
+                  <p className="text-[11px] text-slate-400">
+                    {vheList.length} {lang === "nl" ? "eenheden" : "units"}
+                  </p>
+                  <div className="flex items-center gap-0.5 rounded-md border border-slate-200 bg-white p-0.5">
+                    <button
+                      onClick={() => setVheViewMode("cards")}
+                      className={`flex items-center gap-1 px-2 py-1 rounded text-[11px] transition-colors ${
+                        vheViewMode === "cards"
+                          ? "bg-slate-100 text-slate-700 font-medium"
+                          : "text-slate-400 hover:text-slate-600"
+                      }`}
+                      title={lang === "nl" ? "Kaartweergave" : "Card view"}
+                    >
+                      <CreditCard size={12} />
+                      <span className="hidden sm:inline">{lang === "nl" ? "Kaarten" : "Cards"}</span>
+                    </button>
+                    <button
+                      onClick={() => setVheViewMode("table")}
+                      className={`flex items-center gap-1 px-2 py-1 rounded text-[11px] transition-colors ${
+                        vheViewMode === "table"
+                          ? "bg-slate-100 text-slate-700 font-medium"
+                          : "text-slate-400 hover:text-slate-600"
+                      }`}
+                      title={lang === "nl" ? "Tabelweergave" : "Table view"}
+                    >
+                      <LayoutList size={12} />
+                      <span className="hidden sm:inline">{lang === "nl" ? "Tabel" : "Table"}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {vheList.length === 0 ? (
+                  <div className="px-4 py-8 text-center text-sm text-slate-400">
+                    {t("noResults", lang)}
+                  </div>
+                ) : vheViewMode === "table" ? (
+                  /* ── TABLE VIEW ── */
+                  <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="bg-slate-50/80 border-b border-slate-100">
+                            <th className="text-left px-3 py-2 font-semibold text-slate-500 text-[11px] uppercase tracking-wider">
+                              {t("unit", lang)}
+                            </th>
+                            <th className="text-left px-3 py-2 font-semibold text-slate-500 text-[11px] uppercase tracking-wider">
+                              {lang === "nl" ? "Adres" : "Address"}
+                            </th>
+                            <th className="text-left px-3 py-2 font-semibold text-slate-500 text-[11px] uppercase tracking-wider hidden sm:table-cell">
+                              m²
+                            </th>
+                            <th className="text-left px-3 py-2 font-semibold text-slate-500 text-[11px] uppercase tracking-wider">
+                              Status
+                            </th>
+                            <th className="text-left px-3 py-2 font-semibold text-slate-500 text-[11px] uppercase tracking-wider hidden sm:table-cell">
+                              {lang === "nl" ? "Contract" : "Contract"}
+                            </th>
+                            <th className="text-right px-3 py-2 font-semibold text-slate-500 text-[11px] uppercase tracking-wider">
+                              {lang === "nl" ? "Voorschot" : "Advance"}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                          {vheList.map((vhe) => (
+                            <tr
+                              key={vhe.id}
+                              className="hover:bg-slate-50/50 cursor-pointer transition-colors"
+                              onClick={() => {
+                                setVheViewMode("cards");
+                                setExpandedVhe(vhe.id);
+                              }}
+                            >
+                              <td className="px-3 py-2.5 text-slate-600 font-mono tabular-nums">
+                                {vhe.unit}
+                              </td>
+                              <td className="px-3 py-2.5 text-slate-700 font-medium max-w-[200px] truncate">
+                                {vhe.address}
+                              </td>
+                              <td className="px-3 py-2.5 text-slate-500 tabular-nums hidden sm:table-cell">
+                                {vhe.m2 ? `${vhe.m2}` : "—"}
+                              </td>
+                              <td className="px-3 py-2.5">
+                                <StatusBadge status={vhe.status} size="xs" />
+                              </td>
+                              <td className="px-3 py-2.5 hidden sm:table-cell">
+                                {vhe.contract ? (
+                                  <StatusBadge status={vhe.contract.status} size="xs" />
+                                ) : (
+                                  <span className="text-slate-300">—</span>
+                                )}
+                              </td>
+                              <td className="px-3 py-2.5 text-right font-medium tabular-nums" style={{ color: brand.navy }}>
+                                {fmt(vhe.voorschot)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                        <tfoot>
+                          <tr className="bg-slate-50/80 border-t border-slate-200">
+                            <td colSpan={5} className="px-3 py-2 text-[11px] font-semibold text-slate-500">
+                              {lang === "nl" ? "Totaal" : "Total"} ({vheList.length})
+                            </td>
+                            <td className="px-3 py-2 text-right text-xs font-bold tabular-nums" style={{ color: brand.navy }}>
+                              {fmt(vheList.reduce((s, v) => s + (v.voorschot || 0), 0))}
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </table>
                     </div>
-                  ) : (
-                    vheList.map((vhe) => {
+                  </div>
+                ) : (
+                  /* ── CARD VIEW (existing dropdown) ── */
+                  <div className="space-y-3">
+                    {vheList.map((vhe) => {
                       const isExpanded = expandedVhe === vhe.id;
                       return (
                         <React.Fragment key={vhe.id}>
@@ -1812,9 +1924,9 @@ export default function BuildingDetailPage() {
                           </Card>
                         </React.Fragment>
                       );
-                    })
-                  )}
-                </div>
+                    })}
+                  </div>
+                )}
               </TabsContent>
 
               {/* ═══ ACTIVITY TAB ═══ */}
