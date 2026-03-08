@@ -3,16 +3,17 @@
     "id": "SVC-EM-heat",
     "code": "EM-HEAT",
     "name": {
-      "en": "Heating",
-      "nl": "Verwarming"
+      "en": "District Heating",
+      "nl": "Stadsverwarming"
+    },
+    "description": {
+      "en": "Central district heating supply",
+      "nl": "Centrale stadsverwarming"
     },
     "category": "energy",
-    "variable": true,
     "metered": true,
-    "buildingCount": 0,
-    "suppliers": [],
-    "avgCostPerVhe": 0,
-    "status": "active"
+    "variable": true,
+    "utility": "heat"
   },
   {
     "id": "SVC-EM-gas",
@@ -21,13 +22,14 @@
       "en": "Gas Supply",
       "nl": "Gaslevering"
     },
+    "description": {
+      "en": "Natural gas supply",
+      "nl": "Aardgaslevering"
+    },
     "category": "energy",
-    "variable": true,
     "metered": true,
-    "buildingCount": 0,
-    "suppliers": [],
-    "avgCostPerVhe": 0,
-    "status": "active"
+    "variable": true,
+    "utility": "gas"
   },
   {
     "id": "SVC-EM-water",
@@ -36,57 +38,45 @@
       "en": "Cold Water",
       "nl": "Koud Water"
     },
+    "description": {
+      "en": "Cold water supply",
+      "nl": "Koudwaterlevering"
+    },
     "category": "energy",
-    "variable": true,
     "metered": true,
-    "buildingCount": 0,
-    "suppliers": [],
-    "avgCostPerVhe": 0,
-    "status": "active"
+    "variable": true,
+    "utility": "water"
   },
   {
     "id": "SVC-EM-warmwater",
-    "code": "EM-WARMWATER",
+    "code": "EM-WW",
     "name": {
       "en": "Warm Water",
       "nl": "Warm Water"
     },
+    "description": {
+      "en": "Warm water supply",
+      "nl": "Warmwaterlevering"
+    },
     "category": "energy",
-    "variable": true,
     "metered": true,
-    "buildingCount": 0,
-    "suppliers": [],
-    "avgCostPerVhe": 0,
-    "status": "active"
+    "variable": true,
+    "utility": "warmWater"
   },
   {
     "id": "SVC-EM-electricity",
-    "code": "EM-ELECTRICITY",
+    "code": "EM-ELEC",
     "name": {
       "en": "Electricity",
       "nl": "Elektriciteit"
     },
-    "category": "energy",
-    "variable": true,
-    "metered": true,
-    "buildingCount": 0,
-    "suppliers": [],
-    "avgCostPerVhe": 0,
-    "status": "active"
-  },
-  {
-    "id": "SVC-EM-contracts",
-    "code": "EM-CONTRACTS",
-    "name": {
-      "en": "Service Contracts",
-      "nl": "Servicecontracten"
+    "description": {
+      "en": "Electricity supply",
+      "nl": "Elektriciteitslevering"
     },
     "category": "energy",
-    "variable": false,
-    "metered": false,
-    "buildingCount": 0,
-    "suppliers": [],
-    "avgCostPerVhe": 0,
-    "status": "active"
+    "metered": true,
+    "variable": true,
+    "utility": "electricity"
   }
 ]

@@ -39,8 +39,10 @@ import pSettlements from "../../data/portaal/settlements.json";
 import pSettlementChecks from "../../data/portaal/settlementChecks.json";
 import pSuppliers from "../../data/portaal/suppliers.json";
 import pSupplierCategories from "../../data/portaal/supplierCategories.json";
+import pDistributionMethods from "../../data/portaal/distributionMethods.json";
 import pDistributionModels from "../../data/portaal/distributionModels.json";
 import pMonthlyClose from "../../data/portaal/monthlyCloseStatuses.json";
+import pHeatingSeasons from "../../data/portaal/heatingSeasons.json";
 import pSavedViews from "../../data/portaal/savedViews.json";
 import pActivities from "../../data/portaal/activities.json";
 import pModuleConfig from "../../data/portaal/moduleConfig.json";
@@ -132,6 +134,20 @@ function buildIndexes(ds) {
   ds._supplierMap = new Map();
   for (const s of ds.suppliers) ds._supplierMap.set(s.id, s);
 
+  // Heating seasons by building
+  ds._hsByBuilding = new Map();
+  for (const hs of (ds.heatingSeasons || [])) {
+    if (!ds._hsByBuilding.has(hs.buildingId)) ds._hsByBuilding.set(hs.buildingId, []);
+    ds._hsByBuilding.get(hs.buildingId).push(hs);
+  }
+
+  // Distribution models by building
+  ds._dmByBuilding = new Map();
+  for (const dm of ds.distributionModels) {
+    if (!ds._dmByBuilding.has(String(dm.buildingId))) ds._dmByBuilding.set(String(dm.buildingId), []);
+    ds._dmByBuilding.get(String(dm.buildingId)).push(dm);
+  }
+
   return ds;
 }
 
@@ -156,6 +172,7 @@ const rochdale = buildIndexes({
   savedViews: rSavedViews,
   activities: rActivities,
   moduleConfig: rModuleConfig,
+  heatingSeasons: [], // Rochdale uses calendar years
 });
 
 const portaal = buildIndexes({
@@ -172,12 +189,13 @@ const portaal = buildIndexes({
   settlementChecks: pSettlementChecks,
   suppliers: pSuppliers,
   supplierCategories: pSupplierCategories,
-  distributionMethods: rDistributionMethods, // Shared
+  distributionMethods: pDistributionMethods,
   distributionModels: pDistributionModels,
   monthlyCloseStatuses: pMonthlyClose,
   savedViews: pSavedViews,
   activities: pActivities,
   moduleConfig: pModuleConfig,
+  heatingSeasons: pHeatingSeasons,
 });
 
 const datasets = {

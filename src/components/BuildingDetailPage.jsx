@@ -50,6 +50,8 @@ import {
   isFeatureEnabled,
   getFieldSource,
   getAvailableYears,
+  getHeatingSeasonsByBuilding,
+  getDistributionModelsByBuilding,
 } from "@/lib/mockData";
 import { useOrg } from "@/lib/OrgContext";
 import { t, useLang } from "@/lib/i18n";
@@ -181,23 +183,51 @@ function CheckStatusBadge({ status, lang }) {
 }
 
 /* ── Year selector ── */
-function YearSelector({ year, setYear, availableYears }) {
+function YearSelector({ year, setYear, availableYears, heatingSeasons }) {
+  // If we have heating seasons, prefer those for labels
+  const seasonMap = useMemo(() => {
+    const map = {};
+    for (const hs of (heatingSeasons || [])) {
+      map[hs.yearKey] = hs;
+    }
+    return map;
+  }, [heatingSeasons]);
+
   const years = availableYears && availableYears.length > 0 ? availableYears : [2024, 2025, 2026];
   return (
-    <div className="inline-flex items-center rounded-lg bg-slate-100 p-0.5">
-      {years.map((y) => (
-        <button
-          key={y}
-          onClick={() => setYear(y)}
-          className={`px-3 h-7 rounded-lg text-xs font-medium tabular-nums transition-colors ${
-            year === y
-              ? "bg-white text-slate-900 shadow-sm"
-              : "text-slate-400 hover:text-slate-600"
-          }`}
-        >
-          {y}
-        </button>
-      ))}
+    <div className="inline-flex flex-col items-start gap-1">
+      <div className="inline-flex items-center rounded-lg bg-slate-100 p-0.5">
+        {years.map((y) => {
+          const season = seasonMap[y];
+          const label = season ? season.yearLabel : String(y);
+          return (
+            <button
+              key={y}
+              onClick={() => setYear(y)}
+              className={`px-3 h-7 rounded-lg text-xs font-medium tabular-nums transition-colors ${
+                year === y
+                  ? "bg-white text-slate-900 shadow-sm"
+                  : "text-slate-400 hover:text-slate-600"
+              }`}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
+      {/* Show season date range subtitle for active year */}
+      {(() => {
+        const activeSeason = seasonMap[year];
+        if (!activeSeason) return null;
+        const startDate = new Date(activeSeason.seasonStart);
+        const endDate = new Date(activeSeason.seasonEnd);
+        const fmtMonth = (d) => d.toLocaleDateString("nl-NL", { month: "short", year: "numeric" });
+        return (
+          <span className="text-[10px] text-slate-400 ml-1">
+            {fmtMonth(startDate)} – {fmtMonth(endDate)}
+          </span>
+        );
+      })()}
     </div>
   );
 }
@@ -214,14 +244,18 @@ export default function BuildingDetailPage() {
   const availableYears = useMemo(() => getAvailableYears(), []);
   const [year, setYear] = useState(() => {
     const yrs = getAvailableYears();
+    const currentYear = new Date().getFullYear();
+    if (yrs.includes(currentYear)) return currentYear;
     return yrs.length > 0 ? yrs[yrs.length - 1] : 2025;
   });
+  const heatingSeasons = useMemo(() => getHeatingSeasonsByBuilding(buildingId), [buildingId]);
   const [activeTab, setActiveTab] = useState("overview");
   const [expandedVhe, setExpandedVhe] = useState(null);
   const [expandedService, setExpandedService] = useState(null);
   const [expandedCostCats, setExpandedCostCats] = useState({});  // { [ccId]: true }
   const toggleCostCat = (ccId) => setExpandedCostCats((prev) => ({ ...prev, [ccId]: !prev[ccId] }));
   const [distDrilldown, setDistDrilldown] = useState(null); // { serviceId, buildingId } when viewing distribution
+  const [showDismounted, setShowDismounted] = useState(false);
 
   const building = getBuilding(buildingId);
 
@@ -233,7 +267,7 @@ export default function BuildingDetailPage() {
     [buildingId, year]
   );
   const vheList = useMemo(() => getVhesByBuilding(buildingId), [buildingId]);
-  const meterList = useMemo(
+  const allMeters = useMemo(
     () =>
       getMetersByBuilding(buildingId).map((m) => {
         const r = m.readings?.[year];
@@ -246,6 +280,14 @@ export default function BuildingDetailPage() {
         };
       }),
     [buildingId, year]
+  );
+  const meterList = useMemo(
+    () => showDismounted ? allMeters : allMeters.filter(m => !m.dismounted),
+    [allMeters, showDismounted]
+  );
+  const dismountedCount = useMemo(
+    () => allMeters.filter(m => m.dismounted).length,
+    [allMeters]
   );
   const activityList = useMemo(
     () => getActivitiesByBuilding(buildingId),
@@ -374,7 +416,7 @@ export default function BuildingDetailPage() {
               </div>
             </div>
           </div>
-          <YearSelector year={year} setYear={setYear} availableYears={availableYears} />
+          <YearSelector year={year} setYear={setYear} availableYears={availableYears} heatingSeasons={heatingSeasons} />
         </div>
 
         {/* ── Content: tabs + attribute panel ── */}
@@ -840,6 +882,30 @@ export default function BuildingDetailPage() {
                             <p className="text-xs text-slate-400">
                               {lang === "nl" ? "Geen verdelingsmodel beschikbaar voor deze dienst" : "No distribution model available for this service"}
                             </p>
+                          </CardContent>
+                        </Card>
+                      ) : dm && !dm.inputs ? (
+                        // Simple energy distribution model view
+                        <Card className="border-slate-200 bg-white">
+                          <CardContent className="py-4 space-y-3">
+                            <div className="flex items-center gap-2">
+                              <Gauge size={16} className="text-slate-500" />
+                              <span className="text-xs font-semibold text-slate-700">
+                                {dm.description?.[lang] || dm.description?.en || "Metered distribution"}
+                              </span>
+                            </div>
+                            {dm.provider && (
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="text-slate-400">{lang === "nl" ? "Meetbedrijf" : "Metering provider"}</span>
+                                <span className="font-medium text-slate-700">{dm.provider}</span>
+                              </div>
+                            )}
+                            {dm.meterTypes && dm.meterTypes.length > 0 && (
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="text-slate-400">{lang === "nl" ? "Metertypes" : "Meter types"}</span>
+                                <span className="font-medium text-slate-700">{dm.meterTypes.join(", ")}</span>
+                              </div>
+                            )}
                           </CardContent>
                         </Card>
                       ) : (
@@ -1423,6 +1489,20 @@ export default function BuildingDetailPage() {
               {/* ═══ METERS TAB (requires consumption feature) ═══ */}
               {isFeatureEnabled("consumption") && <TabsContent value="meters">
                 <div className="mt-4 space-y-4">
+                  {/* Dismounted meter filter */}
+                  {dismountedCount > 0 && (
+                    <div className="flex items-center justify-end mb-3">
+                      <button
+                        onClick={() => setShowDismounted(!showDismounted)}
+                        className="flex items-center gap-1.5 text-[11px] font-medium text-slate-400 hover:text-slate-600 transition-colors"
+                      >
+                        <span className={`w-3.5 h-3.5 rounded border transition-colors flex items-center justify-center ${showDismounted ? 'bg-slate-700 border-slate-700' : 'border-slate-300'}`}>
+                          {showDismounted && <CheckCircle2 size={10} className="text-white" />}
+                        </span>
+                        {lang === "nl" ? `Gedemonteerde meters tonen (${dismountedCount})` : `Show dismounted meters (${dismountedCount})`}
+                      </button>
+                    </div>
+                  )}
                   {/* Main meters */}
                   <div>
                     <h3 className="text-sm font-semibold text-slate-600 mb-3">
@@ -1454,9 +1534,16 @@ export default function BuildingDetailPage() {
                                       <p className="text-[11px] text-slate-400">{t(m.utility, lang)} · {m.unit}</p>
                                     </div>
                                   </div>
-                                  <span className={`text-[11px] font-medium whitespace-nowrap ml-2 ${isOverdue ? "text-amber-600" : "text-green-600"}`}>
-                                    {isOverdue ? t("readingsOverdue", lang) : t("readingsUpToDate", lang)}
-                                  </span>
+                                  <div className="flex items-center gap-2 ml-2">
+                                    {m.dismounted && (
+                                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-400">
+                                        {lang === "nl" ? "Gedemonteerd" : "Dismounted"}
+                                      </span>
+                                    )}
+                                    <span className={`text-[11px] font-medium whitespace-nowrap ${isOverdue ? "text-amber-600" : "text-green-600"}`}>
+                                      {isOverdue ? t("readingsOverdue", lang) : t("readingsUpToDate", lang)}
+                                    </span>
+                                  </div>
                                 </div>
 
                                 <div className="grid grid-cols-3 gap-3 px-3 py-2 bg-slate-50 rounded">
@@ -1519,9 +1606,16 @@ export default function BuildingDetailPage() {
                                       <p className="text-[11px] text-slate-400">{m.vheId}</p>
                                     </div>
                                   </div>
-                                  <span className="text-sm font-semibold tabular-nums" style={{ color: brand.navy }}>
-                                    {(m.consumption || 0).toLocaleString("nl-NL")} {m.unit}
-                                  </span>
+                                  <div className="flex items-center gap-2">
+                                    {m.dismounted && (
+                                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-400">
+                                        {lang === "nl" ? "Gedemonteerd" : "Dismounted"}
+                                      </span>
+                                    )}
+                                    <span className="text-sm font-semibold tabular-nums" style={{ color: brand.navy }}>
+                                      {(m.consumption || 0).toLocaleString("nl-NL")} {m.unit}
+                                    </span>
+                                  </div>
                                 </div>
                               </CardContent>
                             </Card>

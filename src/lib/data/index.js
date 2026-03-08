@@ -263,11 +263,29 @@ export function getDistributionMethod(id) {
 }
 
 export function getDistributionModel(buildingId, serviceId) {
-  // Try indexed lookup from distribution models
-  for (const m of ds().distributionModels) {
-    if (String(m.buildingId) === String(buildingId) && m.serviceId === serviceId) return m;
+  const bid = String(buildingId);
+  // First try exact match (buildingId + serviceId)
+  if (serviceId) {
+    for (const m of ds().distributionModels) {
+      if (String(m.buildingId) === bid && m.serviceId === serviceId) return m;
+    }
   }
-  return null;
+  // Fallback: match by buildingId only (for energy module where model is per-building)
+  const byBuilding = ds()._dmByBuilding?.get(bid);
+  return byBuilding?.[0] || null;
+}
+
+export function getDistributionModelsByBuilding(buildingId) {
+  return ds()._dmByBuilding?.get(String(buildingId)) || [];
+}
+
+// --- Heating Seasons ---
+export function getHeatingSeasonsByBuilding(buildingId) {
+  return ds()._hsByBuilding?.get(String(buildingId)) || [];
+}
+
+export function getHeatingSeasons() {
+  return ds().heatingSeasons || [];
 }
 
 // --- Monthly Close ---

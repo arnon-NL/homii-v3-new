@@ -1,10 +1,9 @@
 [
   {
     "id": "energy",
-    "icon": "Zap",
     "label": {
-      "en": "Energy & Water",
-      "nl": "Energie & Water"
+      "en": "Energy",
+      "nl": "Energie"
     }
   }
 ]

@@ -110,6 +110,13 @@ export {
   // --- Available years ---
   getAvailableYears,
 
+  // --- Heating season getters ---
+  getHeatingSeasonsByBuilding,
+  getHeatingSeasons,
+
+  // --- Distribution model by building ---
+  getDistributionModelsByBuilding,
+
   // --- Org state ---
   setActiveOrg,
   getActiveOrgId,

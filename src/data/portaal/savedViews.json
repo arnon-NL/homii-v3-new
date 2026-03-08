@@ -12,7 +12,8 @@
       "complex",
       "location",
       "vhe",
-      "status"
+      "utilities",
+      "dataQuality"
     ],
     "filters": [],
     "year": null
@@ -29,7 +30,7 @@
     "columns": [
       "complex",
       "dataQuality",
-      "status"
+      "utilities"
     ],
     "filters": [],
     "year": null
@@ -46,8 +47,7 @@
     "columns": [
       "address",
       "unit",
-      "status",
-      "voorschot"
+      "status"
     ],
     "filters": [],
     "year": null
@@ -64,8 +64,8 @@
     "columns": [
       "utility",
       "meterNumber",
-      "status",
-      "latestDate"
+      "type",
+      "status"
     ],
     "filters": [],
     "year": null
