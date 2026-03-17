@@ -34,6 +34,18 @@ import { STEP_ORDER, STEP_CONFIG } from "@/lib/data/distributions";
 import Breadcrumbs from "./Breadcrumbs";
 import { Card, CardContent } from "./ui/card";
 
+/* ── Deep copy helper ── */
+const deepCopy = (obj) => JSON.parse(JSON.stringify(obj));
+
+/* ── Mock users available for approval requests ── */
+const MOCK_USERS = [
+  { id: "user-lisa",  name: "Lisa" },
+  { id: "user-peter", name: "Peter" },
+];
+
+/* ── Today as ISO date string ── */
+const today = () => new Date().toISOString().split("T")[0];
+
 /* ── Formatters ── */
 const fmtEur = (v, decimals = 0) =>
   v == null ? "—" :
@@ -43,10 +55,10 @@ const fmtDate = (d) => d ? new Date(d).toLocaleDateString("nl-NL", { day: "2-dig
 
 /* ── Step status config ── */
 const STEP_STATUS = {
-  complete:    { icon: CheckCircle2, color: "#16A34A", bg: "#F0FDF4", label: { en: "Complete",     nl: "Afgerond"        } },
-  in_progress: { icon: Clock,        color: "#2563EB", bg: "#EFF6FF", label: { en: "In progress",  nl: "In uitvoering"   } },
-  pending:     { icon: Circle,       color: "#94A3B8", bg: "#F8FAFC", label: { en: "Pending",      nl: "In afwachting"   } },
-  flagged:     { icon: AlertTriangle,color: "#D97706", bg: "#FFFBEB", label: { en: "Flagged",      nl: "Aandacht"        } },
+  complete:    { icon: CheckCircle2, color: "#16A34A", bg: "#F0FDF4", label: { en: "Complete",    nl: "Afgerond"      } },
+  in_progress: { icon: Clock,        color: "#2563EB", bg: "#EFF6FF", label: { en: "In progress", nl: "In uitvoering" } },
+  pending:     { icon: Circle,       color: "#94A3B8", bg: "#F8FAFC", label: { en: "Pending",     nl: "In afwachting" } },
+  flagged:     { icon: AlertTriangle,color: "#D97706", bg: "#FFFBEB", label: { en: "Flagged",     nl: "Aandacht"      } },
 };
 
 function StepStatusBadge({ status, lang }) {
@@ -73,6 +85,68 @@ function VarianceBadge({ pct, threshold = 10 }) {
       {fmtPct(pct)}
       {exceeded && <Flag size={10} />}
     </span>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════════
+   STEP ACTION FOOTER
+   Renders at the bottom of every step panel:
+   - isComplete  → green "Completed" stamp
+   - !isActive   → grey "Complete previous steps" lock
+   - isActive    → primary CTA button (enabled/disabled)
+   ══════════════════════════════════════════════════════════════ */
+function StepActionFooter({ isActive, isComplete, completedAt, completedBy, canAdvance, onAdvance, advanceLabel, blockReason, lang }) {
+  if (isComplete) {
+    return (
+      <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2">
+        <CheckCircle2 size={13} className="text-green-500 flex-none" />
+        <span className="text-xs text-green-700 font-medium">
+          {lang === "nl" ? "Afgerond" : "Completed"}
+          {completedAt ? ` · ${fmtDate(completedAt)}` : ""}
+          {completedBy ? ` · ${completedBy}` : ""}
+        </span>
+      </div>
+    );
+  }
+
+  if (!isActive) {
+    return (
+      <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2">
+        <Lock size={12} className="text-slate-300 flex-none" />
+        <span className="text-xs text-slate-400">
+          {lang === "nl" ? "Voltooi de vorige stappen eerst" : "Complete previous steps first"}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-4">
+      <div className="min-w-0 flex-1">
+        {blockReason ? (
+          <span className="flex items-center gap-1.5 text-xs text-amber-600">
+            <AlertTriangle size={12} className="flex-none" />
+            {blockReason}
+          </span>
+        ) : (
+          <span className="text-xs text-slate-400">
+            {lang === "nl" ? "Klaar voor de volgende stap" : "Ready to proceed"}
+          </span>
+        )}
+      </div>
+      <button
+        onClick={canAdvance ? onAdvance : undefined}
+        disabled={!canAdvance}
+        className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-all flex-none ${
+          canAdvance
+            ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm cursor-pointer"
+            : "bg-slate-100 text-slate-400 cursor-not-allowed"
+        }`}
+      >
+        {advanceLabel || (lang === "nl" ? "Bevestigen & verder" : "Confirm & proceed")}
+        {canAdvance && <ChevronRight size={13} />}
+      </button>
+    </div>
   );
 }
 
@@ -106,7 +180,6 @@ function StepNavigator({ distribution, activeStep, onSelectStep, lang }) {
                 : "text-slate-300 cursor-not-allowed"
             }`}
           >
-            {/* Step number / status icon */}
             <div className="w-6 h-6 flex items-center justify-center flex-none">
               {done ? (
                 <CheckCircle2 size={16} style={{ color: brand.teal || "#3EB1C8" }} />
@@ -121,7 +194,6 @@ function StepNavigator({ distribution, activeStep, onSelectStep, lang }) {
               )}
             </div>
 
-            {/* Label */}
             <div className="flex-1 min-w-0">
               <p className={`text-xs font-medium leading-tight ${active ? "text-slate-900" : done ? "text-slate-600" : isCurrent ? "text-slate-800" : "text-slate-300"}`}>
                 {stepCfg.label[lang] || stepCfg.label.en}
@@ -134,7 +206,6 @@ function StepNavigator({ distribution, activeStep, onSelectStep, lang }) {
               )}
             </div>
 
-            {/* Flag indicators */}
             {(hasFlagged || hasFlaggedCheck) && (
               <Flag size={11} className="text-amber-500 flex-none" />
             )}
@@ -147,12 +218,17 @@ function StepNavigator({ distribution, activeStep, onSelectStep, lang }) {
 
 /* ══════════════════════════════════════════════════════════════
    STEP PANELS
-═══════════════════════════════════════════════════════════════ */
+   Each receives: distribution (local state), lang, isActive, onAdvance
+   ══════════════════════════════════════════════════════════════ */
 
 /* ── Step 1: Validation ── */
-function ValidationPanel({ distribution, lang }) {
+function ValidationPanel({ distribution, lang, isActive, onAdvance }) {
   const step = distribution.steps?.validation;
   const issues = step?.issues || [];
+  const isComplete = step?.status === "complete";
+  const allComplete = distribution.services.every(s => (s.completeness ?? 0) === 100);
+  const canAdvance = allComplete && issues.length === 0;
+
   return (
     <div className="space-y-4">
       <StepHeader
@@ -166,7 +242,6 @@ function ValidationPanel({ distribution, lang }) {
         lang={lang}
       />
 
-      {/* Service completeness */}
       <Card className="border-slate-200 bg-white">
         <CardContent className="py-0">
           {distribution.services.map((svc, idx) => {
@@ -180,24 +255,16 @@ function ValidationPanel({ distribution, lang }) {
                   <p className="text-xs font-medium text-slate-700 truncate">{name}</p>
                   <p className="text-[11px] text-slate-400">{svc.serviceId}</p>
                 </div>
-                {/* Completeness bar */}
                 <div className="w-32 hidden sm:block">
                   <div className="flex items-center gap-2">
                     <div className="flex-1 h-1.5 rounded-full bg-slate-100">
-                      <div
-                        className="h-full rounded-full"
-                        style={{ width: `${completeness}%`, background: isOk ? "#3EB1C8" : "#F59E0B" }}
-                      />
+                      <div className="h-full rounded-full" style={{ width: `${completeness}%`, background: isOk ? "#3EB1C8" : "#F59E0B" }} />
                     </div>
                     <span className="text-[11px] tabular-nums text-slate-500 w-8 text-right">{completeness}%</span>
                   </div>
                 </div>
                 <div className="flex-none">
-                  {isOk ? (
-                    <CheckCircle2 size={15} className="text-green-500" />
-                  ) : (
-                    <AlertTriangle size={15} className="text-amber-500" />
-                  )}
+                  {isOk ? <CheckCircle2 size={15} className="text-green-500" /> : <AlertTriangle size={15} className="text-amber-500" />}
                 </div>
               </div>
             );
@@ -205,12 +272,9 @@ function ValidationPanel({ distribution, lang }) {
         </CardContent>
       </Card>
 
-      {/* Issues */}
       {issues.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-            {lang === "nl" ? "Aandachtspunten" : "Issues"}
-          </p>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{lang === "nl" ? "Aandachtspunten" : "Issues"}</p>
           {issues.map((issue, i) => {
             const svc = getService(issue.serviceId);
             return (
@@ -226,22 +290,36 @@ function ValidationPanel({ distribution, lang }) {
         </div>
       )}
 
-      {issues.length === 0 && step?.status === "complete" && (
+      {issues.length === 0 && allComplete && !isComplete && (
         <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-100">
           <CheckCircle2 size={14} className="text-green-500 flex-none" />
           <p className="text-xs text-green-700">
-            {lang === "nl" ? "Alle kosten volledig ingeboekt. Klaar voor volgende stap." : "All costs fully booked. Ready for next step."}
+            {lang === "nl" ? "Alle kosten volledig ingeboekt. Klaar voor de volgende stap." : "All costs fully booked. Ready for next step."}
           </p>
         </div>
       )}
+
+      <StepActionFooter
+        isActive={isActive}
+        isComplete={isComplete}
+        completedAt={step?.completedAt}
+        completedBy={step?.completedBy}
+        canAdvance={canAdvance}
+        onAdvance={() => onAdvance()}
+        advanceLabel={lang === "nl" ? "Validatie bevestigen" : "Confirm validation"}
+        blockReason={!canAdvance && isActive ? (lang === "nl" ? "Niet alle diensten zijn 100% compleet" : "Not all services are 100% complete") : null}
+        lang={lang}
+      />
     </div>
   );
 }
 
 /* ── Step 2: Comparison ── */
-function ComparisonPanel({ distribution, lang }) {
+function ComparisonPanel({ distribution, lang, isActive, onAdvance }) {
   const step = distribution.steps?.comparison;
   const deviations = step?.deviations || [];
+  const isComplete = step?.status === "complete";
+
   return (
     <div className="space-y-4">
       <StepHeader
@@ -266,7 +344,6 @@ function ComparisonPanel({ distribution, lang }) {
           {distribution.services.map((svc, idx) => {
             const service = getService(svc.serviceId);
             const name = service?.name?.[lang] || service?.name?.en || svc.serviceId;
-            const deviation = deviations.find(d => d.serviceId === svc.serviceId);
             return (
               <div key={svc.serviceId} className={`grid grid-cols-5 gap-2 items-center px-3 py-3 ${idx < distribution.services.length - 1 ? "border-b border-slate-100" : ""}`}>
                 <div className="col-span-2 min-w-0">
@@ -282,15 +359,47 @@ function ComparisonPanel({ distribution, lang }) {
           })}
         </CardContent>
       </Card>
+
+      <StepActionFooter
+        isActive={isActive}
+        isComplete={isComplete}
+        completedAt={step?.completedAt}
+        completedBy={step?.completedBy}
+        canAdvance={true}
+        onAdvance={() => onAdvance()}
+        advanceLabel={lang === "nl" ? "Vergelijking bevestigen" : "Confirm comparison"}
+        lang={lang}
+      />
     </div>
   );
 }
 
 /* ── Step 3: Control ── */
-function ControlPanel({ distribution, lang }) {
+function ControlPanel({ distribution, lang, isActive, onAdvance }) {
   const step = distribution.steps?.control;
   const excesses = step?.excesses || [];
   const threshold = step?.threshold || 10;
+  const isComplete = step?.status === "complete";
+
+  /* Local state for editing notes on exceeded services */
+  const [notes, setNotes] = useState(() => {
+    const n = {};
+    for (const e of excesses) n[e.serviceId] = e.note || "";
+    return n;
+  });
+
+  const exceededWithoutNotes = excesses.filter(e => e.exceeded && !(notes[e.serviceId] || "").trim());
+  const canAdvance = exceededWithoutNotes.length === 0;
+
+  const handleAdvance = () => {
+    onAdvance({
+      excesses: excesses.map(e => ({
+        ...e,
+        note: (notes[e.serviceId] !== undefined ? notes[e.serviceId] : e.note) || "",
+      })),
+    });
+  };
+
   return (
     <div className="space-y-4">
       <StepHeader
@@ -304,7 +413,6 @@ function ControlPanel({ distribution, lang }) {
         lang={lang}
       />
 
-      {/* Threshold indicator */}
       <div className="flex items-center gap-2 p-3 rounded-lg bg-slate-50 border border-slate-200">
         <Gauge size={14} className="text-slate-400 flex-none" />
         <span className="text-xs text-slate-500">
@@ -313,7 +421,6 @@ function ControlPanel({ distribution, lang }) {
         </span>
       </div>
 
-      {/* All services with threshold check */}
       <Card className="border-slate-200 bg-white">
         <CardContent className="py-0">
           {distribution.services.map((svc, idx) => {
@@ -322,23 +429,43 @@ function ControlPanel({ distribution, lang }) {
             const excess = excesses.find(e => e.serviceId === svc.serviceId);
             const exceeded = excess?.exceeded || false;
             const pct = svc.variancePct;
+            const noteVal = notes[svc.serviceId] !== undefined ? notes[svc.serviceId] : (excess?.note || "");
+            const needsNote = exceeded && isActive && !isComplete;
+
             return (
               <div key={svc.serviceId} className={`flex items-start gap-3 py-3 px-3 ${idx < distribution.services.length - 1 ? "border-b border-slate-100" : ""} ${exceeded ? "bg-amber-50/40" : ""}`}>
                 <div className="flex-none mt-0.5">
-                  {exceeded
-                    ? <AlertTriangle size={15} className="text-amber-500" />
-                    : <CheckCircle2 size={15} className="text-green-500" />
-                  }
+                  {exceeded ? <AlertTriangle size={15} className="text-amber-500" /> : <CheckCircle2 size={15} className="text-green-500" />}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-xs font-medium text-slate-700">{name}</p>
                     <VarianceBadge pct={pct} threshold={threshold} />
                   </div>
-                  {exceeded && excess?.note && (
-                    <p className="text-[11px] text-amber-700 mt-1 bg-amber-50 rounded px-2 py-1 border border-amber-100">
-                      {excess.note}
-                    </p>
+                  {/* Editable note when active, read-only note when complete */}
+                  {exceeded && (
+                    needsNote ? (
+                      <div className="mt-2">
+                        <textarea
+                          value={noteVal}
+                          onChange={(e) => setNotes(prev => ({ ...prev, [svc.serviceId]: e.target.value }))}
+                          placeholder={lang === "nl" ? "Voeg een toelichting toe voor deze overschrijding…" : "Add a note explaining this excess…"}
+                          rows={2}
+                          className={`w-full text-[11px] text-slate-700 placeholder-slate-400 bg-white border rounded-lg px-2.5 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-blue-400 ${
+                            !noteVal.trim() ? "border-amber-200 bg-amber-50/60" : "border-slate-200"
+                          }`}
+                        />
+                        {!noteVal.trim() && (
+                          <p className="text-[10px] text-amber-600 mt-0.5">
+                            {lang === "nl" ? "Toelichting verplicht" : "Note required to proceed"}
+                          </p>
+                        )}
+                      </div>
+                    ) : excess?.note || noteVal ? (
+                      <p className="text-[11px] text-amber-700 mt-1 bg-amber-50 rounded px-2 py-1 border border-amber-100">
+                        {excess?.note || noteVal}
+                      </p>
+                    ) : null
                   )}
                 </div>
                 <span className="text-xs font-semibold text-slate-700 tabular-nums">{fmtEur(svc.actual)}</span>
@@ -356,18 +483,35 @@ function ControlPanel({ distribution, lang }) {
           </p>
         </div>
       )}
+
+      <StepActionFooter
+        isActive={isActive}
+        isComplete={isComplete}
+        completedAt={step?.completedAt}
+        completedBy={step?.completedBy}
+        canAdvance={canAdvance}
+        onAdvance={handleAdvance}
+        advanceLabel={lang === "nl" ? "Controle bevestigen" : "Confirm control"}
+        blockReason={!canAdvance && isActive
+          ? (lang === "nl"
+              ? `${exceededWithoutNotes.length} overschrijding(en) vereist een toelichting`
+              : `${exceededWithoutNotes.length} excess(es) require a note`)
+          : null}
+        lang={lang}
+      />
     </div>
   );
 }
 
 /* ── Step 4: Check ── */
-function CheckPanel({ distribution, lang }) {
+function CheckPanel({ distribution, lang, isActive, onAdvance }) {
   const step = distribution.steps?.check;
   const outcomes = step?.tenantOutcomes || [];
   const hasTenants = outcomes.length > 0;
+  const isComplete = step?.status === "complete";
 
-  const totalRefund = outcomes.filter(t => t.delta < 0).reduce((s, t) => s + t.delta, 0);
-  const totalOwed   = outcomes.filter(t => t.delta > 0).reduce((s, t) => s + t.delta, 0);
+  const totalRefund  = outcomes.filter(t => t.delta < 0).reduce((s, t) => s + t.delta, 0);
+  const totalOwed    = outcomes.filter(t => t.delta > 0).reduce((s, t) => s + t.delta, 0);
   const flaggedTenants = outcomes.filter(t => t.status === "flagged");
 
   return (
@@ -383,7 +527,6 @@ function CheckPanel({ distribution, lang }) {
         lang={lang}
       />
 
-      {/* Totals summary */}
       {hasTenants && (
         <div className="grid grid-cols-3 gap-3">
           <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 text-center">
@@ -401,7 +544,6 @@ function CheckPanel({ distribution, lang }) {
         </div>
       )}
 
-      {/* Flagged tenants warning */}
       {flaggedTenants.length > 0 && (
         <div className="p-3 rounded-lg bg-amber-50 border border-amber-100">
           <div className="flex items-center gap-2 mb-2">
@@ -419,7 +561,6 @@ function CheckPanel({ distribution, lang }) {
         </div>
       )}
 
-      {/* Tenant table */}
       {hasTenants && (
         <Card className="border-slate-200 bg-white">
           <CardContent className="py-0">
@@ -462,13 +603,36 @@ function CheckPanel({ distribution, lang }) {
           <p className="text-xs">{lang === "nl" ? "Huurderuitkomsten worden berekend zodra vorige stappen zijn afgerond." : "Tenant outcomes are calculated once previous steps are completed."}</p>
         </div>
       )}
+
+      <StepActionFooter
+        isActive={isActive}
+        isComplete={isComplete}
+        completedAt={step?.completedAt}
+        completedBy={step?.completedBy}
+        canAdvance={true}
+        onAdvance={() => onAdvance()}
+        advanceLabel={
+          flaggedTenants.length > 0
+            ? (lang === "nl" ? "Bevestigen (gemarkeerde huurders bekeken)" : "Confirm (flagged tenants reviewed)")
+            : (lang === "nl" ? "Check bevestigen" : "Confirm check")
+        }
+        lang={lang}
+      />
     </div>
   );
 }
 
 /* ── Step 5: Approval ── */
-function ApprovalPanel({ distribution, lang }) {
+function ApprovalPanel({ distribution, lang, isActive, onAdvance, onRequestApproval }) {
   const step = distribution.steps?.approval;
+  const isComplete = step?.status === "complete";
+  const isInProgress = step?.status === "in_progress";
+  const hasRequest = !!step?.requestedFrom;
+
+  /* Form state for the approval request */
+  const [selectedUser, setSelectedUser] = useState(MOCK_USERS[0].id);
+  const [note, setNote] = useState("");
+
   return (
     <div className="space-y-4">
       <StepHeader
@@ -484,7 +648,49 @@ function ApprovalPanel({ distribution, lang }) {
 
       <Card className="border-slate-200 bg-white">
         <CardContent className="py-4 space-y-3">
-          {step?.requestedFrom ? (
+
+          {/* ─ No request yet: show request form ─ */}
+          {!hasRequest && isActive && !isComplete && (
+            <>
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1">
+                {lang === "nl" ? "Goedkeuring aanvragen" : "Request approval"}
+              </p>
+              <div className="space-y-2">
+                <div>
+                  <label className="text-[11px] text-slate-500 mb-1 block">{lang === "nl" ? "Aan" : "To"}</label>
+                  <select
+                    value={selectedUser}
+                    onChange={e => setSelectedUser(e.target.value)}
+                    className="w-full text-xs text-slate-700 bg-white border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  >
+                    {MOCK_USERS.map(u => (
+                      <option key={u.id} value={u.id}>{u.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[11px] text-slate-500 mb-1 block">{lang === "nl" ? "Notitie (optioneel)" : "Note (optional)"}</label>
+                  <textarea
+                    value={note}
+                    onChange={e => setNote(e.target.value)}
+                    placeholder={lang === "nl" ? "Voeg een bericht toe voor de goed­keurder…" : "Add a message for the approver…"}
+                    rows={2}
+                    className="w-full text-xs text-slate-700 placeholder-slate-400 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-blue-400"
+                  />
+                </div>
+              </div>
+              <button
+                onClick={() => onRequestApproval(selectedUser, note)}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm"
+              >
+                <Send size={12} />
+                {lang === "nl" ? "Verzoek versturen" : "Send request"}
+              </button>
+            </>
+          )}
+
+          {/* ─ Request sent / in progress ─ */}
+          {hasRequest && (
             <>
               <div className="flex items-center justify-between text-xs">
                 <span className="text-slate-400">{lang === "nl" ? "Aangevraagd bij" : "Requested from"}</span>
@@ -492,7 +698,9 @@ function ApprovalPanel({ distribution, lang }) {
                   <div className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center">
                     <Users size={11} className="text-slate-500" />
                   </div>
-                  <span className="font-medium text-slate-700">{step.requestedFrom}</span>
+                  <span className="font-medium text-slate-700">
+                    {MOCK_USERS.find(u => u.id === step.requestedFrom)?.name || step.requestedFrom}
+                  </span>
                 </div>
               </div>
               {step?.requestedAt && (
@@ -506,7 +714,7 @@ function ApprovalPanel({ distribution, lang }) {
                   "{step.note}"
                 </div>
               )}
-              {step?.status === "in_progress" && (
+              {isInProgress && (
                 <div className="flex items-center gap-2 p-2 rounded-lg bg-blue-50 border border-blue-100 text-xs text-blue-700">
                   <Clock size={12} />
                   {lang === "nl" ? "Wacht op goedkeuring…" : "Waiting for approval…"}
@@ -517,13 +725,18 @@ function ApprovalPanel({ distribution, lang }) {
                   <span className="text-slate-400">{lang === "nl" ? "Goedgekeurd door" : "Approved by"}</span>
                   <div className="flex items-center gap-2">
                     <ShieldCheck size={13} className="text-green-500" />
-                    <span className="font-medium text-slate-700">{step.approvedBy}</span>
+                    <span className="font-medium text-slate-700">
+                      {MOCK_USERS.find(u => u.id === step.approvedBy)?.name || step.approvedBy}
+                    </span>
                     <span className="text-slate-400">{fmtDate(step.approvedAt)}</span>
                   </div>
                 </div>
               )}
             </>
-          ) : (
+          )}
+
+          {/* ─ No request, not active: empty state ─ */}
+          {!hasRequest && !isActive && !isComplete && (
             <div className="text-center py-4">
               <Users size={20} className="mx-auto mb-2 text-slate-300" />
               <p className="text-xs text-slate-400">
@@ -533,13 +746,57 @@ function ApprovalPanel({ distribution, lang }) {
           )}
         </CardContent>
       </Card>
+
+      {/* Footer: when in_progress → show "Simulate approval" as primary action */}
+      {isInProgress && isActive ? (
+        <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-4">
+          <span className="text-xs text-slate-400 flex items-center gap-1.5">
+            <Clock size={12} />
+            {lang === "nl" ? "Wacht op goedkeuring van " : "Awaiting approval from "}
+            <span className="font-medium text-slate-600">
+              {MOCK_USERS.find(u => u.id === step?.requestedFrom)?.name || step?.requestedFrom}
+            </span>
+          </span>
+          <button
+            onClick={() => onAdvance({
+              approvedBy: step?.requestedFrom,
+              approvedAt: today(),
+            })}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-green-600 text-white hover:bg-green-700 shadow-sm transition-colors"
+          >
+            <ShieldCheck size={13} />
+            {lang === "nl" ? "Goedkeuring simuleren ✓" : "Simulate approval ✓"}
+          </button>
+        </div>
+      ) : (
+        <StepActionFooter
+          isActive={isActive && !isInProgress}
+          isComplete={isComplete}
+          completedAt={step?.completedAt}
+          completedBy={step?.completedBy}
+          canAdvance={false}
+          onAdvance={() => {}}
+          advanceLabel={lang === "nl" ? "Stuur eerst een verzoek" : "Send a request first"}
+          lang={lang}
+        />
+      )}
     </div>
   );
 }
 
 /* ── Step 6: Distribution ── */
-function DistributionPanel({ distribution, lang }) {
+function DistributionPanel({ distribution, lang, isActive, onAdvance }) {
   const step = distribution.steps?.distribution;
+  const isComplete = step?.status === "complete";
+  const [confirming, setConfirming] = useState(false);
+
+  const handleConfirmERP = () => {
+    const year = new Date().getFullYear();
+    const ref = `ERP-${year}-${String(Math.floor(Math.random() * 9000) + 1000)}`;
+    onAdvance({ sentToErp: true, erpReference: ref });
+    setConfirming(false);
+  };
+
   return (
     <div className="space-y-4">
       <StepHeader
@@ -553,55 +810,128 @@ function DistributionPanel({ distribution, lang }) {
         lang={lang}
       />
 
-      <Card className="border-slate-200 bg-white">
-        <CardContent className="py-4 space-y-3">
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-slate-400">{lang === "nl" ? "ERP-export" : "ERP export"}</span>
-            {step?.sentToErp ? (
-              <span className="inline-flex items-center gap-1 text-green-600 font-medium">
-                <CheckCircle2 size={13} />
-                {lang === "nl" ? "Verzonden" : "Sent"}
-              </span>
-            ) : (
-              <span className="text-slate-400">{lang === "nl" ? "Nog niet verzonden" : "Not sent yet"}</span>
-            )}
-          </div>
-          {step?.erpReference && (
+      {/* Summary totals */}
+      {distribution.totals?.totalCost != null && (
+        <Card className="border-slate-200 bg-white">
+          <CardContent className="py-4 space-y-2.5">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-3">
+              {lang === "nl" ? "Samenvatting" : "Summary"}
+            </p>
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400">{lang === "nl" ? "ERP-referentie" : "ERP reference"}</span>
-              <span className="font-mono text-sm font-semibold text-slate-700">{step.erpReference}</span>
+              <span className="text-slate-400">{lang === "nl" ? "Totale kosten" : "Total costs"}</span>
+              <span className="font-semibold text-slate-800 tabular-nums">{fmtEur(distribution.totals.totalCost)}</span>
             </div>
-          )}
-          {step?.completedAt && (
-            <div className="flex items-center justify-between text-xs border-t border-slate-100 pt-3">
-              <span className="text-slate-400">{lang === "nl" ? "Afgerekend op" : "Distributed on"}</span>
-              <span className="font-medium text-slate-700">{fmtDate(step.completedAt)}</span>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-400">{lang === "nl" ? "Totaal voorschot" : "Total advance"}</span>
+              <span className="font-medium text-slate-600 tabular-nums">{fmtEur(distribution.totals.totalVoorschot)}</span>
             </div>
-          )}
+            {distribution.totals?.netResult != null && (
+              <div className="flex items-center justify-between text-xs border-t border-slate-100 pt-2.5">
+                <span className="font-semibold text-slate-600">{lang === "nl" ? "Nettoresultaat" : "Net result"}</span>
+                <span className={`font-bold tabular-nums text-sm ${distribution.totals.netResult >= 0 ? "text-green-600" : "text-red-500"}`}>
+                  {distribution.totals.netResult >= 0 ? "+" : ""}{fmtEur(distribution.totals.netResult, 2)}
+                </span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
-          {/* Summary totals */}
-          {distribution.totals?.totalCost != null && (
-            <div className="mt-3 pt-3 border-t border-slate-100 space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400">{lang === "nl" ? "Totale kosten" : "Total costs"}</span>
-                <span className="font-semibold text-slate-800 tabular-nums">{fmtEur(distribution.totals.totalCost)}</span>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400">{lang === "nl" ? "Totaal voorschot" : "Total advance"}</span>
-                <span className="font-medium text-slate-600 tabular-nums">{fmtEur(distribution.totals.totalVoorschot)}</span>
-              </div>
-              {distribution.totals?.netResult != null && (
-                <div className="flex items-center justify-between text-xs border-t border-slate-100 pt-2">
-                  <span className="font-semibold text-slate-600">{lang === "nl" ? "Nettoresultaat" : "Net result"}</span>
-                  <span className={`font-bold tabular-nums text-sm ${distribution.totals.netResult >= 0 ? "text-green-600" : "text-red-500"}`}>
-                    {distribution.totals.netResult >= 0 ? "+" : ""}{fmtEur(distribution.totals.netResult, 2)}
-                  </span>
+      {/* Services breakdown */}
+      <Card className="border-slate-200 bg-white">
+        <CardContent className="py-0">
+          <div className="grid grid-cols-4 gap-2 px-3 py-2 border-b border-slate-100 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+            <span className="col-span-2">{lang === "nl" ? "Dienst" : "Service"}</span>
+            <span className="text-right">{lang === "nl" ? "Werkelijk" : "Actual"}</span>
+            <span className="text-right">{lang === "nl" ? "Methode" : "Method"}</span>
+          </div>
+          {distribution.services.map((svc, idx) => {
+            const service = getService(svc.serviceId);
+            const name = service?.name?.[lang] || service?.name?.en || svc.serviceId;
+            return (
+              <div key={svc.serviceId} className={`grid grid-cols-4 gap-2 items-center px-3 py-2.5 ${idx < distribution.services.length - 1 ? "border-b border-slate-100" : ""}`}>
+                <div className="col-span-2 min-w-0">
+                  <p className="text-xs font-medium text-slate-700 truncate">{name}</p>
                 </div>
-              )}
-            </div>
-          )}
+                <span className="text-xs text-right font-medium text-slate-700 tabular-nums">{fmtEur(svc.actual)}</span>
+                <span className="text-xs text-right text-slate-500 capitalize">{svc.distributionMethod}</span>
+              </div>
+            );
+          })}
         </CardContent>
       </Card>
+
+      {/* ERP export status (completed state) */}
+      {isComplete && (
+        <Card className="border-green-100 bg-green-50">
+          <CardContent className="py-4 space-y-2">
+            <div className="flex items-center gap-2 mb-2">
+              <CheckCircle2 size={14} className="text-green-600" />
+              <p className="text-xs font-semibold text-green-800">{lang === "nl" ? "Verzonden naar ERP" : "Sent to ERP"}</p>
+            </div>
+            {step?.erpReference && (
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-green-700">{lang === "nl" ? "Referentie" : "Reference"}</span>
+                <span className="font-mono font-bold text-green-900">{step.erpReference}</span>
+              </div>
+            )}
+            {step?.completedAt && (
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-green-700">{lang === "nl" ? "Datum" : "Date"}</span>
+                <span className="font-medium text-green-900">{fmtDate(step.completedAt)}</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Inline confirmation card */}
+      {confirming && isActive && !isComplete && (
+        <div className="p-4 rounded-xl border-2 border-blue-200 bg-blue-50 space-y-3">
+          <div className="flex items-start gap-3">
+            <Send size={16} className="text-blue-600 flex-none mt-0.5" />
+            <div>
+              <p className="text-sm font-bold text-blue-900">
+                {lang === "nl" ? "Definitieve verdeling bevestigen?" : "Confirm final distribution?"}
+              </p>
+              <p className="text-xs text-blue-700 mt-0.5">
+                {lang === "nl"
+                  ? `Periode ${distribution.period} wordt afgerekend en verzonden naar het ERP-systeem. Dit kan niet ongedaan worden gemaakt.`
+                  : `Period ${distribution.period} will be finalised and sent to the ERP system. This cannot be undone.`}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 pt-1">
+            <button
+              onClick={handleConfirmERP}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 shadow-sm transition-colors"
+            >
+              <CheckCircle2 size={13} />
+              {lang === "nl" ? "Ja, verstuur naar ERP" : "Yes, send to ERP"}
+            </button>
+            <button
+              onClick={() => setConfirming(false)}
+              className="px-3 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+            >
+              {lang === "nl" ? "Annuleren" : "Cancel"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Footer */}
+      {!confirming && (
+        <StepActionFooter
+          isActive={isActive}
+          isComplete={isComplete}
+          completedAt={step?.completedAt}
+          completedBy={step?.completedBy}
+          canAdvance={true}
+          onAdvance={() => setConfirming(true)}
+          advanceLabel={lang === "nl" ? "Verstuur naar ERP" : "Send to ERP"}
+          lang={lang}
+        />
+      )}
     </div>
   );
 }
@@ -626,21 +956,28 @@ function StepHeader({ title, description, status, completedAt, completedBy, lang
 
 /* ══════════════════════════════════════════════════════════════
    MAIN PAGE
-═══════════════════════════════════════════════════════════════ */
+   ══════════════════════════════════════════════════════════════ */
 export default function DistributionDetailPage() {
   const { distributionId } = useParams();
   const navigate = useNavigate();
   const { orgId } = useOrg();
   const lang = useLang();
 
-  const distribution = getDistributionById(distributionId);
-  const building = distribution ? getBuilding(distribution.buildingId) : null;
+  const sourceDist = getDistributionById(distributionId);
+  const building = sourceDist ? getBuilding(sourceDist.buildingId) : null;
 
-  // Default active step = currentStep (or first step)
-  const defaultStep = distribution?.currentStep === "complete" ? "distribution" : (distribution?.currentStep || "validation");
+  /* ── Local mutable copy of distribution (prototype state) ── */
+  const [localDist, setLocalDist] = useState(() =>
+    sourceDist ? deepCopy(sourceDist) : null
+  );
+
+  /* ── Default active step = currentStep or first step ── */
+  const defaultStep = sourceDist?.currentStep === "complete"
+    ? "distribution"
+    : (sourceDist?.currentStep || "validation");
   const [activeStep, setActiveStep] = useState(defaultStep);
 
-  if (!distribution) {
+  if (!localDist) {
     return (
       <div className="flex items-center justify-center h-full text-slate-400">
         <p className="text-sm">{lang === "nl" ? "Verdeling niet gevonden" : "Distribution not found"}</p>
@@ -648,9 +985,51 @@ export default function DistributionDetailPage() {
     );
   }
 
-  const isComplete = distribution.currentStep === "complete";
-  const currentStepIdx = isComplete ? 6 : STEP_ORDER.indexOf(distribution.currentStep);
-  const flaggedCount = distribution.services.filter(s => s.status === "flagged").length;
+  const isComplete = localDist.currentStep === "complete";
+  const currentStepIdx = isComplete ? 6 : STEP_ORDER.indexOf(localDist.currentStep);
+  const flaggedCount = localDist.services.filter(s => s.status === "flagged").length;
+
+  /* ── Advance a step to complete, mutate local state, auto-navigate ── */
+  const advanceStep = (stepName, patches = {}) => {
+    const stepIdx = STEP_ORDER.indexOf(stepName);
+    const nextStep = stepIdx < STEP_ORDER.length - 1 ? STEP_ORDER[stepIdx + 1] : "complete";
+    setLocalDist(prev => ({
+      ...prev,
+      currentStep: nextStep,
+      steps: {
+        ...prev.steps,
+        [stepName]: {
+          ...prev.steps[stepName],
+          status: "complete",
+          completedAt: today(),
+          completedBy: "user-arnon",
+          ...patches,
+        },
+      },
+    }));
+    /* Auto-navigate: go to next step, or stay on distribution when fully done */
+    setActiveStep(nextStep === "complete" ? "distribution" : nextStep);
+  };
+
+  /* ── Set approval step to in_progress (request sent, not yet approved) ── */
+  const requestApproval = (requestedFrom, note) => {
+    setLocalDist(prev => ({
+      ...prev,
+      steps: {
+        ...prev.steps,
+        approval: {
+          ...prev.steps.approval,
+          status: "in_progress",
+          requestedFrom,
+          requestedAt: today(),
+          note: note || null,
+        },
+      },
+    }));
+  };
+
+  /* ── Helper: is a given step the current active process step? ── */
+  const isStepActive = (step) => !isComplete && localDist.currentStep === step;
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -659,23 +1038,23 @@ export default function DistributionDetailPage() {
         <Breadcrumbs
           items={[
             { label: lang === "nl" ? "Verdeling" : "Distribution", href: `/${orgId}/distribution` },
-            { label: `${building?.complex || distribution.buildingId} · ${distribution.period}` },
+            { label: `${building?.complex || localDist.buildingId} · ${localDist.period}` },
           ]}
         />
         <div className="flex items-start justify-between mt-3 gap-4">
           <div>
-            <h1 className="text-lg font-bold text-slate-900">{building?.complex || distribution.buildingId}</h1>
+            <h1 className="text-lg font-bold text-slate-900">{building?.complex || localDist.buildingId}</h1>
             <div className="flex items-center gap-3 mt-1">
               <div className="flex items-center gap-1.5 text-xs text-slate-500">
                 <CalendarDays size={12} className="text-slate-400" />
-                {distribution.period}
+                {localDist.period}
               </div>
               <div className="flex items-center gap-1.5 text-xs text-slate-500">
                 <Building2 size={12} className="text-slate-400" />
                 {building?.location}
               </div>
               <div className="flex items-center gap-1.5 text-xs text-slate-500">
-                {distribution.services.length} {lang === "nl" ? "diensten" : "services"}
+                {localDist.services.length} {lang === "nl" ? "diensten" : "services"}
               </div>
               {flaggedCount > 0 && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-100">
@@ -697,9 +1076,8 @@ export default function DistributionDetailPage() {
                 {lang === "nl" ? "Stap" : "Step"} {currentStepIdx + 1}/6
               </span>
             )}
-            {/* Link to building */}
             <button
-              onClick={() => navigate(`/${orgId}/buildings/${distribution.buildingId}`)}
+              onClick={() => navigate(`/${orgId}/buildings/${localDist.buildingId}`)}
               className="flex items-center gap-1 text-xs text-slate-400 hover:text-slate-700 transition-colors"
             >
               <ArrowUpRight size={14} />
@@ -716,24 +1094,23 @@ export default function DistributionDetailPage() {
             {lang === "nl" ? "Stappen" : "Steps"}
           </p>
           <StepNavigator
-            distribution={distribution}
+            distribution={localDist}
             activeStep={activeStep}
             onSelectStep={setActiveStep}
             lang={lang}
           />
 
-          {/* Divider + totals summary */}
-          {distribution.totals?.totalCost != null && (
+          {localDist.totals?.totalCost != null && (
             <div className="mt-4 pt-4 border-t border-slate-200 px-3 space-y-2">
               <div className="flex justify-between text-[11px]">
                 <span className="text-slate-400">{lang === "nl" ? "Totaal" : "Total"}</span>
-                <span className="font-semibold text-slate-700 tabular-nums">{fmtEur(distribution.totals.totalCost)}</span>
+                <span className="font-semibold text-slate-700 tabular-nums">{fmtEur(localDist.totals.totalCost)}</span>
               </div>
-              {distribution.totals.netResult != null && (
+              {localDist.totals.netResult != null && (
                 <div className="flex justify-between text-[11px]">
                   <span className="text-slate-400">{lang === "nl" ? "Resultaat" : "Result"}</span>
-                  <span className={`font-bold tabular-nums ${distribution.totals.netResult >= 0 ? "text-green-600" : "text-red-500"}`}>
-                    {distribution.totals.netResult >= 0 ? "+" : ""}{fmtEur(distribution.totals.netResult)}
+                  <span className={`font-bold tabular-nums ${localDist.totals.netResult >= 0 ? "text-green-600" : "text-red-500"}`}>
+                    {localDist.totals.netResult >= 0 ? "+" : ""}{fmtEur(localDist.totals.netResult)}
                   </span>
                 </div>
               )}
@@ -743,12 +1120,55 @@ export default function DistributionDetailPage() {
 
         {/* Right: active step content */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
-          {activeStep === "validation"   && <ValidationPanel   distribution={distribution} lang={lang} />}
-          {activeStep === "comparison"   && <ComparisonPanel   distribution={distribution} lang={lang} />}
-          {activeStep === "control"      && <ControlPanel      distribution={distribution} lang={lang} />}
-          {activeStep === "check"        && <CheckPanel        distribution={distribution} lang={lang} />}
-          {activeStep === "approval"     && <ApprovalPanel     distribution={distribution} lang={lang} />}
-          {activeStep === "distribution" && <DistributionPanel distribution={distribution} lang={lang} />}
+          {activeStep === "validation" && (
+            <ValidationPanel
+              distribution={localDist}
+              lang={lang}
+              isActive={isStepActive("validation")}
+              onAdvance={(patches) => advanceStep("validation", patches)}
+            />
+          )}
+          {activeStep === "comparison" && (
+            <ComparisonPanel
+              distribution={localDist}
+              lang={lang}
+              isActive={isStepActive("comparison")}
+              onAdvance={(patches) => advanceStep("comparison", patches)}
+            />
+          )}
+          {activeStep === "control" && (
+            <ControlPanel
+              distribution={localDist}
+              lang={lang}
+              isActive={isStepActive("control")}
+              onAdvance={(patches) => advanceStep("control", patches)}
+            />
+          )}
+          {activeStep === "check" && (
+            <CheckPanel
+              distribution={localDist}
+              lang={lang}
+              isActive={isStepActive("check")}
+              onAdvance={(patches) => advanceStep("check", patches)}
+            />
+          )}
+          {activeStep === "approval" && (
+            <ApprovalPanel
+              distribution={localDist}
+              lang={lang}
+              isActive={isStepActive("approval")}
+              onAdvance={(patches) => advanceStep("approval", patches)}
+              onRequestApproval={requestApproval}
+            />
+          )}
+          {activeStep === "distribution" && (
+            <DistributionPanel
+              distribution={localDist}
+              lang={lang}
+              isActive={isStepActive("distribution")}
+              onAdvance={(patches) => advanceStep("distribution", patches)}
+            />
+          )}
         </div>
       </div>
     </div>
