@@ -9,6 +9,7 @@ const dict = {
   inbox:         { en: "Inbox",         nl: "Inbox" },
   tasks:         { en: "Tasks",         nl: "Taken" },
   workflows:     { en: "Workflows",     nl: "Workflows" },
+  automations:   { en: "Automations",   nl: "Automatiseringen" },
   onboarding:    { en: "Onboarding",    nl: "Onboarding" },
 
   // Navigation — objects section
@@ -53,6 +54,7 @@ const dict = {
   inboxTitle:    { en: "Inbox",         nl: "Inbox" },
   tasksTitle:    { en: "Tasks",         nl: "Taken" },
   workflowsTitle:    { en: "Workflows",     nl: "Workflows" },
+  automationsTitle:  { en: "Automations",   nl: "Automatiseringen" },
   onboardingTitle:   { en: "Onboarding",    nl: "Onboarding" },
   buildingsTitle:    { en: "Complexes",     nl: "Complexen" },
   metersTitle:       { en: "Meters",        nl: "Meters" },

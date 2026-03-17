@@ -19,10 +19,14 @@ import {
   MapPin,
   ArrowUpRight,
   RotateCcw,
+  Columns2,
+  Check,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import { useOrg } from "@/lib/OrgContext";
 import { useViews } from "@/lib/ViewsContext";
+import { getMetersByBuilding } from "@/lib/data";
+import { BUILDING_COLUMNS, COLUMN_CATEGORIES, defaultComplexColumns } from "@/lib/columnRegistry";
 import { t, useLang } from "@/lib/i18n";
 import { StatusBadge } from "./ui/status-badge";
 
@@ -108,22 +112,85 @@ const sortOptions = [
   { value: "utilityCount", label: { en: "Utilities",  nl: "Nutsvoorzieningen" } },
 ];
 
-/* ── Column definitions ── */
-const allColumns = {
-  complex:          { align: "left",   sortable: false },
-  complexId:        { align: "left",   sortable: false },
-  location:         { align: "left",   sortable: false },
-  vhe:              { align: "right",  sortable: true },
-  components:       { align: "right",  sortable: true },
-  utilities:        { align: "left",   sortable: true, sortKey: "utilityCount" },
-  budgetProgress:   { align: "left",   sortable: false },
-  dataQuality:      { align: "center", sortable: false },
-};
+/* ── Budget bar ─ (used in renderCell) ─────────────────────── */
+/* ── defined here so it's available before the main component ── */
 
-/* ── Default columns ── */
-const defaultComplexColumns = [
-  "complex", "complexId", "location", "vhe", "components", "utilities", "dataQuality",
-];
+/* ── ColumnPicker popover ──────────────────────────────────── */
+function ColumnPicker({ visibleCols, onChange, lang }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    }
+    if (open) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  function toggleCol(key) {
+    // Always keep at least one column
+    if (visibleCols.includes(key)) {
+      if (visibleCols.length === 1) return;
+      onChange(visibleCols.filter((k) => k !== key));
+    } else {
+      onChange([...visibleCols, key]);
+    }
+  }
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className={`inline-flex items-center gap-1.5 px-3 h-8 rounded-lg text-xs font-medium transition-colors border ${
+          open
+            ? "border-[#3EB1C8] bg-[#3EB1C8]/5 text-[#3EB1C8]"
+            : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+        }`}
+        title={lang === "nl" ? "Kolommen aanpassen" : "Customize columns"}
+      >
+        <Columns2 size={13} />
+        {lang === "nl" ? "Kolommen" : "Columns"}
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full mt-1 z-50 w-56 rounded-xl border border-slate-200 bg-white shadow-lg py-2">
+          {COLUMN_CATEGORIES.map((cat) => {
+            const cols = Object.values(BUILDING_COLUMNS).filter((c) => c.category === cat.key);
+            if (!cols.length) return null;
+            return (
+              <div key={cat.key}>
+                <div className="px-3 pt-2 pb-1 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">
+                  {cat.label[lang] || cat.label.en}
+                </div>
+                {cols.map((col) => {
+                  const isVisible = visibleCols.includes(col.key);
+                  return (
+                    <button
+                      key={col.key}
+                      onClick={() => toggleCol(col.key)}
+                      className="w-full flex items-center justify-between px-3 py-1.5 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+                    >
+                      <span className="flex items-center gap-2">
+                        <span className={isVisible ? "text-slate-800 font-medium" : "text-slate-500"}>
+                          {col.label[lang] || col.label.en}
+                        </span>
+                        {col.unit && (
+                          <span className="text-[10px] text-slate-400">{col.unit}</span>
+                        )}
+                      </span>
+                      {isVisible && <Check size={12} className="text-[#3EB1C8] shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 /* ── Dropdown component ── */
 function Dropdown({ trigger, children, align = "left" }) {
@@ -202,8 +269,13 @@ export default function BuildingListPage() {
     return locs;
   }, [data.buildings]);
 
-  // Columns — always default for now (settlement views handled separately)
-  const visibleColumns = defaultComplexColumns;
+  // Visible columns: driven by the active view's columns array, else defaults
+  const visibleColumns = (activeView?.columns?.length ? activeView.columns : defaultComplexColumns);
+
+  // Handler for column picker changes — persisted to the active view
+  function handleColumnsChange(newCols) {
+    if (activeViewId) updateView(activeViewId, { columns: newCols });
+  }
 
   // Build set of building IDs that have at least one external kostenverdeler service
   const buildingsWithExternalKv = useMemo(() => {
@@ -220,14 +292,42 @@ export default function BuildingListPage() {
     return ids;
   }, [data.suppliers, data.buildingServices]);
 
-  // Enrich buildings
+  // Pre-aggregate annual consumption totals per building from meter readings
+  const consumptionByBuilding = useMemo(() => {
+    const YEAR = new Date().getFullYear();
+    const map = {};
+    for (const b of data.buildings) {
+      const meters = getMetersByBuilding(b.id);
+      const totals = { heat: 0, water: 0, electricity: 0, warmWater: 0 };
+      let hasAny = false;
+      for (const m of meters) {
+        const reading = m.readings?.[YEAR] ?? m.readings?.[YEAR - 1];
+        if (reading?.consumption != null) {
+          totals[m.utility] = (totals[m.utility] || 0) + reading.consumption;
+          hasAny = true;
+        }
+      }
+      map[b.id] = hasAny ? totals : null;
+    }
+    return map;
+  }, [data.buildings]);
+
+  // Enrich buildings — attach consumption totals as flat sortable fields
   const enriched = useMemo(() => {
-    return data.buildings.map((b) => ({
-      ...b,
-      utilityCount: b.utilities.length,
-      hasExternalKv: buildingsWithExternalKv.has(b.id),
-    }));
-  }, [data.buildings, buildingsWithExternalKv]);
+    return data.buildings.map((b) => {
+      const c = consumptionByBuilding[b.id];
+      return {
+        ...b,
+        utilityCount: b.utilities.length,
+        hasExternalKv: buildingsWithExternalKv.has(b.id),
+        _consumption: c,
+        heat_consumption:          c?.heat          ?? null,
+        water_consumption:         c?.water         ?? null,
+        electricity_consumption:   c?.electricity   ?? null,
+        warmWater_consumption:     c?.warmWater      ?? null,
+      };
+    });
+  }, [data.buildings, buildingsWithExternalKv, consumptionByBuilding]);
 
   // Filter
   const filtered = useMemo(() => {
@@ -356,7 +456,7 @@ export default function BuildingListPage() {
 
   // Toggle sort on a column
   function handleSort(colKey) {
-    const col = allColumns[colKey];
+    const col = BUILDING_COLUMNS[colKey];
     if (!col?.sortable) return;
     const key = col.sortKey || colKey;
     if (sortCol === key) {
@@ -438,14 +538,31 @@ export default function BuildingListPage() {
             <StatusBadge status={b.dataQuality} size="xs" />
           </td>
         );
+      case "heat_consumption":
+      case "water_consumption":
+      case "electricity_consumption":
+      case "warmWater_consumption": {
+        const colDef = BUILDING_COLUMNS[col];
+        const val = b[col];
+        const formatted = val != null
+          ? `${Number.isInteger(val) ? val.toLocaleString() : val.toFixed(1)} ${colDef?.unit || ""}`
+          : "—";
+        return (
+          <td key={col} className="px-3 sm:px-4 py-3 text-right">
+            <span className={`text-sm tabular-nums ${val != null ? "text-slate-700" : "text-slate-300"}`}>
+              {formatted}
+            </span>
+          </td>
+        );
+      }
       default:
-        return <td key={col} className="px-3 sm:px-4 py-3">—</td>;
+        return <td key={col} className="px-3 sm:px-4 py-3 text-slate-300">—</td>;
     }
   }
 
   /* ── Sort icon helper ── */
   function SortIcon({ colKey }) {
-    const col = allColumns[colKey];
+    const col = BUILDING_COLUMNS[colKey];
     if (!col?.sortable) return null;
     const key = col.sortKey || colKey;
     const isActive = sortCol === key;
@@ -463,7 +580,11 @@ export default function BuildingListPage() {
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-baseline gap-3">
             <h1 className="text-xl font-semibold" style={{ color: brand.navy }}>
-              {t("buildingsTitle", lang)}
+              {activeView
+                ? (typeof activeView.name === "object"
+                    ? activeView.name[lang] || activeView.name.en
+                    : activeView.name)
+                : t("buildingsTitle", lang)}
             </h1>
             <span className="text-sm text-slate-400">
               {sorted.length > PAGE_SIZE
@@ -471,6 +592,15 @@ export default function BuildingListPage() {
                 : sorted.length}
             </span>
           </div>
+
+          {/* Column picker — only available when a view is active */}
+          {activeView && (
+            <ColumnPicker
+              visibleCols={visibleColumns}
+              onChange={handleColumnsChange}
+              lang={lang}
+            />
+          )}
         </div>
 
         {/* ── Filter & Sort toolbar ── */}
@@ -789,7 +919,7 @@ export default function BuildingListPage() {
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50/80">
                 {visibleColumns.map((colKey) => {
-                  const col = allColumns[colKey] || { align: "left" };
+                  const col = BUILDING_COLUMNS[colKey] || { align: "left" };
                   const isSortable = col.sortable;
                   return (
                     <th
@@ -799,8 +929,13 @@ export default function BuildingListPage() {
                       }`}
                       onClick={() => handleSort(colKey)}
                     >
-                      <span className="inline-flex items-center">
+                      <span className="inline-flex items-center gap-1">
                         {col.label ? (col.label[lang] || col.label.en) : t(colKey, lang)}
+                        {col.unit && (
+                          <span className="text-[9px] font-normal text-slate-400 normal-case tracking-normal">
+                            {col.unit}
+                          </span>
+                        )}
                         {isSortable && <SortIcon colKey={colKey} />}
                       </span>
                     </th>
