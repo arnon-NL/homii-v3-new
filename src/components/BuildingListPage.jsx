@@ -19,7 +19,7 @@ import {
   MapPin,
   ArrowUpRight,
   RotateCcw,
-  Columns2,
+  Columns,
   Check,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
@@ -149,7 +149,7 @@ function ColumnPicker({ visibleCols, onChange, lang }) {
         }`}
         title={lang === "nl" ? "Kolommen aanpassen" : "Customize columns"}
       >
-        <Columns2 size={13} />
+        <Columns size={13} />
         {lang === "nl" ? "Kolommen" : "Columns"}
       </button>
 
