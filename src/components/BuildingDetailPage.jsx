@@ -592,12 +592,8 @@ export default function BuildingDetailPage() {
                     .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
                   const overdueTasks = openTasks.filter((t) => new Date(t.dueDate) < new Date());
 
-                  // Merge action queue
+                  // Merge action queue (tasks + warnings only — distribution lives in header + its own tab)
                   const actionQueue = [];
-                  // Distribution in progress → show at top
-                  if (hasActiveDistribution) {
-                    actionQueue.push({ type: "distribution", severity: "info", item: activeDistribution });
-                  }
                   overdueTasks.forEach((t) => actionQueue.push({ type: "task", severity: "error", item: t }));
                   warnings.forEach((w) => actionQueue.push({ type: "warning", severity: w.severity, item: w }));
                   openTasks.filter((t) => !overdueTasks.includes(t)).forEach((t) => actionQueue.push({ type: "task", severity: "info", item: t }));
@@ -643,38 +639,7 @@ export default function BuildingDetailPage() {
                         </div>
                         <div className="divide-y divide-slate-100">
                           {actionQueue.map((entry) => {
-                            if (entry.type === "distribution") {
-                              const dist = entry.item;
-                              const stepCfg = STEP_CONFIG[dist.currentStep];
-                              const stepLabel = stepCfg?.label?.[lang] ?? dist.currentStep;
-                              const flagged = getFlaggedServiceCount(dist);
-                              return (
-                                <button
-                                  key={dist.id}
-                                  onClick={() => navigate(`/distribution/${dist.id}`)}
-                                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors text-left"
-                                >
-                                  <span
-                                    className="w-1.5 h-1.5 rounded-full shrink-0 animate-pulse"
-                                    style={{ background: brand.teal }}
-                                  />
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-xs text-slate-700">
-                                      {lang === "nl" ? "Verdeling" : "Distribution"} {dist.period}
-                                      <span className="mx-1.5 text-slate-300">·</span>
-                                      <span className="text-slate-400">{lang === "nl" ? "Stap" : "Step"}: {stepLabel}</span>
-                                    </p>
-                                  </div>
-                                  {flagged > 0 && (
-                                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full shrink-0"
-                                      style={{ background: brand.amber + "18", color: brand.amber }}>
-                                      {flagged} {lang === "nl" ? "melding" : "flag"}{flagged > 1 ? "s" : ""}
-                                    </span>
-                                  )}
-                                  <ChevronRight size={12} className="text-slate-300 shrink-0" />
-                                </button>
-                              );
-                            } else if (entry.type === "task") {
+                            if (entry.type === "task") {
                               const task = entry.item;
                               const isOverdue = new Date(task.dueDate) < new Date();
                               return (
@@ -817,82 +782,7 @@ export default function BuildingDetailPage() {
                       </CardContent>
                     </Card>
 
-                  {/* ── Distribution Reference Card ── */}
-                  {isFeatureEnabled("ledger") && buildingDistributions.length > 0 && (() => {
-                    const dist = activeDistribution || buildingDistributions[0];
-                    const isComplete = dist.currentStep === "complete";
-                    const stepIdx = getStepIndex(dist);
-                    const stepCfg = STEP_CONFIG[dist.currentStep];
-                    const flaggedSvcs = dist.services.filter(s => s.status === "flagged").length;
-                    const distId = `/${orgId}/distribution/${dist.id}`;
-
-                    return (
-                      <Card className="border-slate-200 bg-white overflow-hidden">
-                        <CardContent className="px-4 py-3">
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-2">
-                              <Send size={13} className="text-slate-400" />
-                              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                                {lang === "nl" ? "Verdeling" : "Distribution"} {dist.period}
-                              </span>
-                            </div>
-                            {isComplete ? (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-                                <CheckCircle2 size={10} />
-                                {lang === "nl" ? "Afgerond" : "Complete"}
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
-                                <Clock size={10} />
-                                {lang === "nl" ? "Stap" : "Step"} {stepIdx + 1}/6
-                              </span>
-                            )}
-                          </div>
-
-                          {/* 6-step mini progress bar */}
-                          <div className="flex items-center gap-0.5 mb-2">
-                            {STEP_ORDER.map((step, i) => {
-                              const done = isComplete || i < stepIdx;
-                              const active = !isComplete && i === stepIdx;
-                              return (
-                                <div
-                                  key={step}
-                                  className="h-1 rounded-full flex-1"
-                                  style={{ background: done ? (brand.teal || "#3EB1C8") : active ? "#93C5FD" : "#E2E8F0" }}
-                                />
-                              );
-                            })}
-                          </div>
-
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              {!isComplete && stepCfg && (
-                                <span className="text-[11px] text-slate-500">
-                                  {lang === "nl" ? "Huidig" : "Current"}: <span className="font-medium text-slate-700">{stepCfg.label[lang] || stepCfg.label.en}</span>
-                                </span>
-                              )}
-                              {flaggedSvcs > 0 && (
-                                <span className="inline-flex items-center gap-1 text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
-                                  <AlertTriangle size={10} />
-                                  {flaggedSvcs} {lang === "nl" ? "aandacht" : "flagged"}
-                                </span>
-                              )}
-                            </div>
-                            <button
-                              onClick={() => navigate(distId)}
-                              className="text-[11px] font-medium hover:underline flex items-center gap-0.5"
-                              style={{ color: brand.blue }}
-                            >
-                              {lang === "nl" ? "Open verdeling" : "Open distribution"}
-                              <ChevronRight size={11} />
-                            </button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })()}
-
-                  {/* Layer 3: Notes & Context */}
+                  {/* Notes & Context */}
                   <Card className="border-slate-200 bg-white overflow-hidden">
                     <CardContent className="p-0">
                       <div className="px-4 py-2.5 border-b border-slate-100 flex items-center justify-between">
@@ -953,41 +843,6 @@ export default function BuildingDetailPage() {
                     </CardContent>
                   </Card>
 
-                  {/* Layer 4: Recent Activity */}
-                  {activityList.length > 0 && (
-                    <Card className="border-slate-200 bg-white overflow-hidden">
-                      <CardContent className="p-0">
-                        <div className="px-4 py-2.5 border-b border-slate-100 flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Activity size={13} className="text-slate-400" />
-                            <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                              {lang === "nl" ? "Recente activiteit" : "Recent activity"}
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => setActiveTab("activity")}
-                            className="text-[11px] font-medium hover:underline transition-colors"
-                            style={{ color: brand.blue }}
-                          >
-                            {lang === "nl" ? "Bekijk alles" : "View all"} →
-                          </button>
-                        </div>
-                        <div className="divide-y divide-slate-100">
-                          {activityList.slice(0, 4).map((act) => (
-                            <div key={act.id} className="flex items-start gap-3 px-4 py-2">
-                              <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 shrink-0" />
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs text-slate-600 truncate">
-                                  {act.description[lang] || act.description.en}
-                                </p>
-                              </div>
-                              <span className="text-[11px] text-slate-400 shrink-0 tabular-nums">{act.date}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
                 </div>
                 );
                 })()}
