@@ -31,8 +31,6 @@ import {
   getLedgerSummaryByService,
   getBuildingServicesByService,
   getMetersByBuilding,
-  getAvailableYears,
-  getSettlementsByYear,
   isFeatureEnabled,
   getHeatingSeasonsByBuilding,
   getCostCategoriesByService,
@@ -531,36 +529,15 @@ export default function ServiceDetailPage() {
   const category = orgData.serviceCategories.find((c) => c.id === service?.category);
 
   const hasLedger = isFeatureEnabled("ledger");
-  const availableYears = useMemo(() => getAvailableYears(), []);
+  const availableYears = [2024, 2025];
   const [year, setYear] = useState(() => {
-    const yrs = getAvailableYears();
     const currentYear = new Date().getFullYear();
-    if (yrs.includes(currentYear)) return currentYear;
-    return yrs.length > 0 ? yrs[yrs.length - 1] : 2025;
+    if (availableYears.includes(currentYear)) return currentYear;
+    return availableYears.length > 0 ? availableYears[availableYears.length - 1] : 2025;
   });
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [expandedBuilding, setExpandedBuilding] = useState(null);
-
-  const isPastYear = year < new Date().getFullYear();
-
-  // Settlement context for past years (aggregated across buildings for this service)
-  const settlementContext = useMemo(() => {
-    if (!hasLedger || !isPastYear) return null;
-    const settlements = getSettlementsByYear(year);
-    if (settlements.length === 0) return null;
-    const total = settlements.length;
-    const statusCounts = {};
-    for (const s of settlements) {
-      statusCounts[s.status] = (statusCounts[s.status] || 0) + 1;
-    }
-    // Determine dominant status
-    const dominantStatus = statusCounts.distributed >= total * 0.8 ? "distributed"
-      : statusCounts.approved >= total * 0.5 ? "approved"
-      : statusCounts.in_review >= total * 0.3 ? "in_review"
-      : "monitoring";
-    return { total, statusCounts, dominantStatus };
-  }, [year, hasLedger, isPastYear]);
 
   // ── Energy mode: building-service rows from buildingServices ──
   const energyBuildingRows = useMemo(() => {

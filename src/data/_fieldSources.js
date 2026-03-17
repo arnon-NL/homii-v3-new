@@ -34,8 +34,6 @@ export const FIELD_SOURCES = {
     ytdBalance: "real", endTotalCost: "real", suggestedAdvance: "real",
   },
   supplier: { _entity: "mock" },
-  settlement: { _entity: "mock" },
-  settlementCheck: { _entity: "mock" },
   ledgerEntry: { _entity: "mock" },
   costCategory: { _entity: "mock" },
   distributionModel: { _entity: "mock" },

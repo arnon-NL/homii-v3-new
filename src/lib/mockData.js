@@ -23,8 +23,6 @@ export {
   supplierCategories,
   distributionMethods,
   distributionModels,
-  buildingSettlements,
-  settlementChecks,
   savedViews,
   ledgerEntries,
   costCategories,
@@ -82,11 +80,6 @@ export {
   getSuppliersByService,
   getSuppliersByCategory,
 
-  // --- Settlement getters ---
-  getSettlement,
-  getSettlementsByYear,
-  getSettlementChecks,
-
   // --- Distribution getters ---
   getDistributionMethod,
   getDistributionModel,
@@ -112,9 +105,6 @@ export {
   // --- Config ---
   isFeatureEnabled,
   getModuleConfig,
-
-  // --- Available years ---
-  getAvailableYears,
 
   // --- Heating season getters ---
   getHeatingSeasonsByBuilding,

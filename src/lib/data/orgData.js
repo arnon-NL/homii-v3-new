@@ -14,8 +14,6 @@ import rCostCategories from "../../data/costCategories.json";
 import rVhes from "../../data/vhes.json";
 import rMeters from "../../data/meters.json";
 import rLedger from "../../data/ledgerEntries.json";
-import rSettlements from "../../data/settlements.json";
-import rSettlementChecks from "../../data/settlementChecks.json";
 import rSuppliers from "../../data/suppliers.json";
 import rSupplierCategories from "../../data/supplierCategories.json";
 import rDistributionMethods from "../../data/distributionMethods.json";
@@ -29,7 +27,7 @@ import rTasks from "../../data/tasks.json";
 import rNotes from "../../data/notes.json";
 import rDistributions from "../../data/distributions.json";
 
-// --- Portaal (energy-only — no ledger, settlement, or supplier data) ---
+// --- Portaal (energy-only — no ledger or supplier data) ---
 import pBuildings from "../../data/portaal/buildings.json";
 import pServices from "../../data/portaal/services.json";
 import pServiceCategories from "../../data/portaal/serviceCategories.json";
@@ -112,21 +110,6 @@ function buildIndexes(ds) {
     ds._ledgerByServiceBuilding.get(key).push(e);
   }
 
-  // Settlements
-  ds._settlementsByBuilding = new Map();
-  for (const s of ds.settlements) {
-    if (!ds._settlementsByBuilding.has(s.buildingId)) ds._settlementsByBuilding.set(s.buildingId, []);
-    ds._settlementsByBuilding.get(s.buildingId).push(s);
-  }
-
-  // Settlement checks
-  ds._checksByBldYear = new Map();
-  for (const c of ds.settlementChecks) {
-    const key = `${c.buildingId}|${c.year}`;
-    if (!ds._checksByBldYear.has(key)) ds._checksByBldYear.set(key, []);
-    ds._checksByBldYear.get(key).push(c);
-  }
-
   // Suppliers
   ds._supplierMap = new Map();
   for (const s of ds.suppliers) ds._supplierMap.set(s.id, s);
@@ -174,8 +157,6 @@ const rochdale = buildIndexes({
   vhes: rVhes,
   meters: rMeters,
   ledgerEntries: rLedger,
-  settlements: rSettlements,
-  settlementChecks: rSettlementChecks,
   suppliers: rSuppliers,
   supplierCategories: rSupplierCategories,
   distributionMethods: rDistributionMethods,
@@ -200,8 +181,6 @@ const portaal = buildIndexes({
   vhes: pVhes,
   meters: pMeters,
   ledgerEntries: [],          // energy-only: no ledger
-  settlements: [],            // energy-only: no settlements
-  settlementChecks: [],       // energy-only: no settlement checks
   suppliers: [],              // energy-only: no suppliers
   supplierCategories: [],     // energy-only: no supplier categories
   distributionMethods: pDistributionMethods,
@@ -228,16 +207,3 @@ export function getDataset(orgId) {
   return datasets[orgId] || rochdale;
 }
 
-/**
- * Get available years for an org's buildings data.
- * Derived from buildingServices years.
- */
-export function getAvailableYears(orgId) {
-  const ds = getDataset(orgId);
-  const years = new Set();
-  for (const bs of ds.buildingServices) {
-    if (bs.year) years.add(bs.year);
-  }
-  const sorted = [...years].sort((a, b) => a - b);
-  return sorted.length > 0 ? sorted : [2024, 2025, 2026];
-}

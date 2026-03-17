@@ -131,7 +131,6 @@ const dict = {
   variance:          { en: "Variance",            nl: "Afwijking" },
   underBudget:       { en: "Under budget",        nl: "Onder budget" },
   overBudget:        { en: "Over budget",         nl: "Over budget" },
-  settlementReadiness: { en: "Settlement",        nl: "Afrekening" },
   activeServices:    { en: "Services",            nl: "Diensten" },
   mainMeters:        { en: "Main Meters",         nl: "Hoofdmeters" },
   subMeters:         { en: "Sub Meters",          nl: "Submeters" },
@@ -159,26 +158,6 @@ const dict = {
 
   // VHE
   vheTitle:          { en: "VHE",                 nl: "VHE" },
-
-  // Settlement (eindafrekening)
-  settlement:        { en: "Settlement",           nl: "Afrekening" },
-  settlementStatus:  { en: "Settlement Status",    nl: "Afrekeningsstatus" },
-  netResult:         { en: "Net Result",           nl: "Netto Resultaat" },
-  notStarted:        { en: "Not started",          nl: "Niet gestart" },
-  monitoring:        { en: "Monitoring",           nl: "Monitoring" },
-  inReview:          { en: "In review",            nl: "In controle" },
-  approved:          { en: "Approved",             nl: "Goedgekeurd" },
-  distributed:       { en: "Distributed",          nl: "Afgerekend" },
-  naheffing:         { en: "Surcharge",            nl: "Naheffing" },
-  teruggave:         { en: "Refund",               nl: "Teruggave" },
-  ledgerComplete:    { en: "Ledger complete",      nl: "Boekhouding compleet" },
-  budgetApproved:    { en: "Budget approved",      nl: "Budget goedgekeurd" },
-  yoyDeviation:      { en: "YoY deviation",        nl: "Jaarvergelijking" },
-  consumptionVerified: { en: "Consumption verified", nl: "Verbruik geverifieerd" },
-  checksPerService:  { en: "Checks per service",   nl: "Controles per dienst" },
-  verified:          { en: "Verified",             nl: "Geverifieerd" },
-  flagged:           { en: "Flagged",              nl: "Gemarkeerd" },
-  pending:           { en: "Pending",              nl: "In afwachting" },
 };
 
 export function t(key, lang = "en") {

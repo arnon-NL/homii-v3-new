@@ -6,7 +6,7 @@
 //
 // Pattern: all getter functions delegate to the active org's dataset.
 // ═══════════════════════════════════════════════════════════════
-import { getDataset, getAvailableYears as _getAvailableYears } from "./orgData.js";
+import { getDataset } from "./orgData.js";
 
 // --- Active org state (set by OrgContext) ---
 let _activeOrgId = "rochdale";
@@ -35,8 +35,6 @@ export function getMeters() { return ds().meters; }
 export function getAllLedgerEntries() { return ds().ledgerEntries; }
 export function getSuppliers() { return ds().suppliers; }
 export function getSupplierCategories() { return ds().supplierCategories; }
-export function getAllSettlements() { return ds().settlements; }
-export function getAllSettlementChecks() { return ds().settlementChecks; }
 export function getDistributionMethods() { return ds().distributionMethods; }
 export function getDistributionModels() { return ds().distributionModels; }
 export function getMonthlyCloseStatuses() { return ds().monthlyCloseStatuses; }
@@ -60,8 +58,6 @@ Object.defineProperty(_proxy, "costCategories", { get: () => ds().costCategories
 Object.defineProperty(_proxy, "vhes", { get: () => ds().vhes, enumerable: true });
 Object.defineProperty(_proxy, "meters", { get: () => ds().meters, enumerable: true });
 Object.defineProperty(_proxy, "ledgerEntries", { get: () => ds().ledgerEntries, enumerable: true });
-Object.defineProperty(_proxy, "settlements", { get: () => ds().settlements, enumerable: true });
-Object.defineProperty(_proxy, "settlementChecks", { get: () => ds().settlementChecks, enumerable: true });
 Object.defineProperty(_proxy, "suppliers", { get: () => ds().suppliers, enumerable: true });
 Object.defineProperty(_proxy, "supplierCategories", { get: () => ds().supplierCategories, enumerable: true });
 Object.defineProperty(_proxy, "distributionMethods", { get: () => ds().distributionMethods, enumerable: true });
@@ -90,8 +86,6 @@ export const monthlyCloseStatuses = _proxy.monthlyCloseStatuses;
 export const savedViews = _proxy.savedViews;
 export const activities = _proxy.activities;
 export const moduleConfig = _proxy.moduleConfig;
-export const buildingSettlements = _proxy.settlements;
-export const settlementChecks = _proxy.settlementChecks;
 
 // ═══════════════════════════════════════════════════════════════
 // Getter functions — all delegate to active org's indexed dataset
@@ -243,21 +237,6 @@ export function getSuppliersByService(serviceId) {
   return ds().suppliers.filter((s) => s.serviceIds && s.serviceIds.includes(serviceId));
 }
 
-// --- Settlements ---
-export function getSettlement(buildingId, year) {
-  const all = ds()._settlementsByBuilding.get(String(buildingId)) || [];
-  if (year) return all.find((s) => s.year === year) || null;
-  return all[0] || null;
-}
-
-export function getSettlementsByYear(year) {
-  return ds().settlements.filter((s) => s.year === year);
-}
-
-export function getSettlementChecks(buildingId, year) {
-  return ds()._checksByBldYear.get(`${String(buildingId)}|${year}`) || [];
-}
-
 // --- Distributions (process objects) ---
 export function getDistributions() {
   return ds().distributions || [];
@@ -378,11 +357,6 @@ export {
 
 // --- Field Sources (shared across orgs) ---
 export { FIELD_SOURCES, getFieldSource, getEntitySource } from "./fieldSources.js";
-
-// --- Available years (derived from data) ---
-export function getAvailableYears() {
-  return _getAvailableYears(_activeOrgId);
-}
 
 // ═══════════════════════════════════════════════════════════════
 // Compatibility aliases — match original mockData.js signatures

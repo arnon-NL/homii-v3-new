@@ -23,11 +23,8 @@ import {
   ChevronRight,
   ChevronDown,
   ArrowLeft,
-  Circle,
   HelpCircle,
-  FileCheck,
   Send,
-  ShieldCheck,
   Flag,
   LayoutList,
   CreditCard,
@@ -40,7 +37,6 @@ import {
   CalendarDays,
   CircleDot,
   ListChecks,
-  Lock,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import {
@@ -51,8 +47,6 @@ import {
   getMetersByBuilding,
   getActivitiesByBuilding,
   getDistributionMethod,
-  getSettlement,
-  getSettlementChecks,
   getServiceCategories,
   getLedgerSummaryByBuilding,
   getLedgerGroupedByCostCategory,
@@ -62,8 +56,6 @@ import {
   getDistributionModel,
   isFeatureEnabled,
   getFieldSource,
-  getAvailableYears,
-  getHeatingSeasonsByBuilding,
   getDistributionModelsByBuilding,
   getTasksByBuilding,
   getNotesByBuilding,
@@ -153,109 +145,10 @@ const activityIcons = {
   alert: { icon: AlertTriangle, color: brand.red },
 };
 
-/* ── Settlement status config ── */
-const settlementStatusConfig = {
-  not_started:  { icon: Circle,        color: "#94A3B8", bg: "#F8FAFC", label: { en: "Not started",  nl: "Niet gestart" } },
-  monitoring:   { icon: Clock,         color: "#94A3B8", bg: "#F8FAFC", label: { en: "Monitoring",   nl: "Monitoring" } },
-  in_review:    { icon: AlertTriangle, color: "#F59E0B", bg: "#F8FAFC", label: { en: "In review",    nl: "In controle" } },
-  approved:     { icon: FileCheck,     color: "#64748B", bg: "#F8FAFC", label: { en: "Approved",     nl: "Goedgekeurd" } },
-  distributed:  { icon: Send,          color: "#64748B", bg: "#F8FAFC", label: { en: "Distributed",  nl: "Afgerekend" } },
-};
 
-/* ── Settlement check icon ── */
-function CheckIcon({ passed, label }) {
-  return (
-    <div className="flex items-center gap-2" title={label}>
-      {passed ? (
-        <CheckCircle2 size={14} className="text-slate-400" />
-      ) : passed === false ? (
-        <AlertTriangle size={14} className="text-amber-500" />
-      ) : (
-        <Circle size={14} className="text-slate-300" />
-      )}
-      <span className={`text-[11px] ${passed ? "text-slate-600" : passed === false ? "text-amber-600 font-medium" : "text-slate-400"}`}>
-        {label}
-      </span>
-    </div>
-  );
-}
 
-/* ── Settlement check status badge ── */
-const checkStatusConfig = {
-  approved: { icon: CheckCircle2, color: "#64748B", bg: "#F8FAFC", label: { en: "Approved",  nl: "Goedgekeurd" } },
-  verified: { icon: ShieldCheck,  color: "#64748B", bg: "#F8FAFC", label: { en: "Verified",  nl: "Geverifieerd" } },
-  flagged:  { icon: Flag,         color: "#EF4444", bg: "#F8FAFC", label: { en: "Flagged",   nl: "Gemarkeerd" } },
-  pending:  { icon: Clock,        color: "#F59E0B", bg: "#F8FAFC", label: { en: "Pending",   nl: "In afwachting" } },
-};
 
-function CheckStatusBadge({ status, lang }) {
-  const cfg = checkStatusConfig[status] || checkStatusConfig.pending;
-  const Icon = cfg.icon;
-  return (
-    <span
-      className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-medium"
-      style={{ background: cfg.bg, color: cfg.color }}
-    >
-      <Icon size={14} />
-      {cfg.label[lang] || cfg.label.en}
-    </span>
-  );
-}
 
-/* ── Year selector ── */
-function YearSelector({ year, setYear, availableYears, heatingSeasons }) {
-  // If we have heating seasons, prefer those for labels
-  const seasonMap = useMemo(() => {
-    const map = {};
-    for (const hs of (heatingSeasons || [])) {
-      map[hs.yearKey] = hs;
-    }
-    return map;
-  }, [heatingSeasons]);
-
-  const years = availableYears && availableYears.length > 0 ? availableYears : [2024, 2025, 2026];
-  const currentYear = new Date().getFullYear();
-  return (
-    <div className="inline-flex flex-col items-start gap-1">
-      <div className="inline-flex items-center rounded-lg bg-slate-100 p-0.5">
-        {years.map((y) => {
-          const season = seasonMap[y];
-          const label = season ? season.yearLabel : String(y);
-          const isPast = y < currentYear;
-          return (
-            <button
-              key={y}
-              onClick={() => setYear(y)}
-              className={`px-3 h-7 rounded-lg text-xs font-medium tabular-nums transition-colors flex items-center gap-1 ${
-                year === y
-                  ? isPast
-                    ? "bg-white text-slate-900 shadow-sm"
-                    : "bg-white text-slate-900 shadow-sm"
-                  : "text-slate-400 hover:text-slate-600"
-              }`}
-            >
-              {isPast && <Lock size={10} className={year === y ? "text-slate-400" : "text-slate-300"} />}
-              {label}
-            </button>
-          );
-        })}
-      </div>
-      {/* Show season date range subtitle for active year */}
-      {(() => {
-        const activeSeason = seasonMap[year];
-        if (!activeSeason) return null;
-        const startDate = new Date(activeSeason.seasonStart);
-        const endDate = new Date(activeSeason.seasonEnd);
-        const fmtMonth = (d) => d.toLocaleDateString("nl-NL", { month: "short", year: "numeric" });
-        return (
-          <span className="text-[11px] text-slate-400 ml-1">
-            {fmtMonth(startDate)} – {fmtMonth(endDate)}
-          </span>
-        );
-      })()}
-    </div>
-  );
-}
 
 /* ══════════════════════════════════════════════════════════════ */
 /* ██  MAIN COMPONENT                                          ██ */
@@ -266,24 +159,7 @@ export default function BuildingDetailPage() {
   const navigate = useNavigate();
   const lang = useLang();
   const { data, orgId } = useOrg();
-  const availableYears = useMemo(() => getAvailableYears(), []);
-  // Years this specific building has service data for
-  const buildingYears = useMemo(() => {
-    const allBs = getBuildingServices(buildingId);
-    return [...new Set(allBs.map((bs) => bs.year))].sort((a, b) => a - b);
-  }, [buildingId]);
-  const [year, setYear] = useState(() => {
-    const currentYear = new Date().getFullYear();
-    // Prefer current year if this building has data for it
-    if (buildingYears.includes(currentYear)) return currentYear;
-    // Fall back to latest year this building has data for
-    if (buildingYears.length > 0) return buildingYears[buildingYears.length - 1];
-    // Last resort: global available years
-    const yrs = getAvailableYears();
-    if (yrs.includes(currentYear)) return currentYear;
-    return yrs.length > 0 ? yrs[yrs.length - 1] : 2025;
-  });
-  const heatingSeasons = useMemo(() => getHeatingSeasonsByBuilding(buildingId), [buildingId]);
+  const year = new Date().getFullYear();
   const [activeTab, setActiveTab] = useState("overview");
   const [expandedVhe, setExpandedVhe] = useState(null);
   const [expandedService, setExpandedService] = useState(null);
@@ -301,8 +177,6 @@ export default function BuildingDetailPage() {
   const buildingDistributions = useMemo(() => getDistributionsByBuilding(buildingId), [buildingId]);
 
   const building = getBuilding(buildingId);
-
-  const isPastYear = year < new Date().getFullYear();
 
   // Related data
   const bsRelations = useMemo(
@@ -343,14 +217,6 @@ export default function BuildingDetailPage() {
   const buildingNotes = useMemo(
     () => getNotesByBuilding(buildingId),
     [buildingId]
-  );
-  const settlement = useMemo(
-    () => getSettlement(buildingId, year),
-    [buildingId, year]
-  );
-  const sChecks = useMemo(
-    () => getSettlementChecks(buildingId, year),
-    [buildingId, year]
   );
   const ledgerByService = useMemo(
     () => getLedgerSummaryByBuilding(buildingId, year),
@@ -483,60 +349,8 @@ export default function BuildingDetailPage() {
               </div>
             </div>
           </div>
-          <YearSelector year={year} setYear={setYear} availableYears={availableYears} heatingSeasons={heatingSeasons} />
         </div>
 
-        {/* ── Settlement context strip (past year + ledger orgs only) ── */}
-        {isFeatureEnabled("ledger") && isPastYear && settlement && (
-          <div className="flex items-center gap-2 mb-4 text-[12px] text-slate-500">
-            {(() => {
-              const sCfg = settlementStatusConfig[settlement.status];
-              const SIcon = sCfg?.icon || Circle;
-              return (
-                <>
-                  <SIcon size={14} style={{ color: sCfg?.color }} />
-                  <span className="font-medium" style={{ color: sCfg?.color }}>
-                    {lang === "nl" ? "Afrekening" : "Settlement"} {year}
-                  </span>
-                  <span className="text-slate-300">·</span>
-                  <span>{sCfg?.label[lang]}</span>
-                  {settlement.approvedAt && (
-                    <>
-                      <span className="text-slate-300">·</span>
-                      <span className="text-slate-400">
-                        {lang === "nl" ? "Goedgekeurd" : "Approved"} {settlement.approvedAt}
-                      </span>
-                    </>
-                  )}
-                  {settlement.distributedAt && (
-                    <>
-                      <span className="text-slate-300">·</span>
-                      <span className="text-slate-400">
-                        {lang === "nl" ? "Afgerekend" : "Distributed"} {settlement.distributedAt}
-                      </span>
-                    </>
-                  )}
-                  {settlement.netResult != null && (
-                    <>
-                      <span className="text-slate-300 ml-auto">·</span>
-                      <span
-                        className="font-semibold tabular-nums"
-                        style={{ color: settlement.netResult >= 0 ? brand.blue : brand.red }}
-                      >
-                        {settlement.netResult >= 0 ? "+" : ""}{fmt(settlement.netResult)}
-                      </span>
-                      <span className="text-slate-400">
-                        {settlement.netResult >= 0
-                          ? (lang === "nl" ? "teruggave" : "refund")
-                          : (lang === "nl" ? "naheffing" : "surcharge")}
-                      </span>
-                    </>
-                  )}
-                </>
-              );
-            })()}
-          </div>
-        )}
 
         {/* ── Content: tabs + attribute panel ── */}
         <div className="flex flex-col xl:flex-row gap-6">
@@ -553,6 +367,10 @@ export default function BuildingDetailPage() {
                   {
                     value: "services",
                     label: `${t("services", lang)} (${bsRelations.length})`,
+                  },
+                  isFeatureEnabled("ledger") && buildingDistributions.length > 0 && {
+                    value: "distributions",
+                    label: `${lang === "nl" ? "Verdelingen" : "Distributions"} (${buildingDistributions.length})`,
                   },
                   isFeatureEnabled("consumption") && {
                     value: "meters",
@@ -653,18 +471,6 @@ export default function BuildingDetailPage() {
                     });
                   }
 
-                  // Settlement check failures
-                  if (isFeatureEnabled("ledger") && isPastYear && sChecks.length > 0) {
-                    const failedChecks = sChecks.filter((sc) => sc.status === "flagged" || sc.status === "pending");
-                    if (failedChecks.length > 0) {
-                      warnings.push({
-                        id: "settlement-checks", severity: "error", icon: FileCheck,
-                        text: { en: `${failedChecks.length} settlement ${failedChecks.length === 1 ? "check" : "checks"} need attention`, nl: `${failedChecks.length} afrekening${failedChecks.length === 1 ? "scontrole" : "scontroles"} vragen aandacht` },
-                        action: null,
-                      });
-                    }
-                  }
-
                   // Sort: errors first
                   const sevOrder = { error: 0, warning: 1, info: 2 };
                   warnings.sort((a, b) => (sevOrder[a.severity] ?? 9) - (sevOrder[b.severity] ?? 9));
@@ -674,18 +480,11 @@ export default function BuildingDetailPage() {
                     .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
                   const overdueTasks = openTasks.filter((t) => new Date(t.dueDate) < new Date());
 
-                  // Merge action queue — year-contextual
-                  // Past years: only settlement-related warnings (no operational tasks)
-                  // Current year: overdue tasks, warnings, upcoming tasks
+                  // Merge action queue
                   const actionQueue = [];
-                  if (isPastYear) {
-                    // Settlement mode: only show year-specific warnings (settlement checks, flagged entries, budget variances)
-                    warnings.forEach((w) => actionQueue.push({ type: "warning", severity: w.severity, item: w }));
-                  } else {
-                    overdueTasks.forEach((t) => actionQueue.push({ type: "task", severity: "error", item: t }));
-                    warnings.forEach((w) => actionQueue.push({ type: "warning", severity: w.severity, item: w }));
-                    openTasks.filter((t) => !overdueTasks.includes(t)).forEach((t) => actionQueue.push({ type: "task", severity: "info", item: t }));
-                  }
+                  overdueTasks.forEach((t) => actionQueue.push({ type: "task", severity: "error", item: t }));
+                  warnings.forEach((w) => actionQueue.push({ type: "warning", severity: w.severity, item: w }));
+                  openTasks.filter((t) => !overdueTasks.includes(t)).forEach((t) => actionQueue.push({ type: "task", severity: "info", item: t }));
 
                   // Notes
                   const pinnedNotes = buildingNotes.filter((n) => n.pinned).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -715,110 +514,58 @@ export default function BuildingDetailPage() {
                   return (
                 <div className="mt-4 space-y-4">
 
-                  {/* Layer 0: Pulse Strip — adapts to year context */}
+                  {/* Layer 0: Pulse Strip — Current year operational KPIs */}
                   <div className="flex flex-wrap items-center gap-x-5 gap-y-1 px-1 text-[13px]">
-                    {isPastYear ? (
+                    <span className="tabular-nums" style={{ color: brand.navy }}>
+                      <span className="font-semibold">{fmt(totalBudget)}</span>
+                      <span className="text-slate-400 ml-1">budget</span>
+                    </span>
+                    <span className="w-px h-3.5 bg-slate-200" />
+                    <span className="tabular-nums">
+                      <span
+                        className="font-semibold"
+                        style={{ color: !isOnPace && budgetPct > yearPct + 10 ? brand.amber : brand.navy }}
+                      >
+                        {budgetPct}%
+                      </span>
+                      <span className="text-slate-400 ml-1">{lang === "nl" ? "besteed" : "spent"}</span>
+                    </span>
+                    <span className="w-px h-3.5 bg-slate-200" />
+                    <span className="tabular-nums" style={{ color: brand.navy }}>
+                      <span className="font-semibold">{activeVhe}</span>
+                      <span className="text-slate-400 ml-1">VHE</span>
+                    </span>
+                    {openTasks.length > 0 && (
                       <>
-                        {/* Past year: settlement-focused KPIs */}
-                        <span className="tabular-nums" style={{ color: brand.navy }}>
-                          <span className="font-semibold">{fmt(totalActual)}</span>
-                          <span className="text-slate-400 ml-1">{lang === "nl" ? "werkelijk" : "actual"}</span>
-                        </span>
-                        <span className="w-px h-3.5 bg-slate-200" />
-                        <span className="tabular-nums" style={{ color: brand.navy }}>
-                          <span className="font-semibold">{fmt(totalBudget)}</span>
-                          <span className="text-slate-400 ml-1">{lang === "nl" ? "voorschot" : "advance"}</span>
-                        </span>
                         <span className="w-px h-3.5 bg-slate-200" />
                         <span className="tabular-nums">
                           <span
                             className="font-semibold"
-                            style={{ color: variance >= 0 ? brand.blue : brand.red }}
+                            style={{ color: overdueTasks.length > 0 ? brand.red : brand.navy }}
                           >
-                            {variance >= 0 ? "+" : ""}{fmt(variance)}
+                            {openTasks.length}
                           </span>
                           <span className="text-slate-400 ml-1">
-                            {variance >= 0
-                              ? (lang === "nl" ? "teruggave" : "refund")
-                              : (lang === "nl" ? "naheffing" : "surcharge")}
+                            {openTasks.length === 1
+                              ? (lang === "nl" ? "open taak" : "open task")
+                              : (lang === "nl" ? "open taken" : "open tasks")}
                           </span>
                         </span>
-                        <span className="w-px h-3.5 bg-slate-200" />
-                        <span className="tabular-nums" style={{ color: brand.navy }}>
-                          <span className="font-semibold">{activeVhe}</span>
-                          <span className="text-slate-400 ml-1">VHE</span>
-                        </span>
-                        {warnings.length > 0 && (
-                          <>
-                            <span className="w-px h-3.5 bg-slate-200" />
-                            <span className="tabular-nums">
-                              <span className="font-semibold" style={{ color: brand.amber }}>
-                                {warnings.length}
-                              </span>
-                              <span className="text-slate-400 ml-1">
-                                {warnings.length === 1
-                                  ? (lang === "nl" ? "issue" : "issue")
-                                  : (lang === "nl" ? "issues" : "issues")}
-                              </span>
-                            </span>
-                          </>
-                        )}
                       </>
-                    ) : (
+                    )}
+                    {warnings.length > 0 && (
                       <>
-                        {/* Current year: operational KPIs */}
-                        <span className="tabular-nums" style={{ color: brand.navy }}>
-                          <span className="font-semibold">{fmt(totalBudget)}</span>
-                          <span className="text-slate-400 ml-1">budget</span>
-                        </span>
                         <span className="w-px h-3.5 bg-slate-200" />
                         <span className="tabular-nums">
-                          <span
-                            className="font-semibold"
-                            style={{ color: !isOnPace && budgetPct > yearPct + 10 ? brand.amber : brand.navy }}
-                          >
-                            {budgetPct}%
+                          <span className="font-semibold" style={{ color: brand.amber }}>
+                            {warnings.length}
                           </span>
-                          <span className="text-slate-400 ml-1">{lang === "nl" ? "besteed" : "spent"}</span>
+                          <span className="text-slate-400 ml-1">
+                            {warnings.length === 1
+                              ? (lang === "nl" ? "waarschuwing" : "warning")
+                              : (lang === "nl" ? "waarschuwingen" : "warnings")}
+                          </span>
                         </span>
-                        <span className="w-px h-3.5 bg-slate-200" />
-                        <span className="tabular-nums" style={{ color: brand.navy }}>
-                          <span className="font-semibold">{activeVhe}</span>
-                          <span className="text-slate-400 ml-1">VHE</span>
-                        </span>
-                        {openTasks.length > 0 && (
-                          <>
-                            <span className="w-px h-3.5 bg-slate-200" />
-                            <span className="tabular-nums">
-                              <span
-                                className="font-semibold"
-                                style={{ color: overdueTasks.length > 0 ? brand.red : brand.navy }}
-                              >
-                                {openTasks.length}
-                              </span>
-                              <span className="text-slate-400 ml-1">
-                                {openTasks.length === 1
-                                  ? (lang === "nl" ? "open taak" : "open task")
-                                  : (lang === "nl" ? "open taken" : "open tasks")}
-                              </span>
-                            </span>
-                          </>
-                        )}
-                        {warnings.length > 0 && (
-                          <>
-                            <span className="w-px h-3.5 bg-slate-200" />
-                            <span className="tabular-nums">
-                              <span className="font-semibold" style={{ color: brand.amber }}>
-                                {warnings.length}
-                              </span>
-                              <span className="text-slate-400 ml-1">
-                                {warnings.length === 1
-                                  ? (lang === "nl" ? "waarschuwing" : "warning")
-                                  : (lang === "nl" ? "waarschuwingen" : "warnings")}
-                              </span>
-                            </span>
-                          </>
-                        )}
                       </>
                     )}
                   </div>
@@ -828,15 +575,9 @@ export default function BuildingDetailPage() {
                     <Card className="border-slate-200 bg-white overflow-hidden">
                       <CardContent className="p-0">
                         <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2">
-                          {isPastYear ? (
-                            <FileCheck size={13} className="text-slate-400" />
-                          ) : (
-                            <ListChecks size={13} className="text-slate-400" />
-                          )}
+                          <ListChecks size={13} className="text-slate-400" />
                           <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                            {isPastYear
-                              ? (lang === "nl" ? "Afrekeningsissues" : "Settlement issues")
-                              : (lang === "nl" ? "Acties" : "Actions")}
+                            {lang === "nl" ? "Acties" : "Actions"}
                             <span className="ml-1.5 text-slate-300">({actionQueue.length})</span>
                           </p>
                         </div>
@@ -900,77 +641,15 @@ export default function BuildingDetailPage() {
                     <div className="flex items-center gap-3 px-4 py-4 rounded-lg border border-slate-200 bg-white">
                       <CheckCircle2 size={15} style={{ color: brand.blue }} className="shrink-0" />
                       <p className="text-xs text-slate-500">
-                        {isPastYear
-                          ? (lang === "nl"
-                            ? "Geen openstaande afrekeningsissues."
-                            : "No open settlement issues.")
-                          : (lang === "nl"
-                            ? "Alles op orde — geen openstaande acties."
-                            : "All clear — no open actions.")}
+                        {lang === "nl"
+                          ? "Alles op orde — geen openstaande acties."
+                          : "All clear — no open actions."}
                       </p>
                     </div>
                   )}
 
                   {/* Layer 2: Financial Snapshot */}
-                  {isFeatureEnabled("ledger") && isPastYear && settlement ? (
-                    <Card className="border-slate-200 bg-white overflow-hidden">
-                      <CardContent className="px-4 py-3">
-                        <div className="flex items-center gap-2 mb-3">
-                          <CreditCard size={13} className="text-slate-400" />
-                          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                            {lang === "nl" ? "Afrekening" : "Settlement"} {year}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1 mb-3">
-                          {["monitoring", "in_review", "approved", "distributed"].map((step, i, arr) => {
-                            const stepOrder = { monitoring: 0, in_review: 1, approved: 2, distributed: 3 };
-                            const currentOrder = stepOrder[settlement.status] ?? -1;
-                            const isComplete = stepOrder[step] <= currentOrder;
-                            const isCurrent = step === settlement.status;
-                            const cfg = settlementStatusConfig[step];
-                            return (
-                              <React.Fragment key={step}>
-                                <div className="flex items-center gap-1">
-                                  <div
-                                    className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
-                                    style={{
-                                      background: isCurrent ? cfg?.color : isComplete ? brand.blue : "#F1F5F9",
-                                      opacity: isComplete && !isCurrent ? 0.5 : 1,
-                                    }}
-                                  >
-                                    {isComplete ? (
-                                      <CheckCircle2 size={12} className="text-white" />
-                                    ) : (
-                                      <Circle size={12} style={{ color: "#CBD5E1" }} />
-                                    )}
-                                  </div>
-                                  <span
-                                    className={`text-[10px] ${isCurrent ? "font-semibold" : isComplete ? "font-medium" : ""} hidden sm:inline`}
-                                    style={{ color: isCurrent ? cfg?.color : isComplete ? brand.navy : "#94A3B8" }}
-                                  >
-                                    {cfg?.label[lang]}
-                                  </span>
-                                </div>
-                                {i < arr.length - 1 && (
-                                  <div className="flex-1 h-px mx-0.5" style={{ background: stepOrder[arr[i + 1]] <= currentOrder ? brand.blue : "#E2E8F0" }} />
-                                )}
-                              </React.Fragment>
-                            );
-                          })}
-                        </div>
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
-                          <span className="tabular-nums">{fmt(totalActual)} {lang === "nl" ? "werkelijk" : "actual"}</span>
-                          <span className="text-slate-300">·</span>
-                          <span className="tabular-nums">{fmt(totalBudget)} {lang === "nl" ? "voorschot" : "advance"}</span>
-                          <span className="text-slate-300">·</span>
-                          <span className="font-semibold tabular-nums" style={{ color: variance >= 0 ? brand.blue : brand.red }}>
-                            {variance >= 0 ? "+" : ""}{fmt(variance)} {lang === "nl" ? "netto" : "net"}
-                          </span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <Card className="border-slate-200 bg-white overflow-hidden">
+                  <Card className="border-slate-200 bg-white overflow-hidden">
                       <CardContent className="px-4 py-3">
                         <div className="flex items-center gap-2 mb-2.5">
                           <CreditCard size={13} className="text-slate-400" />
@@ -1046,7 +725,6 @@ export default function BuildingDetailPage() {
                         </div>
                       </CardContent>
                     </Card>
-                  )}
 
                   {/* ── Distribution Reference Card ── */}
                   {isFeatureEnabled("ledger") && buildingDistributions.length > 0 && (() => {
@@ -1134,15 +812,13 @@ export default function BuildingDetailPage() {
                             {allNotes.length > 0 && <span className="ml-1 text-slate-300">({allNotes.length})</span>}
                           </p>
                         </div>
-                        {!isPastYear && (
-                          <button
-                            className="flex items-center gap-1 text-[11px] font-medium transition-colors hover:opacity-80"
-                            style={{ color: brand.blue }}
-                          >
-                            <Plus size={12} />
-                            {lang === "nl" ? "Toevoegen" : "Add"}
-                          </button>
-                        )}
+                        <button
+                          className="flex items-center gap-1 text-[11px] font-medium transition-colors hover:opacity-80"
+                          style={{ color: brand.blue }}
+                        >
+                          <Plus size={12} />
+                          {lang === "nl" ? "Toevoegen" : "Add"}
+                        </button>
                       </div>
                       {allNotes.length > 0 ? (
                         <div className="divide-y divide-slate-100">
@@ -1968,6 +1644,94 @@ export default function BuildingDetailPage() {
                 )}
               </TabsContent>
 
+              {/* ═══ DISTRIBUTIONS TAB ═══ */}
+              <TabsContent value="distributions">
+                <div className="mt-4">
+                  {buildingDistributions.length === 0 ? (
+                    <div className="text-center py-12 text-slate-400 text-sm">
+                      {lang === "nl" ? "Geen verdelingen beschikbaar." : "No distributions available."}
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {[...buildingDistributions]
+                        .sort((a, b) => b.period - a.period)
+                        .map((dist) => {
+                          const isComplete = dist.currentStep === "complete";
+                          const stepIdx = getStepIndex(dist);
+                          const stepCfg = STEP_CONFIG[dist.currentStep];
+                          const flaggedSvcs = dist.services.filter((s) => s.status === "flagged").length;
+                          return (
+                            <Card
+                              key={dist.id}
+                              className="border-slate-200 bg-white hover:border-slate-300 transition-colors cursor-pointer"
+                              onClick={() => navigate(`/${orgId}/distribution/${dist.id}`)}
+                            >
+                              <CardContent className="px-4 py-3">
+                                <div className="flex items-center justify-between mb-2">
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-sm font-semibold" style={{ color: brand.navy }}>
+                                      {dist.period}
+                                    </span>
+                                    {isComplete ? (
+                                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                                        <CheckCircle2 size={10} />
+                                        {lang === "nl" ? "Afgerond" : "Complete"}
+                                      </span>
+                                    ) : (
+                                      <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                                        <Clock size={10} />
+                                        {stepCfg?.label[lang] || dist.currentStep}
+                                      </span>
+                                    )}
+                                    {flaggedSvcs > 0 && (
+                                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">
+                                        <Flag size={9} />
+                                        {flaggedSvcs}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <ChevronRight size={14} className="text-slate-300" />
+                                </div>
+                                {/* 6-step mini progress bar */}
+                                <div className="flex items-center gap-0.5 mb-2">
+                                  {STEP_ORDER.map((step, i) => {
+                                    const done = isComplete || i < stepIdx;
+                                    const active = !isComplete && i === stepIdx;
+                                    return (
+                                      <div
+                                        key={step}
+                                        className="h-1 rounded-full flex-1"
+                                        style={{ background: done ? (brand.teal || "#3EB1C8") : active ? "#93C5FD" : "#E2E8F0" }}
+                                      />
+                                    );
+                                  })}
+                                </div>
+                                <div className="flex items-center gap-3 text-xs text-slate-500">
+                                  <span>{dist.services.length} {lang === "nl" ? "diensten" : "services"}</span>
+                                  {dist.totals?.totalCost != null && (
+                                    <>
+                                      <span className="text-slate-300">·</span>
+                                      <span className="tabular-nums">{new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(dist.totals.totalCost)}</span>
+                                    </>
+                                  )}
+                                  {dist.totals?.netResult != null && (
+                                    <>
+                                      <span className="text-slate-300">·</span>
+                                      <span className="tabular-nums font-medium" style={{ color: dist.totals.netResult >= 0 ? brand.blue : "#EF4444" }}>
+                                        {dist.totals.netResult >= 0 ? "+" : ""}{new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(dist.totals.netResult)}
+                                      </span>
+                                    </>
+                                  )}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
               {/* ═══ CONSUMPTION TAB — Meter-centric physical view ═══ */}
               {isFeatureEnabled("consumptionControl") && (
               <TabsContent value="consumption">
@@ -2415,9 +2179,8 @@ export default function BuildingDetailPage() {
               {/* ═══ VHE TAB — Enhanced table with sort/filter ═══ */}
               <TabsContent value="vhe">
                 {(() => {
-                  // Get active heating season for "Since" column
-                  const activeSeason = heatingSeasons?.find((hs) => hs.yearKey === year);
-                  const seasonStart = activeSeason?.seasonStart;
+                  // Get season start (current year heating season start date)
+                  const seasonStart = null;
 
                   // Compute derived fields for each VHE
                   const enrichedVheList = vheList.map((vhe) => {

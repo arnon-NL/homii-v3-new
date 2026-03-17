@@ -188,52 +188,6 @@
     }
   },
   {
-    "id": "DIST-8666-2026",
-    "buildingId": "8666",
-    "period": 2026,
-    "currentStep": "validation",
-    "services": [
-      {
-        "serviceId": "SVC-115",
-        "distributionMethod": "equal",
-        "distributionModelId": null,
-        "budget": 280,
-        "actual": null,
-        "previousActual": 263,
-        "variancePct": null,
-        "completeness": 42,
-        "status": "pending"
-      },
-      {
-        "serviceId": "SVC-036",
-        "distributionMethod": "equal",
-        "distributionModelId": null,
-        "budget": 190,
-        "actual": null,
-        "previousActual": 177,
-        "variancePct": null,
-        "completeness": 67,
-        "status": "pending"
-      }
-    ],
-    "steps": {
-      "validation": { "status": "in_progress", "completedAt": null, "completedBy": null, "issues": [
-        { "serviceId": "SVC-115", "type": "incomplete_ledger", "message": "5 of 12 months missing" },
-        { "serviceId": "SVC-036", "type": "incomplete_ledger", "message": "4 of 12 months missing" }
-      ]},
-      "comparison": { "status": "pending", "completedAt": null, "completedBy": null, "deviations": [] },
-      "control": { "status": "pending", "completedAt": null, "completedBy": null, "threshold": 10, "excesses": [] },
-      "check": { "status": "pending", "completedAt": null, "completedBy": null, "tenantOutcomes": [] },
-      "approval": { "status": "pending", "completedAt": null, "requestedFrom": null, "requestedAt": null, "approvedBy": null, "approvedAt": null, "note": null },
-      "distribution": { "status": "pending", "completedAt": null, "sentToErp": false, "erpReference": null }
-    },
-    "totals": {
-      "totalCost": null,
-      "totalVoorschot": 24522.91,
-      "netResult": null
-    }
-  },
-  {
     "id": "DIST-8666-2025",
     "buildingId": "8666",
     "period": 2025,
