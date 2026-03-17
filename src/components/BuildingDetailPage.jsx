@@ -460,42 +460,56 @@ export default function BuildingDetailPage() {
         </div>
 
 
-        {/* ── Tab bar (stays in sticky header zone) ── */}
-          <TabsList className="bg-transparent h-10 gap-0 p-0 border-b border-slate-200 w-full justify-start rounded-none overflow-x-auto">
+        {/* ── Tab bar (Attio-style: icon + label + count badge) ── */}
+          <TabsList className="bg-transparent h-10 gap-1 p-0 border-b border-slate-200 w-full justify-start rounded-none overflow-x-auto">
             {[
-              { value: "overview", label: t("overview", lang) },
+              { value: "overview", label: t("overview", lang), icon: LayoutList },
               isFeatureEnabled("consumptionControl") && {
                 value: "consumption",
                 label: lang === "nl" ? "Verbruik" : "Consumption",
+                icon: Flame,
               },
               {
                 value: "services",
-                label: `${t("services", lang)} (${bsRelations.length})`,
+                label: t("services", lang),
+                icon: Wrench,
+                count: bsRelations.length,
               },
               isFeatureEnabled("ledger") && {
                 value: "distributions",
-                label: buildingDistributions.length > 0
-                  ? `${lang === "nl" ? "Verdelingen" : "Distributions"} (${buildingDistributions.length})`
-                  : `${lang === "nl" ? "Verdelingen" : "Distributions"}`,
+                label: lang === "nl" ? "Verdelingen" : "Distributions",
+                icon: Send,
+                count: buildingDistributions.length || undefined,
               },
               isFeatureEnabled("consumption") && {
                 value: "meters",
-                label: `${t("meters", lang)} (${meterList.length})`,
+                label: t("meters", lang),
+                icon: Gauge,
+                count: meterList.length,
               },
               {
                 value: "vhe",
-                label: `VHE (${vheList.length})`,
+                label: "VHE",
+                icon: Home,
+                count: vheList.length,
               },
-              { value: "activity", label: t("activity", lang) },
-            ].filter(Boolean).map((tab) => (
-              <TabsTrigger
-                key={tab.value}
-                value={tab.value}
-                className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#3EB1C8] data-[state=active]:text-slate-900 data-[state=active]:shadow-none px-4 text-sm text-slate-400 hover:text-slate-600 transition-colors whitespace-nowrap"
-              >
-                {tab.label}
-              </TabsTrigger>
-            ))}
+              { value: "activity", label: t("activity", lang), icon: Activity },
+            ].filter(Boolean).map((tab) => {
+              const TabIcon = tab.icon;
+              return (
+                <TabsTrigger
+                  key={tab.value}
+                  value={tab.value}
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-slate-900 data-[state=active]:text-slate-900 data-[state=active]:shadow-none px-4 h-10 text-sm text-slate-400 hover:text-slate-600 transition-colors whitespace-nowrap flex items-center gap-2"
+                >
+                  <TabIcon size={14} strokeWidth={1.5} />
+                  {tab.label}
+                  {tab.count != null && (
+                    <span className="text-xs text-slate-400 tabular-nums">{tab.count}</span>
+                  )}
+                </TabsTrigger>
+              );
+            })}
           </TabsList>
       </div>{/* end sticky header zone */}
 
