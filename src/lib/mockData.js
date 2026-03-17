@@ -139,4 +139,11 @@ export {
   FIELD_SOURCES,
   getFieldSource,
   getEntitySource,
+
+  // --- Distributions ---
+  getDistributions,
+  getDistributionById,
+  getDistributionsByBuilding,
+  getDistributionByPeriod,
+  getActiveDistribution,
 } from "./data/index.js";
