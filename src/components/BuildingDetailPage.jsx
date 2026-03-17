@@ -354,12 +354,13 @@ export default function BuildingDetailPage() {
       : "on_track";
 
   return (
-    <div className="flex-1 overflow-y-auto">
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
+    <div className="flex-1 flex flex-col overflow-hidden">
+      {/* ── Sticky header zone ── */}
+      <div className="shrink-0 max-w-[1400px] w-full mx-auto px-4 sm:px-6 pt-4 sm:pt-6">
         <Breadcrumbs items={crumbs} />
 
         {/* ── Header ── */}
-        <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-4">
           <div className="flex items-start gap-3 flex-1 min-w-0">
             <div
               className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
@@ -367,29 +368,14 @@ export default function BuildingDetailPage() {
             >
               <Building2 size={20} style={{ color: brand.navy }} />
             </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-3 mb-1 flex-wrap">
-                <h1
-                  className="text-xl font-semibold truncate"
-                  style={{ color: brand.navy }}
-                >
-                  {building.complex}
-                </h1>
-                <StatusBadge status={building.dataQuality} size="xs" />
-              </div>
-              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-slate-500">
-                <span className="flex items-center gap-1">
-                  <MapPin size={14} /> {building.location}
-                </span>
-                <span className="w-px h-3 bg-slate-200" />
-                <span className="flex items-center gap-1">
-                  <Hash size={14} /> {building.complexId}
-                </span>
-                <span className="w-px h-3 bg-slate-200" />
-                <span className="flex items-center gap-1">
-                  <Home size={14} /> {building.vhe} VHE
-                </span>
-              </div>
+            <div className="min-w-0 flex items-center gap-3 flex-wrap">
+              <h1
+                className="text-xl font-semibold truncate"
+                style={{ color: brand.navy }}
+              >
+                {building.complex}
+              </h1>
+              <StatusBadge status={building.dataQuality} size="xs" />
             </div>
           </div>
 
@@ -474,47 +460,50 @@ export default function BuildingDetailPage() {
         </div>
 
 
-        {/* ── Content: tabs + attribute panel ── */}
-        <div className="flex flex-col xl:flex-row gap-6">
-          <div className="flex-1 min-w-0">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              {/* Underline-style tabs */}
-              <TabsList className="bg-transparent h-10 gap-0 p-0 border-b border-slate-200 w-full justify-start rounded-none overflow-x-auto">
-                {[
-                  { value: "overview", label: t("overview", lang) },
-                  isFeatureEnabled("consumptionControl") && {
-                    value: "consumption",
-                    label: lang === "nl" ? "Verbruik" : "Consumption",
-                  },
-                  {
-                    value: "services",
-                    label: `${t("services", lang)} (${bsRelations.length})`,
-                  },
-                  isFeatureEnabled("ledger") && {
-                    value: "distributions",
-                    label: buildingDistributions.length > 0
-                      ? `${lang === "nl" ? "Verdelingen" : "Distributions"} (${buildingDistributions.length})`
-                      : `${lang === "nl" ? "Verdelingen" : "Distributions"}`,
-                  },
-                  isFeatureEnabled("consumption") && {
-                    value: "meters",
-                    label: `${t("meters", lang)} (${meterList.length})`,
-                  },
-                  {
-                    value: "vhe",
-                    label: `VHE (${vheList.length})`,
-                  },
-                  { value: "activity", label: t("activity", lang) },
-                ].filter(Boolean).map((tab) => (
-                  <TabsTrigger
-                    key={tab.value}
-                    value={tab.value}
-                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#3EB1C8] data-[state=active]:text-slate-900 data-[state=active]:shadow-none px-4 text-sm text-slate-400 hover:text-slate-600 transition-colors whitespace-nowrap"
-                  >
-                    {tab.label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
+        {/* ── Tab bar (stays in sticky header zone) ── */}
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="bg-transparent h-10 gap-0 p-0 border-b border-slate-200 w-full justify-start rounded-none overflow-x-auto">
+            {[
+              { value: "overview", label: t("overview", lang) },
+              isFeatureEnabled("consumptionControl") && {
+                value: "consumption",
+                label: lang === "nl" ? "Verbruik" : "Consumption",
+              },
+              {
+                value: "services",
+                label: `${t("services", lang)} (${bsRelations.length})`,
+              },
+              isFeatureEnabled("ledger") && {
+                value: "distributions",
+                label: buildingDistributions.length > 0
+                  ? `${lang === "nl" ? "Verdelingen" : "Distributions"} (${buildingDistributions.length})`
+                  : `${lang === "nl" ? "Verdelingen" : "Distributions"}`,
+              },
+              isFeatureEnabled("consumption") && {
+                value: "meters",
+                label: `${t("meters", lang)} (${meterList.length})`,
+              },
+              {
+                value: "vhe",
+                label: `VHE (${vheList.length})`,
+              },
+              { value: "activity", label: t("activity", lang) },
+            ].filter(Boolean).map((tab) => (
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#3EB1C8] data-[state=active]:text-slate-900 data-[state=active]:shadow-none px-4 text-sm text-slate-400 hover:text-slate-600 transition-colors whitespace-nowrap"
+              >
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+      </div>{/* end sticky header zone */}
+
+      {/* ── Scrollable content: left tab content + right attribute panel ── */}
+      <div className="flex-1 flex flex-col xl:flex-row overflow-hidden">
+        <div className="flex-1 min-w-0 overflow-y-auto">
+          <div className="max-w-[1100px] px-4 sm:px-6 pb-6">
 
               {/* ═══ OVERVIEW TAB — BUILDING HOME PAGE ═══ */}
               <TabsContent value="overview">
@@ -642,63 +631,7 @@ export default function BuildingDetailPage() {
                   return (
                 <div className="mt-4 space-y-4">
 
-                  {/* Layer 0: Pulse Strip — Current year operational KPIs */}
-                  <div className="flex flex-wrap items-center gap-x-5 gap-y-1 px-1 text-[13px]">
-                    <span className="tabular-nums" style={{ color: brand.navy }}>
-                      <span className="font-semibold">{fmt(totalBudget)}</span>
-                      <span className="text-slate-400 ml-1">budget</span>
-                    </span>
-                    <span className="w-px h-3.5 bg-slate-200" />
-                    <span className="tabular-nums">
-                      <span
-                        className="font-semibold"
-                        style={{ color: !isOnPace && budgetPct > yearPct + 10 ? brand.amber : brand.navy }}
-                      >
-                        {budgetPct}%
-                      </span>
-                      <span className="text-slate-400 ml-1">{lang === "nl" ? "besteed" : "spent"}</span>
-                    </span>
-                    <span className="w-px h-3.5 bg-slate-200" />
-                    <span className="tabular-nums" style={{ color: brand.navy }}>
-                      <span className="font-semibold">{activeVhe}</span>
-                      <span className="text-slate-400 ml-1">VHE</span>
-                    </span>
-                    {openTasks.length > 0 && (
-                      <>
-                        <span className="w-px h-3.5 bg-slate-200" />
-                        <span className="tabular-nums">
-                          <span
-                            className="font-semibold"
-                            style={{ color: overdueTasks.length > 0 ? brand.red : brand.navy }}
-                          >
-                            {openTasks.length}
-                          </span>
-                          <span className="text-slate-400 ml-1">
-                            {openTasks.length === 1
-                              ? (lang === "nl" ? "open taak" : "open task")
-                              : (lang === "nl" ? "open taken" : "open tasks")}
-                          </span>
-                        </span>
-                      </>
-                    )}
-                    {warnings.length > 0 && (
-                      <>
-                        <span className="w-px h-3.5 bg-slate-200" />
-                        <span className="tabular-nums">
-                          <span className="font-semibold" style={{ color: brand.amber }}>
-                            {warnings.length}
-                          </span>
-                          <span className="text-slate-400 ml-1">
-                            {warnings.length === 1
-                              ? (lang === "nl" ? "waarschuwing" : "warning")
-                              : (lang === "nl" ? "waarschuwingen" : "warnings")}
-                          </span>
-                        </span>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Layer 1: Action Queue */}
+                  {/* Action Queue */}
                   {actionQueue.length > 0 ? (
                     <Card className="border-slate-200 bg-white overflow-hidden">
                       <CardContent className="p-0">
@@ -2704,12 +2637,12 @@ export default function BuildingDetailPage() {
                   )}
                 </div>
               </TabsContent>
-            </Tabs>
-          </div>
+          </div>{/* close max-w-[1100px] inner wrapper */}
+        </div>{/* close left scroll column */}
 
-          {/* ── Attribute panel (right sidebar) ── */}
-          <div className="w-full xl:w-80 shrink-0">
-            <AttributePanel>
+        {/* ── Attribute panel (right sidebar — independent scroll) ── */}
+        <div className="hidden xl:block w-80 shrink-0 border-l border-slate-200 overflow-y-auto">
+          <AttributePanel>
               {/* ── Complex ── */}
               <AttrSection title="Complex" first>
                 <AttrRow
@@ -2783,8 +2716,8 @@ export default function BuildingDetailPage() {
               </AttrSection>
             </AttributePanel>
           </div>
-        </div>
-      </div>
-    </div>
+        </div>{/* close scrollable row */}
+      </Tabs>
+    </div>{/* close outer flex-col */}
   );
 }
