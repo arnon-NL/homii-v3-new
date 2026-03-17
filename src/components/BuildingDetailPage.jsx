@@ -354,8 +354,7 @@ export default function BuildingDetailPage() {
       : "on_track";
 
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab}>
-    <div className="flex-1 flex flex-col overflow-hidden">
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
       {/* ── Sticky header zone ── */}
       <div className="shrink-0 max-w-[1400px] w-full mx-auto px-4 sm:px-6 pt-4 sm:pt-6">
         <Breadcrumbs items={crumbs} />
@@ -2717,7 +2716,6 @@ export default function BuildingDetailPage() {
             </AttributePanel>
           </div>
         </div>{/* close scrollable row */}
-    </div>{/* close outer flex-col */}
     </Tabs>
   );
 }
