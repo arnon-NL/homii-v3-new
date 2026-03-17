@@ -74,6 +74,7 @@ import {
   AttributePanel,
   AttrSection,
   AttrRow,
+  AttrBadge,
 } from "./ui/attribute-panel";
 import { StatusBadge } from "./ui/status-badge";
 
@@ -228,6 +229,26 @@ export default function BuildingDetailPage() {
     () => allMeters.filter(m => m.dismounted).length,
     [allMeters]
   );
+  // ── Right panel computed values ──────────────────────────────
+  const activeContracts = useMemo(
+    () => vheList.filter((v) => v.contract?.status === "active").length,
+    [vheList]
+  );
+  const avgAdvance = useMemo(() => {
+    const withAdvance = vheList.filter((v) => v.voorschot > 0);
+    return withAdvance.length > 0
+      ? withAdvance.reduce((s, v) => s + v.voorschot, 0) / withAdvance.length
+      : 0;
+  }, [vheList]);
+  const totalResidentialM2 = useMemo(
+    () => vheList.reduce((s, v) => s + (v.m2 || 0), 0),
+    [vheList]
+  );
+  const primaryAddress = useMemo(() => {
+    if (vheList.length > 0 && vheList[0].address) return vheList[0].address;
+    return building.complex;
+  }, [vheList, building]);
+
   const activityList = useMemo(
     () => getActivitiesByBuilding(buildingId),
     [buildingId]
@@ -2689,25 +2710,76 @@ export default function BuildingDetailPage() {
           {/* ── Attribute panel (right sidebar) ── */}
           <div className="w-full xl:w-80 shrink-0">
             <AttributePanel>
-              <AttrSection title={lang === "nl" ? "Identiteit" : "Identity"}>
-                <AttrRow label="Complex ID" value={building.complexId} />
-                <AttrRow label={lang === "nl" ? "Locatie" : "Location"} value={building.location} />
+              {/* ── Complex ── */}
+              <AttrSection title="Complex" first>
+                <AttrRow
+                  label={lang === "nl" ? "Adres" : "Address"}
+                  value={primaryAddress}
+                />
+                <AttrRow
+                  label={lang === "nl" ? "Locatie" : "Location"}
+                  value={building.location}
+                />
+                <AttrRow label="Complex ID" value={building.complexId} mono />
+                <AttrRow
+                  label={lang === "nl" ? "Objectcode" : "Object code"}
+                  value={building.id}
+                  mono
+                />
+                <AttrRow
+                  label={lang === "nl" ? "Woon m²" : "Residential m²"}
+                  value={totalResidentialM2 > 0 ? `${totalResidentialM2.toLocaleString()} m²` : "—"}
+                />
+                <AttrRow
+                  label={lang === "nl" ? "Algemeen m²" : "Common space m²"}
+                  value="—"
+                  muted
+                />
               </AttrSection>
-              <AttrSection title={lang === "nl" ? "Samenstelling" : "Composition"}>
-                <AttrRow label="VHE" value={building.vhe} />
-                <AttrRow label={lang === "nl" ? "Diensten" : "Services"} value={bsRelations.length} />
-                <AttrRow label={lang === "nl" ? "Meters" : "Meters"} value={`${mainMeters.length} ${lang === "nl" ? "hoofd" : "main"} · ${subMeters.length} sub`} />
-                {building.utilities?.length > 0 && (
-                  <AttrRow
-                    label={lang === "nl" ? "Nutsbedrijven" : "Utilities"}
-                    value={building.utilities.map(u => ({
-                      electricity: lang === "nl" ? "Elektra" : "Electricity",
-                      heat: lang === "nl" ? "Warmte" : "Heat",
-                      gas: "Gas",
-                      water: "Water",
-                    })[u] || u).join(", ")}
-                  />
-                )}
+
+              {/* ── Relationships ── */}
+              <AttrSection title={lang === "nl" ? "Relaties" : "Relationships"}>
+                <AttrRow
+                  label={lang === "nl" ? "Diensten" : "Services"}
+                  value={bsRelations.length}
+                  onClick={() => setActiveTab("services")}
+                />
+                <AttrRow
+                  label={lang === "nl" ? "Hoofdmeters" : "Main meters"}
+                  value={mainMeters.length}
+                  onClick={() => setActiveTab("meters")}
+                />
+                <AttrRow
+                  label={lang === "nl" ? "Submeters" : "Submeters"}
+                  value={subMeters.length}
+                  onClick={() => setActiveTab("meters")}
+                />
+              </AttrSection>
+
+              {/* ── Tenants ── */}
+              <AttrSection title={lang === "nl" ? "Huurders" : "Tenants"}>
+                <AttrRow
+                  label={lang === "nl" ? "Actieve contracten" : "Active contracts"}
+                  value={activeContracts}
+                  onClick={() => setActiveTab("vhe")}
+                />
+                <AttrRow
+                  label={lang === "nl" ? "Gem. voorschot" : "Avg. advance"}
+                  value={avgAdvance > 0 ? `€ ${avgAdvance.toFixed(2)}` : "—"}
+                />
+                <AttrBadge
+                  label="Tenant app"
+                  active
+                  text={lang === "nl" ? "Actief" : "Active"}
+                />
+                <AttrRow
+                  label={lang === "nl" ? "App gebruikers" : "App users"}
+                  value={activeContracts > 0 ? Math.round(activeContracts * 0.7) : 0}
+                />
+                <AttrRow
+                  label={lang === "nl" ? "Waarschuwingsbrieven" : "Warning letters"}
+                  value="0"
+                />
               </AttrSection>
             </AttributePanel>
           </div>
