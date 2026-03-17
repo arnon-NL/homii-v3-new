@@ -136,4 +136,10 @@ export {
   getDistributionsByBuilding,
   getDistributionByPeriod,
   getActiveDistribution,
+  addRuntimeDistribution,
+  buildDistributionFromData,
+  STEP_ORDER,
+  STEP_CONFIG,
+  getStepIndex,
+  getFlaggedServiceCount,
 } from "./data/index.js";

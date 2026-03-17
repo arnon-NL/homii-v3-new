@@ -238,28 +238,31 @@ export function getSuppliersByService(serviceId) {
 }
 
 // --- Distributions (process objects) ---
+// Runtime-aware getters delegate to distributions.js which merges
+// session-created distributions with the static JSON data.
+export {
+  addRuntimeDistribution,
+  buildDistributionFromData,
+  getDistributionById,
+  getDistributionsByBuilding,
+  getActiveDistribution,
+  STEP_ORDER,
+  STEP_CONFIG,
+  getStepIndex,
+  getFlaggedServiceCount,
+} from "./distributions.js";
+
+import {
+  getDistributionsByBuilding as _getRtDistsByBuilding,
+} from "./distributions.js";
+
 export function getDistributions() {
   return ds().distributions || [];
 }
 
-export function getDistributionById(id) {
-  return ds()._distributionMap?.get(id) || null;
-}
-
-export function getDistributionsByBuilding(buildingId) {
-  return ds()._distributionsByBuilding?.get(String(buildingId)) || [];
-}
-
 export function getDistributionByPeriod(buildingId, period) {
-  const all = getDistributionsByBuilding(buildingId);
+  const all = _getRtDistsByBuilding(buildingId);
   return all.find((d) => d.period === period) || null;
-}
-
-export function getActiveDistribution(buildingId) {
-  const all = getDistributionsByBuilding(buildingId);
-  if (!all.length) return null;
-  const active = all.find((d) => d.currentStep !== "complete");
-  return active || [...all].sort((a, b) => b.period - a.period)[0];
 }
 
 // --- Distribution Methods / Models ---

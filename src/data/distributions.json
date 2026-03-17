@@ -504,5 +504,224 @@
       "totalVoorschot": 700.37,
       "netResult": -42.63
     }
+  },
+  {
+    "id": "DIST-8172-2025",
+    "buildingId": "8172",
+    "period": 2025,
+    "currentStep": "validation",
+    "services": [
+      {
+        "serviceId": "SVC-108",
+        "distributionMethod": "metered",
+        "distributionModelId": "DM-8172-108",
+        "budget": 11000,
+        "actual": 10840,
+        "previousActual": 10320,
+        "variancePct": 5.04,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-105",
+        "distributionMethod": "metered",
+        "distributionModelId": null,
+        "budget": 1900,
+        "actual": 1850,
+        "previousActual": 1780,
+        "variancePct": 3.93,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-122",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 1600,
+        "actual": 2640,
+        "previousActual": 1449,
+        "variancePct": 82.19,
+        "completeness": 100,
+        "status": "flagged"
+      },
+      {
+        "serviceId": "SVC-171",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 850,
+        "actual": 892,
+        "previousActual": 797,
+        "variancePct": 11.92,
+        "completeness": 100,
+        "status": "flagged"
+      },
+      {
+        "serviceId": "SVC-131",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 1350,
+        "actual": 1310,
+        "previousActual": null,
+        "variancePct": null,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-036",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 700,
+        "actual": 680,
+        "previousActual": 648,
+        "variancePct": 4.94,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-115",
+        "distributionMethod": "m2",
+        "distributionModelId": null,
+        "budget": 440,
+        "actual": 428,
+        "previousActual": 410,
+        "variancePct": 4.39,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-118",
+        "distributionMethod": "m2",
+        "distributionModelId": null,
+        "budget": 210,
+        "actual": 198,
+        "previousActual": 192,
+        "variancePct": 3.13,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-041",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 370,
+        "actual": 362,
+        "previousActual": 347,
+        "variancePct": 4.32,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-177",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 270,
+        "actual": 264,
+        "previousActual": 252,
+        "variancePct": 4.76,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-092",
+        "distributionMethod": "m2",
+        "distributionModelId": null,
+        "budget": 160,
+        "actual": 152,
+        "previousActual": 148,
+        "variancePct": 2.70,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-055",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 350,
+        "actual": 362,
+        "previousActual": 345,
+        "variancePct": 4.93,
+        "completeness": 100,
+        "status": "complete"
+      }
+    ],
+    "steps": {
+      "validation": {
+        "status": "in_progress",
+        "completedAt": null,
+        "completedBy": null,
+        "issues": []
+      },
+      "comparison": {
+        "status": "pending",
+        "completedAt": null,
+        "completedBy": null,
+        "deviations": []
+      },
+      "control": {
+        "status": "pending",
+        "completedAt": null,
+        "completedBy": null,
+        "threshold": 10,
+        "excesses": []
+      },
+      "check": {
+        "status": "pending",
+        "completedAt": null,
+        "completedBy": null,
+        "tenantOutcomes": [
+          { "vheId": "VHE-8172-S1",  "address": "Abel Tasmanplein 54", "voorschot": 368, "actualCost": 629, "delta": 261, "status": "ok" },
+          { "vheId": "VHE-8172-S2",  "address": "Abel Tasmanplein 55", "voorschot": 368, "actualCost": 625, "delta": 257, "status": "ok" },
+          { "vheId": "VHE-8172-S3",  "address": "Abel Tasmanplein 56", "voorschot": 367, "actualCost": 631, "delta": 264, "status": "ok" },
+          { "vheId": "VHE-8172-S4",  "address": "Abel Tasmanplein 57", "voorschot": 367, "actualCost": 631, "delta": 264, "status": "ok" },
+          { "vheId": "VHE-8172-S5",  "address": "Abel Tasmanplein 58", "voorschot": 367, "actualCost": 634, "delta": 267, "status": "ok" },
+          { "vheId": "VHE-8172-S6",  "address": "Abel Tasmanplein 59", "voorschot": 367, "actualCost": 627, "delta": 260, "status": "ok" },
+          { "vheId": "VHE-8172-S7",  "address": "Abel Tasmanplein 60", "voorschot": 367, "actualCost": 629, "delta": 262, "status": "ok" },
+          { "vheId": "VHE-8172-S8",  "address": "Abel Tasmanplein 61", "voorschot": 367, "actualCost": 633, "delta": 266, "status": "ok" },
+          { "vheId": "VHE-8172-S9",  "address": "Abel Tasmanplein 62", "voorschot": 367, "actualCost": 636, "delta": 269, "status": "ok" },
+          { "vheId": "VHE-8172-S10", "address": "Abel Tasmanplein 63", "voorschot": 367, "actualCost": 628, "delta": 261, "status": "ok" },
+          { "vheId": "VHE-8172-S11", "address": "Abel Tasmanplein 64", "voorschot": 367, "actualCost": 635, "delta": 268, "status": "ok" },
+          { "vheId": "VHE-8172-S12", "address": "Abel Tasmanplein 65", "voorschot": 367, "actualCost": 622, "delta": 255, "status": "ok" },
+          { "vheId": "VHE-8172-S13", "address": "Abel Tasmanplein 66", "voorschot": 367, "actualCost": 629, "delta": 262, "status": "ok" },
+          { "vheId": "VHE-8172-S14", "address": "Abel Tasmanplein 67", "voorschot": 367, "actualCost": 920, "delta": 553, "status": "flagged" },
+          { "vheId": "VHE-8172-S15", "address": "Abel Tasmanplein 68", "voorschot": 367, "actualCost": 624, "delta": 257, "status": "ok" },
+          { "vheId": "VHE-8172-S16", "address": "Abel Tasmanplein 69", "voorschot": 367, "actualCost": 631, "delta": 264, "status": "ok" },
+          { "vheId": "VHE-8172-S17", "address": "Abel Tasmanplein 70", "voorschot": 367, "actualCost": 627, "delta": 260, "status": "ok" },
+          { "vheId": "VHE-8172-S18", "address": "Abel Tasmanplein 71", "voorschot": 367, "actualCost": 637, "delta": 270, "status": "ok" },
+          { "vheId": "VHE-8172-S19", "address": "Abel Tasmanplein 72", "voorschot": 367, "actualCost": 628, "delta": 261, "status": "ok" },
+          { "vheId": "VHE-8172-S20", "address": "Abel Tasmanplein 73", "voorschot": 367, "actualCost": 624, "delta": 257, "status": "ok" },
+          { "vheId": "VHE-8172-S21", "address": "Abel Tasmanplein 74", "voorschot": 367, "actualCost": 632, "delta": 265, "status": "ok" },
+          { "vheId": "VHE-8172-S22", "address": "Abel Tasmanplein 75", "voorschot": 367, "actualCost": 820, "delta": 453, "status": "flagged" },
+          { "vheId": "VHE-8172-S23", "address": "Abel Tasmanplein 76", "voorschot": 367, "actualCost": 623, "delta": 256, "status": "ok" },
+          { "vheId": "VHE-8172-S24", "address": "Abel Tasmanplein 77", "voorschot": 367, "actualCost": 618, "delta": 251, "status": "ok" },
+          { "vheId": "VHE-8172-S25", "address": "Abel Tasmanplein 78", "voorschot": 367, "actualCost": 629, "delta": 262, "status": "ok" },
+          { "vheId": "VHE-8172-S26", "address": "Abel Tasmanplein 79", "voorschot": 367, "actualCost": 626, "delta": 259, "status": "ok" },
+          { "vheId": "VHE-8172-S27", "address": "Abel Tasmanplein 80", "voorschot": 367, "actualCost": 625, "delta": 258, "status": "ok" },
+          { "vheId": "VHE-8172-S28", "address": "Abel Tasmanplein 81", "voorschot": 367, "actualCost": 631, "delta": 264, "status": "ok" },
+          { "vheId": "VHE-8172-S29", "address": "Abel Tasmanplein 82", "voorschot": 367, "actualCost": 634, "delta": 267, "status": "ok" },
+          { "vheId": "VHE-8172-S30", "address": "Abel Tasmanplein 83", "voorschot": 367, "actualCost": 629, "delta": 262, "status": "ok" },
+          { "vheId": "VHE-8172-S31", "address": "Abel Tasmanplein 84", "voorschot": 367, "actualCost": 631, "delta": 264, "status": "ok" }
+        ]
+      },
+      "approval": {
+        "status": "pending",
+        "completedAt": null,
+        "requestedFrom": null,
+        "requestedAt": null,
+        "approvedBy": null,
+        "approvedAt": null,
+        "note": null
+      },
+      "distribution": {
+        "status": "pending",
+        "completedAt": null,
+        "sentToErp": false,
+        "erpReference": null
+      }
+    },
+    "totals": {
+      "totalCost": 19978,
+      "totalVoorschot": 11379,
+      "netResult": -8599
+    }
   }
 ]

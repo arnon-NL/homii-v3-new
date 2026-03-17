@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   CheckCircle2,
   Clock,
@@ -954,10 +954,13 @@ function StepHeader({ title, description, status, completedAt, completedBy, lang
 export default function DistributionDetailPage() {
   const { distributionId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { orgId } = useOrg();
   const lang = useLang();
 
-  const sourceDist = getDistributionById(distributionId);
+  // Prefer distribution passed via navigation state (newly created runtime dists)
+  // so they work even before addRuntimeDistribution has had time to propagate.
+  const sourceDist = location.state?.distribution || getDistributionById(distributionId);
   const building = sourceDist ? getBuilding(sourceDist.buildingId) : null;
 
   /* ── Local mutable copy of distribution (prototype state) ── */

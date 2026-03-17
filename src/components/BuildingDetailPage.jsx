@@ -61,8 +61,10 @@ import {
   getNotesByBuilding,
   getActiveDistribution,
   getDistributionsByBuilding,
+  addRuntimeDistribution,
+  buildDistributionFromData,
 } from "@/lib/mockData";
-import { STEP_CONFIG, STEP_ORDER, getStepIndex } from "@/lib/data/distributions";
+import { STEP_CONFIG, STEP_ORDER, getStepIndex, getFlaggedServiceCount } from "@/lib/data/distributions";
 import { useOrg } from "@/lib/OrgContext";
 import { t, useLang } from "@/lib/i18n";
 import Breadcrumbs from "./Breadcrumbs";
@@ -172,9 +174,29 @@ export default function BuildingDetailPage() {
   const toggleCostCat = (ccId) => setExpandedCostCats((prev) => ({ ...prev, [ccId]: !prev[ccId] }));
   const [showDismounted, setShowDismounted] = useState(false);
 
-  // Distribution process object for this building
+  // Distribution process objects for this building
   const activeDistribution = useMemo(() => getActiveDistribution(buildingId), [buildingId]);
   const buildingDistributions = useMemo(() => getDistributionsByBuilding(buildingId), [buildingId]);
+
+  // "New distribution" popover state
+  const [showDistPopover, setShowDistPopover] = useState(false);
+  const currentYear = new Date().getFullYear();
+  const eligiblePeriods = useMemo(() => {
+    const existing = new Set(buildingDistributions.map((d) => d.period));
+    return [currentYear - 1, currentYear - 2, currentYear - 3].filter((y) => !existing.has(y));
+  }, [buildingDistributions, currentYear]);
+  const [newDistPeriod, setNewDistPeriod] = useState(null);
+  const hasActiveDistribution = activeDistribution && activeDistribution.currentStep !== "complete";
+  const canStartNewDistribution = !hasActiveDistribution && eligiblePeriods.length > 0 && isFeatureEnabled("ledger");
+
+  function handleCreateDistribution() {
+    const period = newDistPeriod ?? eligiblePeriods[0];
+    if (!period) return;
+    const dist = buildDistributionFromData(buildingId, period);
+    addRuntimeDistribution(dist);
+    setShowDistPopover(false);
+    navigate(`/distribution/${dist.id}`, { state: { distribution: dist } });
+  }
 
   const building = getBuilding(buildingId);
 
@@ -349,6 +371,85 @@ export default function BuildingDetailPage() {
               </div>
             </div>
           </div>
+
+          {/* ── Header action zone (Attio-style: workflow commands live here) ── */}
+          <div className="relative flex-shrink-0 flex items-center">
+            {hasActiveDistribution ? (
+              /* Distribution in progress → chip linking to detail page */
+              <button
+                onClick={() => navigate(`/distribution/${activeDistribution.id}`)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all hover:shadow-sm"
+                style={{
+                  borderColor: brand.teal + "40",
+                  background: brand.teal + "08",
+                  color: brand.teal,
+                }}
+              >
+                <span
+                  className="w-1.5 h-1.5 rounded-full animate-pulse"
+                  style={{ background: brand.teal }}
+                />
+                {lang === "nl" ? "Verdeling loopt" : "Distribution in progress"}
+                <ChevronRight size={12} />
+              </button>
+            ) : canStartNewDistribution ? (
+              /* No active distribution → "New distribution" button + popover */
+              <>
+                <button
+                  onClick={() => setShowDistPopover((v) => !v)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:shadow-sm border border-slate-200 bg-white text-slate-700 hover:border-slate-300"
+                >
+                  <Plus size={13} />
+                  {lang === "nl" ? "Nieuwe verdeling" : "New distribution"}
+                  <ChevronDown size={12} className={`transition-transform ${showDistPopover ? "rotate-180" : ""}`} />
+                </button>
+
+                {/* Popover */}
+                {showDistPopover && (
+                  <div
+                    className="absolute right-0 top-full mt-1.5 w-52 rounded-xl border border-slate-200 bg-white shadow-lg z-30 overflow-hidden"
+                    style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.10)" }}
+                  >
+                    <div className="px-3 py-2.5 border-b border-slate-100">
+                      <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
+                        {lang === "nl" ? "Selecteer jaar" : "Select period"}
+                      </p>
+                    </div>
+                    <div className="py-1">
+                      {eligiblePeriods.map((yr) => (
+                        <button
+                          key={yr}
+                          onClick={() => setNewDistPeriod(yr)}
+                          className="w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-slate-50 transition-colors"
+                          style={{
+                            color: (newDistPeriod ?? eligiblePeriods[0]) === yr ? brand.navy : "#374151",
+                            fontWeight: (newDistPeriod ?? eligiblePeriods[0]) === yr ? 600 : 400,
+                          }}
+                        >
+                          <span className="flex items-center gap-2">
+                            <CalendarDays size={13} className="text-slate-400" />
+                            {yr}
+                          </span>
+                          {(newDistPeriod ?? eligiblePeriods[0]) === yr && (
+                            <CheckCircle2 size={13} style={{ color: brand.teal }} />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="px-3 py-2.5 border-t border-slate-100">
+                      <button
+                        onClick={handleCreateDistribution}
+                        className="w-full py-1.5 rounded-lg text-xs font-semibold text-white transition-colors"
+                        style={{ background: brand.navy }}
+                      >
+                        {lang === "nl" ? "Start verdeling" : "Start distribution"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : null}
+          </div>
         </div>
 
 
@@ -368,9 +469,11 @@ export default function BuildingDetailPage() {
                     value: "services",
                     label: `${t("services", lang)} (${bsRelations.length})`,
                   },
-                  isFeatureEnabled("ledger") && buildingDistributions.length > 0 && {
+                  isFeatureEnabled("ledger") && {
                     value: "distributions",
-                    label: `${lang === "nl" ? "Verdelingen" : "Distributions"} (${buildingDistributions.length})`,
+                    label: buildingDistributions.length > 0
+                      ? `${lang === "nl" ? "Verdelingen" : "Distributions"} (${buildingDistributions.length})`
+                      : `${lang === "nl" ? "Verdelingen" : "Distributions"}`,
                   },
                   isFeatureEnabled("consumption") && {
                     value: "meters",
@@ -482,6 +585,10 @@ export default function BuildingDetailPage() {
 
                   // Merge action queue
                   const actionQueue = [];
+                  // Distribution in progress → show at top
+                  if (hasActiveDistribution) {
+                    actionQueue.push({ type: "distribution", severity: "info", item: activeDistribution });
+                  }
                   overdueTasks.forEach((t) => actionQueue.push({ type: "task", severity: "error", item: t }));
                   warnings.forEach((w) => actionQueue.push({ type: "warning", severity: w.severity, item: w }));
                   openTasks.filter((t) => !overdueTasks.includes(t)).forEach((t) => actionQueue.push({ type: "task", severity: "info", item: t }));
@@ -583,7 +690,38 @@ export default function BuildingDetailPage() {
                         </div>
                         <div className="divide-y divide-slate-100">
                           {actionQueue.map((entry) => {
-                            if (entry.type === "task") {
+                            if (entry.type === "distribution") {
+                              const dist = entry.item;
+                              const stepCfg = STEP_CONFIG[dist.currentStep];
+                              const stepLabel = stepCfg?.label?.[lang] ?? dist.currentStep;
+                              const flagged = getFlaggedServiceCount(dist);
+                              return (
+                                <button
+                                  key={dist.id}
+                                  onClick={() => navigate(`/distribution/${dist.id}`)}
+                                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors text-left"
+                                >
+                                  <span
+                                    className="w-1.5 h-1.5 rounded-full shrink-0 animate-pulse"
+                                    style={{ background: brand.teal }}
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs text-slate-700">
+                                      {lang === "nl" ? "Verdeling" : "Distribution"} {dist.period}
+                                      <span className="mx-1.5 text-slate-300">·</span>
+                                      <span className="text-slate-400">{lang === "nl" ? "Stap" : "Step"}: {stepLabel}</span>
+                                    </p>
+                                  </div>
+                                  {flagged > 0 && (
+                                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full shrink-0"
+                                      style={{ background: brand.amber + "18", color: brand.amber }}>
+                                      {flagged} {lang === "nl" ? "melding" : "flag"}{flagged > 1 ? "s" : ""}
+                                    </span>
+                                  )}
+                                  <ChevronRight size={12} className="text-slate-300 shrink-0" />
+                                </button>
+                              );
+                            } else if (entry.type === "task") {
                               const task = entry.item;
                               const isOverdue = new Date(task.dueDate) < new Date();
                               return (
