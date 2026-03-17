@@ -460,8 +460,15 @@ export default function BuildingDetailPage() {
         </div>
 
 
-        {/* ── Tab bar (Attio-style: icon + label + count badge) ── */}
-          <TabsList className="bg-transparent h-10 gap-1 p-0 border-b border-slate-200 w-full justify-start rounded-none overflow-x-auto">
+      </div>{/* end sticky header zone */}
+
+      {/* ── Scrollable content: left tab content + right attribute panel ── */}
+      <div className="flex-1 flex flex-col xl:flex-row overflow-hidden">
+        <div className="flex-1 min-w-0 overflow-y-auto">
+          <div className="max-w-[1100px] px-4 sm:px-6 pb-6">
+
+          {/* ── Tab bar (Attio-style: icon + label + count badge) ── */}
+          <TabsList className="bg-transparent h-10 gap-1 p-0 border-b border-slate-200 w-full justify-start rounded-none overflow-x-auto mb-0">
             {[
               { value: "overview", label: t("overview", lang), icon: LayoutList },
               isFeatureEnabled("consumptionControl") && {
@@ -505,18 +512,12 @@ export default function BuildingDetailPage() {
                   <TabIcon size={14} strokeWidth={1.5} />
                   {tab.label}
                   {tab.count != null && (
-                    <span className="text-xs text-slate-400 tabular-nums">{tab.count}</span>
+                    <span className="min-w-[20px] h-5 px-1 rounded bg-slate-100 text-[11px] text-slate-500 font-medium tabular-nums inline-flex items-center justify-center">{tab.count}</span>
                   )}
                 </TabsTrigger>
               );
             })}
           </TabsList>
-      </div>{/* end sticky header zone */}
-
-      {/* ── Scrollable content: left tab content + right attribute panel ── */}
-      <div className="flex-1 flex flex-col xl:flex-row overflow-hidden">
-        <div className="flex-1 min-w-0 overflow-y-auto">
-          <div className="max-w-[1100px] px-4 sm:px-6 pb-6">
 
               {/* ═══ OVERVIEW TAB — BUILDING HOME PAGE ═══ */}
               <TabsContent value="overview">
@@ -640,85 +641,7 @@ export default function BuildingDetailPage() {
                   return (
                 <div className="mt-4 space-y-4">
 
-                  {/* Action Queue */}
-                  {actionQueue.length > 0 ? (
-                    <Card className="border-slate-200 bg-white overflow-hidden">
-                      <CardContent className="p-0">
-                        <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2">
-                          <ListChecks size={13} className="text-slate-400" />
-                          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                            {lang === "nl" ? "Acties" : "Actions"}
-                            <span className="ml-1.5 text-slate-300">({actionQueue.length})</span>
-                          </p>
-                        </div>
-                        <div className="divide-y divide-slate-100">
-                          {actionQueue.map((entry) => {
-                            if (entry.type === "task") {
-                              const task = entry.item;
-                              const isOverdue = new Date(task.dueDate) < new Date();
-                              return (
-                                <div key={task.id} className={`flex items-center gap-3 px-4 py-2.5 ${isOverdue ? "bg-red-50/40" : ""}`}>
-                                  <div
-                                    className="w-2 h-2 rounded-full shrink-0"
-                                    style={{ background: priorityDot[task.priority] || brand.muted }}
-                                  />
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-xs text-slate-700 truncate">
-                                      {task.title[lang] || task.title.en}
-                                    </p>
-                                  </div>
-                                  <div className="flex items-center gap-2 shrink-0">
-                                    <span
-                                      className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-semibold text-white shrink-0"
-                                      style={{ background: brand.navy + "80" }}
-                                      title={task.assignee}
-                                    >
-                                      {task.assigneeInitials}
-                                    </span>
-                                    <span className={`text-[11px] tabular-nums ${isOverdue ? "text-red-600 font-medium" : "text-slate-400"}`}>
-                                      {fmtRelDate(task.dueDate)}
-                                    </span>
-                                  </div>
-                                </div>
-                              );
-                            } else {
-                              const w = entry.item;
-                              const sty = sevStyles[w.severity] || sevStyles.info;
-                              const WIcon = w.icon;
-                              return (
-                                <div key={w.id} className={`flex items-center gap-3 px-4 py-2.5 ${sty.bg}`}>
-                                  <WIcon size={13} className="shrink-0" style={{ color: sty.iconColor }} />
-                                  <p className="flex-1 min-w-0 text-xs text-slate-700 truncate">
-                                    {w.text[lang] || w.text.en}
-                                  </p>
-                                  {w.action && (
-                                    <button
-                                      onClick={w.action}
-                                      className="text-[11px] font-medium shrink-0 px-2 py-0.5 rounded hover:bg-slate-100 transition-colors"
-                                      style={{ color: brand.blue }}
-                                    >
-                                      {lang === "nl" ? "Bekijk" : "View"} →
-                                    </button>
-                                  )}
-                                </div>
-                              );
-                            }
-                          })}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <div className="flex items-center gap-3 px-4 py-4 rounded-lg border border-slate-200 bg-white">
-                      <CheckCircle2 size={15} style={{ color: brand.blue }} className="shrink-0" />
-                      <p className="text-xs text-slate-500">
-                        {lang === "nl"
-                          ? "Alles op orde — geen openstaande acties."
-                          : "All clear — no open actions."}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Layer 2: Financial Snapshot */}
+                  {/* 1. Budget */}
                   <Card className="border-slate-200 bg-white overflow-hidden">
                       <CardContent className="px-4 py-3">
                         <div className="flex items-center gap-2 mb-2.5">
@@ -796,7 +719,97 @@ export default function BuildingDetailPage() {
                       </CardContent>
                     </Card>
 
-                  {/* Notes & Context */}
+                  {/* 2. Tasks */}
+                  {openTasks.length > 0 ? (
+                    <Card className="border-slate-200 bg-white overflow-hidden">
+                      <CardContent className="p-0">
+                        <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2">
+                          <ListChecks size={13} className="text-slate-400" />
+                          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                            {lang === "nl" ? "Taken" : "Tasks"}
+                            <span className="ml-1.5 text-slate-300">({openTasks.length})</span>
+                          </p>
+                        </div>
+                        <div className="divide-y divide-slate-100">
+                          {openTasks.map((task) => {
+                            const isOverdue = new Date(task.dueDate) < new Date();
+                            return (
+                              <div key={task.id} className={`flex items-center gap-3 px-4 py-2.5 ${isOverdue ? "bg-red-50/40" : ""}`}>
+                                <div
+                                  className="w-2 h-2 rounded-full shrink-0"
+                                  style={{ background: priorityDot[task.priority] || brand.muted }}
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs text-slate-700 truncate">
+                                    {task.title[lang] || task.title.en}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <span
+                                    className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-semibold text-white shrink-0"
+                                    style={{ background: brand.navy + "80" }}
+                                    title={task.assignee}
+                                  >
+                                    {task.assigneeInitials}
+                                  </span>
+                                  <span className={`text-[11px] tabular-nums ${isOverdue ? "text-red-600 font-medium" : "text-slate-400"}`}>
+                                    {fmtRelDate(task.dueDate)}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="flex items-center gap-3 px-4 py-4 rounded-lg border border-slate-200 bg-white">
+                      <CheckCircle2 size={15} style={{ color: brand.blue }} className="shrink-0" />
+                      <p className="text-xs text-slate-500">
+                        {lang === "nl" ? "Geen openstaande taken" : "No open tasks"}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* 3. Warnings (auto-generated alerts) */}
+                  {warnings.length > 0 && (
+                    <Card className="border-slate-200 bg-white overflow-hidden">
+                      <CardContent className="p-0">
+                        <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2">
+                          <AlertTriangle size={13} className="text-slate-400" />
+                          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                            {lang === "nl" ? "Waarschuwingen" : "Warnings"}
+                            <span className="ml-1.5 text-slate-300">({warnings.length})</span>
+                          </p>
+                        </div>
+                        <div className="divide-y divide-slate-100">
+                          {warnings.map((w) => {
+                            const sty = sevStyles[w.severity] || sevStyles.info;
+                            const WIcon = w.icon;
+                            return (
+                              <div key={w.id} className={`flex items-center gap-3 px-4 py-2.5 ${sty.bg}`}>
+                                <WIcon size={13} className="shrink-0" style={{ color: sty.iconColor }} />
+                                <p className="flex-1 min-w-0 text-xs text-slate-700 truncate">
+                                  {w.text[lang] || w.text.en}
+                                </p>
+                                {w.action && (
+                                  <button
+                                    onClick={w.action}
+                                    className="text-[11px] font-medium shrink-0 px-2 py-0.5 rounded hover:bg-slate-100 transition-colors"
+                                    style={{ color: brand.blue }}
+                                  >
+                                    {lang === "nl" ? "Bekijk" : "View"} →
+                                  </button>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* 4. Notes */}
                   <Card className="border-slate-200 bg-white overflow-hidden">
                     <CardContent className="p-0">
                       <div className="px-4 py-2.5 border-b border-slate-100 flex items-center justify-between">
