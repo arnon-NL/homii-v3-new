@@ -1,64 +1,86 @@
 import React from "react";
-import { ArrowUpRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { brand } from "@/lib/brand";
-import { DataSourceTag } from "@/components/ui/data-source-tag";
+
+/* ═══════════════════════════════════════════════════════════════
+   Attribute Panel — right sidebar for detail pages
+   Design: clean left-border accent, strict 4px grid, minimal palette
+   ═══════════════════════════════════════════════════════════════ */
 
 export function AttributePanel({ children }) {
   return (
-    <div className="w-full xl:w-[280px] shrink-0 xl:border-l border-t xl:border-t-0 border-slate-200 bg-slate-50/50 overflow-y-auto mt-6 xl:mt-0 pt-6 xl:pt-0">
-      <div className="px-4 py-4 space-y-5">
+    <div className="w-full xl:w-[280px] shrink-0 overflow-y-auto">
+      <div className="xl:border-l border-slate-200 space-y-0 py-2">
         {children}
       </div>
     </div>
   );
 }
 
-export function AttrSection({ title, children }) {
+export function AttrSection({ title, children, first }) {
   return (
-    <div>
-      <h3 className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-2.5">{title}</h3>
-      <div className="space-y-2">{children}</div>
-    </div>
-  );
-}
-
-export function AttrRow({ label, value, onClick, color, source }) {
-  const Val = onClick ? "button" : "span";
-  return (
-    <div className="flex items-baseline justify-between gap-2 min-h-[22px]">
-      <span className="text-[11px] text-slate-400 shrink-0">{label}</span>
-      <span className="flex items-center gap-1.5">
-        <Val
-          className={`text-xs font-medium text-right truncate max-w-[180px] xl:max-w-[140px] ${onClick ? "cursor-pointer transition-colors" : ""}`}
-          onMouseEnter={onClick ? (e) => e.currentTarget.style.color = brand.blue : undefined}
-          onMouseLeave={onClick ? (e) => e.currentTarget.style.color = color || brand.navy : undefined}
-          style={{ color: color || brand.navy }}
-          onClick={onClick}
-          title={typeof value === "string" ? value : undefined}>
-          {value}
-        </Val>
-        {source && <DataSourceTag source={source} />}
-      </span>
-    </div>
-  );
-}
-
-export function AttrLink({ title, label, items, onItemClick }) {
-  return (
-    <div>
-      <h3 className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest mb-2.5">{title || label}</h3>
-      <div className="space-y-1">
-        {items.map((item, i) => (
-          <button key={i}
-            onClick={() => item.onClick ? item.onClick() : onItemClick?.(item)}
-            className="group flex items-center gap-1 text-xs font-medium text-left transition-colors hover:underline max-w-full"
-            style={{ color: brand.blue }}
-            title={item.label}>
-            <span className="truncate">{item.label}</span>
-            <ArrowUpRight size={14} className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-          </button>
-        ))}
+    <div className={first ? "" : "border-t border-slate-100"}>
+      <div className={`px-5 ${first ? "pt-2" : "pt-5"} pb-4`}>
+        <div className="flex items-center gap-2 mb-3">
+          <div
+            className="w-0.5 h-3 rounded-full"
+            style={{ background: brand.blue }}
+          />
+          <h3 className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest">
+            {title}
+          </h3>
+        </div>
+        <div className="space-y-2 pl-3">{children}</div>
       </div>
+    </div>
+  );
+}
+
+export function AttrRow({ label, value, onClick, mono, muted }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3">
+      <span className="text-[11px] text-slate-400 shrink-0">{label}</span>
+      {onClick ? (
+        <button
+          onClick={onClick}
+          className="group flex items-center gap-1 text-xs font-medium transition-colors text-right truncate max-w-[160px]"
+          style={{ color: brand.blue }}
+          title={typeof value === "string" ? value : undefined}
+        >
+          <span className="truncate">{value}</span>
+          <ChevronRight
+            size={12}
+            className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+          />
+        </button>
+      ) : (
+        <span
+          className={`text-xs font-medium text-right truncate max-w-[160px] ${
+            mono ? "font-mono text-[11px]" : ""
+          } ${muted ? "text-slate-400" : ""}`}
+          style={muted ? undefined : { color: brand.navy }}
+          title={typeof value === "string" ? value : undefined}
+        >
+          {value}
+        </span>
+      )}
+    </div>
+  );
+}
+
+export function AttrBadge({ label, active, text }) {
+  return (
+    <div className="flex items-baseline justify-between gap-3">
+      <span className="text-[11px] text-slate-400 shrink-0">{label}</span>
+      <span
+        className={`inline-flex items-center text-[11px] font-medium px-2 py-0.5 rounded-full ${
+          active
+            ? "bg-[#3EB1C8]/10 text-[#3EB1C8]"
+            : "bg-slate-100 text-slate-400"
+        }`}
+      >
+        {text}
+      </span>
     </div>
   );
 }
