@@ -70,6 +70,7 @@ Object.defineProperty(_proxy, "monthlyCloseStatuses", { get: () => ds().monthlyC
 Object.defineProperty(_proxy, "savedViews", { get: () => ds().savedViews, enumerable: true });
 Object.defineProperty(_proxy, "activities", { get: () => ds().activities, enumerable: true });
 Object.defineProperty(_proxy, "moduleConfig", { get: () => ds().moduleConfig, enumerable: true });
+Object.defineProperty(_proxy, "distributions", { get: () => ds().distributions || [], enumerable: true });
 
 // Re-export as named constants (these reference the proxy getters)
 export const buildings = _proxy.buildings;
@@ -257,7 +258,32 @@ export function getSettlementChecks(buildingId, year) {
   return ds()._checksByBldYear.get(`${String(buildingId)}|${year}`) || [];
 }
 
-// --- Distribution ---
+// --- Distributions (process objects) ---
+export function getDistributions() {
+  return ds().distributions || [];
+}
+
+export function getDistributionById(id) {
+  return ds()._distributionMap?.get(id) || null;
+}
+
+export function getDistributionsByBuilding(buildingId) {
+  return ds()._distributionsByBuilding?.get(String(buildingId)) || [];
+}
+
+export function getDistributionByPeriod(buildingId, period) {
+  const all = getDistributionsByBuilding(buildingId);
+  return all.find((d) => d.period === period) || null;
+}
+
+export function getActiveDistribution(buildingId) {
+  const all = getDistributionsByBuilding(buildingId);
+  if (!all.length) return null;
+  const active = all.find((d) => d.currentStep !== "complete");
+  return active || [...all].sort((a, b) => b.period - a.period)[0];
+}
+
+// --- Distribution Methods / Models ---
 export function getDistributionMethod(id) {
   return ds().distributionMethods.find((m) => m.id === id) || null;
 }

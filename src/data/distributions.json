@@ -1,0 +1,554 @@
+[
+  {
+    "id": "DIST-8047-2025",
+    "buildingId": "8047",
+    "period": 2025,
+    "currentStep": "check",
+    "services": [
+      {
+        "serviceId": "SVC-108",
+        "distributionMethod": "metered",
+        "distributionModelId": "DM-8047-108",
+        "budget": 95000,
+        "actual": 91250,
+        "previousActual": 86000,
+        "variancePct": 6.10,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-036",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 4200,
+        "actual": 4380,
+        "previousActual": 3950,
+        "variancePct": 10.89,
+        "completeness": 100,
+        "status": "flagged"
+      },
+      {
+        "serviceId": "SVC-115",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 1800,
+        "actual": 1720,
+        "previousActual": 1690,
+        "variancePct": 1.78,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-118",
+        "distributionMethod": "m2",
+        "distributionModelId": null,
+        "budget": 6500,
+        "actual": 6350,
+        "previousActual": 6100,
+        "variancePct": 4.10,
+        "completeness": 100,
+        "status": "complete"
+      }
+    ],
+    "steps": {
+      "validation": {
+        "status": "complete",
+        "completedAt": "2026-01-12",
+        "completedBy": "user-arnon",
+        "issues": []
+      },
+      "comparison": {
+        "status": "complete",
+        "completedAt": "2026-01-15",
+        "completedBy": "user-arnon",
+        "deviations": [
+          { "serviceId": "SVC-108", "pct": 6.10, "flagged": false },
+          { "serviceId": "SVC-036", "pct": 10.89, "flagged": true },
+          { "serviceId": "SVC-115", "pct": 1.78, "flagged": false },
+          { "serviceId": "SVC-118", "pct": 4.10, "flagged": false }
+        ]
+      },
+      "control": {
+        "status": "complete",
+        "completedAt": "2026-01-18",
+        "completedBy": "user-arnon",
+        "threshold": 10,
+        "excesses": [
+          { "serviceId": "SVC-036", "pct": 10.89, "threshold": 10, "exceeded": true, "note": "Schoonmaakkosten gestegen door nieuw contract" }
+        ]
+      },
+      "check": {
+        "status": "in_progress",
+        "completedAt": null,
+        "completedBy": null,
+        "tenantOutcomes": [
+          { "vheId": "VHE-8047-13531", "address": "Oude Keern 11", "voorschot": 920, "actualCost": 874, "delta": -46, "status": "ok" },
+          { "vheId": "VHE-8047-13532", "address": "Oude Keern 13", "voorschot": 840, "actualCost": 901, "delta": 61, "status": "ok" },
+          { "vheId": "VHE-8047-13533", "address": "Oude Keern 15", "voorschot": 880, "actualCost": 856, "delta": -24, "status": "ok" },
+          { "vheId": "VHE-8047-13534", "address": "Oude Keern 17", "voorschot": 910, "actualCost": 1120, "delta": 210, "status": "flagged" },
+          { "vheId": "VHE-8047-13535", "address": "Oude Keern 19", "voorschot": 850, "actualCost": 798, "delta": -52, "status": "ok" }
+        ]
+      },
+      "approval": {
+        "status": "pending",
+        "completedAt": null,
+        "requestedFrom": null,
+        "requestedAt": null,
+        "approvedBy": null,
+        "approvedAt": null,
+        "note": null
+      },
+      "distribution": {
+        "status": "pending",
+        "completedAt": null,
+        "sentToErp": false,
+        "erpReference": null
+      }
+    },
+    "totals": {
+      "totalCost": 103700,
+      "totalVoorschot": 107500,
+      "netResult": 3800
+    }
+  },
+  {
+    "id": "DIST-8047-2024",
+    "buildingId": "8047",
+    "period": 2024,
+    "currentStep": "complete",
+    "services": [
+      {
+        "serviceId": "SVC-108",
+        "distributionMethod": "metered",
+        "distributionModelId": "DM-8047-108",
+        "budget": 92000,
+        "actual": 88999,
+        "previousActual": 82000,
+        "variancePct": 8.54,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-036",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 4000,
+        "actual": 3950,
+        "previousActual": 3800,
+        "variancePct": 3.95,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-115",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 1750,
+        "actual": 1690,
+        "previousActual": 1620,
+        "variancePct": 4.32,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-118",
+        "distributionMethod": "m2",
+        "distributionModelId": null,
+        "budget": 6200,
+        "actual": 6100,
+        "previousActual": 5900,
+        "variancePct": 3.39,
+        "completeness": 100,
+        "status": "complete"
+      }
+    ],
+    "steps": {
+      "validation": { "status": "complete", "completedAt": "2025-01-10", "completedBy": "user-arnon", "issues": [] },
+      "comparison": { "status": "complete", "completedAt": "2025-01-13", "completedBy": "user-arnon", "deviations": [
+        { "serviceId": "SVC-108", "pct": 8.54, "flagged": false },
+        { "serviceId": "SVC-036", "pct": 3.95, "flagged": false },
+        { "serviceId": "SVC-115", "pct": 4.32, "flagged": false },
+        { "serviceId": "SVC-118", "pct": 3.39, "flagged": false }
+      ]},
+      "control": { "status": "complete", "completedAt": "2025-01-16", "completedBy": "user-arnon", "threshold": 10, "excesses": [] },
+      "check": { "status": "complete", "completedAt": "2025-01-20", "completedBy": "user-arnon", "tenantOutcomes": [
+        { "vheId": "VHE-8047-13531", "address": "Oude Keern 11", "voorschot": 900, "actualCost": 856, "delta": -44, "status": "ok" },
+        { "vheId": "VHE-8047-13532", "address": "Oude Keern 13", "voorschot": 820, "actualCost": 840, "delta": 20, "status": "ok" },
+        { "vheId": "VHE-8047-13533", "address": "Oude Keern 15", "voorschot": 860, "actualCost": 830, "delta": -30, "status": "ok" },
+        { "vheId": "VHE-8047-13534", "address": "Oude Keern 17", "voorschot": 890, "actualCost": 910, "delta": 20, "status": "ok" },
+        { "vheId": "VHE-8047-13535", "address": "Oude Keern 19", "voorschot": 840, "actualCost": 803, "delta": -37, "status": "ok" }
+      ]},
+      "approval": { "status": "complete", "completedAt": "2025-01-24", "requestedFrom": "user-lisa", "requestedAt": "2025-01-21", "approvedBy": "user-lisa", "approvedAt": "2025-01-24", "note": null },
+      "distribution": { "status": "complete", "completedAt": "2025-02-01", "sentToErp": true, "erpReference": "ERP-2025-0042" }
+    },
+    "totals": {
+      "totalCost": 100739,
+      "totalVoorschot": 104300,
+      "netResult": 3561
+    }
+  },
+  {
+    "id": "DIST-8666-2026",
+    "buildingId": "8666",
+    "period": 2026,
+    "currentStep": "validation",
+    "services": [
+      {
+        "serviceId": "SVC-115",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 280,
+        "actual": null,
+        "previousActual": 263,
+        "variancePct": null,
+        "completeness": 42,
+        "status": "pending"
+      },
+      {
+        "serviceId": "SVC-036",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 190,
+        "actual": null,
+        "previousActual": 177,
+        "variancePct": null,
+        "completeness": 67,
+        "status": "pending"
+      }
+    ],
+    "steps": {
+      "validation": { "status": "in_progress", "completedAt": null, "completedBy": null, "issues": [
+        { "serviceId": "SVC-115", "type": "incomplete_ledger", "message": "5 of 12 months missing" },
+        { "serviceId": "SVC-036", "type": "incomplete_ledger", "message": "4 of 12 months missing" }
+      ]},
+      "comparison": { "status": "pending", "completedAt": null, "completedBy": null, "deviations": [] },
+      "control": { "status": "pending", "completedAt": null, "completedBy": null, "threshold": 10, "excesses": [] },
+      "check": { "status": "pending", "completedAt": null, "completedBy": null, "tenantOutcomes": [] },
+      "approval": { "status": "pending", "completedAt": null, "requestedFrom": null, "requestedAt": null, "approvedBy": null, "approvedAt": null, "note": null },
+      "distribution": { "status": "pending", "completedAt": null, "sentToErp": false, "erpReference": null }
+    },
+    "totals": {
+      "totalCost": null,
+      "totalVoorschot": 24522.91,
+      "netResult": null
+    }
+  },
+  {
+    "id": "DIST-8666-2025",
+    "buildingId": "8666",
+    "period": 2025,
+    "currentStep": "complete",
+    "services": [
+      {
+        "serviceId": "SVC-115",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 270,
+        "actual": 263,
+        "previousActual": 250,
+        "variancePct": 5.2,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-036",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 185,
+        "actual": 177,
+        "previousActual": 168,
+        "variancePct": 5.36,
+        "completeness": 100,
+        "status": "complete"
+      }
+    ],
+    "steps": {
+      "validation": { "status": "complete", "completedAt": "2026-01-05", "completedBy": "user-arnon", "issues": [] },
+      "comparison": { "status": "complete", "completedAt": "2026-01-07", "completedBy": "user-arnon", "deviations": [
+        { "serviceId": "SVC-115", "pct": 5.2, "flagged": false },
+        { "serviceId": "SVC-036", "pct": 5.36, "flagged": false }
+      ]},
+      "control": { "status": "complete", "completedAt": "2026-01-09", "completedBy": "user-arnon", "threshold": 10, "excesses": [] },
+      "check": { "status": "complete", "completedAt": "2026-01-12", "completedBy": "user-arnon", "tenantOutcomes": [] },
+      "approval": { "status": "complete", "completedAt": "2026-01-20", "requestedFrom": "user-lisa", "requestedAt": "2026-01-14", "approvedBy": "user-lisa", "approvedAt": "2026-01-20", "note": null },
+      "distribution": { "status": "complete", "completedAt": "2026-02-02", "sentToErp": true, "erpReference": "ERP-2026-0011" }
+    },
+    "totals": {
+      "totalCost": 440,
+      "totalVoorschot": 452,
+      "netResult": 12
+    }
+  },
+  {
+    "id": "DIST-8666-2024",
+    "buildingId": "8666",
+    "period": 2024,
+    "currentStep": "complete",
+    "services": [
+      {
+        "serviceId": "SVC-115",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 260,
+        "actual": 250,
+        "previousActual": 238,
+        "variancePct": 5.04,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-036",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 180,
+        "actual": 168,
+        "previousActual": 160,
+        "variancePct": 5.0,
+        "completeness": 100,
+        "status": "complete"
+      }
+    ],
+    "steps": {
+      "validation": { "status": "complete", "completedAt": "2025-01-08", "completedBy": "user-arnon", "issues": [] },
+      "comparison": { "status": "complete", "completedAt": "2025-01-10", "completedBy": "user-arnon", "deviations": [
+        { "serviceId": "SVC-115", "pct": 5.04, "flagged": false },
+        { "serviceId": "SVC-036", "pct": 5.0, "flagged": false }
+      ]},
+      "control": { "status": "complete", "completedAt": "2025-01-12", "completedBy": "user-arnon", "threshold": 10, "excesses": [] },
+      "check": { "status": "complete", "completedAt": "2025-01-15", "completedBy": "user-arnon", "tenantOutcomes": [] },
+      "approval": { "status": "complete", "completedAt": "2025-01-22", "requestedFrom": "user-lisa", "requestedAt": "2025-01-16", "approvedBy": "user-lisa", "approvedAt": "2025-01-22", "note": null },
+      "distribution": { "status": "complete", "completedAt": "2025-03-08", "sentToErp": true, "erpReference": "ERP-2025-0018" }
+    },
+    "totals": {
+      "totalCost": 418,
+      "totalVoorschot": 445,
+      "netResult": 27
+    }
+  },
+  {
+    "id": "DIST-8245-2025",
+    "buildingId": "8245",
+    "period": 2025,
+    "currentStep": "approval",
+    "services": [
+      {
+        "serviceId": "SVC-115",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 32,
+        "actual": 30,
+        "previousActual": 28,
+        "variancePct": 7.14,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-036",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 20,
+        "actual": 17.9,
+        "previousActual": 16.5,
+        "variancePct": 8.48,
+        "completeness": 100,
+        "status": "complete"
+      }
+    ],
+    "steps": {
+      "validation": { "status": "complete", "completedAt": "2026-01-08", "completedBy": "user-arnon", "issues": [] },
+      "comparison": { "status": "complete", "completedAt": "2026-01-10", "completedBy": "user-arnon", "deviations": [
+        { "serviceId": "SVC-115", "pct": 7.14, "flagged": false },
+        { "serviceId": "SVC-036", "pct": 8.48, "flagged": false }
+      ]},
+      "control": { "status": "complete", "completedAt": "2026-01-12", "completedBy": "user-arnon", "threshold": 10, "excesses": [] },
+      "check": { "status": "complete", "completedAt": "2026-01-16", "completedBy": "user-arnon", "tenantOutcomes": [] },
+      "approval": { "status": "in_progress", "completedAt": null, "requestedFrom": "user-lisa", "requestedAt": "2026-01-17", "approvedBy": null, "approvedAt": null, "note": "Please review before the 25th" },
+      "distribution": { "status": "pending", "completedAt": null, "sentToErp": false, "erpReference": null }
+    },
+    "totals": {
+      "totalCost": 47.9,
+      "totalVoorschot": 49.43,
+      "netResult": 1.53
+    }
+  },
+  {
+    "id": "DIST-8245-2024",
+    "buildingId": "8245",
+    "period": 2024,
+    "currentStep": "complete",
+    "services": [
+      {
+        "serviceId": "SVC-115",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 310,
+        "actual": 298,
+        "previousActual": 285,
+        "variancePct": 4.56,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-036",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 175,
+        "actual": 170,
+        "previousActual": 163,
+        "variancePct": 4.29,
+        "completeness": 100,
+        "status": "complete"
+      }
+    ],
+    "steps": {
+      "validation": { "status": "complete", "completedAt": "2025-02-10", "completedBy": "user-arnon", "issues": [] },
+      "comparison": { "status": "complete", "completedAt": "2025-02-12", "completedBy": "user-arnon", "deviations": [] },
+      "control": { "status": "complete", "completedAt": "2025-02-14", "completedBy": "user-arnon", "threshold": 10, "excesses": [] },
+      "check": { "status": "complete", "completedAt": "2025-02-18", "completedBy": "user-arnon", "tenantOutcomes": [] },
+      "approval": { "status": "complete", "completedAt": "2025-05-22", "requestedFrom": "user-lisa", "requestedAt": "2025-05-20", "approvedBy": "user-lisa", "approvedAt": "2025-05-22", "note": null },
+      "distribution": { "status": "complete", "completedAt": "2025-05-28", "sentToErp": true, "erpReference": "ERP-2025-0091" }
+    },
+    "totals": {
+      "totalCost": 468.15,
+      "totalVoorschot": 483.65,
+      "netResult": 15.5
+    }
+  },
+  {
+    "id": "DIST-8244-2025",
+    "buildingId": "8244",
+    "period": 2025,
+    "currentStep": "comparison",
+    "services": [
+      {
+        "serviceId": "SVC-115",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 2100,
+        "actual": 2040,
+        "previousActual": 1950,
+        "variancePct": 4.62,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-036",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 1400,
+        "actual": 1385,
+        "previousActual": 1290,
+        "variancePct": 7.36,
+        "completeness": 100,
+        "status": "complete"
+      }
+    ],
+    "steps": {
+      "validation": { "status": "complete", "completedAt": "2026-01-20", "completedBy": "user-arnon", "issues": [] },
+      "comparison": { "status": "in_progress", "completedAt": null, "completedBy": null, "deviations": [
+        { "serviceId": "SVC-115", "pct": 4.62, "flagged": false },
+        { "serviceId": "SVC-036", "pct": 7.36, "flagged": false }
+      ]},
+      "control": { "status": "pending", "completedAt": null, "completedBy": null, "threshold": 10, "excesses": [] },
+      "check": { "status": "pending", "completedAt": null, "completedBy": null, "tenantOutcomes": [] },
+      "approval": { "status": "pending", "completedAt": null, "requestedFrom": null, "requestedAt": null, "approvedBy": null, "approvedAt": null, "note": null },
+      "distribution": { "status": "pending", "completedAt": null, "sentToErp": false, "erpReference": null }
+    },
+    "totals": {
+      "totalCost": 3425.22,
+      "totalVoorschot": 3596.48,
+      "netResult": 171.26
+    }
+  },
+  {
+    "id": "DIST-8244-2024",
+    "buildingId": "8244",
+    "period": 2024,
+    "currentStep": "complete",
+    "services": [
+      {
+        "serviceId": "SVC-115",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 2050,
+        "actual": 1950,
+        "previousActual": 1880,
+        "variancePct": 3.72,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-036",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 1350,
+        "actual": 1290,
+        "previousActual": 1230,
+        "variancePct": 4.88,
+        "completeness": 100,
+        "status": "complete"
+      }
+    ],
+    "steps": {
+      "validation": { "status": "complete", "completedAt": "2025-01-14", "completedBy": "user-arnon", "issues": [] },
+      "comparison": { "status": "complete", "completedAt": "2025-01-17", "completedBy": "user-arnon", "deviations": [] },
+      "control": { "status": "complete", "completedAt": "2025-01-20", "completedBy": "user-arnon", "threshold": 10, "excesses": [] },
+      "check": { "status": "complete", "completedAt": "2025-01-25", "completedBy": "user-arnon", "tenantOutcomes": [] },
+      "approval": { "status": "complete", "completedAt": "2025-05-11", "requestedFrom": "user-lisa", "requestedAt": "2025-05-09", "approvedBy": "user-lisa", "approvedAt": "2025-05-11", "note": null },
+      "distribution": { "status": "complete", "completedAt": "2025-05-18", "sentToErp": true, "erpReference": "ERP-2025-0077" }
+    },
+    "totals": {
+      "totalCost": 5362.39,
+      "totalVoorschot": 5540.56,
+      "netResult": 178.17
+    }
+  },
+  {
+    "id": "DIST-8723-2025",
+    "buildingId": "8723",
+    "period": 2025,
+    "currentStep": "control",
+    "services": [
+      {
+        "serviceId": "SVC-115",
+        "distributionMethod": "equal",
+        "distributionModelId": null,
+        "budget": 520,
+        "actual": 498,
+        "previousActual": 465,
+        "variancePct": 7.10,
+        "completeness": 100,
+        "status": "complete"
+      },
+      {
+        "serviceId": "SVC-102",
+        "distributionMethod": "metered",
+        "distributionModelId": null,
+        "budget": 210,
+        "actual": 245,
+        "previousActual": 200,
+        "variancePct": 22.5,
+        "completeness": 100,
+        "status": "flagged"
+      }
+    ],
+    "steps": {
+      "validation": { "status": "complete", "completedAt": "2026-01-22", "completedBy": "user-arnon", "issues": [] },
+      "comparison": { "status": "complete", "completedAt": "2026-01-25", "completedBy": "user-arnon", "deviations": [
+        { "serviceId": "SVC-115", "pct": 7.10, "flagged": false },
+        { "serviceId": "SVC-102", "pct": 22.5, "flagged": true }
+      ]},
+      "control": { "status": "in_progress", "completedAt": null, "completedBy": null, "threshold": 10, "excesses": [
+        { "serviceId": "SVC-102", "pct": 22.5, "threshold": 10, "exceeded": true, "note": "Elektriciteitsverbruik gemeenschappelijke ruimtes fors gestegen" }
+      ]},
+      "check": { "status": "pending", "completedAt": null, "completedBy": null, "tenantOutcomes": [] },
+      "approval": { "status": "pending", "completedAt": null, "requestedFrom": null, "requestedAt": null, "approvedBy": null, "approvedAt": null, "note": null },
+      "distribution": { "status": "pending", "completedAt": null, "sentToErp": false, "erpReference": null }
+    },
+    "totals": {
+      "totalCost": 743,
+      "totalVoorschot": 700.37,
+      "netResult": -42.63
+    }
+  }
+]

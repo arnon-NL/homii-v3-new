@@ -27,6 +27,7 @@ import rHeatingSeasons from "../../data/heatingSeasons.json";
 import rModuleConfig from "../../data/moduleConfig.json";
 import rTasks from "../../data/tasks.json";
 import rNotes from "../../data/notes.json";
+import rDistributions from "../../data/distributions.json";
 
 // --- Portaal (energy-only — no ledger, settlement, or supplier data) ---
 import pBuildings from "../../data/portaal/buildings.json";
@@ -144,6 +145,21 @@ function buildIndexes(ds) {
     ds._dmByBuilding.get(String(dm.buildingId)).push(dm);
   }
 
+  // Distributions (process objects) — indexed by id and by building
+  ds._distributionMap = new Map();
+  ds._distributionsByBuilding = new Map();
+  for (const d of (ds.distributions || [])) {
+    ds._distributionMap.set(d.id, d);
+    if (!ds._distributionsByBuilding.has(String(d.buildingId))) ds._distributionsByBuilding.set(String(d.buildingId), []);
+    ds._distributionsByBuilding.get(String(d.buildingId)).push(d);
+  }
+
+  // Enrich Building objects with distributionIds (computed from process data)
+  for (const b of ds.buildings) {
+    const dists = ds._distributionsByBuilding.get(String(b.id)) || [];
+    b.distributionIds = dists.map((d) => d.id);
+  }
+
   return ds;
 }
 
@@ -171,6 +187,7 @@ const rochdale = buildIndexes({
   heatingSeasons: rHeatingSeasons,
   tasks: rTasks,
   notes: rNotes,
+  distributions: rDistributions,
 });
 
 const portaal = buildIndexes({
@@ -196,6 +213,7 @@ const portaal = buildIndexes({
   heatingSeasons: pHeatingSeasons,
   tasks: [],                  // energy-only: no tasks
   notes: [],                  // energy-only: no notes
+  distributions: [],          // energy-only: no distributions
 });
 
 const datasets = {

@@ -67,7 +67,10 @@ import {
   getDistributionModelsByBuilding,
   getTasksByBuilding,
   getNotesByBuilding,
+  getActiveDistribution,
+  getDistributionsByBuilding,
 } from "@/lib/mockData";
+import { STEP_CONFIG, STEP_ORDER, getStepIndex } from "@/lib/data/distributions";
 import { useOrg } from "@/lib/OrgContext";
 import { t, useLang } from "@/lib/i18n";
 import Breadcrumbs from "./Breadcrumbs";
@@ -291,8 +294,11 @@ export default function BuildingDetailPage() {
   const [vheSearch, setVheSearch] = useState("");
   const [expandedCostCats, setExpandedCostCats] = useState({});  // { [ccId]: true }
   const toggleCostCat = (ccId) => setExpandedCostCats((prev) => ({ ...prev, [ccId]: !prev[ccId] }));
-  const [distDrilldown, setDistDrilldown] = useState(null); // { serviceId, buildingId } when viewing distribution
   const [showDismounted, setShowDismounted] = useState(false);
+
+  // Distribution process object for this building
+  const activeDistribution = useMemo(() => getActiveDistribution(buildingId), [buildingId]);
+  const buildingDistributions = useMemo(() => getDistributionsByBuilding(buildingId), [buildingId]);
 
   const building = getBuilding(buildingId);
 
@@ -1042,6 +1048,81 @@ export default function BuildingDetailPage() {
                     </Card>
                   )}
 
+                  {/* ── Distribution Reference Card ── */}
+                  {isFeatureEnabled("ledger") && buildingDistributions.length > 0 && (() => {
+                    const dist = activeDistribution || buildingDistributions[0];
+                    const isComplete = dist.currentStep === "complete";
+                    const stepIdx = getStepIndex(dist);
+                    const stepCfg = STEP_CONFIG[dist.currentStep];
+                    const flaggedSvcs = dist.services.filter(s => s.status === "flagged").length;
+                    const distId = `/${orgId}/distribution/${dist.id}`;
+
+                    return (
+                      <Card className="border-slate-200 bg-white overflow-hidden">
+                        <CardContent className="px-4 py-3">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <Send size={13} className="text-slate-400" />
+                              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                                {lang === "nl" ? "Verdeling" : "Distribution"} {dist.period}
+                              </span>
+                            </div>
+                            {isComplete ? (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                                <CheckCircle2 size={10} />
+                                {lang === "nl" ? "Afgerond" : "Complete"}
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                                <Clock size={10} />
+                                {lang === "nl" ? "Stap" : "Step"} {stepIdx + 1}/6
+                              </span>
+                            )}
+                          </div>
+
+                          {/* 6-step mini progress bar */}
+                          <div className="flex items-center gap-0.5 mb-2">
+                            {STEP_ORDER.map((step, i) => {
+                              const done = isComplete || i < stepIdx;
+                              const active = !isComplete && i === stepIdx;
+                              return (
+                                <div
+                                  key={step}
+                                  className="h-1 rounded-full flex-1"
+                                  style={{ background: done ? (brand.teal || "#3EB1C8") : active ? "#93C5FD" : "#E2E8F0" }}
+                                />
+                              );
+                            })}
+                          </div>
+
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              {!isComplete && stepCfg && (
+                                <span className="text-[11px] text-slate-500">
+                                  {lang === "nl" ? "Huidig" : "Current"}: <span className="font-medium text-slate-700">{stepCfg.label[lang] || stepCfg.label.en}</span>
+                                </span>
+                              )}
+                              {flaggedSvcs > 0 && (
+                                <span className="inline-flex items-center gap-1 text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
+                                  <AlertTriangle size={10} />
+                                  {flaggedSvcs} {lang === "nl" ? "aandacht" : "flagged"}
+                                </span>
+                              )}
+                            </div>
+                            <button
+                              onClick={() => navigate(distId)}
+                              className="text-[11px] font-medium hover:underline flex items-center gap-0.5"
+                              style={{ color: brand.blue }}
+                            >
+                              {lang === "nl" ? "Open verdeling" : "Open distribution"}
+                              <ChevronRight size={11} />
+                            </button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })()}
+
                   {/* Layer 3: Notes & Context */}
                   <Card className="border-slate-200 bg-white overflow-hidden">
                     <CardContent className="p-0">
@@ -1147,11 +1228,11 @@ export default function BuildingDetailPage() {
 
               {/* ═══ SERVICES TAB — DETAIL & INVESTIGATION ═══ */}
               <TabsContent value="services">
-                {/* ── Distribution drill-down view ── */}
-                {distDrilldown ? (() => {
-                  const dm = getDistributionModel(distDrilldown.buildingId, distDrilldown.serviceId);
-                  const svc = getService(distDrilldown.serviceId);
-                  const svcName = svc ? (svc.name[lang] || svc.name.en) : distDrilldown.serviceId;
+                {/* ── Distribution is now handled by the dedicated Distribution page ── */}
+                {false ? (() => {
+                  const dm = null;
+                  const svc = null;
+                  const svcName = null;
 
                   // Resolve intermediate values from the split tree
                   const resolveValue = (outputId) => {
@@ -1175,7 +1256,7 @@ export default function BuildingDetailPage() {
                     <div className="mt-4 space-y-5">
                       {/* Back navigation */}
                       <button
-                        onClick={() => setDistDrilldown(null)}
+                        onClick={() => null}
                         className="flex items-center gap-1 text-xs font-medium transition-colors hover:underline"
                         style={{ color: brand.blue }}
                       >
@@ -1793,20 +1874,29 @@ export default function BuildingDetailPage() {
                                           )}
                                         </div>
 
-                                        {/* Footer: Distribution model + cross-navigation */}
+                                        {/* Footer: Distribution link + cross-navigation */}
                                         <div className="flex items-center justify-between pt-2 border-t border-slate-100">
-                                          <button
-                                            className="text-[11px] font-medium flex items-center gap-1 transition-colors hover:underline"
-                                            style={{ color: brand.blue }}
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              setDistDrilldown({ serviceId: bs.serviceId, buildingId });
-                                            }}
-                                          >
-                                            <Activity size={12} />
-                                            {lang === "nl" ? "Bekijk verdelingsmodel" : "View distribution model"}
-                                            <ChevronRight size={12} />
-                                          </button>
+                                          {(() => {
+                                            const dist = activeDistribution;
+                                            return dist ? (
+                                              <button
+                                                className="text-[11px] font-medium flex items-center gap-1 transition-colors hover:underline"
+                                                style={{ color: brand.blue }}
+                                                onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  navigate(`/${orgId}/distribution/${dist.id}`);
+                                                }}
+                                              >
+                                                <Send size={12} />
+                                                {lang === "nl" ? "Bekijk verdeling" : "View distribution"}
+                                                <ChevronRight size={12} />
+                                              </button>
+                                            ) : (
+                                              <span className="text-[11px] text-slate-300">
+                                                {lang === "nl" ? "Geen verdeling" : "No distribution"}
+                                              </span>
+                                            );
+                                          })()}
                                           <button
                                             className="text-[11px] font-medium flex items-center gap-1 hover:underline"
                                             style={{ color: brand.blue }}

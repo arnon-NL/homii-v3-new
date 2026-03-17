@@ -20,6 +20,7 @@ import {
   Plus,
   ChevronDown,
   Check,
+  Send,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import { t, useLang } from "@/lib/i18n";
@@ -239,6 +240,7 @@ export default function Sidebar({ lang, setLang }) {
     { label: t("services", lang), icon: Wrench, path: `/${orgId}/services` },
     hasModule("serviceCharges") && { label: t("suppliers", lang), icon: Truck, path: `/${orgId}/suppliers` },
     { label: t("meters", lang), icon: Gauge, path: `/${orgId}/meters` },
+    hasModule("serviceCharges") && { label: lang === "nl" ? "Verdeling" : "Distribution", icon: Send, path: `/${orgId}/distribution` },
   ].filter(Boolean);
 
   // Filter out default views — those are just the object list pages themselves
