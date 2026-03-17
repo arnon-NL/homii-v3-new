@@ -20,6 +20,8 @@ import {
   Lock,
   FileCheck,
   ArrowUpRight,
+  ChevronDown,
+  FolderOpen,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import {
@@ -27,6 +29,8 @@ import {
   getBuilding,
   getService,
   getDistributionModel,
+  getCostCategoriesByService,
+  getLedgerByServiceAndBuilding,
 } from "@/lib/mockData";
 import { useOrg } from "@/lib/OrgContext";
 import { useLang } from "@/lib/i18n";
@@ -228,6 +232,7 @@ function ValidationPanel({ distribution, lang, isActive, onAdvance }) {
   const isComplete = step?.status === "complete";
   const allComplete = distribution.services.every(s => (s.completeness ?? 0) === 100);
   const canAdvance = allComplete && issues.length === 0;
+  const [expandedSvc, setExpandedSvc] = useState(null);
 
   return (
     <div className="space-y-4">
@@ -249,23 +254,100 @@ function ValidationPanel({ distribution, lang, isActive, onAdvance }) {
             const name = service?.name?.[lang] || service?.name?.en || svc.serviceId;
             const completeness = svc.completeness ?? 0;
             const isOk = completeness === 100;
+            const isExpanded = expandedSvc === svc.serviceId;
+
+            // Ledger data for drill-down
+            const ledgerEntries = getLedgerByServiceAndBuilding(svc.serviceId, distribution.buildingId)
+              .filter(e => e.year === distribution.period);
+            const costCats = getCostCategoriesByService(svc.serviceId)
+              .filter(cc => cc.id.startsWith(`CC-${distribution.buildingId}`) || !cc.id.includes("-8"));
+            // Group ledger entries by cost category
+            const byCat = {};
+            for (const e of ledgerEntries) {
+              const key = e.costCategoryId || "_none";
+              if (!byCat[key]) byCat[key] = [];
+              byCat[key].push(e);
+            }
+
             return (
-              <div key={svc.serviceId} className={`flex items-center gap-3 py-3 ${idx < distribution.services.length - 1 ? "border-b border-slate-100" : ""}`}>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-slate-700 truncate">{name}</p>
-                  <p className="text-[11px] text-slate-400">{svc.serviceId}</p>
-                </div>
-                <div className="w-32 hidden sm:block">
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 h-1.5 rounded-full bg-slate-100">
-                      <div className="h-full rounded-full" style={{ width: `${completeness}%`, background: isOk ? "#3EB1C8" : "#F59E0B" }} />
-                    </div>
-                    <span className="text-[11px] tabular-nums text-slate-500 w-8 text-right">{completeness}%</span>
+              <div key={svc.serviceId} className={idx < distribution.services.length - 1 ? "border-b border-slate-100" : ""}>
+                <button
+                  onClick={() => setExpandedSvc(isExpanded ? null : svc.serviceId)}
+                  className="w-full flex items-center gap-3 py-3 hover:bg-slate-50/50 transition-colors text-left"
+                >
+                  <ChevronDown
+                    size={13}
+                    className={`text-slate-300 shrink-0 transition-transform ${isExpanded ? "rotate-0" : "-rotate-90"}`}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-slate-700 truncate">{name}</p>
+                    <p className="text-[11px] text-slate-400">
+                      {svc.serviceId}
+                      {ledgerEntries.length > 0 && (
+                        <span className="ml-2 text-slate-300">
+                          · {ledgerEntries.length} {lang === "nl" ? "boekingen" : "entries"}
+                          · {fmtEur(svc.actual)}
+                        </span>
+                      )}
+                    </p>
                   </div>
-                </div>
-                <div className="flex-none">
-                  {isOk ? <CheckCircle2 size={15} className="text-green-500" /> : <AlertTriangle size={15} className="text-amber-500" />}
-                </div>
+                  <div className="w-32 hidden sm:block">
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-1.5 rounded-full bg-slate-100">
+                        <div className="h-full rounded-full" style={{ width: `${completeness}%`, background: isOk ? "#3EB1C8" : "#F59E0B" }} />
+                      </div>
+                      <span className="text-[11px] tabular-nums text-slate-500 w-8 text-right">{completeness}%</span>
+                    </div>
+                  </div>
+                  <div className="flex-none">
+                    {isOk ? <CheckCircle2 size={15} className="text-green-500" /> : <AlertTriangle size={15} className="text-amber-500" />}
+                  </div>
+                </button>
+
+                {/* Expanded: Cost categories and ledger entries */}
+                {isExpanded && (
+                  <div className="pl-7 pr-3 pb-3">
+                    {Object.keys(byCat).length > 0 ? (
+                      <div className="rounded-lg border border-slate-100 overflow-hidden">
+                        {Object.entries(byCat).map(([catId, entries], catIdx) => {
+                          const catObj = costCats.find(cc => cc.id === catId);
+                          const catName = catObj?.name?.[lang] || catObj?.name?.en || (catId === "_none" ? (lang === "nl" ? "Overig" : "Other") : catId);
+                          const catTotal = entries.reduce((s, e) => s + (e.amount || 0), 0);
+                          return (
+                            <div key={catId} className={catIdx > 0 ? "border-t border-slate-100" : ""}>
+                              {/* Category header */}
+                              <div className="flex items-center gap-2 px-3 py-2 bg-slate-50/80">
+                                <FolderOpen size={11} className="text-slate-400 shrink-0" />
+                                <span className="text-[11px] font-semibold text-slate-600 flex-1 truncate">{catName}</span>
+                                <span className="text-[11px] font-medium tabular-nums text-slate-500">{fmtEur(catTotal)}</span>
+                                <span className="text-[10px] text-slate-400">({entries.length}×)</span>
+                              </div>
+                              {/* Individual entries */}
+                              <div className="divide-y divide-slate-50">
+                                {entries
+                                  .sort((a, b) => a.month - b.month || a.date.localeCompare(b.date))
+                                  .map((entry) => (
+                                  <div key={entry.id} className="flex items-center gap-2 px-3 py-1.5 text-[11px]">
+                                    <span className="w-16 shrink-0 text-slate-400 tabular-nums">{entry.date}</span>
+                                    <span className="flex-1 text-slate-600 truncate">{entry.description}</span>
+                                    {entry.supplier && (
+                                      <span className="hidden sm:block text-[10px] text-slate-400 truncate max-w-[120px]">{entry.supplier}</span>
+                                    )}
+                                    <span className="shrink-0 tabular-nums font-medium text-slate-700 text-right w-16">{fmtEur(entry.amount, 2)}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <p className="text-[11px] text-slate-400 py-2">
+                        {lang === "nl" ? "Geen boekingen gevonden voor deze periode." : "No entries found for this period."}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}

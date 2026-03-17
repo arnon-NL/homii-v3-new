@@ -112,7 +112,7 @@
     },
     "supplier": "CSU Cleaning Services",
     "invoiceFrequency": "monthly",
-    "budgetShare": 1.0,
+    "budgetShare": 1,
     "unit": null,
     "unitPrice": null
   },
@@ -125,7 +125,7 @@
     },
     "supplier": "SWB Wijkbeheer",
     "invoiceFrequency": "monthly",
-    "budgetShare": 1.0,
+    "budgetShare": 1,
     "unit": null,
     "unitPrice": null
   },
@@ -138,7 +138,7 @@
     },
     "supplier": "Techem Energy Services BV",
     "invoiceFrequency": "quarterly",
-    "budgetShare": 1.0,
+    "budgetShare": 1,
     "unit": null,
     "unitPrice": null
   },
@@ -167,5 +167,319 @@
     "budgetShare": 0.8,
     "unit": null,
     "unitPrice": null
+  },
+  {
+    "id": "CC-8172-108-01",
+    "serviceId": "SVC-108",
+    "name": {
+      "en": "Heat supply",
+      "nl": "Warmtelevering"
+    },
+    "supplier": "Vattenfall Warmte",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 0.66,
+    "unit": "GJ",
+    "unitPrice": 28.5
+  },
+  {
+    "id": "CC-8172-108-02",
+    "serviceId": "SVC-108",
+    "name": {
+      "en": "Grid operator costs",
+      "nl": "Netbeheerkosten"
+    },
+    "supplier": "Liander",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 0.2
+  },
+  {
+    "id": "CC-8172-108-03",
+    "serviceId": "SVC-108",
+    "name": {
+      "en": "Metering services",
+      "nl": "Meetdiensten"
+    },
+    "supplier": "Ista Nederland",
+    "invoiceFrequency": "quarterly",
+    "budgetShare": 0.1
+  },
+  {
+    "id": "CC-8172-108-04",
+    "serviceId": "SVC-108",
+    "name": {
+      "en": "Heat transport",
+      "nl": "Warmtetransport"
+    },
+    "supplier": "Vattenfall Warmte",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 0.04
+  },
+  {
+    "id": "CC-8172-105-01",
+    "serviceId": "SVC-105",
+    "name": {
+      "en": "Water supply",
+      "nl": "Waterlevering"
+    },
+    "supplier": "Waternet",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 0.7,
+    "unit": "m³",
+    "unitPrice": 1.92
+  },
+  {
+    "id": "CC-8172-105-02",
+    "serviceId": "SVC-105",
+    "name": {
+      "en": "Standing charge",
+      "nl": "Vastrecht water"
+    },
+    "supplier": "Waternet",
+    "invoiceFrequency": "quarterly",
+    "budgetShare": 0.2
+  },
+  {
+    "id": "CC-8172-105-03",
+    "serviceId": "SVC-105",
+    "name": {
+      "en": "Sewage levy",
+      "nl": "Rioolheffing"
+    },
+    "supplier": "Gemeente Amsterdam",
+    "invoiceFrequency": "annual",
+    "budgetShare": 0.1
+  },
+  {
+    "id": "CC-8172-122-01",
+    "serviceId": "SVC-122",
+    "name": {
+      "en": "Regular drain maintenance",
+      "nl": "Regulier rioolonderhoud"
+    },
+    "supplier": "Riool.nl",
+    "invoiceFrequency": "quarterly",
+    "budgetShare": 0.5
+  },
+  {
+    "id": "CC-8172-122-02",
+    "serviceId": "SVC-122",
+    "name": {
+      "en": "Unclogging services",
+      "nl": "Ontstoppingen"
+    },
+    "supplier": "Riool.nl",
+    "invoiceFrequency": "irregular",
+    "budgetShare": 0.35
+  },
+  {
+    "id": "CC-8172-122-03",
+    "serviceId": "SVC-122",
+    "name": {
+      "en": "Camera inspection",
+      "nl": "Camera-inspectie"
+    },
+    "supplier": "Riool.nl",
+    "invoiceFrequency": "annual",
+    "budgetShare": 0.15
+  },
+  {
+    "id": "CC-8172-171-01",
+    "serviceId": "SVC-171",
+    "name": {
+      "en": "Door service contract",
+      "nl": "Servicecontract deuren"
+    },
+    "supplier": "KONE Deursystemen",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 0.7
+  },
+  {
+    "id": "CC-8172-171-02",
+    "serviceId": "SVC-171",
+    "name": {
+      "en": "Repairs",
+      "nl": "Reparaties deuren"
+    },
+    "supplier": "KONE Deursystemen",
+    "invoiceFrequency": "irregular",
+    "budgetShare": 0.3
+  },
+  {
+    "id": "CC-8172-131-01",
+    "serviceId": "SVC-131",
+    "name": {
+      "en": "Elevator service contract",
+      "nl": "Servicecontract lift"
+    },
+    "supplier": "KONE Liften",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 0.7
+  },
+  {
+    "id": "CC-8172-131-02",
+    "serviceId": "SVC-131",
+    "name": {
+      "en": "Inspections",
+      "nl": "Keuringen lift"
+    },
+    "supplier": "Liftinstituut",
+    "invoiceFrequency": "semi-annual",
+    "budgetShare": 0.2
+  },
+  {
+    "id": "CC-8172-131-03",
+    "serviceId": "SVC-131",
+    "name": {
+      "en": "Repairs",
+      "nl": "Reparaties lift"
+    },
+    "supplier": "KONE Liften",
+    "invoiceFrequency": "irregular",
+    "budgetShare": 0.1
+  },
+  {
+    "id": "CC-8172-036-01",
+    "serviceId": "SVC-036",
+    "name": {
+      "en": "Stairwell cleaning",
+      "nl": "Schoonmaak trappenhuis"
+    },
+    "supplier": "CSU Cleaning Services",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 0.7
+  },
+  {
+    "id": "CC-8172-036-02",
+    "serviceId": "SVC-036",
+    "name": {
+      "en": "Gallery cleaning",
+      "nl": "Schoonmaak galerij"
+    },
+    "supplier": "CSU Cleaning Services",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 0.3
+  },
+  {
+    "id": "CC-8172-115-01",
+    "serviceId": "SVC-115",
+    "name": {
+      "en": "Building fire insurance",
+      "nl": "Brandverzekering pand"
+    },
+    "supplier": "Centraal Beheer",
+    "invoiceFrequency": "annual",
+    "budgetShare": 0.65
+  },
+  {
+    "id": "CC-8172-115-02",
+    "serviceId": "SVC-115",
+    "name": {
+      "en": "Liability insurance",
+      "nl": "Aansprakelijkheidsverzekering"
+    },
+    "supplier": "Centraal Beheer",
+    "invoiceFrequency": "annual",
+    "budgetShare": 0.35
+  },
+  {
+    "id": "CC-8172-118-01",
+    "serviceId": "SVC-118",
+    "name": {
+      "en": "Green maintenance",
+      "nl": "Groenonderhoud"
+    },
+    "supplier": "Donkergroen",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 0.7
+  },
+  {
+    "id": "CC-8172-118-02",
+    "serviceId": "SVC-118",
+    "name": {
+      "en": "Weed control",
+      "nl": "Onkruidbestrijding"
+    },
+    "supplier": "Donkergroen",
+    "invoiceFrequency": "quarterly",
+    "budgetShare": 0.3
+  },
+  {
+    "id": "CC-8172-041-01",
+    "serviceId": "SVC-041",
+    "name": {
+      "en": "Common area electricity",
+      "nl": "Elektra gemeenschappelijke ruimten"
+    },
+    "supplier": "ENGIE Energie Nederland",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 0.7,
+    "unit": "kWh",
+    "unitPrice": 0.38
+  },
+  {
+    "id": "CC-8172-041-02",
+    "serviceId": "SVC-041",
+    "name": {
+      "en": "Emergency lighting",
+      "nl": "Noodverlichting"
+    },
+    "supplier": "Securitas Fire",
+    "invoiceFrequency": "quarterly",
+    "budgetShare": 0.3
+  },
+  {
+    "id": "CC-8172-177-01",
+    "serviceId": "SVC-177",
+    "name": {
+      "en": "CCTV monitoring",
+      "nl": "Camerabewaking"
+    },
+    "supplier": "Securitas",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 0.7
+  },
+  {
+    "id": "CC-8172-177-02",
+    "serviceId": "SVC-177",
+    "name": {
+      "en": "Intercom system",
+      "nl": "Intercomsysteem"
+    },
+    "supplier": "BAS-IP",
+    "invoiceFrequency": "quarterly",
+    "budgetShare": 0.3
+  },
+  {
+    "id": "CC-8172-092-01",
+    "serviceId": "SVC-092",
+    "name": {
+      "en": "Glass insurance",
+      "nl": "Glasverzekering"
+    },
+    "supplier": "Centraal Beheer",
+    "invoiceFrequency": "annual",
+    "budgetShare": 1
+  },
+  {
+    "id": "CC-8172-055-01",
+    "serviceId": "SVC-055",
+    "name": {
+      "en": "Administration costs",
+      "nl": "Administratiekosten"
+    },
+    "supplier": "Rochdale",
+    "invoiceFrequency": "monthly",
+    "budgetShare": 0.7
+  },
+  {
+    "id": "CC-8172-055-02",
+    "serviceId": "SVC-055",
+    "name": {
+      "en": "Accountancy charges",
+      "nl": "Accountantskosten"
+    },
+    "supplier": "Mazars Accountants",
+    "invoiceFrequency": "annual",
+    "budgetShare": 0.3
   }
 ]

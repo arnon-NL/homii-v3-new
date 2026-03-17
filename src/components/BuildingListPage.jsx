@@ -21,11 +21,12 @@ import {
   RotateCcw,
   Columns,
   Check,
+  ListChecks,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import { useOrg } from "@/lib/OrgContext";
 import { useViews } from "@/lib/ViewsContext";
-import { getMetersByBuilding } from "@/lib/data";
+import { getMetersByBuilding, getDistributionsByBuilding } from "@/lib/data";
 import { BUILDING_COLUMNS, COLUMN_CATEGORIES, defaultComplexColumns } from "@/lib/columnRegistry";
 import { t, useLang } from "@/lib/i18n";
 import { StatusBadge } from "./ui/status-badge";
@@ -230,6 +231,7 @@ export default function BuildingListPage() {
   const [utilityFilters, setUtilityFilters] = useState([]);
   const [locationFilter, setLocationFilter] = useState("all");
   const [kvFilter, setKvFilter] = useState(false);
+  const [distFilter, setDistFilter] = useState("all"); // all | not_started | in_progress
   const [sortCol, setSortCol] = useState(null);
   const [sortDir, setSortDir] = useState("desc");
   const { data, orgId } = useOrg();
@@ -257,6 +259,7 @@ export default function BuildingListPage() {
     setUtilityFilters(f.utilityFilters || []);
     setLocationFilter(f.locationFilter || "all");
     setKvFilter(f.kvFilter || false);
+    setDistFilter(f.distFilter || "all");
     setSortCol(f.sortCol || null);
     setSortDir(f.sortDir || "desc");
     setSearch(f.search || "");
@@ -312,14 +315,32 @@ export default function BuildingListPage() {
     return map;
   }, [data.buildings]);
 
+  // Pre-compute distribution status per building
+  const distStatusByBuilding = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    const map = {};
+    for (const b of data.buildings) {
+      const dists = getDistributionsByBuilding(b.id);
+      const existingPeriods = new Set(dists.map((d) => d.period));
+      const hasInProgress = dists.some((d) => d.currentStep !== "complete");
+      // "not_started" = at least one recent closed year has no distribution at all
+      const hasNotStarted = [currentYear - 1, currentYear - 2].some((y) => !existingPeriods.has(y));
+      map[b.id] = { hasInProgress, hasNotStarted };
+    }
+    return map;
+  }, [data.buildings]);
+
   // Enrich buildings — attach consumption totals as flat sortable fields
   const enriched = useMemo(() => {
     return data.buildings.map((b) => {
       const c = consumptionByBuilding[b.id];
+      const distStatus = distStatusByBuilding[b.id] || {};
       return {
         ...b,
         utilityCount: b.utilities.length,
         hasExternalKv: buildingsWithExternalKv.has(b.id),
+        distInProgress: distStatus.hasInProgress || false,
+        distNotStarted: distStatus.hasNotStarted || false,
         _consumption: c,
         heat_consumption:          c?.heat          ?? null,
         water_consumption:         c?.water         ?? null,
@@ -327,7 +348,7 @@ export default function BuildingListPage() {
         warmWater_consumption:     c?.warmWater      ?? null,
       };
     });
-  }, [data.buildings, buildingsWithExternalKv, consumptionByBuilding]);
+  }, [data.buildings, buildingsWithExternalKv, consumptionByBuilding, distStatusByBuilding]);
 
   // Filter
   const filtered = useMemo(() => {
@@ -346,9 +367,13 @@ export default function BuildingListPage() {
       const matchLocation =
         locationFilter === "all" || b.location === locationFilter;
       const matchKv = !kvFilter || b.hasExternalKv;
-      return matchSearch && matchQuality && matchUtility && matchLocation && matchKv;
+      const matchDist =
+        distFilter === "all" ||
+        (distFilter === "not_started" && b.distNotStarted) ||
+        (distFilter === "in_progress" && b.distInProgress);
+      return matchSearch && matchQuality && matchUtility && matchLocation && matchKv && matchDist;
     });
-  }, [search, qualityFilter, utilityFilters, locationFilter, kvFilter, enriched]);
+  }, [search, qualityFilter, utilityFilters, locationFilter, kvFilter, distFilter, enriched]);
 
   // Sort
   const sorted = useMemo(() => {
@@ -370,7 +395,7 @@ export default function BuildingListPage() {
   }, [sorted, page]);
 
   // Reset page when filters change
-  useMemo(() => setPage(0), [search, qualityFilter, utilityFilters, locationFilter, kvFilter]);
+  useMemo(() => setPage(0), [search, qualityFilter, utilityFilters, locationFilter, kvFilter, distFilter]);
 
   // Check if any filters are active
   const hasActiveFilters =
@@ -378,6 +403,7 @@ export default function BuildingListPage() {
     utilityFilters.length > 0 ||
     locationFilter !== "all" ||
     kvFilter ||
+    distFilter !== "all" ||
     sortCol !== null ||
     search !== "";
 
@@ -388,6 +414,7 @@ export default function BuildingListPage() {
       utilityFilters: [...utilityFilters],
       locationFilter,
       kvFilter,
+      distFilter,
       sortCol,
       sortDir,
       search,
@@ -402,6 +429,7 @@ export default function BuildingListPage() {
       qualityFilter !== (vf.qualityFilter || "all") ||
       locationFilter !== (vf.locationFilter || "all") ||
       kvFilter !== (vf.kvFilter || false) ||
+      distFilter !== (vf.distFilter || "all") ||
       sortCol !== (vf.sortCol || null) ||
       sortDir !== (vf.sortDir || "desc") ||
       search !== (vf.search || "") ||
@@ -438,6 +466,7 @@ export default function BuildingListPage() {
     setUtilityFilters(f.utilityFilters || []);
     setLocationFilter(f.locationFilter || "all");
     setKvFilter(f.kvFilter || false);
+    setDistFilter(f.distFilter || "all");
     setSortCol(f.sortCol || null);
     setSortDir(f.sortDir || "desc");
     setSearch(f.search || "");
@@ -449,6 +478,7 @@ export default function BuildingListPage() {
     setUtilityFilters([]);
     setLocationFilter("all");
     setKvFilter(false);
+    setDistFilter("all");
     setSortCol(null);
     setSortDir("desc");
     setSearch("");
@@ -736,6 +766,52 @@ export default function BuildingListPage() {
             <ArrowUpRight size={13} />
             <span className="hidden sm:inline">KV</span>
           </button>
+
+          {/* Distribution status filter */}
+          <Dropdown
+            trigger={
+              <button
+                className={`inline-flex items-center gap-1.5 px-3 h-8 rounded-lg text-xs font-medium transition-colors border ${
+                  distFilter !== "all"
+                    ? "border-[#3EB1C8] bg-[#3EB1C8]/5 text-[#3EB1C8]"
+                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                <ListChecks size={13} />
+                {distFilter === "all"
+                  ? (lang === "nl" ? "Verdeling" : "Distribution")
+                  : distFilter === "not_started"
+                    ? (lang === "nl" ? "Niet gestart" : "Not started")
+                    : (lang === "nl" ? "Loopt" : "In progress")}
+                <ChevronDown size={12} />
+              </button>
+            }
+          >
+            <button
+              onClick={() => setDistFilter("all")}
+              className={`w-full text-left px-3 py-2 text-xs hover:bg-slate-50 ${
+                distFilter === "all" ? "font-semibold text-slate-900" : "text-slate-600"
+              }`}
+            >
+              {lang === "nl" ? "Alle gebouwen" : "All buildings"}
+            </button>
+            <button
+              onClick={() => setDistFilter("not_started")}
+              className={`w-full text-left px-3 py-2 text-xs hover:bg-slate-50 ${
+                distFilter === "not_started" ? "font-semibold text-slate-900" : "text-slate-600"
+              }`}
+            >
+              {lang === "nl" ? "Verdeling niet gestart" : "Distribution not started"}
+            </button>
+            <button
+              onClick={() => setDistFilter("in_progress")}
+              className={`w-full text-left px-3 py-2 text-xs hover:bg-slate-50 ${
+                distFilter === "in_progress" ? "font-semibold text-slate-900" : "text-slate-600"
+              }`}
+            >
+              {lang === "nl" ? "Verdeling loopt" : "Distribution in progress"}
+            </button>
+          </Dropdown>
 
           {/* Divider */}
           <div className="w-px h-5 bg-slate-200 mx-1" />
