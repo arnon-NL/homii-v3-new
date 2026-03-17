@@ -21,10 +21,13 @@ import {
   ChevronDown,
   Check,
   Send,
+  Trash2,
+  X,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import { t, useLang } from "@/lib/i18n";
 import { useOrg } from "@/lib/OrgContext";
+import { useViews } from "@/lib/ViewsContext";
 
 /* ── Icon lookup for view icons ── */
 const viewIconMap = {
@@ -65,7 +68,7 @@ function NavButton({ item, showCount }) {
 }
 
 /* ── View button (in Views section) ── */
-function ViewButton({ view, lang, orgId }) {
+function ViewButton({ view, lang, orgId, onDelete }) {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const Icon = viewIconMap[view.icon] || List;
@@ -85,19 +88,33 @@ function ViewButton({ view, lang, orgId }) {
     searchParams.get("view") === view.id;
 
   return (
-    <NavLink
-      to={viewPath}
-      className={`w-full flex items-center gap-3 h-7 pl-4 pr-2 rounded-lg text-xs transition-colors no-underline ${
-        isActive
-          ? "bg-slate-200/60 text-slate-900 font-medium"
-          : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
-      }`}
-    >
-      <Icon size={14} strokeWidth={isActive ? 2 : 1.5} />
-      <span className="flex-1 text-left truncate">
-        {view.name[lang] || view.name.en}
-      </span>
-    </NavLink>
+    <div className="group relative">
+      <NavLink
+        to={viewPath}
+        className={`w-full flex items-center gap-3 h-7 pl-4 pr-7 rounded-lg text-xs transition-colors no-underline ${
+          isActive
+            ? "bg-slate-200/60 text-slate-900 font-medium"
+            : "text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+        }`}
+      >
+        <Icon size={14} strokeWidth={isActive ? 2 : 1.5} />
+        <span className="flex-1 text-left truncate">
+          {typeof view.name === "object"
+            ? view.name[lang] || view.name.en
+            : view.name}
+        </span>
+      </NavLink>
+      {/* Delete button — only for user-created views, revealed on hover */}
+      {onDelete && (
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onDelete(view.id); }}
+          className="absolute right-1 top-1/2 -translate-y-1/2 w-5 h-5 rounded flex items-center justify-center text-slate-300 hover:text-red-400 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity"
+          title={lang === "nl" ? "Weergave verwijderen" : "Delete view"}
+        >
+          <Trash2 size={11} />
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -224,7 +241,48 @@ function OrgSwitcher() {
 }
 
 export default function Sidebar({ lang, setLang }) {
-  const { orgId, data, hasModule } = useOrg();
+  const { orgId, hasModule } = useOrg();
+  const { views, addView, deleteView } = useViews();
+  const navigate = useNavigate();
+
+  // Inline view-creation form state
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [createName, setCreateName] = useState("");
+  const [createObjectType, setCreateObjectType] = useState("buildings");
+  const createInputRef = useRef(null);
+
+  useEffect(() => {
+    if (showCreateForm && createInputRef.current) createInputRef.current.focus();
+  }, [showCreateForm]);
+
+  function handleCreateView(e) {
+    e?.preventDefault();
+    if (!createName.trim()) return;
+    const newView = addView({
+      name: createName.trim(),
+      objectType: createObjectType,
+      filters: {},
+      columns: [],
+    });
+    setCreateName("");
+    setShowCreateForm(false);
+    const objectRouteMap = {
+      buildings: `/${orgId}/buildings`,
+      vhe: `/${orgId}/vhe`,
+      services: `/${orgId}/services`,
+      suppliers: `/${orgId}/suppliers`,
+      meters: `/${orgId}/meters`,
+    };
+    navigate(`${objectRouteMap[createObjectType] || `/${orgId}/buildings`}?view=${newView.id}`);
+  }
+
+  const objectTypeOptions = [
+    { value: "buildings", label: lang === "nl" ? "Gebouwen" : "Buildings" },
+    { value: "vhe",       label: lang === "nl" ? "Eenheden" : "Units" },
+    { value: "services",  label: lang === "nl" ? "Diensten" : "Services" },
+    { value: "suppliers", label: lang === "nl" ? "Leveranciers" : "Suppliers" },
+    { value: "meters",    label: lang === "nl" ? "Meters" : "Meters" },
+  ];
 
   const navItems = [
     { label: t("home", lang), icon: Home, path: `/${orgId}/home`, end: true },
@@ -243,8 +301,8 @@ export default function Sidebar({ lang, setLang }) {
     hasModule("serviceCharges") && { label: lang === "nl" ? "Verdeling" : "Distribution", icon: Send, path: `/${orgId}/distribution` },
   ].filter(Boolean);
 
-  // Filter out default views — those are just the object list pages themselves
-  const viewItems = (data.savedViews || []).filter((v) => !v.isDefault);
+  // User-created views (non-system) are deletable
+  const isUserView = (view) => !view.isSystem && !view.isDefault;
 
   return (
     <aside className="w-60 shrink-0 border-r border-slate-200 bg-slate-50 flex flex-col h-full select-none">
@@ -289,15 +347,67 @@ export default function Sidebar({ lang, setLang }) {
             {lang === "nl" ? "Weergaven" : "Views"}
           </span>
           <button
+            onClick={() => { setShowCreateForm((v) => !v); setCreateName(""); }}
             className="w-4 h-4 rounded flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
             title={lang === "nl" ? "Weergave toevoegen" : "Add view"}
           >
             <Plus size={14} strokeWidth={2} />
           </button>
         </div>
+
+        {/* Inline create-view form */}
+        {showCreateForm && (
+          <form
+            onSubmit={handleCreateView}
+            className="mx-2 mb-1 p-2 rounded-lg border border-slate-200 bg-white shadow-sm space-y-1.5"
+          >
+            <input
+              ref={createInputRef}
+              type="text"
+              value={createName}
+              onChange={(e) => setCreateName(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Escape") { setShowCreateForm(false); setCreateName(""); } }}
+              placeholder={lang === "nl" ? "Naam weergave..." : "View name..."}
+              className="w-full h-7 px-2 text-xs rounded-md border border-slate-200 bg-slate-50 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#3EB1C8]/30 focus:border-[#3EB1C8]"
+            />
+            <select
+              value={createObjectType}
+              onChange={(e) => setCreateObjectType(e.target.value)}
+              className="w-full h-7 px-2 text-xs rounded-md border border-slate-200 bg-slate-50 text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#3EB1C8]/30 focus:border-[#3EB1C8]"
+            >
+              {objectTypeOptions.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+            <div className="flex items-center gap-1">
+              <button
+                type="submit"
+                disabled={!createName.trim()}
+                className="flex-1 h-6 rounded text-[11px] font-medium text-white disabled:opacity-40 transition-colors"
+                style={{ background: brand.teal }}
+              >
+                {lang === "nl" ? "Aanmaken" : "Create"}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setShowCreateForm(false); setCreateName(""); }}
+                className="w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+              >
+                <X size={12} />
+              </button>
+            </div>
+          </form>
+        )}
+
         <div className="space-y-0.5">
-          {viewItems.map((view) => (
-            <ViewButton key={view.id} view={view} lang={lang} orgId={orgId} />
+          {views.map((view) => (
+            <ViewButton
+              key={view.id}
+              view={view}
+              lang={lang}
+              orgId={orgId}
+              onDelete={isUserView(view) ? deleteView : undefined}
+            />
           ))}
         </div>
       </nav>

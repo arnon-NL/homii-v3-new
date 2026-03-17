@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   Search,
   Building2,
@@ -17,11 +17,12 @@ import {
   X,
   SlidersHorizontal,
   MapPin,
-  Trash2,
   ArrowUpRight,
+  RotateCcw,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import { useOrg } from "@/lib/OrgContext";
+import { useViews } from "@/lib/ViewsContext";
 import { t, useLang } from "@/lib/i18n";
 import { StatusBadge } from "./ui/status-badge";
 
@@ -124,20 +125,6 @@ const defaultComplexColumns = [
   "complex", "complexId", "location", "vhe", "components", "utilities", "dataQuality",
 ];
 
-/* ── Saved filters persistence ── */
-const STORAGE_KEY = "homii-building-filters";
-
-function loadSavedFilters(orgId) {
-  try {
-    const raw = localStorage.getItem(`${STORAGE_KEY}-${orgId}`);
-    return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
-}
-
-function persistSavedFilters(orgId, filters) {
-  localStorage.setItem(`${STORAGE_KEY}-${orgId}`, JSON.stringify(filters));
-}
-
 /* ── Dropdown component ── */
 function Dropdown({ trigger, children, align = "left" }) {
   const [open, setOpen] = useState(false);
@@ -170,6 +157,7 @@ function Dropdown({ trigger, children, align = "left" }) {
 export default function BuildingListPage() {
   const lang = useLang();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const [qualityFilter, setQualityFilter] = useState("all");
   const [utilityFilters, setUtilityFilters] = useState([]);
@@ -178,22 +166,35 @@ export default function BuildingListPage() {
   const [sortCol, setSortCol] = useState(null);
   const [sortDir, setSortDir] = useState("desc");
   const { data, orgId } = useOrg();
+  const { getView, addView, updateView } = useViews();
 
-  // Saved filters
-  const [savedFilters, setSavedFilters] = useState(() => loadSavedFilters(orgId));
+  // Save-as-view input state
   const [showSaveInput, setShowSaveInput] = useState(false);
   const [filterName, setFilterName] = useState("");
   const saveInputRef = useRef(null);
-
-  // Sync saved filters when org changes
-  useEffect(() => {
-    setSavedFilters(loadSavedFilters(orgId));
-  }, [orgId]);
 
   // Focus save input when shown
   useEffect(() => {
     if (showSaveInput && saveInputRef.current) saveInputRef.current.focus();
   }, [showSaveInput]);
+
+  // Active view from URL param
+  const activeViewId = searchParams.get("view");
+  const activeView = activeViewId ? getView(activeViewId) : null;
+
+  // Apply view filters whenever the active view ID changes
+  useEffect(() => {
+    if (!activeView) return;
+    const f = activeView.filters || {};
+    setQualityFilter(f.qualityFilter || "all");
+    setUtilityFilters(f.utilityFilters || []);
+    setLocationFilter(f.locationFilter || "all");
+    setKvFilter(f.kvFilter || false);
+    setSortCol(f.sortCol || null);
+    setSortDir(f.sortDir || "desc");
+    setSearch(f.search || "");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeViewId]);
 
   // Extract unique locations from building data
   const locations = useMemo(() => {
@@ -293,8 +294,46 @@ export default function BuildingListPage() {
     };
   }
 
-  // Apply a saved filter
-  function applyFilter(f) {
+  // Detect if current filters have diverged from the active view's saved filters
+  const hasViewChanges = useMemo(() => {
+    if (!activeView) return false;
+    const vf = activeView.filters || {};
+    return (
+      qualityFilter !== (vf.qualityFilter || "all") ||
+      locationFilter !== (vf.locationFilter || "all") ||
+      kvFilter !== (vf.kvFilter || false) ||
+      sortCol !== (vf.sortCol || null) ||
+      sortDir !== (vf.sortDir || "desc") ||
+      search !== (vf.search || "") ||
+      JSON.stringify([...utilityFilters].sort()) !==
+        JSON.stringify([...(vf.utilityFilters || [])].sort())
+    );
+  }, [activeView, qualityFilter, locationFilter, kvFilter, sortCol, sortDir, search, utilityFilters]);
+
+  // Save current filters as a new view → appears in sidebar
+  function handleSaveAsView() {
+    if (!filterName.trim()) return;
+    const newView = addView({
+      name: filterName.trim(),
+      objectType: "buildings",
+      filters: getCurrentFilterState(),
+      columns: [],
+    });
+    setFilterName("");
+    setShowSaveInput(false);
+    navigate(`?view=${newView.id}`);
+  }
+
+  // Update the active view's saved filters to match the current state
+  function handleUpdateView() {
+    if (!activeViewId) return;
+    updateView(activeViewId, { filters: getCurrentFilterState() });
+  }
+
+  // Reset filters back to what the active view originally saved
+  function handleResetToView() {
+    if (!activeView) return;
+    const f = activeView.filters || {};
     setQualityFilter(f.qualityFilter || "all");
     setUtilityFilters(f.utilityFilters || []);
     setLocationFilter(f.locationFilter || "all");
@@ -302,28 +341,6 @@ export default function BuildingListPage() {
     setSortCol(f.sortCol || null);
     setSortDir(f.sortDir || "desc");
     setSearch(f.search || "");
-  }
-
-  // Save current filter
-  function handleSaveFilter() {
-    if (!filterName.trim()) return;
-    const newFilter = {
-      id: `filter-${Date.now()}`,
-      name: filterName.trim(),
-      ...getCurrentFilterState(),
-    };
-    const updated = [...savedFilters, newFilter];
-    setSavedFilters(updated);
-    persistSavedFilters(orgId, updated);
-    setFilterName("");
-    setShowSaveInput(false);
-  }
-
-  // Delete a saved filter
-  function handleDeleteFilter(id) {
-    const updated = savedFilters.filter((f) => f.id !== id);
-    setSavedFilters(updated);
-    persistSavedFilters(orgId, updated);
   }
 
   // Clear all filters
@@ -650,8 +667,27 @@ export default function BuildingListPage() {
             </button>
           )}
 
-          {/* Save filter button */}
-          {hasActiveFilters && (
+          {/* ── View actions: Save as View (no active view) or Update/Reset (active view with changes) ── */}
+          {activeView && hasViewChanges ? (
+            <>
+              <div className="w-px h-5 bg-slate-200 mx-1" />
+              <button
+                onClick={handleUpdateView}
+                className="inline-flex items-center gap-1.5 px-3 h-8 rounded-lg text-xs font-medium text-white transition-colors"
+                style={{ background: brand.teal }}
+              >
+                <Save size={13} />
+                {lang === "nl" ? "Weergave bijwerken" : "Update view"}
+              </button>
+              <button
+                onClick={handleResetToView}
+                className="inline-flex items-center gap-1.5 px-2 h-8 rounded-lg text-xs font-medium text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                title={lang === "nl" ? "Herstel naar opgeslagen weergave" : "Reset to saved view"}
+              >
+                <RotateCcw size={13} />
+              </button>
+            </>
+          ) : !activeView && hasActiveFilters ? (
             <>
               <div className="w-px h-5 bg-slate-200 mx-1" />
               {!showSaveInput ? (
@@ -660,7 +696,7 @@ export default function BuildingListPage() {
                   className="inline-flex items-center gap-1.5 px-3 h-8 rounded-lg text-xs font-medium text-slate-500 border border-dashed border-slate-300 hover:border-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors"
                 >
                   <Save size={13} />
-                  {lang === "nl" ? "Opslaan" : "Save"}
+                  {lang === "nl" ? "Opslaan als weergave" : "Save as view"}
                 </button>
               ) : (
                 <div className="inline-flex items-center gap-1.5">
@@ -670,14 +706,14 @@ export default function BuildingListPage() {
                     value={filterName}
                     onChange={(e) => setFilterName(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter") handleSaveFilter();
+                      if (e.key === "Enter") handleSaveAsView();
                       if (e.key === "Escape") { setShowSaveInput(false); setFilterName(""); }
                     }}
-                    placeholder={lang === "nl" ? "Naam..." : "Name..."}
-                    className="h-8 w-32 px-2.5 text-xs rounded-lg border border-slate-300 bg-white text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#3EB1C8]/30 focus:border-[#3EB1C8]"
+                    placeholder={lang === "nl" ? "Naam weergave..." : "View name..."}
+                    className="h-8 w-36 px-2.5 text-xs rounded-lg border border-slate-300 bg-white text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#3EB1C8]/30 focus:border-[#3EB1C8]"
                   />
                   <button
-                    onClick={handleSaveFilter}
+                    onClick={handleSaveAsView}
                     disabled={!filterName.trim()}
                     className="h-8 px-3 rounded-lg text-xs font-medium text-white transition-colors disabled:opacity-40"
                     style={{ background: brand.teal }}
@@ -693,38 +729,8 @@ export default function BuildingListPage() {
                 </div>
               )}
             </>
-          )}
+          ) : null}
         </div>
-
-        {/* ── Saved filters bar ── */}
-        {savedFilters.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mb-4">
-            <span className="text-[11px] font-medium text-slate-400 uppercase tracking-wider mr-1">
-              <Save size={13} className="inline -mt-0.5 mr-1" />
-              {lang === "nl" ? "Opgeslagen" : "Saved"}
-            </span>
-            {savedFilters.map((f) => (
-              <div
-                key={f.id}
-                className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white hover:border-slate-300 transition-colors group"
-              >
-                <button
-                  onClick={() => applyFilter(f)}
-                  className="px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900"
-                >
-                  {f.name}
-                </button>
-                <button
-                  onClick={() => handleDeleteFilter(f.id)}
-                  className="pr-2 py-1.5 text-slate-300 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                  title={lang === "nl" ? "Verwijderen" : "Delete"}
-                >
-                  <Trash2 size={12} />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
 
         {/* ── Mobile card view ── */}
         <div className="block md:hidden space-y-3">

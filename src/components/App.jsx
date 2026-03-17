@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import { brand } from "@/lib/brand";
 import { LangCtx, t } from "@/lib/i18n";
 import { OrgProvider, useOrg } from "@/lib/OrgContext";
+import { ViewsProvider } from "@/lib/ViewsContext";
 import Sidebar from "./Sidebar";
 import PlaceholderPage from "./PlaceholderPage";
 import BuildingListPage from "./BuildingListPage";
@@ -164,7 +165,9 @@ function AppContent() {
 export default function App() {
   return (
     <OrgProvider>
-      <AppContent />
+      <ViewsProvider>
+        <AppContent />
+      </ViewsProvider>
     </OrgProvider>
   );
 }
