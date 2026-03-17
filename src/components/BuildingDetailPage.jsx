@@ -354,6 +354,7 @@ export default function BuildingDetailPage() {
       : "on_track";
 
   return (
+    <Tabs value={activeTab} onValueChange={setActiveTab}>
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* ── Sticky header zone ── */}
       <div className="shrink-0 max-w-[1400px] w-full mx-auto px-4 sm:px-6 pt-4 sm:pt-6">
@@ -461,7 +462,6 @@ export default function BuildingDetailPage() {
 
 
         {/* ── Tab bar (stays in sticky header zone) ── */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="bg-transparent h-10 gap-0 p-0 border-b border-slate-200 w-full justify-start rounded-none overflow-x-auto">
             {[
               { value: "overview", label: t("overview", lang) },
@@ -2717,7 +2717,7 @@ export default function BuildingDetailPage() {
             </AttributePanel>
           </div>
         </div>{/* close scrollable row */}
-      </Tabs>
     </div>{/* close outer flex-col */}
+    </Tabs>
   );
 }
