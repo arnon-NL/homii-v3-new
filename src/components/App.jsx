@@ -14,6 +14,7 @@ import SupplierListPage from "./SupplierListPage";
 import ServiceDetailPage from "./ServiceDetailPage";
 import DistributionListPage from "./DistributionListPage";
 import DistributionDetailPage from "./DistributionDetailPage";
+import HomePage from "./HomePage";
 
 /* ── Layout that syncs URL :orgId param → OrgContext ── */
 function OrgLayout() {
@@ -100,20 +101,12 @@ function AppContent() {
         <div className="flex-1 flex flex-col overflow-hidden pt-12 lg:pt-0" key={orgId}>
           <Routes>
             {/* Root redirect → current org */}
-            <Route path="/" element={<Navigate to={`/${orgId}/buildings`} replace />} />
+            <Route path="/" element={<Navigate to={`/${orgId}/home`} replace />} />
 
             {/* Org-scoped routes */}
             <Route path="/:orgId" element={<OrgLayout />}>
-              <Route index element={<Navigate to="buildings" replace />} />
-              <Route
-                path="home"
-                element={
-                  <PlaceholderPage
-                    title={t("homeTitle", lang)}
-                    subtitle={t("homeSubtitle", lang)}
-                  />
-                }
-              />
+              <Route index element={<Navigate to="home" replace />} />
+              <Route path="home" element={<HomePage />} />
               <Route
                 path="inbox"
                 element={<PlaceholderPage title={t("inboxTitle", lang)} />}

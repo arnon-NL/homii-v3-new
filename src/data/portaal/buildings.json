@@ -21,7 +21,8 @@
       "endMonth": 8,
       "seasonStart": "2025-09-01",
       "seasonEnd": "2026-08-31"
-    }
+    },
+    "onboardingStatus": "onboarded"
   },
   {
     "id": "71560",
@@ -45,7 +46,8 @@
       "endMonth": 8,
       "seasonStart": "2025-09-01",
       "seasonEnd": "2026-08-31"
-    }
+    },
+    "onboardingStatus": "onboarded"
   },
   {
     "id": "9318",
@@ -68,7 +70,8 @@
       "endMonth": 5,
       "seasonStart": "2026-06-01",
       "seasonEnd": "2027-05-31"
-    }
+    },
+    "onboardingStatus": "live"
   },
   {
     "id": "100306",
@@ -92,7 +95,8 @@
       "endMonth": 8,
       "seasonStart": "2025-09-01",
       "seasonEnd": "2026-08-31"
-    }
+    },
+    "onboardingStatus": "live"
   },
   {
     "id": "12486",
@@ -115,7 +119,8 @@
       "endMonth": 5,
       "seasonStart": "2025-06-01",
       "seasonEnd": "2026-05-31"
-    }
+    },
+    "onboardingStatus": "pipeline"
   },
   {
     "id": "71014",
@@ -139,7 +144,8 @@
       "endMonth": 8,
       "seasonStart": "2025-09-01",
       "seasonEnd": "2026-08-31"
-    }
+    },
+    "onboardingStatus": "live"
   },
   {
     "id": "12078",
@@ -163,7 +169,8 @@
       "endMonth": 12,
       "seasonStart": "2026-01-01",
       "seasonEnd": "2026-12-31"
-    }
+    },
+    "onboardingStatus": "pipeline"
   },
   {
     "id": "71574",
@@ -187,7 +194,8 @@
       "endMonth": 8,
       "seasonStart": "2025-09-01",
       "seasonEnd": "2026-08-31"
-    }
+    },
+    "onboardingStatus": "onboarded"
   },
   {
     "id": "33770",
@@ -211,7 +219,8 @@
       "endMonth": 12,
       "seasonStart": "2026-01-01",
       "seasonEnd": "2026-12-31"
-    }
+    },
+    "onboardingStatus": "onboarded"
   },
   {
     "id": "52051",
@@ -235,7 +244,8 @@
       "endMonth": 8,
       "seasonStart": "2025-09-01",
       "seasonEnd": "2026-08-31"
-    }
+    },
+    "onboardingStatus": "onboarded"
   },
   {
     "id": "33769",
@@ -259,7 +269,8 @@
       "endMonth": 12,
       "seasonStart": "2026-01-01",
       "seasonEnd": "2026-12-31"
-    }
+    },
+    "onboardingStatus": "onboarded"
   },
   {
     "id": "103265",
@@ -283,7 +294,8 @@
       "endMonth": 12,
       "seasonStart": "2026-01-01",
       "seasonEnd": "2026-12-31"
-    }
+    },
+    "onboardingStatus": "onboarded"
   },
   {
     "id": "52565",
@@ -307,7 +319,8 @@
       "endMonth": 8,
       "seasonStart": "2025-09-01",
       "seasonEnd": "2026-08-31"
-    }
+    },
+    "onboardingStatus": "onboarded"
   },
   {
     "id": "33000427",
@@ -331,7 +344,8 @@
       "endMonth": 12,
       "seasonStart": "2026-01-01",
       "seasonEnd": "2026-12-31"
-    }
+    },
+    "onboardingStatus": "live"
   },
   {
     "id": "71577",
@@ -355,7 +369,8 @@
       "endMonth": 8,
       "seasonStart": "2026-09-01",
       "seasonEnd": "2027-08-31"
-    }
+    },
+    "onboardingStatus": "pipeline"
   },
   {
     "id": "33001074",
@@ -380,7 +395,8 @@
       "endMonth": 5,
       "seasonStart": "2025-06-01",
       "seasonEnd": "2026-05-31"
-    }
+    },
+    "onboardingStatus": "onboarded"
   },
   {
     "id": "71579",
@@ -404,7 +420,8 @@
       "endMonth": 8,
       "seasonStart": "2025-09-01",
       "seasonEnd": "2026-08-31"
-    }
+    },
+    "onboardingStatus": "pipeline"
   },
   {
     "id": "17989",
@@ -428,7 +445,8 @@
       "endMonth": 12,
       "seasonStart": "2026-01-01",
       "seasonEnd": "2026-12-31"
-    }
+    },
+    "onboardingStatus": "pipeline"
   },
   {
     "id": "52050",
@@ -452,7 +470,8 @@
       "endMonth": 8,
       "seasonStart": "2025-09-01",
       "seasonEnd": "2026-08-31"
-    }
+    },
+    "onboardingStatus": "onboarded"
   },
   {
     "id": "33006558",
@@ -476,7 +495,8 @@
       "endMonth": 4,
       "seasonStart": "2026-05-01",
       "seasonEnd": "2027-04-30"
-    }
+    },
+    "onboardingStatus": "onboarded"
   },
   {
     "id": "33000586",
@@ -500,7 +520,8 @@
       "endMonth": 5,
       "seasonStart": "2026-06-01",
       "seasonEnd": "2027-05-31"
-    }
+    },
+    "onboardingStatus": "pipeline"
   },
   {
     "id": "15198",
@@ -524,7 +545,8 @@
       "endMonth": 12,
       "seasonStart": "2026-01-01",
       "seasonEnd": "2026-12-31"
-    }
+    },
+    "onboardingStatus": "pipeline"
   },
   {
     "id": "12487",
@@ -547,7 +569,8 @@
       "endMonth": 5,
       "seasonStart": "2026-06-01",
       "seasonEnd": "2027-05-31"
-    }
+    },
+    "onboardingStatus": "pipeline"
   },
   {
     "id": "51935",
@@ -571,7 +594,8 @@
       "endMonth": 8,
       "seasonStart": "2025-09-01",
       "seasonEnd": "2026-08-31"
-    }
+    },
+    "onboardingStatus": "live"
   },
   {
     "id": "51596",
@@ -594,7 +618,8 @@
       "endMonth": 6,
       "seasonStart": "2026-07-01",
       "seasonEnd": "2027-06-30"
-    }
+    },
+    "onboardingStatus": "pipeline"
   },
   {
     "id": "71584",
@@ -618,7 +643,8 @@
       "endMonth": 8,
       "seasonStart": "2025-09-01",
       "seasonEnd": "2026-08-31"
-    }
+    },
+    "onboardingStatus": "pipeline"
   },
   {
     "id": "33004024",
@@ -642,7 +668,8 @@
       "endMonth": 12,
       "seasonStart": "2026-01-01",
       "seasonEnd": "2026-12-31"
-    }
+    },
+    "onboardingStatus": "live"
   },
   {
     "id": "71578",
@@ -666,7 +693,8 @@
       "endMonth": 8,
       "seasonStart": "2025-09-01",
       "seasonEnd": "2026-08-31"
-    }
+    },
+    "onboardingStatus": "pipeline"
   },
   {
     "id": "11493",
@@ -690,7 +718,8 @@
       "endMonth": 12,
       "seasonStart": "2026-01-01",
       "seasonEnd": "2026-12-31"
-    }
+    },
+    "onboardingStatus": "pipeline"
   },
   {
     "id": "33006629",
@@ -714,6 +743,7 @@
       "endMonth": 9,
       "seasonStart": "2025-10-01",
       "seasonEnd": "2026-09-30"
-    }
+    },
+    "onboardingStatus": "live"
   }
 ]

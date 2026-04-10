@@ -74,7 +74,6 @@ import {
   AttributePanel,
   AttrSection,
   AttrRow,
-  AttrBadge,
 } from "./ui/attribute-panel";
 import { StatusBadge } from "./ui/status-badge";
 
@@ -229,26 +228,6 @@ export default function BuildingDetailPage() {
     () => allMeters.filter(m => m.dismounted).length,
     [allMeters]
   );
-  // ── Right panel computed values ──────────────────────────────
-  const activeContracts = useMemo(
-    () => vheList.filter((v) => v.contract?.status === "active").length,
-    [vheList]
-  );
-  const avgAdvance = useMemo(() => {
-    const withAdvance = vheList.filter((v) => v.voorschot > 0);
-    return withAdvance.length > 0
-      ? withAdvance.reduce((s, v) => s + v.voorschot, 0) / withAdvance.length
-      : 0;
-  }, [vheList]);
-  const totalResidentialM2 = useMemo(
-    () => vheList.reduce((s, v) => s + (v.m2 || 0), 0),
-    [vheList]
-  );
-  const primaryAddress = useMemo(() => {
-    if (vheList.length > 0 && vheList[0].address) return vheList[0].address;
-    return building.complex;
-  }, [vheList, building]);
-
   const activityList = useMemo(
     () => getActivitiesByBuilding(buildingId),
     [buildingId]
@@ -354,13 +333,12 @@ export default function BuildingDetailPage() {
       : "on_track";
 
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-      {/* ── Sticky header zone ── */}
-      <div className="shrink-0 max-w-[1400px] w-full mx-auto px-4 sm:px-6 pt-4 sm:pt-6">
+    <div className="flex-1 overflow-y-auto">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-4 sm:py-6">
         <Breadcrumbs items={crumbs} />
 
         {/* ── Header ── */}
-        <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-start gap-4 mb-6">
           <div className="flex items-start gap-3 flex-1 min-w-0">
             <div
               className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
@@ -368,14 +346,29 @@ export default function BuildingDetailPage() {
             >
               <Building2 size={20} style={{ color: brand.navy }} />
             </div>
-            <div className="min-w-0 flex items-center gap-3 flex-wrap">
-              <h1
-                className="text-xl font-semibold truncate"
-                style={{ color: brand.navy }}
-              >
-                {building.complex}
-              </h1>
-              <StatusBadge status={building.dataQuality} size="xs" />
+            <div className="min-w-0">
+              <div className="flex items-center gap-3 mb-1 flex-wrap">
+                <h1
+                  className="text-xl font-semibold truncate"
+                  style={{ color: brand.navy }}
+                >
+                  {building.complex}
+                </h1>
+                <StatusBadge status={building.dataQuality} size="xs" />
+              </div>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-slate-500">
+                <span className="flex items-center gap-1">
+                  <MapPin size={14} /> {building.location}
+                </span>
+                <span className="w-px h-3 bg-slate-200" />
+                <span className="flex items-center gap-1">
+                  <Hash size={14} /> {building.complexId}
+                </span>
+                <span className="w-px h-3 bg-slate-200" />
+                <span className="flex items-center gap-1">
+                  <Home size={14} /> {building.vhe} VHE
+                </span>
+              </div>
             </div>
           </div>
 
@@ -460,64 +453,47 @@ export default function BuildingDetailPage() {
         </div>
 
 
-      </div>{/* end sticky header zone */}
-
-      {/* ── Scrollable content: left tab content + right attribute panel ── */}
-      <div className="flex-1 flex flex-col xl:flex-row overflow-hidden">
-        <div className="flex-1 min-w-0 overflow-y-auto">
-          <div className="max-w-[1100px] px-4 sm:px-6 pb-6">
-
-          {/* ── Tab bar (Attio-style: icon + label + count badge) ── */}
-          <TabsList className="bg-transparent h-10 gap-1 p-0 border-b border-slate-200 w-full justify-start rounded-none overflow-x-auto mb-0">
-            {[
-              { value: "overview", label: t("overview", lang), icon: LayoutList },
-              isFeatureEnabled("consumptionControl") && {
-                value: "consumption",
-                label: lang === "nl" ? "Verbruik" : "Consumption",
-                icon: Flame,
-              },
-              {
-                value: "services",
-                label: t("services", lang),
-                icon: Wrench,
-                count: bsRelations.length,
-              },
-              isFeatureEnabled("ledger") && {
-                value: "distributions",
-                label: lang === "nl" ? "Verdelingen" : "Distributions",
-                icon: Send,
-                count: buildingDistributions.length || undefined,
-              },
-              isFeatureEnabled("consumption") && {
-                value: "meters",
-                label: t("meters", lang),
-                icon: Gauge,
-                count: meterList.length,
-              },
-              {
-                value: "vhe",
-                label: "VHE",
-                icon: Home,
-                count: vheList.length,
-              },
-              { value: "activity", label: t("activity", lang), icon: Activity },
-            ].filter(Boolean).map((tab) => {
-              const TabIcon = tab.icon;
-              return (
-                <TabsTrigger
-                  key={tab.value}
-                  value={tab.value}
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-slate-900 data-[state=active]:text-slate-900 data-[state=active]:shadow-none px-4 h-10 text-sm text-slate-400 hover:text-slate-600 transition-colors whitespace-nowrap flex items-center gap-2"
-                >
-                  <TabIcon size={14} strokeWidth={1.5} />
-                  {tab.label}
-                  {tab.count != null && (
-                    <span className="min-w-[20px] h-5 px-1 rounded bg-slate-100 text-[11px] text-slate-500 font-medium tabular-nums inline-flex items-center justify-center">{tab.count}</span>
-                  )}
-                </TabsTrigger>
-              );
-            })}
-          </TabsList>
+        {/* ── Content: tabs + attribute panel ── */}
+        <div className="flex flex-col xl:flex-row gap-6">
+          <div className="flex-1 min-w-0">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              {/* Underline-style tabs */}
+              <TabsList className="bg-transparent h-10 gap-0 p-0 border-b border-slate-200 w-full justify-start rounded-none overflow-x-auto">
+                {[
+                  { value: "overview", label: t("overview", lang) },
+                  isFeatureEnabled("consumptionControl") && {
+                    value: "consumption",
+                    label: lang === "nl" ? "Verbruik" : "Consumption",
+                  },
+                  {
+                    value: "services",
+                    label: `${t("services", lang)} (${bsRelations.length})`,
+                  },
+                  isFeatureEnabled("ledger") && {
+                    value: "distributions",
+                    label: buildingDistributions.length > 0
+                      ? `${lang === "nl" ? "Verdelingen" : "Distributions"} (${buildingDistributions.length})`
+                      : `${lang === "nl" ? "Verdelingen" : "Distributions"}`,
+                  },
+                  isFeatureEnabled("consumption") && {
+                    value: "meters",
+                    label: `${t("meters", lang)} (${meterList.length})`,
+                  },
+                  {
+                    value: "vhe",
+                    label: `VHE (${vheList.length})`,
+                  },
+                  { value: "activity", label: t("activity", lang) },
+                ].filter(Boolean).map((tab) => (
+                  <TabsTrigger
+                    key={tab.value}
+                    value={tab.value}
+                    className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#3EB1C8] data-[state=active]:text-slate-900 data-[state=active]:shadow-none px-4 text-sm text-slate-400 hover:text-slate-600 transition-colors whitespace-nowrap"
+                  >
+                    {tab.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
 
               {/* ═══ OVERVIEW TAB — BUILDING HOME PAGE ═══ */}
               <TabsContent value="overview">
@@ -607,8 +583,12 @@ export default function BuildingDetailPage() {
                     .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
                   const overdueTasks = openTasks.filter((t) => new Date(t.dueDate) < new Date());
 
-                  // Merge action queue (tasks + warnings only — distribution lives in header + its own tab)
+                  // Merge action queue
                   const actionQueue = [];
+                  // Distribution in progress → show at top
+                  if (hasActiveDistribution) {
+                    actionQueue.push({ type: "distribution", severity: "info", item: activeDistribution });
+                  }
                   overdueTasks.forEach((t) => actionQueue.push({ type: "task", severity: "error", item: t }));
                   warnings.forEach((w) => actionQueue.push({ type: "warning", severity: w.severity, item: w }));
                   openTasks.filter((t) => !overdueTasks.includes(t)).forEach((t) => actionQueue.push({ type: "task", severity: "info", item: t }));
@@ -641,7 +621,172 @@ export default function BuildingDetailPage() {
                   return (
                 <div className="mt-4 space-y-4">
 
-                  {/* 1. Budget */}
+                  {/* Layer 0: Pulse Strip — Current year operational KPIs */}
+                  <div className="flex flex-wrap items-center gap-x-5 gap-y-1 px-1 text-[13px]">
+                    <span className="tabular-nums" style={{ color: brand.navy }}>
+                      <span className="font-semibold">{fmt(totalBudget)}</span>
+                      <span className="text-slate-400 ml-1">budget</span>
+                    </span>
+                    <span className="w-px h-3.5 bg-slate-200" />
+                    <span className="tabular-nums">
+                      <span
+                        className="font-semibold"
+                        style={{ color: !isOnPace && budgetPct > yearPct + 10 ? brand.amber : brand.navy }}
+                      >
+                        {budgetPct}%
+                      </span>
+                      <span className="text-slate-400 ml-1">{lang === "nl" ? "besteed" : "spent"}</span>
+                    </span>
+                    <span className="w-px h-3.5 bg-slate-200" />
+                    <span className="tabular-nums" style={{ color: brand.navy }}>
+                      <span className="font-semibold">{activeVhe}</span>
+                      <span className="text-slate-400 ml-1">VHE</span>
+                    </span>
+                    {openTasks.length > 0 && (
+                      <>
+                        <span className="w-px h-3.5 bg-slate-200" />
+                        <span className="tabular-nums">
+                          <span
+                            className="font-semibold"
+                            style={{ color: overdueTasks.length > 0 ? brand.red : brand.navy }}
+                          >
+                            {openTasks.length}
+                          </span>
+                          <span className="text-slate-400 ml-1">
+                            {openTasks.length === 1
+                              ? (lang === "nl" ? "open taak" : "open task")
+                              : (lang === "nl" ? "open taken" : "open tasks")}
+                          </span>
+                        </span>
+                      </>
+                    )}
+                    {warnings.length > 0 && (
+                      <>
+                        <span className="w-px h-3.5 bg-slate-200" />
+                        <span className="tabular-nums">
+                          <span className="font-semibold" style={{ color: brand.amber }}>
+                            {warnings.length}
+                          </span>
+                          <span className="text-slate-400 ml-1">
+                            {warnings.length === 1
+                              ? (lang === "nl" ? "waarschuwing" : "warning")
+                              : (lang === "nl" ? "waarschuwingen" : "warnings")}
+                          </span>
+                        </span>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Layer 1: Action Queue */}
+                  {actionQueue.length > 0 ? (
+                    <Card className="border-slate-200 bg-white overflow-hidden">
+                      <CardContent className="p-0">
+                        <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2">
+                          <ListChecks size={13} className="text-slate-400" />
+                          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                            {lang === "nl" ? "Acties" : "Actions"}
+                            <span className="ml-1.5 text-slate-300">({actionQueue.length})</span>
+                          </p>
+                        </div>
+                        <div className="divide-y divide-slate-100">
+                          {actionQueue.map((entry) => {
+                            if (entry.type === "distribution") {
+                              const dist = entry.item;
+                              const stepCfg = STEP_CONFIG[dist.currentStep];
+                              const stepLabel = stepCfg?.label?.[lang] ?? dist.currentStep;
+                              const flagged = getFlaggedServiceCount(dist);
+                              return (
+                                <button
+                                  key={dist.id}
+                                  onClick={() => navigate(`/distribution/${dist.id}`)}
+                                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors text-left"
+                                >
+                                  <span
+                                    className="w-1.5 h-1.5 rounded-full shrink-0 animate-pulse"
+                                    style={{ background: brand.teal }}
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs text-slate-700">
+                                      {lang === "nl" ? "Verdeling" : "Distribution"} {dist.period}
+                                      <span className="mx-1.5 text-slate-300">·</span>
+                                      <span className="text-slate-400">{lang === "nl" ? "Stap" : "Step"}: {stepLabel}</span>
+                                    </p>
+                                  </div>
+                                  {flagged > 0 && (
+                                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full shrink-0"
+                                      style={{ background: brand.amber + "18", color: brand.amber }}>
+                                      {flagged} {lang === "nl" ? "melding" : "flag"}{flagged > 1 ? "s" : ""}
+                                    </span>
+                                  )}
+                                  <ChevronRight size={12} className="text-slate-300 shrink-0" />
+                                </button>
+                              );
+                            } else if (entry.type === "task") {
+                              const task = entry.item;
+                              const isOverdue = new Date(task.dueDate) < new Date();
+                              return (
+                                <div key={task.id} className={`flex items-center gap-3 px-4 py-2.5 ${isOverdue ? "bg-red-50/40" : ""}`}>
+                                  <div
+                                    className="w-2 h-2 rounded-full shrink-0"
+                                    style={{ background: priorityDot[task.priority] || brand.muted }}
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs text-slate-700 truncate">
+                                      {task.title[lang] || task.title.en}
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center gap-2 shrink-0">
+                                    <span
+                                      className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-semibold text-white shrink-0"
+                                      style={{ background: brand.navy + "80" }}
+                                      title={task.assignee}
+                                    >
+                                      {task.assigneeInitials}
+                                    </span>
+                                    <span className={`text-[11px] tabular-nums ${isOverdue ? "text-red-600 font-medium" : "text-slate-400"}`}>
+                                      {fmtRelDate(task.dueDate)}
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            } else {
+                              const w = entry.item;
+                              const sty = sevStyles[w.severity] || sevStyles.info;
+                              const WIcon = w.icon;
+                              return (
+                                <div key={w.id} className={`flex items-center gap-3 px-4 py-2.5 ${sty.bg}`}>
+                                  <WIcon size={13} className="shrink-0" style={{ color: sty.iconColor }} />
+                                  <p className="flex-1 min-w-0 text-xs text-slate-700 truncate">
+                                    {w.text[lang] || w.text.en}
+                                  </p>
+                                  {w.action && (
+                                    <button
+                                      onClick={w.action}
+                                      className="text-[11px] font-medium shrink-0 px-2 py-0.5 rounded hover:bg-slate-100 transition-colors"
+                                      style={{ color: brand.blue }}
+                                    >
+                                      {lang === "nl" ? "Bekijk" : "View"} →
+                                    </button>
+                                  )}
+                                </div>
+                              );
+                            }
+                          })}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="flex items-center gap-3 px-4 py-4 rounded-lg border border-slate-200 bg-white">
+                      <CheckCircle2 size={15} style={{ color: brand.blue }} className="shrink-0" />
+                      <p className="text-xs text-slate-500">
+                        {lang === "nl"
+                          ? "Alles op orde — geen openstaande acties."
+                          : "All clear — no open actions."}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Layer 2: Financial Snapshot */}
                   <Card className="border-slate-200 bg-white overflow-hidden">
                       <CardContent className="px-4 py-3">
                         <div className="flex items-center gap-2 mb-2.5">
@@ -719,97 +864,82 @@ export default function BuildingDetailPage() {
                       </CardContent>
                     </Card>
 
-                  {/* 2. Tasks */}
-                  {openTasks.length > 0 ? (
-                    <Card className="border-slate-200 bg-white overflow-hidden">
-                      <CardContent className="p-0">
-                        <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2">
-                          <ListChecks size={13} className="text-slate-400" />
-                          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                            {lang === "nl" ? "Taken" : "Tasks"}
-                            <span className="ml-1.5 text-slate-300">({openTasks.length})</span>
-                          </p>
-                        </div>
-                        <div className="divide-y divide-slate-100">
-                          {openTasks.map((task) => {
-                            const isOverdue = new Date(task.dueDate) < new Date();
-                            return (
-                              <div key={task.id} className={`flex items-center gap-3 px-4 py-2.5 ${isOverdue ? "bg-red-50/40" : ""}`}>
+                  {/* ── Distribution Reference Card ── */}
+                  {isFeatureEnabled("ledger") && buildingDistributions.length > 0 && (() => {
+                    const dist = activeDistribution || buildingDistributions[0];
+                    const isComplete = dist.currentStep === "complete";
+                    const stepIdx = getStepIndex(dist);
+                    const stepCfg = STEP_CONFIG[dist.currentStep];
+                    const flaggedSvcs = dist.services.filter(s => s.status === "flagged").length;
+                    const distId = `/${orgId}/distribution/${dist.id}`;
+
+                    return (
+                      <Card className="border-slate-200 bg-white overflow-hidden">
+                        <CardContent className="px-4 py-3">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <Send size={13} className="text-slate-400" />
+                              <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                                {lang === "nl" ? "Verdeling" : "Distribution"} {dist.period}
+                              </span>
+                            </div>
+                            {isComplete ? (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                                <CheckCircle2 size={10} />
+                                {lang === "nl" ? "Afgerond" : "Complete"}
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                                <Clock size={10} />
+                                {lang === "nl" ? "Stap" : "Step"} {stepIdx + 1}/6
+                              </span>
+                            )}
+                          </div>
+
+                          {/* 6-step mini progress bar */}
+                          <div className="flex items-center gap-0.5 mb-2">
+                            {STEP_ORDER.map((step, i) => {
+                              const done = isComplete || i < stepIdx;
+                              const active = !isComplete && i === stepIdx;
+                              return (
                                 <div
-                                  className="w-2 h-2 rounded-full shrink-0"
-                                  style={{ background: priorityDot[task.priority] || brand.muted }}
+                                  key={step}
+                                  className="h-1 rounded-full flex-1"
+                                  style={{ background: done ? (brand.teal || "#3EB1C8") : active ? "#93C5FD" : "#E2E8F0" }}
                                 />
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-xs text-slate-700 truncate">
-                                    {task.title[lang] || task.title.en}
-                                  </p>
-                                </div>
-                                <div className="flex items-center gap-2 shrink-0">
-                                  <span
-                                    className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-semibold text-white shrink-0"
-                                    style={{ background: brand.navy + "80" }}
-                                    title={task.assignee}
-                                  >
-                                    {task.assigneeInitials}
-                                  </span>
-                                  <span className={`text-[11px] tabular-nums ${isOverdue ? "text-red-600 font-medium" : "text-slate-400"}`}>
-                                    {fmtRelDate(task.dueDate)}
-                                  </span>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ) : (
-                    <div className="flex items-center gap-3 px-4 py-4 rounded-lg border border-slate-200 bg-white">
-                      <CheckCircle2 size={15} style={{ color: brand.blue }} className="shrink-0" />
-                      <p className="text-xs text-slate-500">
-                        {lang === "nl" ? "Geen openstaande taken" : "No open tasks"}
-                      </p>
-                    </div>
-                  )}
+                              );
+                            })}
+                          </div>
 
-                  {/* 3. Warnings (auto-generated alerts) */}
-                  {warnings.length > 0 && (
-                    <Card className="border-slate-200 bg-white overflow-hidden">
-                      <CardContent className="p-0">
-                        <div className="px-4 py-2.5 border-b border-slate-100 flex items-center gap-2">
-                          <AlertTriangle size={13} className="text-slate-400" />
-                          <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                            {lang === "nl" ? "Waarschuwingen" : "Warnings"}
-                            <span className="ml-1.5 text-slate-300">({warnings.length})</span>
-                          </p>
-                        </div>
-                        <div className="divide-y divide-slate-100">
-                          {warnings.map((w) => {
-                            const sty = sevStyles[w.severity] || sevStyles.info;
-                            const WIcon = w.icon;
-                            return (
-                              <div key={w.id} className={`flex items-center gap-3 px-4 py-2.5 ${sty.bg}`}>
-                                <WIcon size={13} className="shrink-0" style={{ color: sty.iconColor }} />
-                                <p className="flex-1 min-w-0 text-xs text-slate-700 truncate">
-                                  {w.text[lang] || w.text.en}
-                                </p>
-                                {w.action && (
-                                  <button
-                                    onClick={w.action}
-                                    className="text-[11px] font-medium shrink-0 px-2 py-0.5 rounded hover:bg-slate-100 transition-colors"
-                                    style={{ color: brand.blue }}
-                                  >
-                                    {lang === "nl" ? "Bekijk" : "View"} →
-                                  </button>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              {!isComplete && stepCfg && (
+                                <span className="text-[11px] text-slate-500">
+                                  {lang === "nl" ? "Huidig" : "Current"}: <span className="font-medium text-slate-700">{stepCfg.label[lang] || stepCfg.label.en}</span>
+                                </span>
+                              )}
+                              {flaggedSvcs > 0 && (
+                                <span className="inline-flex items-center gap-1 text-[10px] text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">
+                                  <AlertTriangle size={10} />
+                                  {flaggedSvcs} {lang === "nl" ? "aandacht" : "flagged"}
+                                </span>
+                              )}
+                            </div>
+                            <button
+                              onClick={() => navigate(distId)}
+                              className="text-[11px] font-medium hover:underline flex items-center gap-0.5"
+                              style={{ color: brand.blue }}
+                            >
+                              {lang === "nl" ? "Open verdeling" : "Open distribution"}
+                              <ChevronRight size={11} />
+                            </button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })()}
 
-                  {/* 4. Notes */}
+                  {/* Layer 3: Notes & Context */}
                   <Card className="border-slate-200 bg-white overflow-hidden">
                     <CardContent className="p-0">
                       <div className="px-4 py-2.5 border-b border-slate-100 flex items-center justify-between">
@@ -870,6 +1000,41 @@ export default function BuildingDetailPage() {
                     </CardContent>
                   </Card>
 
+                  {/* Layer 4: Recent Activity */}
+                  {activityList.length > 0 && (
+                    <Card className="border-slate-200 bg-white overflow-hidden">
+                      <CardContent className="p-0">
+                        <div className="px-4 py-2.5 border-b border-slate-100 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Activity size={13} className="text-slate-400" />
+                            <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                              {lang === "nl" ? "Recente activiteit" : "Recent activity"}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => setActiveTab("activity")}
+                            className="text-[11px] font-medium hover:underline transition-colors"
+                            style={{ color: brand.blue }}
+                          >
+                            {lang === "nl" ? "Bekijk alles" : "View all"} →
+                          </button>
+                        </div>
+                        <div className="divide-y divide-slate-100">
+                          {activityList.slice(0, 4).map((act) => (
+                            <div key={act.id} className="flex items-start gap-3 px-4 py-2">
+                              <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs text-slate-600 truncate">
+                                  {act.description[lang] || act.description.en}
+                                </p>
+                              </div>
+                              <span className="text-[11px] text-slate-400 shrink-0 tabular-nums">{act.date}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
                 </div>
                 );
                 })()}
@@ -2518,86 +2683,36 @@ export default function BuildingDetailPage() {
                   )}
                 </div>
               </TabsContent>
-          </div>{/* close max-w-[1100px] inner wrapper */}
-        </div>{/* close left scroll column */}
+            </Tabs>
+          </div>
 
-        {/* ── Attribute panel (right sidebar — independent scroll) ── */}
-        <div className="hidden xl:block w-80 shrink-0 border-l border-slate-200 overflow-y-auto">
-          <AttributePanel>
-              {/* ── Complex ── */}
-              <AttrSection title="Complex" first>
-                <AttrRow
-                  label={lang === "nl" ? "Adres" : "Address"}
-                  value={primaryAddress}
-                />
-                <AttrRow
-                  label={lang === "nl" ? "Locatie" : "Location"}
-                  value={building.location}
-                />
-                <AttrRow label="Complex ID" value={building.complexId} mono />
-                <AttrRow
-                  label={lang === "nl" ? "Objectcode" : "Object code"}
-                  value={building.id}
-                  mono
-                />
-                <AttrRow
-                  label={lang === "nl" ? "Woon m²" : "Residential m²"}
-                  value={totalResidentialM2 > 0 ? `${totalResidentialM2.toLocaleString()} m²` : "—"}
-                />
-                <AttrRow
-                  label={lang === "nl" ? "Algemeen m²" : "Common space m²"}
-                  value="—"
-                  muted
-                />
+          {/* ── Attribute panel (right sidebar) ── */}
+          <div className="w-full xl:w-80 shrink-0">
+            <AttributePanel>
+              <AttrSection title={lang === "nl" ? "Identiteit" : "Identity"}>
+                <AttrRow label="Complex ID" value={building.complexId} />
+                <AttrRow label={lang === "nl" ? "Locatie" : "Location"} value={building.location} />
               </AttrSection>
-
-              {/* ── Relationships ── */}
-              <AttrSection title={lang === "nl" ? "Relaties" : "Relationships"}>
-                <AttrRow
-                  label={lang === "nl" ? "Diensten" : "Services"}
-                  value={bsRelations.length}
-                  onClick={() => setActiveTab("services")}
-                />
-                <AttrRow
-                  label={lang === "nl" ? "Hoofdmeters" : "Main meters"}
-                  value={mainMeters.length}
-                  onClick={() => setActiveTab("meters")}
-                />
-                <AttrRow
-                  label={lang === "nl" ? "Submeters" : "Submeters"}
-                  value={subMeters.length}
-                  onClick={() => setActiveTab("meters")}
-                />
-              </AttrSection>
-
-              {/* ── Tenants ── */}
-              <AttrSection title={lang === "nl" ? "Huurders" : "Tenants"}>
-                <AttrRow
-                  label={lang === "nl" ? "Actieve contracten" : "Active contracts"}
-                  value={activeContracts}
-                  onClick={() => setActiveTab("vhe")}
-                />
-                <AttrRow
-                  label={lang === "nl" ? "Gem. voorschot" : "Avg. advance"}
-                  value={avgAdvance > 0 ? `€ ${avgAdvance.toFixed(2)}` : "—"}
-                />
-                <AttrBadge
-                  label="Tenant app"
-                  active
-                  text={lang === "nl" ? "Actief" : "Active"}
-                />
-                <AttrRow
-                  label={lang === "nl" ? "App gebruikers" : "App users"}
-                  value={activeContracts > 0 ? Math.round(activeContracts * 0.7) : 0}
-                />
-                <AttrRow
-                  label={lang === "nl" ? "Waarschuwingsbrieven" : "Warning letters"}
-                  value="0"
-                />
+              <AttrSection title={lang === "nl" ? "Samenstelling" : "Composition"}>
+                <AttrRow label="VHE" value={building.vhe} />
+                <AttrRow label={lang === "nl" ? "Diensten" : "Services"} value={bsRelations.length} />
+                <AttrRow label={lang === "nl" ? "Meters" : "Meters"} value={`${mainMeters.length} ${lang === "nl" ? "hoofd" : "main"} · ${subMeters.length} sub`} />
+                {building.utilities?.length > 0 && (
+                  <AttrRow
+                    label={lang === "nl" ? "Nutsbedrijven" : "Utilities"}
+                    value={building.utilities.map(u => ({
+                      electricity: lang === "nl" ? "Elektra" : "Electricity",
+                      heat: lang === "nl" ? "Warmte" : "Heat",
+                      gas: "Gas",
+                      water: "Water",
+                    })[u] || u).join(", ")}
+                  />
+                )}
               </AttrSection>
             </AttributePanel>
           </div>
-        </div>{/* close scrollable row */}
-    </Tabs>
+        </div>
+      </div>
+    </div>
   );
 }
