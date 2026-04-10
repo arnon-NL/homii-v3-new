@@ -28,6 +28,7 @@ import {
   getSuppliers,
   getAllBuildingServices,
 } from "@/lib/data";
+import rawTasks from "../data/tasks.json";
 
 /* ── Formatting ── */
 const fmtEur = (v) =>
@@ -301,14 +302,7 @@ export default function HomePage() {
     ).length;
 
     // --- Section 3: Tasks ---
-    // Load tasks via import (they're small enough)
-    let tasks = [];
-    try {
-      tasks = require("../data/tasks.json");
-    } catch (e) {
-      tasks = [];
-    }
-    const openTasks = tasks
+    const openTasks = rawTasks
       .filter((t) => t.status === "open")
       .sort((a, b) => {
         // Blocking first, then by priority, then by due date
