@@ -9,13 +9,7 @@ import {
   CheckCircle2,
   TrendingUp,
   TrendingDown,
-  CircleDot,
-  UserMinus,
-  Ban,
-  ShieldAlert,
-  CircleAlert,
   Activity,
-  Wrench as WrenchIcon,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import { useLang } from "@/lib/i18n";
@@ -444,7 +438,7 @@ export default function HomePage() {
                 onClick={() => navigate(`/${orgId}/vhe`)}
               />
               <InsightRow
-                icon={UserMinus}
+                icon={AlertTriangle}
                 count={data.departedNegative}
                 label={
                   lang === "nl"
@@ -461,7 +455,7 @@ export default function HomePage() {
               title={lang === "nl" ? "Gebouwen" : "Buildings"}
             >
               <InsightRow
-                icon={Ban}
+                icon={AlertTriangle}
                 count={data.buildingsBlocked}
                 label={
                   lang === "nl" ? "geblokkeerd" : "blocked"
@@ -470,7 +464,7 @@ export default function HomePage() {
                 onClick={() => navigate(`/${orgId}/buildings`)}
               />
               <InsightRow
-                icon={ShieldAlert}
+                icon={AlertTriangle}
                 count={data.buildingsNeedControl}
                 label={
                   lang === "nl"
@@ -481,7 +475,7 @@ export default function HomePage() {
                 onClick={() => navigate(`/${orgId}/buildings`)}
               />
               <InsightRow
-                icon={CircleAlert}
+                icon={AlertTriangle}
                 count={data.buildingsRedDQ}
                 label={
                   lang === "nl"
@@ -498,7 +492,7 @@ export default function HomePage() {
               title={lang === "nl" ? "Meters" : "Meters"}
             >
               <InsightRow
-                icon={CircleAlert}
+                icon={AlertTriangle}
                 count={data.metersRedDQ}
                 label={
                   lang === "nl"
