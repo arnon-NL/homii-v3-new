@@ -14,6 +14,8 @@ import SupplierListPage from "./SupplierListPage";
 import ServiceDetailPage from "./ServiceDetailPage";
 import DistributionListPage from "./DistributionListPage";
 import DistributionDetailPage from "./DistributionDetailPage";
+import CostFlowPage from "./CostFlowPage";
+import GroupDetailPage from "./GroupDetailPage";
 import HomePage from "./HomePage";
 
 /* ── Layout that syncs URL :orgId param → OrgContext ── */
@@ -139,6 +141,9 @@ function AppContent() {
               <Route path="suppliers/:supplierId" element={<PlaceholderPage title={t("suppliersTitle", lang)} />} />
               <Route path="distribution" element={<DistributionListPage />} />
               <Route path="distribution/:distributionId" element={<DistributionDetailPage />} />
+              <Route path="cost-flow" element={<CostFlowPage />} />
+              <Route path="cost-flow/:groupId" element={<CostFlowPage />} />
+              <Route path="groups/:groupId" element={<GroupDetailPage />} />
               <Route
                 path="meters"
                 element={<PlaceholderPage title={t("metersTitle", lang)} />}

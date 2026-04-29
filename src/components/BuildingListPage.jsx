@@ -943,7 +943,7 @@ export default function BuildingListPage() {
           {paged.map((b) => (
             <button
               key={b.id}
-              onClick={() => navigate(`/${orgId}/buildings/${b.id}`)}
+              onClick={() => navigate(b.useNewDetail ? `/${orgId}/groups/${b.id}` : `/${orgId}/buildings/${b.id}`)}
               className="w-full text-left rounded-lg border border-slate-200 bg-white p-4 hover:border-[#3EB1C8] hover:shadow-md transition-colors"
             >
               <div className="flex items-start justify-between mb-2">
@@ -1024,7 +1024,7 @@ export default function BuildingListPage() {
                 <tr
                   key={b.id}
                   className="hover:bg-slate-50/80 transition-colors cursor-pointer"
-                  onClick={() => navigate(`/${orgId}/buildings/${b.id}`)}
+                  onClick={() => navigate(b.useNewDetail ? `/${orgId}/groups/${b.id}` : `/${orgId}/buildings/${b.id}`)}
                 >
                   {visibleColumns.map((colKey) => renderCell(colKey, b))}
                 </tr>

@@ -1,5 +1,20 @@
 [
   {
+    "id": "GRP-zev-complex",
+    "complex": "Zeverijnstraat 30-484",
+    "complexId": "2379+2380",
+    "location": "Hilversum",
+    "vhe": 216,
+    "components": 9,
+    "utilities": ["electricity", "gas"],
+    "budgetTotal": 324362,
+    "budgetSpent": 305974,
+    "dataQuality": "warning",
+    "status": "active",
+    "onboardingStatus": "live",
+    "useNewDetail": true
+  },
+  {
     "id": "8666",
     "complex": "1E Keucheniusstraat 4 en 6",
     "complexId": "3526101",
