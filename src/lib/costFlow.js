@@ -1,48 +1,77 @@
-import costFlowData from "@/data/costFlow.json";
+import zeverijnstraat from "@/data/costFlow.json";
+import dalkruid from "@/data/costFlowDalkruid.json";
+import burghoutweg from "@/data/costFlowBurghoutweg.json";
+import irenestraat from "@/data/costFlowIrenestraat.json";
+import schelpenhoek from "@/data/costFlowSchelpenhoek.json";
+import carolina from "@/data/costFlowCarolina.json";
 
 /* ─────────────────────────────────────────────────────────────
- * Cost-flow data accessors
+ * Cost-flow data accessors — multi-group registry
  *
- * The new (post-migration) data shape:
- *   Group           — a bundle of VHEs (Complex / Block / ad-hoc)
- *   CostSource      — the input to the graph (meter, contract, recurring)
- *   Division /
- *   DivisionDef     — split rules + their materializations
- *   CostCenter      — anchored ledger coordinate
- *   SettlementPeriod — the settlement target
+ * Each Group's flow lives in its own JSON. The "active" group is set
+ * synchronously by the page (GroupDetailPage / CostFlowView) before
+ * children render, so all helpers below can read from a single source.
  *
- * The mock JSON encodes one worked example (Zeverijnstraat 2024) as a
- * graph: lanes (visual rows), nodes (typed), edges (with amounts).
+ * Schema per flow (unchanged from single-group days):
+ *   group, period, siblingGroups, lanes, nodes, edges, trustSummary.
  * ──────────────────────────────────────────────────────────── */
 
+const REGISTRY = {
+  "GRP-zev-complex":  zeverijnstraat,
+  "GRP-dalkruid":     dalkruid,
+  "GRP-burghoutweg":  burghoutweg,
+  "GRP-irenestraat":  irenestraat,
+  "GRP-schelpenhoek": schelpenhoek,
+  "GRP-carolina":     carolina,
+};
+
+const DEFAULT_GROUP_ID = "GRP-zev-complex";
+let activeGroupId = DEFAULT_GROUP_ID;
+
+/** Set the active group. Idempotent. Falls back to the default if the
+ * given groupId isn't registered. */
+export function setActiveGroup(groupId) {
+  if (groupId && REGISTRY[groupId]) activeGroupId = groupId;
+  else activeGroupId = DEFAULT_GROUP_ID;
+}
+
+/** Internal — current flow object. */
+function active() {
+  return REGISTRY[activeGroupId] || REGISTRY[DEFAULT_GROUP_ID];
+}
+
+export function listGroups() {
+  return Object.keys(REGISTRY);
+}
+
 export function getCostFlow() {
-  return costFlowData;
+  return active();
 }
 
 export function getNodeById(id) {
-  return costFlowData.nodes.find((n) => n.id === id) || null;
+  return active().nodes.find((n) => n.id === id) || null;
 }
 
 export function getNodesByLane(laneId) {
-  return costFlowData.nodes.filter((n) => n.laneId === laneId);
+  return active().nodes.filter((n) => n.laneId === laneId);
 }
 
 export function getEdgesForNode(nodeId) {
   return {
-    incoming: costFlowData.edges.filter((e) => e.to === nodeId),
-    outgoing: costFlowData.edges.filter((e) => e.from === nodeId),
+    incoming: active().edges.filter((e) => e.to === nodeId),
+    outgoing: active().edges.filter((e) => e.from === nodeId),
   };
 }
 
 export function getSourceNodes() {
-  return costFlowData.nodes.filter((n) => n.type === "source");
+  return active().nodes.filter((n) => n.type === "source");
 }
 
 /* Service codes carried by settlement nodes within a lane (one lane can carry
  * multiple services — the shared electricity meter feeds SV1370G + SV1372G). */
 export function getLaneServiceCodes(laneId) {
   const codes = new Set();
-  for (const n of costFlowData.nodes) {
+  for (const n of active().nodes) {
     if (n.laneId === laneId && n.type === "settlement" && n.serviceCode) {
       codes.add(n.serviceCode);
     }
@@ -52,7 +81,7 @@ export function getLaneServiceCodes(laneId) {
 
 /* Settlements that share a Group (used for sibling navigation in the inspector) */
 export function getSettlementsByGroup(groupId, exceptId = null) {
-  return costFlowData.nodes.filter(
+  return active().nodes.filter(
     (n) =>
       n.type === "settlement" &&
       !n.outOfScope &&
@@ -67,32 +96,56 @@ export function getSettlementsByGroup(groupId, exceptId = null) {
  *   • all descendants reachable by walking edges forwards
  *   • all edges that touch any of those nodes on either side
  *
+ * Lane-aware: traversal only continues from "interior" nodes (same lane as
+ * the start). Cross-lane neighbours are included as boundary leaves — they
+ * appear in the subgraph so the bridge edge is visible, but BFS does not
+ * spread further into other lanes. Without this guard, hovering elektra in
+ * Carolina would highlight gas + water transitively via the cross-lane
+ * transfer edges.
+ *
  * Returned as Sets so look-ups in render are O(1).
  */
 export function getConnectedSubgraph(nodeId) {
   if (!nodeId) return { nodes: new Set(), edges: new Set() };
-  const edges = costFlowData.edges;
-  const reached = new Set([nodeId]);
+  const flow = active();
+  const startNode = flow.nodes.find((n) => n.id === nodeId);
+  if (!startNode) return { nodes: new Set(), edges: new Set() };
 
-  // Upstream BFS
+  const edges = flow.edges;
+  const nodeLane = {};
+  for (const n of flow.nodes) nodeLane[n.id] = n.laneId;
+  const startLane = startNode.laneId;
+
+  const reached = new Set([nodeId]);
+  const interior = new Set([nodeId]); // nodes we will traverse FROM
+
+  // Upstream BFS — only from interior nodes
   const upQ = [nodeId];
   while (upQ.length) {
     const cur = upQ.shift();
+    if (!interior.has(cur)) continue;
     for (const e of edges) {
       if (e.to === cur && !reached.has(e.from)) {
         reached.add(e.from);
-        upQ.push(e.from);
+        if (nodeLane[e.from] === startLane) {
+          interior.add(e.from);
+          upQ.push(e.from);
+        }
       }
     }
   }
-  // Downstream BFS
+  // Downstream BFS — only from interior nodes
   const downQ = [nodeId];
   while (downQ.length) {
     const cur = downQ.shift();
+    if (!interior.has(cur)) continue;
     for (const e of edges) {
       if (e.from === cur && !reached.has(e.to)) {
         reached.add(e.to);
-        downQ.push(e.to);
+        if (nodeLane[e.to] === startLane) {
+          interior.add(e.to);
+          downQ.push(e.to);
+        }
       }
     }
   }
@@ -108,7 +161,7 @@ export function getConnectedSubgraph(nodeId) {
 
 /* Subgraph for a whole lane: union of connected subgraphs of each source in the lane */
 export function getLaneSubgraph(laneId) {
-  const sources = costFlowData.nodes.filter(
+  const sources = active().nodes.filter(
     (n) => n.laneId === laneId && n.type === "source"
   );
   const nodes = new Set();
@@ -127,7 +180,7 @@ export function getLaneSubgraph(laneId) {
  * whose groupId matches.
  */
 export function getAudienceSubgraph(groupId) {
-  const settlements = costFlowData.nodes.filter(
+  const settlements = active().nodes.filter(
     (n) => n.type === "settlement" && !n.outOfScope && n.groupId === groupId
   );
   const nodes = new Set();
@@ -141,8 +194,8 @@ export function getAudienceSubgraph(groupId) {
 }
 
 export function getAudienceSummary(groupId) {
-  const sibling = costFlowData.siblingGroups?.find((g) => g.id === groupId);
-  const settlements = costFlowData.nodes.filter(
+  const sibling = active().siblingGroups?.find((g) => g.id === groupId);
+  const settlements = active().nodes.filter(
     (n) => n.type === "settlement" && !n.outOfScope && n.groupId === groupId
   );
   let settled = 0;
@@ -167,7 +220,7 @@ export function getAudienceSummary(groupId) {
 }
 
 export function getAllAudiences() {
-  const sg = costFlowData.siblingGroups || [];
+  const sg = active().siblingGroups || [];
   return sg
     .map((g) => getAudienceSummary(g.id))
     .filter((s) => s.settlementCount > 0); // hide computational-only groups
@@ -193,16 +246,20 @@ export function summariseLane(laneId) {
 
   const issueCount = nodes.reduce((c, n) => c + (n.flags?.length || 0), 0);
 
-  // Net delta across in-scope settlements: + = collect from tenants, − = refund
+  // Net delta across in-scope settlements. Convention in the data is
+  //   delta = advance − actual
+  // So:
+  //   + = refund   (advance was higher than actual; tenant overpaid)
+  //   − = collect  (advance was lower than actual; tenant still owes)
   const deltaContributors = settlements.filter((n) => n.delta != null);
   const netDelta = deltaContributors.reduce((s, n) => s + n.delta, 0);
   const hasDelta = deltaContributors.length > 0;
   const settlementDirection = !hasDelta
     ? "none"
     : netDelta > 1
-    ? "collect"
-    : netDelta < -1
     ? "refund"
+    : netDelta < -1
+    ? "collect"
     : "balanced";
 
   // YoY % vs prior year, taken from the dominant source node (largest by amount)
@@ -242,9 +299,194 @@ export function anchorStatusBucket(status) {
   }
 }
 
+/* ────────────────────────────────────────────────────────────
+ * Category-level rollup — for the progressive "L1" cost-flow view.
+ *
+ * Each lane has a category (energy, cleaning, management, other, …).
+ * The summary aggregates lane-level numbers into category bands AND
+ * records, for each category, how its settled euros distribute across
+ * audiences (used to draw ribbons in the sankey).
+ *
+ * Both sides of the flow use SETTLED amounts (the in-scope settlement
+ * total) so that left and right balance — categories' settled total
+ * equals audiences' settled total by construction.
+ * ──────────────────────────────────────────────────────────── */
+export function getCategoryFlowSummary({ scopeAudienceId = null } = {}) {
+  const flow = active();
+  const map = {};
+
+  for (const lane of flow.lanes) {
+    const cat = lane.category || "other";
+
+    // Per-lane in-scope settlements. When `scopeAudienceId` is set, we narrow
+    // to settlements that go to that audience — categories with no settlements
+    // matching the scope are dropped from the result.
+    const settlements = flow.nodes.filter(
+      (n) =>
+        n.laneId === lane.id &&
+        n.type === "settlement" &&
+        !n.outOfScope &&
+        (!scopeAudienceId || n.groupId === scopeAudienceId)
+    );
+    if (scopeAudienceId && settlements.length === 0) continue;
+
+    const summary = summariseLane(lane.id);
+
+    // When scoped, the lane's "amount" reflects only the slice going to the
+    // scoped audience (so category bands sum correctly to the audience total).
+    // Source amount, health and flag count remain lane-wide — narrowing those
+    // would lie about the lane's own truth.
+    const scopedAmount = scopeAudienceId
+      ? settlements.reduce((s, n) => s + (n.amount || 0), 0)
+      : summary.settled;
+
+    // Magnitude — sum of |amount| per settlement. Used for Sankey band sizing
+    // so a refunded settlement (negative amount) still contributes to "money
+    // moved" rather than cancelling out the rest of the category visually.
+    // Carolina's settle-elektra-res = -€155k is the motivating case: it
+    // belongs in the energy band's *size* even though it shows as a refund.
+    const scopedMagnitude = settlements.reduce(
+      (s, n) => s + Math.abs(n.amount || 0),
+      0
+    );
+
+    if (!map[cat]) {
+      map[cat] = {
+        id: cat,
+        amount: 0,        // signed — drives labels
+        magnitude: 0,     // abs sum — drives band heights / ribbon widths
+        sourceAmount: 0,
+        lanes: [],
+        audiences: {},
+        flagCount: 0,
+        netDelta: 0,
+        hasDelta: false,
+        worstHealth: "matched",
+      };
+    }
+
+    map[cat].amount += scopedAmount;
+    map[cat].magnitude += scopedMagnitude;
+    map[cat].sourceAmount += summary.expected;
+    map[cat].flagCount += summary.issueCount;
+    if (summary.netDelta != null) {
+      map[cat].netDelta += summary.netDelta;
+      map[cat].hasDelta = true;
+    }
+    const rank = { matched: 0, warning: 1, error: 2 };
+    if (rank[summary.health] > rank[map[cat].worstHealth]) {
+      map[cat].worstHealth = summary.health;
+    }
+
+    // Per-lane settlement → audience map for L2 ribbon sizing. We store the
+    // ABS magnitude per audience so a refund-driven negative settlement
+    // still sizes its ribbon by money-moved, not signed-residual.
+    const laneAudiences = {};
+    for (const s of settlements) {
+      const audId = s.groupId;
+      if (!audId) continue;
+      const m = Math.abs(s.amount || 0);
+      laneAudiences[audId] = (laneAudiences[audId] || 0) + m;
+      map[cat].audiences[audId] = (map[cat].audiences[audId] || 0) + m;
+    }
+
+    // Skip empty lanes (nothing settled to anyone in scope) — they'd show
+    // as noise in the L2 expansion. Carolina's lane-elektrapp (€0) is the
+    // motivating example.
+    if (scopedMagnitude > 0) {
+      map[cat].lanes.push({
+        laneId: lane.id,
+        title: lane.title,
+        category: cat,
+        complexity: lane.complexity,
+        amount: scopedAmount,
+        magnitude: scopedMagnitude,
+        sourceAmount: summary.expected,
+        health: summary.health,
+        issueCount: summary.issueCount,
+        netDelta: summary.netDelta,
+        audiences: laneAudiences,
+      });
+    }
+  }
+
+  // Sort by magnitude (so a category that's mostly a refund still ranks by
+  // size of money moved, not the small signed residual).
+  const out = Object.values(map).sort((a, b) => b.magnitude - a.magnitude);
+  for (const cat of out) cat.lanes.sort((a, b) => b.magnitude - a.magnitude);
+  return out;
+}
+
+/* Cross-lane neighbours of a node — the edges whose other endpoint lives in a
+ * different lane. Used by the inspector to surface "← From X" / "→ To Y"
+ * jumping affordances. Returns nodes/lanes deduped per neighbour-lane. */
+export function getCrossLaneNeighbors(nodeId) {
+  const flow = active();
+  const node = flow.nodes.find((n) => n.id === nodeId);
+  if (!node) return { incoming: [], outgoing: [] };
+
+  const incoming = [];
+  const outgoing = [];
+  const seenIn = new Set();
+  const seenOut = new Set();
+
+  for (const edge of flow.edges) {
+    if (edge.to === nodeId) {
+      const fromNode = flow.nodes.find((n) => n.id === edge.from);
+      if (!fromNode) continue;
+      if (fromNode.laneId === node.laneId) continue;
+      if (seenIn.has(fromNode.laneId)) {
+        // Aggregate amounts when multiple edges come from the same other lane
+        const existing = incoming.find((c) => c.lane.id === fromNode.laneId);
+        if (existing) existing.amount += edge.amount || 0;
+        continue;
+      }
+      const lane = flow.lanes.find((l) => l.id === fromNode.laneId);
+      incoming.push({ node: fromNode, lane, amount: edge.amount || 0 });
+      seenIn.add(fromNode.laneId);
+    }
+    if (edge.from === nodeId) {
+      const toNode = flow.nodes.find((n) => n.id === edge.to);
+      if (!toNode) continue;
+      if (toNode.laneId === node.laneId) continue;
+      if (seenOut.has(toNode.laneId)) {
+        const existing = outgoing.find((c) => c.lane.id === toNode.laneId);
+        if (existing) existing.amount += edge.amount || 0;
+        continue;
+      }
+      const lane = flow.lanes.find((l) => l.id === toNode.laneId);
+      outgoing.push({ node: toNode, lane, amount: edge.amount || 0 });
+      seenOut.add(toNode.laneId);
+    }
+  }
+  return { incoming, outgoing };
+}
+
+/* A lane's "focal subgraph" for the L3 sheet — the lane's nodes plus any
+ * cross-lane neighbours connected through edges (e.g. Carolina's
+ * passthrough-elektra-to-gas → addition-gas-from-elektra pair). Returns a
+ * narrowed flow object that can be fed directly to the existing Canvas. */
+export function getSingleLaneFlow(laneId) {
+  const flow = active();
+  const sub = getLaneSubgraph(laneId);
+
+  const nodes = flow.nodes.filter((n) => sub.nodes.has(n.id));
+  const edges = flow.edges.filter((_, idx) => sub.edges.has(idx));
+
+  const laneIds = new Set(nodes.map((n) => n.laneId));
+  const lanes = flow.lanes.filter((l) => laneIds.has(l.id));
+
+  return {
+    ...flow,
+    lanes,
+    nodes,
+    edges,
+  };
+}
+
 /* Trust meter computation across the whole flow */
 export function computeTrust() {
-  const ts = costFlowData.trustSummary;
+  const ts = active().trustSummary;
   const reconciledPct = ts.totalAnchored / ts.totalExpected;
   return {
     ...ts,

@@ -40,6 +40,10 @@ import {
   HelpCircle,
   MoreHorizontal,
   Settings2,
+  Divide,
+  Percent,
+  Square,
+  User,
 } from "lucide-react";
 import { brand } from "@/lib/brand";
 import { useLang } from "@/lib/i18n";
@@ -53,6 +57,8 @@ import {
   getAudienceSubgraph,
   getAllAudiences,
   getLaneServiceCodes,
+  getSingleLaneFlow,
+  getCrossLaneNeighbors,
   summariseLane,
   anchorStatusBucket,
   computeTrust,
@@ -60,9 +66,14 @@ import {
   fmtEur2,
   fmtSignedEur,
 } from "@/lib/costFlow";
+import CategoryFlowView from "./CategoryFlowView";
 
 /* ── Layout constants ── */
-const COL_WIDTH = 240;
+// Edge length between adjacent column cards is COL_WIDTH − (src_w + dst_w)/2
+// (with src_w=208, settle_w=220 that's COL_WIDTH − 214). The on-arrow
+// distribution chip's worst case is "÷ 605 VHE" ≈ 83 px; with 8 px breathing
+// on each side it needs 99 px edge. 330 → 116 px edge, ~33 px of margin.
+const COL_WIDTH = 330;
 const ROW_HEIGHT = 96;
 const LANE_TITLE_HEIGHT = 32;
 const LANE_PADDING_TOP = 8;
@@ -78,7 +89,7 @@ const NODE_SIZES = {
   split:       { w: 164, h: 60 },
   deduction:   { w: 184, h: 48 },
   addition:    { w: 184, h: 48 },
-  passthrough: { w: 156, h: 36 },
+  passthrough: { w: 152, h: 24 },
 };
 function nodeSize(type) {
   return NODE_SIZES[type] || { w: 188, h: 64 };
@@ -92,15 +103,27 @@ const categoryIcon = {
   other: FileText,
 };
 
-/* Node type → glyph */
-const typeIcon = {
+/* Node type → glyph. The five canonical operations are:
+ *   source     — money originates here
+ *   split      — money is divided by a rule
+ *   adjustment — money is modified up or down (sign carried by amount)
+ *   marker     — money is labelled at a checkpoint, no transformation
+ *   settlement — money becomes a bill on someone's account */
+const typeIconStatic = {
   source: CircleDot,
   split: Split,
-  passthrough: ChevronRight,
-  deduction: Minus,
-  addition: Plus,
+  marker: CircleDot,
   settlement: Users,
 };
+
+/* Sign-aware icon resolver — adjustment picks Plus or Minus based on amount. */
+function getTypeIcon(node) {
+  if (!node) return CircleDot;
+  if (node.type === "adjustment") {
+    return (node.amount || 0) >= 0 ? Plus : Minus;
+  }
+  return typeIconStatic[node.type] || CircleDot;
+}
 
 /* Health → text */
 const healthBadge = {
@@ -109,11 +132,114 @@ const healthBadge = {
   error: { dot: "bg-red-500", label: "Has errors" },
 };
 
+/* ─── Distribution method ────────────────────────────────────
+ * The rule that turns "this cost exists" into "this is your share."
+ * Always rendered on the settlement card so the basis isn't implicit.
+ *
+ *   per_vhe         flat divide across VHE count
+ *   metered_ista    Ista handles per-unit allocation by measured consumption
+ *   metered_internal we have meter readings; allocation is by measured units
+ *   by_m2           by surface area
+ *   fixed_pct       a negotiated percentage
+ *   single          one recipient (BOG named tenant, insurance line, etc.)
+ *
+ * `tone: "info"` (sky) only for metered methods — they're operationally
+ * different ("no further reconciliation needed at our end"). Everything
+ * else is neutral slate. */
+const distributionConfig = {
+  per_vhe: {
+    Icon: Divide,
+    // For icon-paired use (settlement card chip): the Divide icon already
+    // carries the "÷" cue, so we don't repeat it in the text.
+    short: (d) => `${d.denominator} ${d.unit || "VHE"}`,
+    // For text-only use (SVG edge chip): explicit "÷ N VHE" since there's no icon.
+    inline: (d) => `÷ ${d.denominator} ${d.unit || "VHE"}`,
+    long: (d) =>
+      `Distributed evenly across ${d.denominator} ${d.unit || "VHE"}`,
+    tone: "neutral",
+  },
+  metered_ista: {
+    Icon: Gauge,
+    short: () => "Metered (Ista)",
+    inline: () => "Metered",
+    long: () =>
+      "Per-unit allocation by Ista based on heat-cost meters — no further reconciliation on our side",
+    tone: "info",
+  },
+  metered_internal: {
+    Icon: Gauge,
+    short: () => "Metered",
+    inline: () => "Metered",
+    long: () => "Allocated by measured consumption",
+    tone: "info",
+  },
+  by_m2: {
+    Icon: Square,
+    short: (d) => (d.denominator ? `${d.denominator} m²` : "m²"),
+    inline: (d) => (d.denominator ? `÷ ${d.denominator} m²` : "by m²"),
+    long: (d) =>
+      `Distributed by surface area${
+        d.denominator ? ` across ${d.denominator} m²` : ""
+      }`,
+    tone: "neutral",
+  },
+  fixed_pct: {
+    Icon: Percent,
+    short: (d) => (d.pct != null ? `${Math.round(d.pct * 100)}` : "Fixed"),
+    inline: (d) => (d.pct != null ? `${Math.round(d.pct * 100)}%` : "Fixed %"),
+    long: () => "Negotiated fixed percentage",
+    tone: "neutral",
+  },
+  single: {
+    Icon: User,
+    short: () => "Direct",
+    inline: () => "Direct",
+    long: (d) => d.note || "Single recipient",
+    tone: "neutral",
+  },
+};
+
+/* Resolve a settlement's distribution config; returns null if absent (older
+ * data without a backfilled distribution still renders without error). */
+function resolveDistribution(node) {
+  if (!node?.distribution) return null;
+  const cfg = distributionConfig[node.distribution.method];
+  if (!cfg) return null;
+  return {
+    cfg,
+    short: cfg.short(node.distribution),
+    inline: cfg.inline(node.distribution),
+    long: cfg.long(node.distribution),
+    Icon: cfg.Icon,
+    tone: cfg.tone,
+  };
+}
+
+/* Quiet property line rendering the distribution method on a settlement
+ * card — Notion-property style, not a UI chip. No border, no background,
+ * subtle icon + text; sky tint for metered methods (the only category that
+ * carries operational meaning beyond audience pill). */
+function DistributionChip({ node }) {
+  const r = resolveDistribution(node);
+  if (!r) return null;
+  const Icon = r.Icon;
+  const tone = r.tone === "info" ? "text-sky-700" : "text-slate-500";
+  return (
+    <div
+      className={`flex items-center gap-1 text-[10px] leading-none ${tone} max-w-full`}
+      title={r.long}
+    >
+      <Icon size={9} strokeWidth={2} className="shrink-0 opacity-80" />
+      <span className="truncate">{r.short}</span>
+    </div>
+  );
+}
+
 const COLLAPSED_LANE_HEIGHT = 32;
 
-/* Compute lane geometry. activeLaneIds (optional Set) marks lanes that should
- * render at full height; everything else collapses to a thin strip. */
-function buildLaneLayout(flow, activeLaneIds = null) {
+/* Compute lane geometry. collapsedLaneIds (optional Set) marks lanes that
+ * should render as a thin strip; all other lanes are full height. */
+function buildLaneLayout(flow, collapsedLaneIds = null) {
   const layout = {};
   let y = 0;
   for (const lane of flow.lanes) {
@@ -121,7 +247,7 @@ function buildLaneLayout(flow, activeLaneIds = null) {
     const maxRow = nodes.reduce((m, n) => Math.max(m, n.row || 0), 0);
     const rowsCount = maxRow + 1;
     const isCollapsed =
-      activeLaneIds != null && !activeLaneIds.has(lane.id);
+      collapsedLaneIds != null && collapsedLaneIds.has(lane.id);
     const height = isCollapsed
       ? COLLAPSED_LANE_HEIGHT
       : LANE_TITLE_HEIGHT + LANE_PADDING_TOP + rowsCount * ROW_HEIGHT + LANE_PADDING_BOTTOM;
@@ -338,14 +464,15 @@ function Header({
 /* ──────────────────────────────────────────────────────────── */
 
 const AUDIENCE_KIND = {
-  complex:  { label: "Complex",   stripe: "bg-slate-700",  badge: "text-slate-700 bg-slate-100 border-slate-200" },
-  block:    { label: "Block",     stripe: "bg-slate-500",  badge: "text-slate-700 bg-slate-100 border-slate-200" },
-  adhoc:    { label: "Ad-hoc",    stripe: "bg-amber-500",  badge: "text-amber-800 bg-amber-50 border-amber-200" },
-  external: { label: "External",  stripe: "bg-slate-300",  badge: "text-slate-500 bg-slate-50 border-slate-200" },
+  complex:    { label: "Complex",    stripe: "bg-slate-700",  badge: "text-slate-700 bg-slate-100 border-slate-200" },
+  block:      { label: "Block",      stripe: "bg-slate-500",  badge: "text-slate-700 bg-slate-100 border-slate-200" },
+  commercial: { label: "BOG",        stripe: "bg-amber-500",  badge: "text-amber-800 bg-amber-50 border-amber-200" },
+  subgroup:   { label: "Subgroup",   stripe: "bg-slate-400",  badge: "text-slate-700 bg-slate-50 border-slate-200" },
+  external:   { label: "External",   stripe: "bg-slate-300",  badge: "text-slate-500 bg-slate-50 border-slate-200" },
 };
 
 function AudienceCard({ audience, isSelected, isHovered, onClick, onHoverEnter, onHoverLeave }) {
-  const cfg = AUDIENCE_KIND[audience.kind] || AUDIENCE_KIND.adhoc;
+  const cfg = AUDIENCE_KIND[audience.kind] || AUDIENCE_KIND.subgroup;
 
   return (
     <button
@@ -475,8 +602,9 @@ function laneTotalsTopline(lanes) {
     issueCount += s.issueCount;
     if (s.health !== "matched") issueLanes++;
     if (s.netDelta != null) {
-      if (s.netDelta > 0) collectTotal += s.netDelta;
-      else if (s.netDelta < 0) refundTotal += Math.abs(s.netDelta);
+      // delta = advance − actual: positive → refund, negative → collect.
+      if (s.netDelta > 0) refundTotal += s.netDelta;
+      else if (s.netDelta < 0) collectTotal += Math.abs(s.netDelta);
     }
   }
   return { totalExpected, issueCount, issueLanes, collectTotal, refundTotal };
@@ -687,7 +815,7 @@ function audienceStripeFor(node) {
   // Look up the sibling group to read its `kind`
   const flow = getCostFlow();
   const g = flow.siblingGroups?.find((x) => x.id === node.groupId);
-  const kind = g?.kind || "adhoc";
+  const kind = g?.kind || "subgroup";
   return AUDIENCE_KIND[kind]?.stripe || "bg-slate-300";
 }
 
@@ -809,7 +937,9 @@ function NodeCard({ node, overlay, isSelected, isHovered, dim, onSelect, onHover
     const stripe = SOURCE_STRIPES[node.utility] || SOURCE_STRIPES.default;
     const KindIcon = sourceKindIcon(node);
     const kindLabel = SOURCE_KIND[node.sourceKind]?.label || "Source";
-    const subtitle = sourceCanvasSubtitle(node);
+    // Canvas headlines the budgeted amount — actual lives in the inspector.
+    const headlineAmount = node.budgetedAmount != null ? node.budgetedAmount : node.amount;
+    const period = getCostFlow().period;
     return (
       <div {...containerProps} className={`${containerProps.className} flex items-stretch rounded-lg border border-slate-300 bg-white hover:shadow-sm`}>
         <span className={`w-1.5 rounded-l-lg ${stripe}`} aria-hidden />
@@ -829,19 +959,12 @@ function NodeCard({ node, overlay, isSelected, isHovered, dim, onSelect, onHover
             <div className="text-[12px] font-semibold text-slate-900 leading-tight truncate">
               {node.label}
             </div>
-            <div className="text-[11px] text-slate-500 leading-tight truncate">
-              {subtitle}
+            <div className="text-[10px] uppercase tracking-widest text-slate-400 font-medium leading-tight">
+              Budgeted {period || ""}
             </div>
           </div>
-          <div className="flex items-end justify-between">
-            <div className="text-[12px] font-semibold tabular-nums text-slate-800">
-              {fmtEur(node.amount)}
-            </div>
-            {overlay && node.anchors && node.anchors.length > 0 && (
-              <span className={`inline-flex items-center gap-0.5 text-[10px] ${anchorColor}`}>
-                <Link2 size={10} /> {node.anchors.length}
-              </span>
-            )}
+          <div className="text-[12px] font-semibold tabular-nums text-slate-800">
+            {fmtEur(headlineAmount)}
           </div>
         </div>
       </div>
@@ -856,18 +979,14 @@ function NodeCard({ node, overlay, isSelected, isHovered, dim, onSelect, onHover
     const sibling = flow.siblingGroups?.find((g) => g.id === node.groupId);
     const audienceName = sibling?.name || node.groupId;
     const audienceVhe = node.vheCount;
-    const audienceKind = sibling?.kind || "adhoc";
+    const audienceKind = sibling?.kind || "subgroup";
 
     // For the Complex audience the page header already names the building.
-    // The pill says just "Complex" + count to avoid redundancy. Block / ad-hoc
+    // The pill says just "Complex" + count to avoid redundancy. Other kinds
     // keep their (typically short) name.
     const pillLabel = audienceKind === "complex" ? "Complex" : audienceName;
-    const pillTone =
-      audienceKind === "complex"
-        ? "text-slate-700 bg-slate-100 border-slate-200"
-        : audienceKind === "block"
-        ? "text-slate-700 bg-slate-50 border-slate-200"
-        : "text-amber-800 bg-amber-50 border-amber-200";
+    const pillTone = AUDIENCE_KIND[audienceKind]?.badge
+      || "text-slate-700 bg-slate-50 border-slate-200";
 
     // External (out-of-scope) settlements use a calmer treatment
     if (node.outOfScope) {
@@ -907,12 +1026,14 @@ function NodeCard({ node, overlay, isSelected, isHovered, dim, onSelect, onHover
             </span>
           </div>
           <div className="min-w-0">
-            <div className="text-[12px] font-semibold text-slate-900 leading-tight truncate">
-              {node.label}
-            </div>
-            <div className="text-[11px] text-slate-500 leading-tight truncate">
-              Settles to {audienceName.toLowerCase()}
-            </div>
+            {node.serviceCode && (
+              <span
+                className="inline-flex items-center px-1.5 h-[16px] rounded text-[10px] font-mono text-slate-700 bg-slate-100 border border-slate-200"
+                title="Service code (links the advance paid to this settlement)"
+              >
+                {node.serviceCode}
+              </span>
+            )}
           </div>
           <div className="flex items-end justify-between gap-1.5">
             <div className="text-[12px] font-semibold tabular-nums text-slate-800">
@@ -922,13 +1043,13 @@ function NodeCard({ node, overlay, isSelected, isHovered, dim, onSelect, onHover
               <span
                 className={`inline-flex items-center gap-0.5 text-[11px] tabular-nums font-medium ${
                   node.delta > 0
-                    ? "text-amber-700"
-                    : node.delta < 0
                     ? "text-emerald-700"
+                    : node.delta < 0
+                    ? "text-amber-700"
                     : "text-slate-400"
                 }`}
               >
-                {node.delta > 0 ? <TrendingUp size={10} /> : node.delta < 0 ? <TrendingDown size={10} /> : null}
+                {node.delta > 0 ? <TrendingDown size={10} /> : node.delta < 0 ? <TrendingUp size={10} /> : null}
                 {fmtSignedEur(node.delta)}
               </span>
             )}
@@ -981,10 +1102,45 @@ function NodeCard({ node, overlay, isSelected, isHovered, dim, onSelect, onHover
     );
   }
 
-  /* ── Deduction / Addition (slim signed chips, sign carries the type) ── */
-  if (node.type === "deduction" || node.type === "addition") {
-    const isAdd = node.type === "addition";
+  /* ── Adjustment (slim signed chip — sign carried by amount). Replaces the
+   * old `addition` and `deduction` types: positive amount renders as Plus
+   * (green), negative as Minus (red). ── */
+  if (node.type === "adjustment") {
+    const isAdd = (node.amount || 0) >= 0;
     const SignIcon = isAdd ? Plus : Minus;
+
+    // For additions/deductions that bridge another lane, surface where the
+    // money came from / is going to. We compute this from the live flow
+    // since node.laneId only tells us the local side. For an addition,
+    // "From" is the cross-lane source; for a deduction, "To" is the
+    // cross-lane sink.
+    const flowForLanes = getCostFlow();
+    const myLaneId = node.laneId;
+    let crossLaneInfo = null;
+    if (isAdd) {
+      const sourceFromOtherLane = flowForLanes.edges
+        .map((e) => {
+          if (e.to !== node.id) return null;
+          const fromN = flowForLanes.nodes.find((n) => n.id === e.from);
+          if (!fromN || fromN.laneId === myLaneId) return null;
+          const lane = flowForLanes.lanes.find((l) => l.id === fromN.laneId);
+          return lane ? { lane, dir: "from" } : null;
+        })
+        .filter(Boolean)[0];
+      crossLaneInfo = sourceFromOtherLane;
+    } else {
+      const sinkToOtherLane = flowForLanes.edges
+        .map((e) => {
+          if (e.from !== node.id) return null;
+          const toN = flowForLanes.nodes.find((n) => n.id === e.to);
+          if (!toN || toN.laneId === myLaneId) return null;
+          const lane = flowForLanes.lanes.find((l) => l.id === toN.laneId);
+          return lane ? { lane, dir: "to" } : null;
+        })
+        .filter(Boolean)[0];
+      crossLaneInfo = sinkToOtherLane;
+    }
+
     return (
       <div {...containerProps} className={`${containerProps.className} flex items-center gap-2.5 rounded-lg border border-slate-200 bg-white hover:shadow-sm px-2.5`}>
         <span
@@ -993,7 +1149,7 @@ function NodeCard({ node, overlay, isSelected, isHovered, dim, onSelect, onHover
               ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
               : "bg-red-50 text-red-700 border border-red-200"
           }`}
-          title={isAdd ? "Addition" : "Deduction"}
+          title={isAdd ? "Adjustment (positive)" : "Adjustment (negative)"}
         >
           <SignIcon size={13} strokeWidth={2.5} />
         </span>
@@ -1001,11 +1157,23 @@ function NodeCard({ node, overlay, isSelected, isHovered, dim, onSelect, onHover
           <div className="text-[12px] text-slate-800 leading-tight truncate font-medium">
             {node.label}
           </div>
-          {node.subLabel && (
+          {crossLaneInfo ? (
+            <div className="text-[10px] text-slate-500 leading-tight truncate flex items-center gap-1">
+              {crossLaneInfo.dir === "from" ? (
+                <ArrowLeft size={9} className="text-slate-400 shrink-0" />
+              ) : (
+                <ChevronRight size={9} className="text-slate-400 shrink-0" />
+              )}
+              <span className="text-slate-400">
+                {crossLaneInfo.dir === "from" ? "From" : "To"}
+              </span>
+              <span className="truncate">{crossLaneInfo.lane.title}</span>
+            </div>
+          ) : node.subLabel ? (
             <div className="text-[11px] text-slate-500 leading-tight truncate">
               {node.subLabel}
             </div>
-          )}
+          ) : null}
         </div>
         <div className="shrink-0 text-[12px] font-semibold tabular-nums text-slate-800">
           {isAdd ? "+" : "−"}
@@ -1020,15 +1188,30 @@ function NodeCard({ node, overlay, isSelected, isHovered, dim, onSelect, onHover
     );
   }
 
-  /* ── Passthrough (slim inline marker carrying name + amount) ── */
-  if (node.type === "passthrough") {
+  /* ── Marker — checkpoint pill, not a stop. ──
+   * A marker applies no transformation; it's a labelled bead on the flow
+   * (running total, slice name, or cross-lane bridge marker). Renders as
+   * a small pill with a leading dot glyph so it reads as a label, not an
+   * operation. The arrowhead on incoming edges is suppressed elsewhere so
+   * the line passes through visually. */
+  if (node.type === "marker") {
     return (
-      <div {...containerProps} className={`${containerProps.className} flex items-center gap-2 rounded-md bg-slate-100/80 border border-slate-200 px-2.5 hover:bg-slate-100`}>
-        <ChevronRight size={11} className="text-slate-400 shrink-0" />
-        <div className="min-w-0 flex-1 text-[11px] text-slate-700 truncate" title={node.label}>
+      <div
+        {...containerProps}
+        className={`${containerProps.className} inline-flex items-center gap-1.5 px-2.5 rounded-full bg-white border border-slate-200 hover:border-slate-500 hover:shadow-sm transition-all`}
+        title={`${node.label} · ${fmtEur2(node.amount)}`}
+      >
+        <span
+          className="w-[7px] h-[7px] rounded-full bg-slate-400 shrink-0"
+          aria-hidden
+        />
+        <div
+          className="min-w-0 text-[10px] text-slate-600 truncate leading-none"
+        >
           {node.label}
         </div>
-        <div className="text-[11px] tabular-nums text-slate-800 font-medium shrink-0">
+        <span className="text-slate-300 text-[10px] leading-none shrink-0">·</span>
+        <div className="text-[10px] tabular-nums text-slate-800 font-medium shrink-0 leading-none">
           {fmtEur(node.amount)}
         </div>
       </div>
@@ -1049,24 +1232,32 @@ function Canvas({
   focusVisibility,
   showEdgeLabels,
   setSelectedLaneId,
+  foldedLaneIds,
+  toggleLaneFold,
   canvasRef,
   laneRefs,
   onBackgroundClick,
 }) {
-  // Lanes that contain at least one visible node when focusVisibility is set.
-  // When no focus is active, all lanes are active (full height).
-  const activeLaneIds = useMemo(() => {
-    if (!focusVisibility) return null;
-    const set = new Set();
-    for (const n of flow.nodes) {
-      if (focusVisibility.nodes.has(n.id)) set.add(n.laneId);
+  // A lane collapses if either:
+  //   • focus mode is active and this lane has no visible nodes in the focus subgraph, OR
+  //   • the user has manually folded it via the lane title bar.
+  const collapsedLaneIds = useMemo(() => {
+    const set = new Set(foldedLaneIds || []);
+    if (focusVisibility) {
+      const activeLanes = new Set();
+      for (const n of flow.nodes) {
+        if (focusVisibility.nodes.has(n.id)) activeLanes.add(n.laneId);
+      }
+      for (const lane of flow.lanes) {
+        if (!activeLanes.has(lane.id)) set.add(lane.id);
+      }
     }
-    return set;
-  }, [flow.nodes, focusVisibility]);
+    return set.size > 0 ? set : null;
+  }, [flow.lanes, flow.nodes, focusVisibility, foldedLaneIds]);
 
   const layout = useMemo(
-    () => buildLaneLayout(flow, activeLaneIds),
-    [flow, activeLaneIds]
+    () => buildLaneLayout(flow, collapsedLaneIds),
+    [flow, collapsedLaneIds]
   );
 
   // Decorate nodes with computed pixel positions and per-type size
@@ -1108,17 +1299,34 @@ function Canvas({
           const Icon = categoryIcon[lane.category] || FileText;
           const health = healthBadge[summary.health];
 
+          // Distinguish "user folded this lane" from "focus mode collapsed it":
+          // the click action is different in each case.
+          const isUserFolded = foldedLaneIds?.has(lane.id);
+
           if (l.isCollapsed) {
-            // Compact strip — click to switch focus to this lane
+            // Strip rendering. Click action depends on WHY it's collapsed.
+            const onStripClick = () => {
+              if (isUserFolded) toggleLaneFold?.(lane.id);   // unfold
+              else setSelectedLaneId?.(lane.id);             // switch focus
+            };
+            const stripTitle = isUserFolded
+              ? `Click to unfold ${lane.title}`
+              : `Switch focus to ${lane.title}`;
+            const stripIndicator = isUserFolded ? (
+              <ChevronRight size={10} className="text-slate-400 shrink-0" />
+            ) : (
+              <ChevronRight size={10} className="text-slate-400 shrink-0" />
+            );
             return (
               <button
                 key={lane.id}
                 ref={(el) => (laneRefs.current[lane.id] = el)}
-                onClick={() => setSelectedLaneId?.(lane.id)}
-                className="absolute left-0 right-0 px-4 flex items-center gap-2 bg-slate-50/60 border-b border-slate-200/60 hover:bg-slate-100/60 group text-left"
+                onClick={onStripClick}
+                className="absolute left-0 right-0 px-3 flex items-center gap-1.5 bg-slate-50/60 border-b border-slate-200/60 hover:bg-slate-100/60 group text-left"
                 style={{ top: l.y, height: l.height }}
-                title={`Switch focus to ${lane.title}`}
+                title={stripTitle}
               >
+                {stripIndicator}
                 <Icon size={11} strokeWidth={1.5} className="text-slate-400 shrink-0" />
                 <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500 shrink-0">
                   {lane.title}
@@ -1129,17 +1337,35 @@ function Canvas({
                   {summary.netDelta != null && Math.abs(summary.netDelta) > 1 && (
                     <span
                       className={`ml-2 ${
-                        summary.netDelta > 0 ? "text-amber-700" : "text-emerald-700"
+                        summary.netDelta > 0 ? "text-emerald-700" : "text-amber-700"
                       }`}
                     >
                       {fmtSignedEur(summary.netDelta)}
                     </span>
                   )}
-                  <span className="ml-2 text-slate-400 group-hover:text-slate-700">↗</span>
                 </span>
               </button>
             );
           }
+
+          // The lane title bar is clickable (folds the lane) only when a real
+          // toggleLaneFold function is supplied. In the L3 sheet we pass null
+          // to render a static label instead, since folding a single-lane
+          // focus view doesn't serve the user's intent.
+          const foldable = typeof toggleLaneFold === "function";
+          const HeaderEl = foldable ? "button" : "div";
+          const headerProps = foldable
+            ? {
+                type: "button",
+                onClick: () => toggleLaneFold(lane.id),
+                title: "Click to fold this lane",
+                className:
+                  "absolute left-0 right-0 top-0 h-8 px-3 flex items-center gap-2 border-b border-dashed border-slate-200 hover:bg-slate-100/40 transition-colors text-left",
+              }
+            : {
+                className:
+                  "absolute left-0 right-0 top-0 h-8 px-3 flex items-center gap-2 border-b border-dashed border-slate-200",
+              };
 
           return (
             <div
@@ -1148,8 +1374,10 @@ function Canvas({
               className={`absolute left-0 right-0 ${i % 2 === 0 ? "bg-white/60" : "bg-slate-50/40"}`}
               style={{ top: l.y, height: l.height }}
             >
-              {/* Lane title — primary navigation surface now that the rail is gone */}
-              <div className="absolute left-0 right-0 top-0 h-8 px-4 flex items-center gap-2 border-b border-dashed border-slate-200">
+              <HeaderEl {...headerProps}>
+                {foldable && (
+                  <ChevronDown size={11} strokeWidth={2} className="text-slate-400 shrink-0" />
+                )}
                 <Icon size={12} strokeWidth={1.5} className="text-slate-400 shrink-0" />
                 <span className="text-[11px] font-semibold uppercase tracking-widest text-slate-500 shrink-0">
                   {lane.title}
@@ -1167,7 +1395,7 @@ function Canvas({
                   {summary.netDelta != null && Math.abs(summary.netDelta) > 1 && (
                     <span
                       className={`text-[10px] tabular-nums font-medium ${
-                        summary.netDelta > 0 ? "text-amber-700" : "text-emerald-700"
+                        summary.netDelta > 0 ? "text-emerald-700" : "text-amber-700"
                       }`}
                     >
                       {fmtSignedEur(summary.netDelta)}
@@ -1184,7 +1412,7 @@ function Canvas({
                     </span>
                   )}
                 </span>
-              </div>
+              </HeaderEl>
             </div>
           );
         })}
@@ -1226,6 +1454,16 @@ function Canvas({
             const visible = !focusVisibility || focusVisibility.edges.has(idx);
             if (!visible) return null;
 
+            // Hide edges that touch a collapsed lane on either end —
+            // otherwise they "float" between/across folded strips.
+            if (
+              collapsedLaneIds &&
+              (collapsedLaneIds.has(fromNode.laneId) ||
+                collapsedLaneIds.has(toNode.laneId))
+            ) {
+              return null;
+            }
+
             const isHoverHighlighted = hoverSet ? hoverSet.edges.has(idx) : false;
             const isHoverDimmed = !!hoverSet && !isHoverHighlighted;
 
@@ -1251,6 +1489,12 @@ function Canvas({
             const stroke = isHoverHighlighted ? "#1E293B" : "#CBD5E1";
             const opacity = isHoverDimmed ? 0.25 : 1;
 
+            // Arrowhead suppressed when the destination is a passthrough —
+            // a passthrough is a marker on the flow, not a stop. The line
+            // continues through it; the arrowhead lands at the eventual
+            // real destination.
+            const showArrowhead = toNode.type !== "marker";
+
             return (
               <g key={idx} opacity={opacity}>
                 {/* Visible path */}
@@ -1259,7 +1503,13 @@ function Canvas({
                   stroke={stroke}
                   strokeWidth={isHoverHighlighted ? "2" : "1.5"}
                   fill="none"
-                  markerEnd={isHoverHighlighted ? "url(#arrowhead-strong)" : "url(#arrowhead)"}
+                  markerEnd={
+                    !showArrowhead
+                      ? undefined
+                      : isHoverHighlighted
+                      ? "url(#arrowhead-strong)"
+                      : "url(#arrowhead)"
+                  }
                 />
                 {/* Wider invisible hit area for hover/click */}
                 <path
@@ -1276,30 +1526,37 @@ function Canvas({
                     {edge.edgeLabel ? `${edge.edgeLabel} · ` : ""}{fmtEur2(edge.amount)}
                   </title>
                 </path>
-                {labelVisible && (
-                  <g style={{ pointerEvents: "none" }}>
-                    <rect
-                      x={labelX - 18}
-                      y={labelY - 8}
-                      width="36"
-                      height="16"
-                      rx="3"
-                      fill="white"
-                      stroke={isHoverHighlighted ? "#1E293B" : "#E2E8F0"}
-                      strokeWidth="1"
-                    />
-                    <text
-                      x={labelX}
-                      y={labelY + 3}
-                      textAnchor="middle"
-                      fontSize="10"
-                      fill={isHoverHighlighted ? "#1E293B" : "#64748B"}
-                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: isHoverHighlighted ? 600 : 400 }}
-                    >
-                      {edge.edgeLabel}
-                    </text>
-                  </g>
-                )}
+                {labelVisible && (() => {
+                  // Auto-size the rect to fit the text (was hardcoded to 36px,
+                  // which clipped longer labels like "Maslow 7/12"). 6.4 px/char
+                  // at 10 px Plus Jakarta Sans + 12 px horizontal padding.
+                  const text = edge.edgeLabel || "";
+                  const labelW = Math.max(36, text.length * 6.4 + 12);
+                  return (
+                    <g style={{ pointerEvents: "none" }}>
+                      <rect
+                        x={labelX - labelW / 2}
+                        y={labelY - 8}
+                        width={labelW}
+                        height="16"
+                        rx="3"
+                        fill="white"
+                        stroke={isHoverHighlighted ? "#1E293B" : "#E2E8F0"}
+                        strokeWidth="1"
+                      />
+                      <text
+                        x={labelX}
+                        y={labelY + 3}
+                        textAnchor="middle"
+                        fontSize="10"
+                        fill={isHoverHighlighted ? "#1E293B" : "#64748B"}
+                        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: isHoverHighlighted ? 600 : 400 }}
+                      >
+                        {text}
+                      </text>
+                    </g>
+                  );
+                })()}
               </g>
             );
           })}
@@ -1309,6 +1566,8 @@ function Canvas({
         {positionedNodes.map((node) => {
           const visible = !focusVisibility || focusVisibility.nodes.has(node.id);
           if (!visible) return null;
+          // Don't render nodes whose lane is collapsed to a strip.
+          if (collapsedLaneIds && collapsedLaneIds.has(node.laneId)) return null;
           const isInHover = hoverSet ? hoverSet.nodes.has(node.id) : false;
           const dim = !!hoverSet && !isInHover;
           return (
@@ -1325,8 +1584,302 @@ function Canvas({
             />
           );
         })}
+
+        {/* Distribution-method chips — HTML overlay positioned at the bezier
+         * midpoint of the settlement's primary incoming edge. Centred on the
+         * arrow's length (translateX(-50%)) and dropped 14 px below the line
+         * so it doesn't collide with edge labels (e.g. "Maslow 7/12"), reads
+         * as a label hanging from the arrow midline. */}
+        {positionedNodes.map((node) => {
+          if (node.type !== "settlement" || node.outOfScope) return null;
+          if (collapsedLaneIds && collapsedLaneIds.has(node.laneId)) return null;
+          if (focusVisibility && !focusVisibility.nodes.has(node.id)) return null;
+          const r = resolveDistribution(node);
+          if (!r) return null;
+
+          // Find the primary incoming edge (largest amount) — chip describes
+          // the destination's distribution, but we centre it on whichever
+          // arrow visually carries the most cost into this settlement.
+          let primary = null;
+          for (const e of flow.edges) {
+            if (e.to !== node.id) continue;
+            if (!primary || (e.amount || 0) > (primary.amount || 0)) primary = e;
+          }
+          if (!primary) return null;
+          const fromNode = nodeById[primary.from];
+          if (!fromNode) return null;
+          // If either end is hidden by focus, hide the chip too.
+          if (focusVisibility && !focusVisibility.nodes.has(fromNode.id)) return null;
+
+          const x1 = fromNode._x + fromNode._w;
+          const y1 = fromNode._y + fromNode._h / 2;
+          const x2 = node._x;
+          const y2 = node._y + node._h / 2;
+          const midX = (x1 + x2) / 2;
+          const midY = (y1 + y2) / 2;
+
+          const isInfo = r.tone === "info";
+          const tone = isInfo
+            ? "text-sky-700 bg-sky-50 border-sky-200"
+            : "text-slate-700 bg-white border-slate-200";
+          const isInHover = hoverSet ? hoverSet.nodes.has(node.id) : false;
+          const dim = !!hoverSet && !isInHover;
+          return (
+            <div
+              key={`dist-${node.id}`}
+              className="absolute pointer-events-none"
+              style={{
+                left: midX,
+                top: midY + 14,
+                transform: "translateX(-50%)",
+                opacity: dim ? 0.4 : 1,
+                transition: "opacity 120ms",
+              }}
+              title={r.long}
+            >
+              <span
+                className={`inline-flex items-center px-2 h-[18px] rounded text-[10px] font-medium border whitespace-nowrap ${tone}`}
+              >
+                {r.inline}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
+  );
+}
+
+/* ──────────────────────────────────────────────────────────── */
+/* LaneDetailSheet — L3 right-anchored slide-out                 */
+/* ──────────────────────────────────────────────────────────── */
+/* Renders the full canvas detail for a single lane (plus any cross-lane
+ * neighbours via getSingleLaneFlow) inside an overlay sheet. Click the
+ * backdrop or press ESC to dismiss. Self-contained inspector state. */
+function LaneDetailSheet({ laneId, onClose, onJumpToLane, onJumpToMeters }) {
+  const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [hoveredNodeId, setHoveredNodeId] = useState(null);
+  const [overlay, setOverlay] = useState(false);
+  const [showEdgeLabels, setShowEdgeLabels] = useState(false);
+
+  // Switching lanes: clear stale node selection from the previous lane.
+  useEffect(() => {
+    setSelectedNodeId(null);
+    setHoveredNodeId(null);
+  }, [laneId]);
+
+  const flow = useMemo(() => getSingleLaneFlow(laneId), [laneId]);
+  const lane = flow?.lanes.find((l) => l.id === laneId);
+  const summary = lane ? summariseLane(laneId) : null;
+  const Icon = lane ? (categoryIcon[lane.category] || FileText) : FileText;
+
+  const hoverHighlight = useMemo(() => {
+    if (hoveredNodeId) return getConnectedSubgraph(hoveredNodeId);
+    return null;
+  }, [hoveredNodeId]);
+
+  const canvasRef = useRef(null);
+  const laneRefs = useRef({});
+
+  // ESC: nested unwind — clear hover, then selection, then close sheet
+  useEffect(() => {
+    function onKey(e) {
+      if (e.key === "Escape") {
+        if (hoveredNodeId) setHoveredNodeId(null);
+        else if (selectedNodeId) setSelectedNodeId(null);
+        else onClose?.();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [hoveredNodeId, selectedNodeId, onClose]);
+
+  if (!flow || !lane) return null;
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 bg-slate-900/35 z-40"
+        onClick={onClose}
+      />
+
+      {/* Sheet */}
+      <div
+        className="fixed inset-y-0 right-0 z-50 bg-white shadow-2xl flex flex-col overflow-hidden"
+        style={{ width: "min(92%, 1400px)" }}
+      >
+        {/* Sheet header */}
+        <div className="flex items-start gap-3 px-5 py-3.5 border-b border-slate-200 shrink-0 bg-white">
+          <div className="w-9 h-9 rounded-md border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-500 shrink-0">
+            <Icon size={16} strokeWidth={1.5} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
+              Lane detail
+            </div>
+            <div className="text-[14px] font-semibold text-slate-900 leading-tight truncate">
+              {lane.title}
+            </div>
+            <div className="text-[11px] text-slate-500 mt-0.5 capitalize">
+              {lane.category} · {lane.complexity || "simple"} flow
+              <span className="text-slate-400 ml-2">
+                {fmtEur(summary.expected)} expected · {fmtEur(summary.settled)} settled
+              </span>
+              {summary.issueCount > 0 && (
+                <span className="ml-2 text-amber-700 normal-case">
+                  · {summary.issueCount} flag{summary.issueCount === 1 ? "" : "s"}
+                </span>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 shrink-0"
+            title="Close (Esc)"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        {/* Sheet body */}
+        <div className="flex flex-1 min-h-0">
+          <Canvas
+            flow={flow}
+            selectedNodeId={selectedNodeId}
+            setSelectedNodeId={setSelectedNodeId}
+            overlay={overlay}
+            hoveredNodeId={hoveredNodeId}
+            setHoveredNodeId={setHoveredNodeId}
+            hoverHighlight={hoverHighlight}
+            focusVisibility={null}
+            showEdgeLabels={showEdgeLabels}
+            setSelectedLaneId={() => {}}
+            foldedLaneIds={null}
+            toggleLaneFold={null}
+            canvasRef={canvasRef}
+            laneRefs={laneRefs}
+            onBackgroundClick={() => setSelectedNodeId(null)}
+          />
+          {selectedNodeId ? (
+            <Inspector
+              nodeId={selectedNodeId}
+              onClose={() => setSelectedNodeId(null)}
+              onJumpToMeters={onJumpToMeters}
+              onJumpToLane={onJumpToLane}
+              currentLaneId={laneId}
+            />
+          ) : null}
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ──────────────────────────────────────────────────────────── */
+/* FullCanvasSheet — all lanes on one screen (overlay variant)   */
+/* ──────────────────────────────────────────────────────────── */
+/* Same shape as LaneDetailSheet but renders the full multi-lane Canvas
+ * unfiltered. For users who want to see the entire complex's flow at once
+ * rather than drilling lane-by-lane. Lane folding is enabled here (multi-lane
+ * makes it useful) and inspector cross-lane links work because the full graph
+ * is visible. */
+function FullCanvasSheet({ onClose, onJumpToMeters }) {
+  const flow = getCostFlow();
+  const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [hoveredNodeId, setHoveredNodeId] = useState(null);
+  const [overlay, setOverlay] = useState(false);
+  const [showEdgeLabels, setShowEdgeLabels] = useState(false);
+  const [foldedLaneIds, setFoldedLaneIds] = useState(() => new Set());
+
+  function toggleLaneFold(laneId) {
+    setFoldedLaneIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(laneId)) next.delete(laneId);
+      else next.add(laneId);
+      return next;
+    });
+  }
+
+  const hoverHighlight = useMemo(() => {
+    if (hoveredNodeId) return getConnectedSubgraph(hoveredNodeId);
+    return null;
+  }, [hoveredNodeId]);
+
+  const canvasRef = useRef(null);
+  const laneRefs = useRef({});
+
+  useEffect(() => {
+    function onKey(e) {
+      if (e.key === "Escape") {
+        if (hoveredNodeId) setHoveredNodeId(null);
+        else if (selectedNodeId) setSelectedNodeId(null);
+        else onClose?.();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [hoveredNodeId, selectedNodeId, onClose]);
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-slate-900/35 z-40" onClick={onClose} />
+      <div
+        className="fixed inset-y-0 right-0 z-50 bg-white shadow-2xl flex flex-col overflow-hidden"
+        style={{ width: "min(96%, 1700px)" }}
+      >
+        <div className="flex items-start gap-3 px-5 py-3.5 border-b border-slate-200 shrink-0 bg-white">
+          <div className="w-9 h-9 rounded-md border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-500 shrink-0">
+            <Layers size={16} strokeWidth={1.5} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
+              Full canvas
+            </div>
+            <div className="text-[14px] font-semibold text-slate-900 leading-tight truncate">
+              {flow.group?.name || "All lanes"}
+            </div>
+            <div className="text-[11px] text-slate-500 mt-0.5">
+              {flow.lanes.length} lane{flow.lanes.length === 1 ? "" : "s"} · period {flow.period}
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 shrink-0"
+            title="Close (Esc)"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="flex flex-1 min-h-0">
+          <Canvas
+            flow={flow}
+            selectedNodeId={selectedNodeId}
+            setSelectedNodeId={setSelectedNodeId}
+            overlay={overlay}
+            hoveredNodeId={hoveredNodeId}
+            setHoveredNodeId={setHoveredNodeId}
+            hoverHighlight={hoverHighlight}
+            focusVisibility={null}
+            showEdgeLabels={showEdgeLabels}
+            setSelectedLaneId={() => {}}
+            foldedLaneIds={foldedLaneIds}
+            toggleLaneFold={toggleLaneFold}
+            canvasRef={canvasRef}
+            laneRefs={laneRefs}
+            onBackgroundClick={() => setSelectedNodeId(null)}
+          />
+          {selectedNodeId ? (
+            <Inspector
+              nodeId={selectedNodeId}
+              onClose={() => setSelectedNodeId(null)}
+              onJumpToMeters={onJumpToMeters}
+            />
+          ) : null}
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -1357,7 +1910,7 @@ function LaneOverview({ flow, laneId, onClose, onPickNode }) {
   const sources = nodes.filter((n) => n.type === "source");
   const settlements = nodes.filter((n) => n.type === "settlement");
   const splits = nodes.filter((n) => n.type === "split");
-  const adjustments = nodes.filter((n) => n.type === "deduction" || n.type === "addition");
+  const adjustments = nodes.filter((n) => n.type === "adjustment");
   const serviceCodes = getLaneServiceCodes(laneId);
   const Icon = categoryIcon[lane.category] || FileText;
   const health = healthBadge[summary.health];
@@ -1488,7 +2041,7 @@ function LaneOverview({ flow, laneId, onClose, onPickNode }) {
           </div>
           <ul className="space-y-1">
             {nodes.map((n) => {
-              const TIcon = typeIcon[n.type] || CircleDot;
+              const TIcon = getTypeIcon(n);
               return (
                 <li key={n.id}>
                   <button
@@ -1498,10 +2051,10 @@ function LaneOverview({ flow, laneId, onClose, onPickNode }) {
                     <TIcon size={11} className="text-slate-400 shrink-0" />
                     <span className="text-slate-700 truncate flex-1">{n.label}</span>
                     <span className="text-slate-500 tabular-nums shrink-0">
-                      {n.type === "deduction"
-                        ? `−${fmtEur(Math.abs(n.amount))}`
-                        : n.type === "addition"
-                        ? `+${fmtEur(n.amount)}`
+                      {n.type === "adjustment"
+                        ? (n.amount || 0) >= 0
+                          ? `+${fmtEur(n.amount)}`
+                          : `−${fmtEur(Math.abs(n.amount))}`
                         : fmtEur(n.amount)}
                     </span>
                   </button>
@@ -1584,13 +2137,16 @@ function HelpPanel({ onClose }) {
               How a cost gets divided. The dashed card shows the rule itself —
               "80%/20%", "96/108", or a per-meter measurement.
             </Item>
-            <Item Icon={Minus} label="Deduction">
-              Subtracts from the flow. Usually a manual carve-out the bookkeeping
-              doesn't see (e.g. private commercial use of common electricity).
+            <Item Icon={Plus} label="Adjustment">
+              Modifies the flow up (positive amount, green Plus) or down
+              (negative amount, red Minus). Used for refunds, transfers in
+              from another lane, late-booked invoices, or carve-outs the
+              bookkeeping doesn't see.
             </Item>
-            <Item Icon={Plus} label="Addition">
-              Adds to the flow. Usually a related cost booked on a different
-              ledger account that conceptually belongs here.
+            <Item Icon={CircleDot} label="Marker">
+              A labelled checkpoint on the flow — running total, slice name,
+              or cross-lane bridge. No transformation; just an annotation so
+              you can read what's flowing where.
             </Item>
             <Item Icon={Users} label="Settlement target">
               Where money lands. Each one is a <em>(Service × Audience × Period)</em>
@@ -1664,13 +2220,19 @@ function HelpPanel({ onClose }) {
   );
 }
 
-function Inspector({ nodeId, onClose, onJumpToMeters }) {
+function Inspector({ nodeId, onClose, onJumpToMeters, onJumpToLane, currentLaneId = null }) {
   if (!nodeId) return null;
   const node = getNodeById(nodeId);
   if (!node) return null;
 
   const { incoming, outgoing } = getEdgesForNode(nodeId);
   const isSource = node.type === "source";
+  // Cross-lane neighbours — only meaningful when we have a sheet context with
+  // a focal lane to navigate FROM. Without `currentLaneId`/`onJumpToLane` the
+  // section is suppressed.
+  const crossLane =
+    currentLaneId && onJumpToLane ? getCrossLaneNeighbors(nodeId) : { incoming: [], outgoing: [] };
+  const hasCrossLane = crossLane.incoming.length > 0 || crossLane.outgoing.length > 0;
 
   return (
     <aside className="w-[380px] shrink-0 border-l border-slate-200 bg-white overflow-y-auto">
@@ -1696,18 +2258,100 @@ function Inspector({ nodeId, onClose, onJumpToMeters }) {
       </div>
 
       <div className="p-4 space-y-4">
-        {/* Amount panel */}
+        {/* Cross-lane connections — surfaced near the top because they're
+         * navigation, not detail. Click swaps the sheet to the other lane. */}
+        {hasCrossLane && (
+          <div className="rounded-lg border border-slate-200 p-3">
+            <div className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-2">
+              Connected to other lanes
+            </div>
+            <ul className="space-y-1">
+              {crossLane.incoming.map((c) => (
+                <li key={`in-${c.lane.id}`}>
+                  <button
+                    onClick={() => onJumpToLane?.(c.lane.id)}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-slate-50 text-left text-[11px]"
+                    title={`Jump to ${c.lane.title}`}
+                  >
+                    <ArrowLeft size={11} className="text-slate-400 shrink-0" />
+                    <span className="text-slate-500 shrink-0">From</span>
+                    <span className="font-medium text-slate-800 truncate flex-1">
+                      {c.lane.title}
+                    </span>
+                    <span className="tabular-nums text-slate-600 shrink-0">
+                      {fmtEur(c.amount)}
+                    </span>
+                    <ChevronRight size={11} className="text-slate-400 shrink-0" />
+                  </button>
+                </li>
+              ))}
+              {crossLane.outgoing.map((c) => (
+                <li key={`out-${c.lane.id}`}>
+                  <button
+                    onClick={() => onJumpToLane?.(c.lane.id)}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-slate-50 text-left text-[11px]"
+                    title={`Jump to ${c.lane.title}`}
+                  >
+                    <ChevronRight size={11} className="text-slate-400 shrink-0 rotate-180 invisible" />
+                    <span className="text-slate-500 shrink-0">To</span>
+                    <span className="font-medium text-slate-800 truncate flex-1">
+                      {c.lane.title}
+                    </span>
+                    <span className="tabular-nums text-slate-600 shrink-0">
+                      {fmtEur(c.amount)}
+                    </span>
+                    <ChevronRight size={11} className="text-slate-400 shrink-0" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Amount panel. Sources headline budgeted (matches canvas) and show
+         * actual + variance subtly underneath. Other types show their amount
+         * straight (sign-aware for adjustments). */}
         <div className="rounded-lg border border-slate-200 p-3">
-          <div className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">
-            Conceptual amount
-          </div>
-          <div className="text-2xl font-semibold text-slate-900 tabular-nums">
-            {node.type === "deduction"
-              ? `−${fmtEur2(Math.abs(node.amount))}`
-              : node.type === "addition"
-              ? `+${fmtEur2(node.amount)}`
-              : fmtEur2(node.amount)}
-          </div>
+          {node.type === "source" && node.budgetedAmount != null ? (
+            <>
+              <div className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">
+                Budgeted {getCostFlow().period || ""}
+              </div>
+              <div className="text-2xl font-semibold text-slate-900 tabular-nums">
+                {fmtEur2(node.budgetedAmount)}
+              </div>
+              {node.amount != null && (() => {
+                const v = node.amount - node.budgetedAmount;
+                const vPct = node.budgetedAmount !== 0 ? (v / node.budgetedAmount) * 100 : 0;
+                const over = v > 0.5;
+                const under = v < -0.5;
+                return (
+                  <div className="mt-1.5 flex items-baseline gap-2 text-[11px]">
+                    <span className="text-slate-500">Actual</span>
+                    <span className="text-slate-700 tabular-nums">{fmtEur2(node.amount)}</span>
+                    {(over || under) && (
+                      <span className={over ? "text-amber-700" : "text-emerald-700"}>
+                        {over ? "+" : ""}{vPct.toFixed(1)}% {over ? "over" : "under"}
+                      </span>
+                    )}
+                  </div>
+                );
+              })()}
+            </>
+          ) : (
+            <>
+              <div className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">
+                Conceptual amount
+              </div>
+              <div className="text-2xl font-semibold text-slate-900 tabular-nums">
+                {node.type === "adjustment"
+                  ? (node.amount || 0) >= 0
+                    ? `+${fmtEur2(node.amount)}`
+                    : `−${fmtEur2(Math.abs(node.amount))}`
+                  : fmtEur2(node.amount)}
+              </div>
+            </>
+          )}
           {node.consumptionUnit && (
             <div className="text-[11px] text-slate-500 mt-1">
               {node.expectedConsumption?.toLocaleString("nl-NL")} {node.consumptionUnit} from metering
@@ -1728,7 +2372,7 @@ function Inspector({ nodeId, onClose, onJumpToMeters }) {
           <SplitInspectorBody node={node} outgoing={outgoing} />
         )}
 
-        {(node.type === "deduction" || node.type === "addition") && (
+        {node.type === "adjustment" && (
           <AdjustmentInspectorBody node={node} />
         )}
 
@@ -1736,35 +2380,11 @@ function Inspector({ nodeId, onClose, onJumpToMeters }) {
           <SettlementInspectorBody node={node} />
         )}
 
-        {/* Universal Bookkeeping anchors / Flags / Connections — sources own these
-         * via NeedsAttentionPanel + BookkeepingPanel + FlowConnectionsPanel,
-         * so suppress for source nodes to avoid duplication. */}
-        {!isSource && node.anchors && node.anchors.length > 0 && (
-          <div className="rounded-lg border border-slate-200 p-3">
-            <div className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-2">
-              Bookkeeping anchors
-            </div>
-            <ul className="space-y-2">
-              {node.anchors.map((anchor, idx) => (
-                <li key={idx} className="text-[11px]">
-                  <div className="flex items-start justify-between gap-2 mb-0.5">
-                    <code className="text-[10px] text-slate-700 font-mono break-all">
-                      {anchor.ledgerAccount}
-                    </code>
-                    <StatusPill status={anchor.status} />
-                  </div>
-                  <div className="text-slate-600 tabular-nums">{fmtEur2(anchor.amount)}</div>
-                  {anchor.note && (
-                    <div className="text-[10px] text-slate-500 italic mt-0.5">{anchor.note}</div>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Flags */}
-        {!isSource && node.flags && node.flags.length > 0 && (
+        {/* Flags — universal but only for adjustment + marker since source
+         * surfaces them via NeedsAttentionPanel and settlement folds them into
+         * MoreDetails. The canvas + per-type body cover the rest. */}
+        {(node.type === "adjustment" || node.type === "marker") &&
+          node.flags && node.flags.length > 0 && (
           <div className="rounded-lg border border-slate-200 p-3">
             <div className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-2">
               Reconciliation flags
@@ -1782,43 +2402,6 @@ function Inspector({ nodeId, onClose, onJumpToMeters }) {
                 </li>
               ))}
             </ul>
-          </div>
-        )}
-
-        {/* Connections (debug-y, but useful for the wireframe) */}
-        {!isSource && (incoming.length > 0 || outgoing.length > 0) && (
-          <div className="rounded-lg border border-slate-200 p-3">
-            <div className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-2">
-              Connected nodes
-            </div>
-            {incoming.length > 0 && (
-              <div className="mb-2">
-                <div className="text-[10px] text-slate-500 mb-1">Inputs</div>
-                {incoming.map((e, i) => {
-                  const n = getNodeById(e.from);
-                  return (
-                    <div key={i} className="text-[11px] text-slate-700 flex items-center justify-between">
-                      <span className="truncate">{n?.label}</span>
-                      <span className="tabular-nums text-slate-500">{fmtEur(e.amount)}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-            {outgoing.length > 0 && (
-              <div>
-                <div className="text-[10px] text-slate-500 mb-1">Outputs</div>
-                {outgoing.map((e, i) => {
-                  const n = getNodeById(e.to);
-                  return (
-                    <div key={i} className="text-[11px] text-slate-700 flex items-center justify-between">
-                      <span className="truncate">{n?.label}</span>
-                      <span className="tabular-nums text-slate-500">{fmtEur(e.amount)}{e.edgeLabel ? ` · ${e.edgeLabel}` : ""}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
           </div>
         )}
       </div>
@@ -2413,15 +2996,56 @@ function FlowConnectionsPanel({ node, edges }) {
   );
 }
 
+/* ─── MoreDetails — Notion-style collapsible disclosure ──────
+ * Wraps audit/secondary content so the inspector defaults to a calm
+ * always-visible top-of-fold. Click the header to expand. */
+function MoreDetails({ children, label = "More details", defaultOpen = false }) {
+  const [open, setOpen] = useState(defaultOpen);
+  // Don't render the toggle if there's no content — children may all be null.
+  const hasContent = React.Children.toArray(children).some(Boolean);
+  if (!hasContent) return null;
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-slate-50 rounded-lg"
+      >
+        <span className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">
+          {label}
+        </span>
+        <ChevronDown
+          size={12}
+          className={`text-slate-400 transition-transform ${open ? "" : "-rotate-90"}`}
+        />
+      </button>
+      {open && <div className="px-1 pb-1 space-y-3">{children}</div>}
+    </div>
+  );
+}
+
 function SourceInspectorBody({ node, edges, onJumpToMeters }) {
+  // Always-visible: anything actionable + suppliers (the "where did the money
+  // come from" answer). Everything audit-flavoured collapses into More details.
+  const supplierItems = node.supplierBreakdown && node.supplierBreakdown.length > 0
+    ? node.supplierBreakdown
+    : node.supplier && node.supplier !== "Internal" && node.amount != null
+    ? [{ name: node.supplier, amount: node.amount, status: "matched" }]
+    : null;
+
   return (
     <>
       <NeedsAttentionPanel node={node} />
-      <SourceDetailsPanel node={node} onJumpToMeters={onJumpToMeters} />
-      {node.supplier === "multi" && <SupplierBreakdown items={node.supplierBreakdown} />}
-      <BookkeepingPanel node={node} />
-      <YoyTrend yoy={node.yoyComparison} />
-      <FlowConnectionsPanel node={node} edges={edges} />
+      {supplierItems && <SupplierBreakdown items={supplierItems} />}
+      <MoreDetails label="More details">
+        <SourceDetailsPanel node={node} onJumpToMeters={onJumpToMeters} />
+        {node.anchors && node.anchors.length > 0 && (
+          <BookkeepingPanel node={node} />
+        )}
+        {node.yoyComparison && node.yoyComparison.length > 1 && (
+          <YoyTrend yoy={node.yoyComparison} />
+        )}
+      </MoreDetails>
     </>
   );
 }
@@ -2462,25 +3086,28 @@ function SplitInspectorBody({ node, outgoing }) {
 }
 
 function AdjustmentInspectorBody({ node }) {
+  const isAdd = (node.amount || 0) >= 0;
   return (
     <div className="rounded-lg border border-slate-200 p-3">
       <div className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-1">
-        {node.type === "deduction" ? "Deduction" : "Addition"}
+        Adjustment {isAdd ? "(positive)" : "(negative)"}
       </div>
       <p className="text-[11px] text-slate-600">
-        {node.type === "deduction"
-          ? "Reduces the cost flowing through this node. Often an Excel-only adjustment that doesn't (yet) have a corresponding ledger entry."
-          : "Adds cost from a separate source — typically a related ledger account that should be folded into this lane."}
+        {isAdd
+          ? "Adds cost into the flow — typically a transfer in from another lane, or a related ledger account folded back here."
+          : "Subtracts from the flow — a refund, transfer out to another lane, or a manual carve-out the bookkeeping doesn't see."}
       </p>
     </div>
   );
 }
 
-/* Settlement direction → "collect", "refund", or "balanced" */
+/* Settlement direction. delta = advance − actual:
+ *   delta > 0 → tenant overpaid → REFUND (back to tenant)
+ *   delta < 0 → tenant underpaid → COLLECT (claim from tenant) */
 function settlementDirection(delta) {
   if (delta == null) return null;
-  if (delta > 1) return "collect";
-  if (delta < -1) return "refund";
+  if (delta > 1) return "refund";
+  if (delta < -1) return "collect";
   return "balanced";
 }
 
@@ -2810,44 +3437,74 @@ function SettlementInspectorBody({ node }) {
         </div>
       </div>
 
-      {/* Identity facts */}
+      {/* Audience — compact identity facts. Service code lives on the canvas
+       * card now, so we don't repeat it here. */}
       <div className="rounded-lg border border-slate-200 p-3">
         <div className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-2">
-          Settlement
+          Audience
         </div>
         <div className="space-y-1.5 text-[11px]">
           <div className="flex justify-between">
-            <span className="text-slate-500">Audience</span>
+            <span className="text-slate-500">Who pays</span>
             <span className="text-slate-800">{node.subLabel}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-slate-500">Service code</span>
-            <span className="text-slate-800 font-mono text-[10px]">{node.serviceCode}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-slate-500">VHE count</span>
             <span className="text-slate-800">{node.vheCount}</span>
           </div>
-          {node.regulation && (
-            <div className="flex justify-between">
-              <span className="text-slate-500">Regulation</span>
-              <span className="text-slate-800 text-[10px]">{node.regulation}</span>
-            </div>
-          )}
-          {node.audienceNote && (
-            <div className="mt-2 text-[10px] text-slate-500 italic">{node.audienceNote}</div>
-          )}
         </div>
       </div>
 
-      <SettlementYoy yoy={node.yoyComparison} />
-      <NewAdvancePanel rec={node.newAdvanceRecommendation} vheCount={node.vheCount} />
-      <AudienceComposition composition={node.audienceComposition} />
-      <SiblingSettlements node={node} />
+      {node.newAdvanceRecommendation && (
+        <NewAdvancePanel rec={node.newAdvanceRecommendation} vheCount={node.vheCount} />
+      )}
 
-      <button className="w-full h-8 rounded-md border border-slate-300 bg-slate-100 text-[11px] text-slate-700 hover:bg-slate-200 inline-flex items-center justify-center gap-1.5">
-        Open settlement workflow <ChevronRight size={12} />
-      </button>
+      {/* Audit-flavoured detail collapsed by default. */}
+      <MoreDetails label="More details">
+        {node.yoyComparison && node.yoyComparison.length > 1 && (
+          <SettlementYoy yoy={node.yoyComparison} />
+        )}
+        <AudienceComposition composition={node.audienceComposition} />
+        <SiblingSettlements node={node} />
+        {(node.regulation || node.audienceNote) && (
+          <div className="rounded-lg border border-slate-200 p-3 space-y-1.5 text-[11px]">
+            {node.regulation && (
+              <div className="flex justify-between gap-2">
+                <span className="text-slate-500 shrink-0">Regulation</span>
+                <span className="text-slate-700 text-[10px] text-right">{node.regulation}</span>
+              </div>
+            )}
+            {node.audienceNote && (
+              <div className="text-[10px] text-slate-600 leading-snug italic">
+                {node.audienceNote}
+              </div>
+            )}
+          </div>
+        )}
+        {node.anchors && node.anchors.length > 0 && (
+          <div className="rounded-lg border border-slate-200 p-3">
+            <div className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mb-2">
+              Bookkeeping anchors
+            </div>
+            <ul className="space-y-2">
+              {node.anchors.map((anchor, idx) => (
+                <li key={idx} className="text-[11px]">
+                  <div className="flex items-start justify-between gap-2 mb-0.5">
+                    <code className="text-[10px] text-slate-700 font-mono break-all">
+                      {anchor.ledgerAccount}
+                    </code>
+                    <StatusPill status={anchor.status} />
+                  </div>
+                  <div className="text-slate-600 tabular-nums">{fmtEur2(anchor.amount)}</div>
+                  {anchor.note && (
+                    <div className="text-[10px] text-slate-500 italic mt-0.5">{anchor.note}</div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </MoreDetails>
     </>
   );
 }
@@ -2858,158 +3515,109 @@ function SettlementInspectorBody({ node }) {
 /* CostFlowView — the embeddable body. Used standalone via CostFlowPage and
  * embedded via GroupDetailPage's "Cost flow" tab. When `compact` is true the
  * Header skips the identity / period (those live in the wrapping shell).
- * `initialLaneId` / `initialGroupId` let a parent (e.g. Overview tab) pre-focus
- * a lane or filter to an audience Group. */
+ *
+ * Progressive disclosure model:
+ *   L1 (default) = CategoryFlowView — proportional sankey of categories ↔
+ *                  audiences. Bands are clickable; a category opens in place
+ *                  to expose its lanes (L2).
+ *   L3          = LaneDetailSheet — slide-out sheet showing the full
+ *                  per-lane canvas, opened by clicking a lane.
+ *
+ * `initialLaneId` (e.g. from Overview's "needs attention") deep-links straight
+ * to L3 by opening the sheet on that lane. */
 export function CostFlowView({
   compact = false,
   onBack,
   initialLaneId = null,
-  initialGroupId = null,
+  initialGroupId = null, // audience scope: filter L1 to flows ending at this audience
   onJumpToMeters = null,
 } = {}) {
   const flow = getCostFlow();
-  const [selectedNodeId, setSelectedNodeId] = useState(null);
-  const [selectedLaneId, setSelectedLaneId] = useState(initialGroupId ? null : initialLaneId);
-  const [selectedGroupId, setSelectedGroupId] = useState(initialGroupId);
-  const [hoveredNodeId, setHoveredNodeId] = useState(null);
-  const [hoveredGroupId, setHoveredGroupId] = useState(null);
-  const [overlay, setOverlay] = useState(false); // default OFF — less noise on first arrival
-  const [focusMode, setFocusMode] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
-  const [showEdgeLabels, setShowEdgeLabels] = useState(false);
-  // Search lives in the rail; nothing else filters at page level
-  const [searchQuery, setSearchQuery] = useState("");
-  const canvasRef = useRef(null);
-  const laneRefs = useRef({});
+  const [expandedCategoryIds, setExpandedCategoryIds] = useState(() => new Set());
+  const [sheetLaneId, setSheetLaneId] = useState(initialLaneId || null);
+  const [scopeAudienceId, setScopeAudienceId] = useState(initialGroupId || null);
+  const [fullCanvasOpen, setFullCanvasOpen] = useState(false);
 
-  // Lane → service codes (for code-aware search)
-  const laneCodes = useMemo(() => {
-    const m = {};
-    for (const lane of flow.lanes) m[lane.id] = getLaneServiceCodes(lane.id);
-    return m;
-  }, [flow.lanes]);
-
-  // Search visibility — when the user types in the rail search, build a
-  // subgraph union over matching lanes. Treated like focus visibility:
-  // non-matching lanes collapse to strips.
-  const filterVisibility = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return null;
-
-    const matching = flow.lanes.filter((lane) => {
-      const titleMatch = lane.title.toLowerCase().includes(q);
-      const codeMatch = laneCodes[lane.id]?.some((c) => c.toLowerCase().includes(q));
-      return titleMatch || codeMatch;
+  function toggleCategory(catId) {
+    setExpandedCategoryIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(catId)) next.delete(catId);
+      else next.add(catId);
+      return next;
     });
+  }
 
-    if (matching.length === flow.lanes.length) return null;
-
-    const nodes = new Set();
-    const edges = new Set();
-    for (const lane of matching) {
-      const sub = getLaneSubgraph(lane.id);
-      sub.nodes.forEach((n) => nodes.add(n));
-      sub.edges.forEach((e) => edges.add(e));
-    }
-    return { nodes, edges };
-  }, [flow.lanes, searchQuery, laneCodes]);
-
-  // ESC closes hover first, then node, then lane
-  useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === "Escape") {
-        if (hoveredNodeId) setHoveredNodeId(null);
-        else if (hoveredGroupId) setHoveredGroupId(null);
-        else if (selectedNodeId) setSelectedNodeId(null);
-        else if (selectedGroupId) setSelectedGroupId(null);
-        else if (selectedLaneId) setSelectedLaneId(null);
-        else if (focusMode) setFocusMode(false);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [hoveredNodeId, hoveredGroupId, selectedNodeId, selectedGroupId, selectedLaneId, focusMode]);
-
-  function scrollToLane(laneId) {
-    const el = laneRefs.current[laneId];
-    if (el && canvasRef.current) {
-      const top = el.offsetTop - 16;
-      canvasRef.current.scrollTo({ top, behavior: "smooth" });
+  // Batch toggle: open every category id, or clear the set entirely.
+  function toggleAllCategories(shouldOpen) {
+    if (shouldOpen) {
+      // Read categories from the live flow each time so newly added
+      // categories pick up automatically.
+      setExpandedCategoryIds(
+        new Set((flow.lanes || []).map((l) => l.category || "other"))
+      );
+    } else {
+      setExpandedCategoryIds(new Set());
     }
   }
 
-  // Honour incoming initialLaneId / initialGroupId on mount or when they change
+  // Honour incoming initialLaneId on mount or when it changes — this opens
+  // the sheet directly. We also expand the parent category in the L1 view so
+  // the lane is visible "underneath" the sheet.
   useEffect(() => {
-    if (initialGroupId) {
-      setSelectedGroupId(initialGroupId);
-      setSelectedNodeId(null);
-      setSelectedLaneId(null);
-    } else if (initialLaneId) {
-      setSelectedLaneId(initialLaneId);
-      setSelectedNodeId(null);
-      setSelectedGroupId(null);
-      const t = setTimeout(() => scrollToLane(initialLaneId), 50);
-      return () => clearTimeout(t);
+    if (initialLaneId) {
+      const lane = flow.lanes.find((l) => l.id === initialLaneId);
+      if (lane?.category) {
+        setExpandedCategoryIds((prev) => {
+          if (prev.has(lane.category)) return prev;
+          const next = new Set(prev);
+          next.add(lane.category);
+          return next;
+        });
+      }
+      setSheetLaneId(initialLaneId);
     }
-  }, [initialLaneId, initialGroupId]);
+  }, [initialLaneId, flow.lanes]);
 
-  // Focus visibility = subgraph that should remain visible.
-  // Priority: audience > toolbar search/filter > focus-mode + selection.
-  const focusVisibility = useMemo(() => {
-    if (selectedGroupId) return getAudienceSubgraph(selectedGroupId);
-    if (filterVisibility) return filterVisibility;
-    if (!focusMode) return null;
-    if (selectedNodeId) return getConnectedSubgraph(selectedNodeId);
-    if (selectedLaneId) return getLaneSubgraph(selectedLaneId);
-    return null;
-  }, [focusMode, selectedNodeId, selectedLaneId, selectedGroupId, filterVisibility]);
+  // Honour audience-scope deep-link from Overview's audience row
+  useEffect(() => {
+    if (initialGroupId) setScopeAudienceId(initialGroupId);
+  }, [initialGroupId]);
 
-  // Hover-driven highlight on top of focus
-  const hoverHighlight = useMemo(() => {
-    if (hoveredNodeId) return getConnectedSubgraph(hoveredNodeId);
-    if (hoveredGroupId) return getAudienceSubgraph(hoveredGroupId);
-    return null;
-  }, [hoveredNodeId, hoveredGroupId]);
-
-  const focusActive = !!(selectedNodeId || selectedLaneId || selectedGroupId);
-
-  // Lane the rail should *highlight* (not strictly the same as selectedLaneId —
-  // a clicked node also implies a "current lane" for visual orientation).
-  const effectiveLaneId = useMemo(() => {
-    if (selectedLaneId) return selectedLaneId;
-    if (selectedNodeId) return getNodeById(selectedNodeId)?.laneId || null;
-    return null;
-  }, [selectedLaneId, selectedNodeId]);
+  // ESC closes help (sheet handles its own ESC)
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape" && helpOpen) setHelpOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [helpOpen]);
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white">
       <Header
         flow={flow}
-        overlay={overlay}
-        setOverlay={setOverlay}
-        focusMode={focusMode}
-        setFocusMode={setFocusMode}
-        focusActive={focusActive}
-        showEdgeLabels={showEdgeLabels}
-        setShowEdgeLabels={setShowEdgeLabels}
+        overlay={false}
+        setOverlay={() => {}}
+        focusMode={false}
+        setFocusMode={() => {}}
+        focusActive={false}
+        showEdgeLabels={false}
+        setShowEdgeLabels={() => {}}
         onOpenHelp={() => setHelpOpen(true)}
         onBack={onBack}
         compact={compact}
       />
-      <AudiencesBand
-        selectedGroupId={selectedGroupId}
-        setSelectedGroupId={(id) => {
-          setSelectedGroupId(id);
-          // Clear node/lane selection so audience scope drives the view
-          if (id) {
-            setSelectedNodeId(null);
-            setSelectedLaneId(null);
-          }
-        }}
-        hoveredGroupId={hoveredGroupId}
-        setHoveredGroupId={setHoveredGroupId}
-        rightActions={compact ? (
-          <>
+
+      {/* Slim utility bar in compact mode — Help button only. The period
+       * lives in the ShellHeader as "{year} distribution"; we don't repeat
+       * it here. */}
+      {compact && (
+        <div className="flex items-center gap-2 px-6 py-2 border-b border-slate-200 bg-slate-50/40">
+          <span className="text-[11px] text-slate-500">
+            {flow.lanes.length} lane{flow.lanes.length === 1 ? "" : "s"}
+          </span>
+          <div className="ml-auto flex items-center gap-2">
             <button
               onClick={() => setHelpOpen(true)}
               className="inline-flex items-center justify-center w-7 h-7 rounded-md border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900"
@@ -3017,77 +3625,39 @@ export function CostFlowView({
             >
               <HelpCircle size={13} />
             </button>
-            <ViewOptionsMenu
-              overlay={overlay}
-              setOverlay={setOverlay}
-              focusMode={focusMode}
-              setFocusMode={setFocusMode}
-              focusActive={focusActive}
-              showEdgeLabels={showEdgeLabels}
-              setShowEdgeLabels={setShowEdgeLabels}
-            />
-          </>
-        ) : null}
-      />
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-1 min-h-0">
-        <SourceRail
-          flow={flow}
-          selectedLaneId={selectedLaneId}
-          effectiveLaneId={effectiveLaneId}
-          setSelectedLaneId={(id) => {
-            setSelectedLaneId(id);
-            setSelectedNodeId(null);
-          }}
-          scrollToLane={scrollToLane}
-          query={searchQuery}
-          setQuery={setSearchQuery}
+        <CategoryFlowView
+          expandedCategoryIds={expandedCategoryIds}
+          toggleCategory={toggleCategory}
+          toggleAllCategories={toggleAllCategories}
+          onSelectLane={(laneId) => setSheetLaneId(laneId)}
+          scopeAudienceId={scopeAudienceId}
+          onScopeAudience={(id) => setScopeAudienceId(id)}
+          onClearScope={() => setScopeAudienceId(null)}
+          onOpenFullCanvas={() => setFullCanvasOpen(true)}
         />
-        <Canvas
-          flow={flow}
-          selectedNodeId={selectedNodeId}
-          setSelectedNodeId={(id) => {
-            // Don't implicitly sync selectedLaneId — closing the node
-            // inspector should not leave a Lane Overview behind.
-            setSelectedNodeId(id);
-          }}
-          overlay={overlay}
-          hoveredNodeId={hoveredNodeId}
-          setHoveredNodeId={setHoveredNodeId}
-          hoverHighlight={hoverHighlight}
-          focusVisibility={focusVisibility}
-          showEdgeLabels={showEdgeLabels}
-          setSelectedLaneId={(id) => {
-            setSelectedLaneId(id);
-            setSelectedNodeId(null);
-            setSelectedGroupId(null);
-          }}
-          canvasRef={canvasRef}
-          laneRefs={laneRefs}
-          onBackgroundClick={() => {
-            setSelectedNodeId(null);
-            setSelectedLaneId(null);
-            setSelectedGroupId(null);
-          }}
-        />
-        {helpOpen ? (
-          <HelpPanel onClose={() => setHelpOpen(false)} />
-        ) : selectedNodeId ? (
-          <Inspector
-            nodeId={selectedNodeId}
-            onClose={() => setSelectedNodeId(null)}
-            onJumpToMeters={onJumpToMeters}
-          />
-        ) : selectedLaneId ? (
-          <LaneOverview
-            flow={flow}
-            laneId={selectedLaneId}
-            onClose={() => setSelectedLaneId(null)}
-            onPickNode={(id) => setSelectedNodeId(id)}
-          />
-        ) : null}
+        {helpOpen && <HelpPanel onClose={() => setHelpOpen(false)} />}
       </div>
 
+      {sheetLaneId && (
+        <LaneDetailSheet
+          laneId={sheetLaneId}
+          onClose={() => setSheetLaneId(null)}
+          onJumpToLane={(laneId) => setSheetLaneId(laneId)}
+          onJumpToMeters={onJumpToMeters}
+        />
+      )}
+
+      {fullCanvasOpen && (
+        <FullCanvasSheet
+          onClose={() => setFullCanvasOpen(false)}
+          onJumpToMeters={onJumpToMeters}
+        />
+      )}
     </div>
   );
 }

@@ -31,6 +31,7 @@ import {
   fmtEur2,
   fmtSignedEur,
   anchorStatusBucket,
+  setActiveGroup,
 } from "@/lib/costFlow";
 import { CostFlowView } from "./CostFlowPage";
 
@@ -44,46 +45,31 @@ const TABS = [
   { id: "activity",    label: "Activity",    icon: Activity },
 ];
 
-const PERIODS = [2024, 2023, 2022];
-
 /* ─── Shell ────────────────────────────────────────────── */
-function ShellHeader({ flow, period, setPeriod, onBack }) {
+/* The cost flow is the historical distribution for one specific year.
+ * The period is fixed by the data; surfaced as a static badge, not as a
+ * selector — picking a different year is a different distribution entirely. */
+function ShellHeader({ flow, onBack }) {
   return (
-    <div className="border-b border-slate-200 bg-white px-6 pt-3 pb-0">
+    <div className="border-b border-slate-200 bg-white px-6 pt-3 pb-3">
       <button
         onClick={onBack}
         className="inline-flex items-center gap-1.5 text-[11px] text-slate-500 hover:text-slate-700 mb-2"
       >
         <ArrowLeft size={12} /> Buildings
       </button>
-      <div className="flex items-center justify-between gap-6">
-        <div className="min-w-0">
-          <div className="flex items-baseline gap-3">
-            <h1 className="text-xl font-semibold text-slate-900">
-              {flow.group.name}
-            </h1>
-            <span className="text-xs text-slate-400">
-              {flow.group.city} · {flow.group.vheCount} VHE · merged from{" "}
-              {flow.group.sourceComplexes.map((c) => `cpl ${c}`).join(" + ")}
-            </span>
-          </div>
-        </div>
-        <div className="shrink-0">
-          {/* Period selector */}
-          <label className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-slate-200 bg-slate-50 text-xs text-slate-600">
-            <Calendar size={12} className="text-slate-400" />
-            <span className="text-[10px] uppercase tracking-widest text-slate-400">Period</span>
-            <select
-              value={period}
-              onChange={(e) => setPeriod(parseInt(e.target.value, 10))}
-              className="bg-transparent outline-none text-slate-700 font-medium tabular-nums"
-            >
-              {PERIODS.map((p) => (
-                <option key={p} value={p}>{p}</option>
-              ))}
-            </select>
-          </label>
-        </div>
+      <div className="flex items-baseline gap-3 flex-wrap">
+        <h1 className="text-xl font-semibold text-slate-900">
+          {flow.group.name}
+        </h1>
+        <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-slate-600 font-semibold px-2 h-5 rounded border border-slate-200 bg-slate-50">
+          <Calendar size={10} className="text-slate-400" />
+          {flow.period} distribution
+        </span>
+        <span className="text-xs text-slate-400">
+          {flow.group.city} · {flow.group.vheCount} VHE · merged from{" "}
+          {flow.group.sourceComplexes.map((c) => `cpl ${c}`).join(" + ")}
+        </span>
       </div>
     </div>
   );
@@ -148,157 +134,24 @@ function KpiCard({ label, value, sub, accent }) {
   );
 }
 
-/* Derive a status label + tone for a settlement row in Costs at a glance.
- * Priority: wrong_account > missing > matched_partial > settlesViaIsta > matched. */
-function deriveSettlementStatus(node, flow) {
-  const sourcesInLane = flow.nodes.filter((n) => n.laneId === node.laneId && n.type === "source");
-  const allAnchors = sourcesInLane.flatMap((n) => n.anchors || []);
-
-  const wrongAccountTotal = allAnchors
-    .filter((a) => a.status === "wrong_account")
-    .reduce((s, a) => s + a.amount, 0);
-  if (wrongAccountTotal > 0) {
-    return { tone: "error", label: `Wrong account ${fmtEur(wrongAccountTotal)}` };
-  }
-  if (allAnchors.some((a) => a.status === "missing")) {
-    return { tone: "error", label: "Missing entries" };
-  }
-  if (allAnchors.some((a) => a.status === "matched_partial")) {
-    return { tone: "warn", label: "Partially reconciled" };
-  }
-  if (node.settlesViaIsta) {
-    return { tone: "info", label: "Settled via Ista" };
-  }
-  return { tone: "ok", label: "Reconciled" };
-}
-
-function CostRowDelta({ delta }) {
-  if (delta == null) return <span className="text-slate-400">—</span>;
-  if (Math.abs(delta) <= 1) return <span className="text-slate-500 tabular-nums">€0</span>;
-  const positive = delta > 0;
-  return (
-    <span className={`inline-flex items-center gap-1 tabular-nums ${positive ? "text-amber-700" : "text-emerald-700"}`}>
-      {positive ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
-      {fmtSignedEur(delta)}
-    </span>
-  );
-}
-
-function CostStatusBadge({ tone, label }) {
-  const cfg = {
-    ok:    { Icon: CheckCircle2, className: "text-slate-600" },
-    warn:  { Icon: AlertTriangle, className: "text-amber-700" },
-    error: { Icon: AlertCircle,   className: "text-red-700" },
-    info:  { Icon: Info,          className: "text-slate-500" },
-  }[tone] || { Icon: Info, className: "text-slate-500" };
-  return (
-    <span className={`inline-flex items-center gap-1.5 text-[11px] ${cfg.className}`}>
-      <cfg.Icon size={12} />
-      {label}
-    </span>
-  );
-}
-
-function CostsAtAGlance({ flow, onJumpToCostFlow }) {
-  const rows = useMemo(() => {
-    return flow.nodes
-      .filter((n) => n.type === "settlement" && !n.outOfScope)
-      .map((n) => {
-        const status = deriveSettlementStatus(n, flow);
-        // Strip the trailing service code from the label for a cleaner Service column
-        const serviceName = (n.label || "").replace(/\s*[\/—]\s*[A-Z]+\d+G$/, "").trim();
-        return {
-          ...n,
-          serviceName,
-          status,
-        };
-      });
-  }, [flow]);
-
-  const totalCost = rows.reduce((s, r) => s + (r.amount || 0), 0);
-  const totalIssues = rows.filter((r) => r.status.tone === "error" || r.status.tone === "warn").length;
-
-  return (
-    <section>
-      <div className="flex items-baseline justify-between mb-2">
-        <h2 className="text-sm font-semibold text-slate-900">Costs at a glance</h2>
-        <div className="flex items-center gap-3">
-          <span className="text-[11px] text-slate-500">
-            click any row to open it in the flow
-          </span>
-        </div>
-      </div>
-      <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
-        <table className="w-full text-[12px]">
-          <thead className="bg-slate-50/80 text-[10px] uppercase tracking-widest text-slate-500">
-            <tr>
-              <th className="text-left font-semibold px-3 py-2">Service</th>
-              <th className="text-left font-semibold px-3 py-2">Audience</th>
-              <th className="text-right font-semibold px-3 py-2">Cost</th>
-              <th className="text-right font-semibold px-3 py-2">Advance</th>
-              <th className="text-right font-semibold px-3 py-2">Delta</th>
-              <th className="text-left font-semibold px-3 py-2">Status</th>
-              <th className="px-3 py-2 w-6" />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {rows.map((r) => (
-              <tr
-                key={r.id}
-                onClick={() => onJumpToCostFlow?.(r.laneId)}
-                className="cursor-pointer hover:bg-slate-50 transition-colors group"
-              >
-                <td className="px-3 py-2">
-                  <div className="text-slate-800 font-medium leading-tight truncate">{r.serviceName}</div>
-                  <div className="text-[10px] text-slate-400 font-mono leading-tight">{r.serviceCode}</div>
-                </td>
-                <td className="px-3 py-2 text-slate-600 truncate max-w-[220px]">{r.subLabel}</td>
-                <td className="px-3 py-2 text-right tabular-nums text-slate-800">{fmtEur(r.amount)}</td>
-                <td className="px-3 py-2 text-right tabular-nums text-slate-500">
-                  {r.advance != null ? fmtEur(r.advance) : "—"}
-                </td>
-                <td className="px-3 py-2 text-right">
-                  <CostRowDelta delta={r.delta} />
-                </td>
-                <td className="px-3 py-2">
-                  <CostStatusBadge tone={r.status.tone} label={r.status.label} />
-                </td>
-                <td className="px-3 py-2 text-slate-300 group-hover:text-slate-500">
-                  <ChevronRight size={13} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-          <tfoot className="bg-slate-50/40 text-[11px]">
-            <tr>
-              <td className="px-3 py-2 text-slate-600 font-medium" colSpan={2}>
-                Total · {rows.length} services
-              </td>
-              <td className="px-3 py-2 text-right tabular-nums text-slate-800 font-semibold">
-                {fmtEur(totalCost)}
-              </td>
-              <td className="px-3 py-2" />
-              <td className="px-3 py-2" />
-              <td className="px-3 py-2 text-slate-500">
-                {totalIssues > 0
-                  ? `${totalIssues} ${totalIssues === 1 ? "issue" : "issues"} to review`
-                  : "All reconciled"}
-              </td>
-              <td />
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    </section>
-  );
-}
+const AUDIENCE_KIND_LABELS = {
+  complex:    "Complex",
+  block:      "Block",
+  commercial: "BOG",
+  subgroup:   "Subgroup",
+  external:   "External",
+};
+const AUDIENCE_KIND_STRIPES = {
+  complex:    "bg-slate-700",
+  block:      "bg-slate-500",
+  commercial: "bg-amber-500",
+  subgroup:   "bg-slate-400",
+  external:   "bg-slate-300",
+};
 
 function AudienceRow({ audience, onOpenInCostFlow }) {
-  const stripeColor = {
-    complex: "bg-slate-700",
-    block:   "bg-slate-500",
-    adhoc:   "bg-amber-500",
-  }[audience.kind] || "bg-slate-300";
+  const stripeColor = AUDIENCE_KIND_STRIPES[audience.kind] || "bg-slate-300";
+  const kindLabel = AUDIENCE_KIND_LABELS[audience.kind] || "Subgroup";
   return (
     <div className="flex items-stretch rounded-lg border border-slate-200 bg-white">
       <span className={`w-1 rounded-l-lg ${stripeColor}`} aria-hidden />
@@ -306,7 +159,7 @@ function AudienceRow({ audience, onOpenInCostFlow }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">
-              {audience.kind === "complex" ? "Complex" : audience.kind === "block" ? "Block" : "Ad-hoc"}
+              {kindLabel}
             </span>
             <span className="text-sm font-medium text-slate-800">{audience.name}</span>
             <span className="text-[11px] text-slate-400">· {audience.vheCount} VHE</span>
@@ -372,8 +225,9 @@ function OverviewTab({ flow, onJumpToCostFlow }) {
       const s = summariseLane(lane.id);
       totalExpected += s.expected;
       if (s.netDelta != null) {
-        if (s.netDelta > 0) collectTotal += s.netDelta;
-        else if (s.netDelta < 0) refundTotal += Math.abs(s.netDelta);
+        // delta = advance − actual: positive → refund, negative → collect.
+        if (s.netDelta > 0) refundTotal += s.netDelta;
+        else if (s.netDelta < 0) collectTotal += Math.abs(s.netDelta);
       }
     }
     return { totalExpected, collectTotal, refundTotal };
@@ -434,9 +288,6 @@ function OverviewTab({ flow, onJumpToCostFlow }) {
             accent="emerald"
           />
         </div>
-
-        {/* Costs at a glance — the simple table view */}
-        <CostsAtAGlance flow={flow} onJumpToCostFlow={onJumpToCostFlow} />
 
         {/* Audiences */}
         <section>
@@ -666,9 +517,10 @@ function SettlementsTab({ flow }) {
   );
 
   function dirOf(d) {
+    // delta = advance − actual: positive → refund, negative → collect.
     if (d == null) return null;
-    if (d > 1) return "collect";
-    if (d < -1) return "refund";
+    if (d > 1) return "refund";
+    if (d < -1) return "collect";
     return "balanced";
   }
 
@@ -858,12 +710,15 @@ function ActivityTab() {
 /* ─── Page ─────────────────────────────────────────────── */
 export default function GroupDetailPage() {
   const { groupId } = useParams();
+  // Set the active flow synchronously BEFORE children read getCostFlow().
+  // Idempotent — safe to call on every render.
+  setActiveGroup(groupId);
+
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [period, setPeriod] = useState(2024);
+  const flow = getCostFlow();
   // Pending focus the Overview clicked into; threaded into CostFlowView
   const [pendingFocus, setPendingFocus] = useState(null);
-  const flow = getCostFlow();
 
   const activeTab =
     TABS.find((t) => t.id === searchParams.get("tab"))?.id || "overview";
@@ -888,12 +743,7 @@ export default function GroupDetailPage() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white">
-      <ShellHeader
-        flow={flow}
-        period={period}
-        setPeriod={setPeriod}
-        onBack={() => navigate(-1)}
-      />
+      <ShellHeader flow={flow} onBack={() => navigate(-1)} />
       <TabBar tabs={TABS} activeId={activeTab} onChange={setTab} />
 
       <div className="flex-1 min-h-0 overflow-hidden bg-slate-50/30">
