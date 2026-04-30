@@ -4,3 +4,4 @@ dist
 *.local
 .vercel
 package-lock.json.bak
+*.bak
